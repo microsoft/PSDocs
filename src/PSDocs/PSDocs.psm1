@@ -89,16 +89,21 @@ function Invoke-PSDocument {
 # Internal language keywords
 #
 
-# Implement the section keyword
+# Implement the Section keyword
 function Section {
+
     [CmdletBinding()]
+    [OutputType([PSObject])]
     param (
+        # The name of the Section
         [Parameter(Position = 0, Mandatory = $True)]
         [String]$Name,
 
+        # A script block with the body of the Section
         [Parameter(Position = 1, Mandatory = $True)]
         [ScriptBlock]$Body,
 
+        # Optionally a condition that must be met prior to including the Section
         [Parameter(Mandatory = $False)]
         [ScriptBlock]$When
     )
@@ -111,6 +116,7 @@ function Section {
 
         $shouldProcess = $True;
 
+        # Evaluate if the Section condition is met
         if ($Null -ne $When) {
 
             Write-Verbose -Message "[Doc][Section] -- When: $When";
@@ -124,6 +130,7 @@ function Section {
             }
         }
 
+        # Run Section block if condition was met
         if ($shouldProcess) {
             Write-Verbose -Message "[Doc][Section] -- Adding section: $Name";
 
@@ -131,12 +138,14 @@ function Section {
 
             $Section = $result;
 
+            # Invoke the Section body and collect the results
             $innerResult = $Body.Invoke();
 
             foreach ($r in $innerResult) {
                 $result.Node += $r;
             }
 
+            # Emit Section object to the pipeline
             $result;
         }
     }
@@ -758,18 +767,7 @@ function NewMarkdownProcessor {
             return $Input;
         }
         
-        Add-Member -InputObject $result -MemberType ScriptMethod -Name 'Section' -Value {
-            param ($Input)
-            Write-Verbose -Message "[Doc][Processor] -- Visit section";
-            "`n$(''.PadLeft($Input.Level, '#')) $($Input.Content)";
-
-            foreach ($n in $Input.Node) {
-
-                Write-Verbose -Message "[Doc][Processor] -- Visit section node";
-
-                $This.Visit($n);
-            }
-        }
+        Add-Member -InputObject $result -MemberType ScriptMethod -Name 'Section' -Value { VisitSection; };
 
         Add-Member -InputObject $result -MemberType ScriptMethod -Name 'Code' -Value {
             param ($Input)
@@ -885,6 +883,24 @@ function NewMarkdownProcessor {
         # $result.Methods.Add((New-Object -TypeName PSScriptMethod -ArgumentList @('Default', { })));
 
         $result;
+    }
+}
+
+function VisitSection {
+
+    param (
+        $Input
+    )
+
+    Write-Verbose -Message "[Doc][Processor] -- Visit section";
+
+    "`n$(''.PadLeft($Input.Level, '#')) $($Input.Content)";
+
+    foreach ($n in $Input.Node) {
+
+        Write-Verbose -Message "[Doc][Processor] -- Visit section node";
+
+        $This.Visit($n);
     }
 }
 
