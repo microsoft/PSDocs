@@ -59,7 +59,7 @@ function RunTest {
             Write-Verbose -Message "[RunTest] -- Running tests: $Path\$TestGroup.Tests";
 
             # Run Pester tests
-            $pesterParams = @{ OutputFile = "$OutputPath\$TestGroup.xml"; OutputFormat = 'NUnitXml'; };
+            $pesterParams = @{ OutputFile = "$OutputPath\$TestGroup.xml"; OutputFormat = 'NUnitXml'; PesterOption = @{ IncludeVSCodeMarker = $True }; };
 
             Invoke-Pester @pesterParams;
 

@@ -5,25 +5,22 @@
     "tasks": [
         {
             "taskName": "test",
-            "command": "powershell.exe",
+            "type": "shell",
+            "command": ".\\scripts\\test.ps1",
             "group": {
                 "kind": "test",
                 "isDefault": true
             },
-            "args": [
-                "-ExecutionPolicy", "Bypass", "-File", "scripts\\test.ps1"
-            ]
+            "problemMatcher": [ "$pester" ]
         },
         {
             "taskName": "build",
-            "command": "powershell.exe",
+            "type": "shell",
+            "command": ".\\scripts\\build.ps1 -Clean -Module PSDocs",
             "group": {
                 "kind": "build",
                 "isDefault": true
-            },
-            "args": [
-                "-ExecutionPolicy", "Bypass", "-File", "scripts\\build.ps1", "-Clean", "-Module", "PSDocs"
-            ]
+            }
         }
     ]
 }

@@ -39,7 +39,7 @@ Write-Verbose -Message "[Test] -- Creating output paths";
 # STEP : Run tests
 
 # Load Pester module
-Import-Module -Name Pester -RequiredVersion '3.4.0' -Verbose:$False;
+Import-Module -Name Pester -Verbose:$False;
 
 @('PSDocs') | RunTest -Path $testPath -OutputPath $reportsPath -Verbose:$VerbosePreference;
 
