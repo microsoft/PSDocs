@@ -136,3 +136,46 @@ function PackageModule {
         Write-Verbose -Message "[PackageModule] END::";
     }
 }
+
+function SendAppveyorTestResult {
+
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $True)]
+        [String]$Uri,
+
+        [Parameter(Mandatory = $True)]
+        [String]$Path,
+
+        [Parameter(Mandatory = $False)]
+        [String]$Include = '*'
+    )
+
+    begin {
+        Write-Verbose -Message "[SendAppveyorTestResult] BEGIN::";
+    }
+
+    process {
+
+        try {
+            $webClient = New-Object -TypeName 'System.Net.WebClient';
+
+            foreach ($resultFile in (Get-ChildItem -Path $Path -Filter $Include -File -Recurse)) {
+
+                Write-Verbose -Message "[SendAppveyorTestResult] -- Uploading file: $($resultFile.FullName)";
+
+                $webClient.UploadFile($Uri, "$($resultFile.FullName)");
+            }
+        }
+        catch {
+            throw $_.Exception;
+        }
+        finally {
+            $webClient = $Null;
+        }
+    }
+
+    end {
+        Write-Verbose -Message "[SendAppveyorTestResult] END::";
+    }
+}

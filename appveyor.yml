@@ -1,12 +1,9 @@
 version: 0.1.0.{build}
 image: Visual Studio 2017
 
-install:
-
-- ps: Install-Module -Name Pester -Force;
-
 build: off
 
 test_script:
-
-- ps: .\scripts\test.ps1
+    - ps: |
+    
+        .\scripts\test.ps1

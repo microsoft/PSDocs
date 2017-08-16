@@ -43,4 +43,10 @@ Import-Module -Name Pester -Verbose:$False;
 
 @('PSDocs') | RunTest -Path $testPath -OutputPath $reportsPath -Verbose:$VerbosePreference;
 
+# STEP : Publish results
+
+if (![String]::IsNullOrEmpty($Env:APPVEYOR_JOB_ID)) {
+    SendAppveyorTestResult -Uri "https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)" -Path '.\reports' -Include '*.xml';
+}
+
 Write-Verbose -Message "[Test] END::";
