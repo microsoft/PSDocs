@@ -20,32 +20,68 @@ $temp = "$here\..\..\build";
 
 Import-Module $src -Force;
 
-$outputPath = "$temp\PSDocs.Tests";
+$outputPath = "$temp\PSDocs.Tests\Section";
 New-Item $outputPath -ItemType Directory -Force | Out-Null;
 
 $dummyObject = New-Object -TypeName PSObject;
 
-document 'SectionBlockTests' {
-    Section 'Test' {
-
-    }
-}
+$Global:TestVars = @{ };
 
 Describe 'PSDocs -- Section keyword' {
-    Context 'Section block' {
+    Context 'Simple Section block' {
+
+        # Define a test document with a section block
+        document 'SectionBlockTests' {
+            Section 'Test' {
+                'Content'
+            }
+        }
 
         Mock -CommandName 'VisitSection' -ModuleName 'PSDocs' -Verifiable -MockWith {
             param (
-                $Input
+                $InputObject
             )
+
+            $Global:TestVars['VisitSection'] = $InputObject;
         }
 
-        $result = Invoke-PSDocument -Name 'SectionBlockTests' -InstanceName 'SectionBlock' -InputObject $dummyObject -OutputPath $outputPath;
+        Invoke-PSDocument -Name 'SectionBlockTests' -InstanceName 'Section' -InputObject $dummyObject -OutputPath $outputPath;
 
-        # It 'Section block processed successfully' {
-        #     $result | Should not be $Null;
-        # }
+        It 'Should process Section keyword' {
+            Assert-MockCalled -CommandName 'VisitSection' -ModuleName 'PSDocs' -Times 1;
+        }
 
-        Assert-MockCalled -CommandName 'VisitSection' -ModuleName 'PSDocs' -Times 1;
+        It 'Should be Section object' {
+            $Global:TestVars['VisitSection'].Type | Should be 'Section';
+        }
+
+        It 'Should have expected section name' {
+            $Global:TestVars['VisitSection'].Content | Should be 'Test';
+        }
+
+        It 'Should have expected section level' {
+            $Global:TestVars['VisitSection'].Level | Should be 2;
+        }
+    }
+
+    Context 'Section markdown' {
+
+        # Define a test document with a section block
+        document 'SectionBlockTests' {
+            Section 'Test' {
+                'Content'
+            }
+        }
+
+        $outputDoc = "$outputPath\Section.md";
+        Invoke-PSDocument -Name 'SectionBlockTests' -InstanceName 'Section' -InputObject $dummyObject -OutputPath $outputPath;
+
+        It 'Should have generated output' {
+            Test-Path -Path $outputDoc | Should be $True;
+        }
+
+        It 'Should match expected format' {
+            Get-Content -Path $outputDoc -Raw | Should match '## Test(\n|\r){1,2}Content';
+        }
     }
 }
