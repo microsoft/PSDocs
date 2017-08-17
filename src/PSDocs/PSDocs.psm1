@@ -7,7 +7,7 @@
 #
 
 $LocalizedData = data {
-
+    
 }
 
 Import-LocalizedData -BindingVariable LocalizedData -FileName 'PSDocs.Resources.psd1' -ErrorAction SilentlyContinue;
@@ -47,13 +47,13 @@ function Invoke-PSDocument {
     [CmdletBinding()]
     param (
         # The name of the document
-        [Parameter(Mandatory = $True)]
+        [Parameter(Position = 0, Mandatory = $True)]
         [String]$Name,
 
         [Parameter(Mandatory = $False)]
-        [String]$InstanceName,
+        [String[]]$InstanceName,
         
-        [Parameter(Mandatory = $True, ValueFromPipeline = $True)]
+        [Parameter(Mandatory = $False, ValueFromPipeline = $True)]
         [PSObject]$InputObject,
 
         [Parameter(Mandatory = $False)]
@@ -65,7 +65,7 @@ function Invoke-PSDocument {
 
         # The output path to save generated documentation
         [Parameter(Mandatory = $False)]
-        [String]$OutputPath,
+        [String]$OutputPath = $PWD,
 
         [Parameter(Mandatory = $False)]
         [ValidateNotNull()]
@@ -74,8 +74,6 @@ function Invoke-PSDocument {
 
     process {
         Write-Verbose -Message "[Invoke-PSDocument]::BEGIN";
-
-        Write-Verbose -Message "[Invoke-PSDocument] -- Processing: $InstanceName";
 
         $fnParams = $PSBoundParameters;
 
@@ -212,94 +210,6 @@ function List {
     }
 }
 
-function Table {
-    [CmdletBinding()]
-    param (
-        [Parameter(Position = 0, Mandatory = $True)]
-        [String[]]$Header,
-
-        [Parameter(Position = 1, Mandatory = $True)]
-        [ScriptBlock]$Body
-    )
-
-    process {
-
-
-        $table = New-Object -TypeName PSObject -Property @{ Type = 'Table'; Header = $Header; Rows = (New-Object -TypeName Collections.Generic.List[String[]]); ColumnCount = 0; };
-
-        $functionsToDefine = New-Object -TypeName 'System.Collections.Generic.Dictionary[string,ScriptBlock]'([System.StringComparer]::OrdinalIgnoreCase);
-        $functionsToDefine.Add('Row', ${function:Row});
-
-        [PSVariable[]]$variablesToDefine = @(
-            New-Object -TypeName PSVariable -ArgumentList ('Table', $table)
-        );
-
-        $Body.InvokeWithContext($functionsToDefine, $variablesToDefine) | Out-Null;
-
-        # foreach ($r in $innerResult) {
-        #     $result.Rows += $r;
-        # }
-
-        $table;
-    }
-}
-
-function Row {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory = $True, ValueFromPipeline = $True)]
-        [AllowNull()]
-        [Object]$InputObject,
-
-        [Parameter(Mandatory = $False, Position = 0)]
-        [String[]]$Property
-    )
-
-    begin {
-        $rowIndex = $Table.Rows.Count;
-
-        if ($Null -eq $Table) {
-            Write-Error -Message 'Failed to find table'
-        }
-
-        [String[]]$objectFields = @($Table.Header);
-
-        if ($Null -ne $Property -and $Property.Count -gt 0) {
-
-            for ($i = 0; $i -lt $objectFields.Count -and $i -lt $Property.Count; $i++)
-            {
-                $objectFields[$i] = $Property[$i];
-            }
-        }
-    }
-
-    process {
-
-        Write-Verbose -Message "[Row][$rowindex]`t-- Adding  '$($InputObject)'";
-
-        [String[]]$row = , [String]::Empty * $Table.Header.Count;
-
-        if ($Null -eq $InputObject) {
-
-        } else {
-            
-            for ($i = 0; $i -lt $row.Count; $i++) {
-                $field = GetObjectField -InputObject $InputObject -Field $objectFields[$i] -Verbose:$VerbosePreference;
-
-                if ($Null -ne $field -and $Null -ne $field.Value) {
-                    $row[$i] = $field.Value;
-                }
-            }
-        }
-
-        $Table.Rows.Add($row);
-    }
-
-    end {
-        
-    }
-}
-
 function Note {
 
     [CmdletBinding()]
@@ -360,7 +270,7 @@ function Yaml {
     }
 }
 
-function FormatTable {
+function Table {
 
     [CmdletBinding()]
     param (
@@ -372,7 +282,7 @@ function FormatTable {
     )
 
     begin {
-        Write-Verbose -Message "[Doc][FormatTable] BEGIN::";
+        Write-Verbose -Message "[Doc][Table] BEGIN::";
 
         $table = New-Object -TypeName PSObject -Property @{ Type = 'Table'; Header = @(); Rows = (New-Object -TypeName Collections.Generic.List[String[]]); ColumnCount = 0; };
 
@@ -389,9 +299,9 @@ function FormatTable {
 
     process {
 
-        Write-Verbose -Message "[Doc][FormatTable][$recordIndex] BEGIN::";
+        Write-Verbose -Message "[Doc][Table][$recordIndex] BEGIN::";
 
-        Write-Verbose -Message "[Doc][FormatTable][$recordIndex] -- Adding  '$($InputObject)'";
+        Write-Verbose -Message "[Doc][Table][$recordIndex] -- Adding  '$($InputObject)'";
 
         if ($Null -ne $InputObject) {
             $selectedObject = Select-Object -InputObject $InputObject -Property $Property;
@@ -399,7 +309,7 @@ function FormatTable {
             $rowData.Add($selectedObject);
         }
 
-        Write-Verbose -Message "[Doc][FormatTable][$recordIndex] END::";
+        Write-Verbose -Message "[Doc][Table][$recordIndex] END::";
 
         $recordIndex++;
     }
@@ -430,7 +340,7 @@ function FormatTable {
 
         $table;
 
-        Write-Verbose -Message "[Doc][FormatTable] END::";
+        Write-Verbose -Message "[Doc][Table] END::";
     }
 }
 
@@ -519,7 +429,7 @@ function GenerateDocumentFn {
         [Object]$ConfigurationData,
 
         [Parameter(Mandatory = $False)]
-        [String]$OutputPath
+        [String]$OutputPath = $PWD
     )
 
     process {
@@ -540,9 +450,9 @@ function GenerateDocument {
         [String]$Name,
 
         [Parameter(Mandatory = $False)]
-        [String]$InstanceName,
+        [String[]]$InstanceName,
 
-        [Parameter(Mandatory = $True)]
+        [Parameter(Mandatory = $False)]
         [PSObject]$InputObject,
 
         [Parameter(Mandatory = $False)]
@@ -552,21 +462,23 @@ function GenerateDocument {
         [String]$Path = $PWD,
 
         [Parameter(Mandatory = $False)]
-        [String]$OutputPath,
+        [String]$OutputPath = $PWD,
 
         [Parameter(Mandatory = $False)]
         [System.Collections.Generic.Dictionary[String, ScriptBlock]]$Function
     )
 
     begin {
-        if (!$Script:DocumentBody.ContainsKey($Name)) {
-            Write-Error -Message "Failed to get document body.";
+        if ($Null -eq $Script:DocumentBody -or !$Script:DocumentBody.ContainsKey($Name)) {
+            
+            Write-Error -Message ($LocalizedData.DocumentNotFound -f $Name) -ErrorAction Stop;
 
             return;
         }
 
         [Hashtable]$parameter = $Null;
 
+        # Import configuration data from either a hashtable or .psd1 file
         if ($ConfigurationData -is [Hashtable]) {
             $parameter = $ConfigurationData
         } elseif ($ConfigurationData -is [String] -and (Test-Path -Path $ConfigurationData -File)) {
@@ -576,53 +488,66 @@ function GenerateDocument {
             Import-LocalizedData -BindingVariable parameter -BaseDirectory $parentPath -FileName $leafPath;
         }
 
-        # Process pipeline input
-
-        # $pi = ParseMofDocument -Path $FileInfo.FullName -Verbose:$VerbosePreference;
-
-        # Run document
-
         $body = $Script:DocumentBody[$Name];
 
+        # Prepare PSDocs language functions
         $functionsToDefine = New-Object -TypeName 'System.Collections.Generic.Dictionary[String,ScriptBlock]'([System.StringComparer]::OrdinalIgnoreCase);
 
+        # Add external functions
         if ($Null -ne $Function -and $Function.Count -gt 0) {
             foreach ($fn in $Function) {
                 $functionsToDefine.Add($fn.Key, $fn.Value);
             }
         }
 
+        # Define built-in functions
         $functionsToDefine['Section'] = ${function:Section};
         $functionsToDefine['Title'] = ${function:Title};
         $functionsToDefine['List'] = ${function:List};
         $functionsToDefine['Code'] = ${function:Code};
-        $functionsToDefine['Table'] = ${function:Table};
         $functionsToDefine['Note'] = ${function:Note};
         $functionsToDefine['Warning'] = ${function:Warning};
         $functionsToDefine['Yaml'] = ${function:Yaml};
-        $functionsToDefine['Format-Table'] = ${function:FormatTable};
+        $functionsToDefine['Table'] = ${function:Table};
+        $functionsToDefine['Format-Table'] = ${function:Table};
         $functionsToDefine['Format-List'] = ${function:FormatList};
     }
 
     process {
 
-        $instances = $InstanceName;
+        [String[]]$instances = @($InstanceName);
 
+        # If an instance name is not specified, default to the document name
+        if ($Null -eq $InstanceName) {
+            $instances = @($Name);
+        }
+
+        # Set the default section level so that sections in the document start from 2
         $Section = @{ Level = 1; };
 
         foreach ($instance in $instances) {
+
+            Write-Verbose -Message "[Doc] -- Processing: $instance";
+
+            # Define built-in variables
             [PSVariable[]]$variablesToDefine = @(
-                New-Object -TypeName PSVariable -ArgumentList ('NodeName', $InstanceName)
+                New-Object -TypeName PSVariable -ArgumentList ('InstanceName', $instance)
                 New-Object -TypeName PSVariable -ArgumentList ('InputObject', $InputObject)
                 New-Object -TypeName PSVariable -ArgumentList ('Parameter', $parameter)
                 New-Object -TypeName PSVariable -ArgumentList ('Section', $Section)
             );
 
+            # Invoke the body of the document definition and get the output
             $innerResult = $body.InvokeWithContext($functionsToDefine, $variablesToDefine);
 
-            $dom = New-Object -TypeName PSObject -Property @{ Node = $innerResult };
+            # Create a document object model based on the output
+            $dom = New-Object -TypeName PSObject -Property @{ Node = $innerResult; };
+            
+            # Build a path for the document
+            $documentPath = Join-Path -Path $OutputPath -ChildPath "$instance.md";
 
-            ParseDom -Dom $dom -Processor (NewMarkdownProcessor) -Verbose:$VerbosePreference | WriteDocumentContent -Path "$OutputPath\$InstanceName.md";
+            # Parse the model
+            ParseDom -Dom $dom -Processor (NewMarkdownProcessor) -Verbose:$VerbosePreference | WriteDocumentContent -Path $documentPath;
         }
     }
 }
@@ -634,6 +559,7 @@ function WriteDocumentContent {
         [Parameter(Mandatory = $True, ValueFromPipeline = $True)]
         [PSObject]$InputObject,
 
+        # The path to the document.
         [Parameter(Mandatory = $True)]
         [String]$Path
     )
@@ -647,7 +573,7 @@ function WriteDocumentContent {
     }
 
     end {
-        $content | Set-Content -Path "$OutputPath\$InstanceName.md";
+        $content | Set-Content -Path $Path;
     }
 }
 
@@ -665,12 +591,15 @@ function ParseDom {
 
         $nodeCounter = 0;
 
+        # Process each node of the DOM
         $innerResult = $Dom.Node | ForEach-Object -Process {
             $node = $_;
 
             Write-Verbose -Message "[Doc][ParseDom] -- Processing node";
 
             if ($Null -ne $node) {
+
+                # Visit the node
                 $Processor.Visit($node);
             }
 

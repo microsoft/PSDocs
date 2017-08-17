@@ -28,12 +28,12 @@ $dummyObject = New-Object -TypeName PSObject;
 $Global:TestVars = @{ };
 
 Describe 'PSDocs -- Table keyword' {
-    Context 'Table' {
+    Context 'Table with a single named property' {
 
         # Define a test document with a table
-        document 'TableTests' {
+        document 'WithSingleNamedProperty' {
             
-            Get-ChildItem -Path $rootPath | Format-Table -Property 'Name'
+            Get-ChildItem -Path '.\' | Table -Property 'Name'
         }
 
         Mock -CommandName 'VisitTable' -ModuleName 'PSDocs' -Verifiable -MockWith {
@@ -44,7 +44,7 @@ Describe 'PSDocs -- Table keyword' {
             $Global:TestVars['VisitTable'] = $InputObject;
         }
 
-        Invoke-PSDocument -Name 'TableTests' -InstanceName 'Table' -InputObject $dummyObject -OutputPath $outputPath;
+        Invoke-PSDocument -Name 'WithSingleNamedProperty' -InputObject $dummyObject -OutputPath $outputPath;
 
         It 'Should process Table keyword' {
             Assert-MockCalled -CommandName 'VisitTable' -ModuleName 'PSDocs' -Times 1;
