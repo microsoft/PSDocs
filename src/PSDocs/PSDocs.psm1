@@ -69,7 +69,10 @@ function Invoke-PSDocument {
 
         [Parameter(Mandatory = $False)]
         [ValidateNotNull()]
-        [System.Collections.Generic.Dictionary[String, ScriptBlock]]$Function
+        [System.Collections.Generic.Dictionary[String, ScriptBlock]]$Function,
+
+        [Parameter(Mandatory = $False)]
+        [Switch]$PassThru = $False
     )
 
     process {
@@ -465,7 +468,10 @@ function GenerateDocument {
         [String]$OutputPath = $PWD,
 
         [Parameter(Mandatory = $False)]
-        [System.Collections.Generic.Dictionary[String, ScriptBlock]]$Function
+        [System.Collections.Generic.Dictionary[String, ScriptBlock]]$Function,
+
+        [Parameter(Mandatory = $False)]
+        [Switch]$PassThru = $False
     )
 
     begin {
@@ -547,7 +553,7 @@ function GenerateDocument {
             $documentPath = Join-Path -Path $OutputPath -ChildPath "$instance.md";
 
             # Parse the model
-            ParseDom -Dom $dom -Processor (NewMarkdownProcessor) -Verbose:$VerbosePreference | WriteDocumentContent -Path $documentPath;
+            ParseDom -Dom $dom -Processor (NewMarkdownProcessor) -Verbose:$VerbosePreference | WriteDocumentContent -Path $documentPath -PassThru:$PassThru;
         }
     }
 }
@@ -561,7 +567,10 @@ function WriteDocumentContent {
 
         # The path to the document.
         [Parameter(Mandatory = $True)]
-        [String]$Path
+        [String]$Path,
+
+        [Parameter(Mandatory = $False)]
+        [Switch]$PassThru = $False
     )
 
     begin {
@@ -573,7 +582,12 @@ function WriteDocumentContent {
     }
 
     end {
-        $content | Set-Content -Path $Path;
+        if ($PassThru) {
+            $content;
+        } else {
+            $content | Set-Content -Path $Path;
+        }
+        
     }
 }
 
@@ -712,171 +726,10 @@ function NewMarkdownProcessor {
     )
 
     process {
-        $result = New-Object -TypeName PSObject
-
-        Add-Member -InputObject $result -MemberType ScriptMethod -Name 'String' -Value {
-            param ($Input)
-            Write-Verbose -Message "Visit string $Input";
-
-            if ($Input -isnot [String]) {
-                return $Input.ToString();
-            }
-
-            return $Input;
-        }
-        
-        Add-Member -InputObject $result -MemberType ScriptMethod -Name 'Section' -Value { param($Input) VisitSection -InputObject $Input; };
-
-        Add-Member -InputObject $result -MemberType ScriptMethod -Name 'Code' -Value { param($Input) VisitCode -InputObject $Input; };
-
-        Add-Member -InputObject $result -MemberType ScriptMethod -Name 'Title' -Value {
-            param ($Input)
-
-            Write-Verbose -Message "[Doc][Processor] -- Visit title";
-
-            "# $($Input.Content)";
-        }
-
-        Add-Member -InputObject $result -MemberType ScriptMethod -Name 'List' -Value {
-            param ($Input)
-
-            Write-Verbose -Message "[Doc][Processor] -- Visit list";
-            ""
-
-            foreach ($n in $Input.Node) {
-                [String]::Concat("- ", $This.Visit($n));
-            }
-        }
-
-        Add-Member -InputObject $result -MemberType ScriptMethod -Name 'Table' -Value { param($Input) VisitTable -InputObject $Input; };
-
-        Add-Member -InputObject $result -MemberType ScriptMethod -Name 'Note' -Value {
-            param ($Input)
-
-            Write-Verbose -Message "[Doc][Processor] -- Visit note";
-            
-            '';
-            '> [!NOTE]';
-            "> $($Input.Content)";
-        }
-
-        Add-Member -InputObject $result -MemberType ScriptMethod -Name 'Warning' -Value {
-            param ($Input)
-
-            Write-Verbose -Message "[Doc][Processor] -- Visit warning";
-            
-            '';
-            '> [!WARNING]';
-            "> $($Input.Content)";
-        }
-
-        Add-Member -InputObject $result -MemberType ScriptMethod -Name 'Yaml' -Value {
-            param ($Input)
-
-            Write-Verbose -Message "[Doc][Processor] -- Visit yaml";
-            
-            '---';
-
-            foreach ($kv in $Input.Content.GetEnumerator()) {
-                "$($kv.Key): $($kv.Value)";
-            }
-
-            '---';
-        }
-
-        Add-Member -InputObject $result -MemberType ScriptMethod -Name 'Visit' -Value {
-            param ($Input)
-
-            if ($Null -eq $Input) {
-                return;
-            }
-
-            if ($Input -is [String]) {
-                return $This.String($Input);
-            }
-
-            switch ($Input.Type) {
-                'Code' { return $This.Code($Input); }
-                'Section' { return $This.Section($Input); }
-                'Title' { return $This.Title($Input); }
-                'List' { return $This.List($Input); }
-                'Table' { return $This.Table($Input); }
-                'Note' { return $This.Note($Input); }
-                'Warning' { return $This.Warning($Input); }
-                'Yaml' { return $This.Yaml($Input); }
-
-                default { return $This.String($Input); }
-            }
-        }
-
-
-        # $result.Methods.Add((New-Object -TypeName PSScriptMethod -ArgumentList @('Default', { })));
+        $result = Import-Module $PSScriptRoot\PSDocsProcessor\Markdown -AsCustomObject -PassThru;
 
         $result;
     }
-}
-
-function VisitSection {
-
-    param (
-        $InputObject
-    )
-
-    $section = $InputObject;
-
-    Write-Verbose -Message "[Doc][Processor][Section] BEGIN::";
-
-    Write-Verbose -Message "[Doc][Processor][Section] -- Writing section: $($section.Content)";
-
-    # Generate markdown for the section name
-    "`n$(''.PadLeft($section.Level, '#')) $($section.Content)";
-
-    foreach ($n in $section.Node) {
-
-        # Visit each node within the section
-        $This.Visit($n);
-    }
-
-    Write-Verbose -Message "[Doc][Processor][Section] END:: [$($section.Node.Length)]";
-}
-
-function VisitCode {
-
-    param (
-        $InputObject
-    )
-
-    Write-Verbose -Message "[Doc][Processor] -- Visit code";
-
-    "   $($InputObject.Content)";
-}
-
-function VisitTable {
-
-    param (
-        $InputObject
-    )
-
-    $table = $InputObject;
-
-    Write-Verbose -Message "[Doc][Processor][Table] BEGIN::";
-
-    $headerCount = $table.Header.Length;
-
-    "";
-
-    # Create header
-    [String]::Concat('|', [String]::Join('|', $table.Header), '|');
-    [String]::Concat(''.PadLeft($headerCount, 'X').Replace('X', '| --- '), '|');
-
-    # Write each row
-    foreach ($row in $table.Rows) {
-        Write-Debug -Message "Generating row";
-
-        [String]::Concat('|', [String]::Join('|', [String[]]$row), '|');
-    }
-
-    Write-Verbose -Message "[Doc][Processor][Table] END:: [$($table.Rows.Count)]";
 }
 
 #

@@ -19,6 +19,7 @@ $temp = "$here\..\..\build";
 # $sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path) -replace '\.Tests\.', '.';
 
 Import-Module $src -Force;
+Import-Module $src\PSDocsProcessor\Markdown -Force;
 
 $outputPath = "$temp\PSDocs.Tests\Table";
 New-Item $outputPath -ItemType Directory -Force | Out-Null;
@@ -36,7 +37,7 @@ Describe 'PSDocs -- Table keyword' {
             Get-ChildItem -Path '.\' | Table -Property 'Name'
         }
 
-        Mock -CommandName 'VisitTable' -ModuleName 'PSDocs' -Verifiable -MockWith {
+        Mock -CommandName 'VisitTable' -ModuleName 'Markdown' -Verifiable -MockWith {
             param (
                 $InputObject
             )
@@ -47,7 +48,7 @@ Describe 'PSDocs -- Table keyword' {
         Invoke-PSDocument -Name 'WithSingleNamedProperty' -InputObject $dummyObject -OutputPath $outputPath;
 
         It 'Should process Table keyword' {
-            Assert-MockCalled -CommandName 'VisitTable' -ModuleName 'PSDocs' -Times 1;
+            Assert-MockCalled -CommandName 'VisitTable' -ModuleName 'Markdown' -Times 1;
         }
 
         It 'Should be Table object' {

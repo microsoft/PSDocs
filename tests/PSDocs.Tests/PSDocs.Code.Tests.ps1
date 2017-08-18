@@ -19,6 +19,7 @@ $temp = "$here\..\..\build";
 # $sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path) -replace '\.Tests\.', '.';
 
 Import-Module $src -Force;
+Import-Module $src\PSDocsProcessor\Markdown -Force;
 
 $outputPath = "$temp\PSDocs.Tests\Code";
 New-Item $outputPath -ItemType Directory -Force | Out-Null;
@@ -38,7 +39,7 @@ Describe 'PSDocs -- Code keyword' {
             }
         }
 
-        Mock -CommandName 'VisitCode' -ModuleName 'PSDocs' -Verifiable -MockWith {
+        Mock -CommandName 'VisitCode' -ModuleName 'Markdown' -Verifiable -MockWith {
             param (
                 $InputObject
             )
@@ -49,7 +50,7 @@ Describe 'PSDocs -- Code keyword' {
         Invoke-PSDocument -Name 'CodeTests' -InstanceName 'Code' -InputObject $dummyObject -OutputPath $outputPath;
 
         It 'Should process Code keyword' {
-            Assert-MockCalled -CommandName 'VisitCode' -ModuleName 'PSDocs' -Times 1;
+            Assert-MockCalled -CommandName 'VisitCode' -ModuleName 'Markdown' -Times 1;
         }
 
         It 'Should be Code object' {

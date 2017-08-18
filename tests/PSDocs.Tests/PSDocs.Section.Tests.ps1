@@ -19,6 +19,7 @@ $temp = "$here\..\..\build";
 # $sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path) -replace '\.Tests\.', '.';
 
 Import-Module $src -Force;
+Import-Module $src\PSDocsProcessor\Markdown -Force;
 
 $outputPath = "$temp\PSDocs.Tests\Section";
 New-Item $outputPath -ItemType Directory -Force | Out-Null;
@@ -37,7 +38,7 @@ Describe 'PSDocs -- Section keyword' {
             }
         }
 
-        Mock -CommandName 'VisitSection' -ModuleName 'PSDocs' -Verifiable -MockWith {
+        Mock -CommandName 'VisitSection' -ModuleName 'Markdown' -Verifiable -MockWith {
             param (
                 $InputObject
             )
@@ -45,10 +46,10 @@ Describe 'PSDocs -- Section keyword' {
             $Global:TestVars['VisitSection'] = $InputObject;
         }
 
-        Invoke-PSDocument -Name 'SectionBlockTests' -InstanceName 'Section' -InputObject $dummyObject -OutputPath $outputPath;
+        $result = Invoke-PSDocument -Name 'SectionBlockTests' -InstanceName 'Section' -InputObject $dummyObject -OutputPath $outputPath -PassThru;
 
         It 'Should process Section keyword' {
-            Assert-MockCalled -CommandName 'VisitSection' -ModuleName 'PSDocs' -Times 1;
+            Assert-MockCalled -CommandName 'VisitSection' -ModuleName 'Markdown' -Times 1;
         }
 
         It 'Should be Section object' {
