@@ -106,7 +106,10 @@ function VisitNote {
     
     VisitString('');
     VisitString('> [!NOTE]');
-    VisitString("> $($InputObject.Content)");
+
+    foreach ($n in $InputObject.Content) {
+        VisitString("> $n");
+    }
 }
 
 function VisitWarning {
@@ -116,7 +119,10 @@ function VisitWarning {
     
     VisitString('');
     VisitString('> [!WARNING]');
-    VisitString("> $($InputObject.Content)");
+
+    foreach ($w in $InputObject.Content) {
+        VisitString("> $w");
+    }
 }
 
 function VisitYaml {

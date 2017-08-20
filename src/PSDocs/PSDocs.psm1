@@ -223,7 +223,7 @@ function Note {
 
     process {
 
-        $result = New-Object -TypeName PSObject -Property @{ Type = 'Note'; Node = @(); Content = ''; };
+        $result = New-Object -TypeName PSObject -Property @{ Type = 'Note'; Node = @(); Content = [String[]]@(); };
 
         $innerResult = $Body.InvokeWithContext($Null, $Null);
 
@@ -245,7 +245,7 @@ function Warning {
 
     process {
 
-        $result = New-Object -TypeName PSObject -Property @{ Type = 'Warning'; Node = @(); Content = ''; };
+        $result = New-Object -TypeName PSObject -Property @{ Type = 'Warning'; Node = @(); Content = [String[]]@(); };
 
         $innerResult = $Body.InvokeWithContext($Null, $Null);
 
