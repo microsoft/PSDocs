@@ -151,17 +151,19 @@ function VisitTable {
 
     $headerCount = $table.Header.Length;
 
-    VisitString('');
+    if ($Null -ne $table.Header -and $table.Header.Length -gt 0) {
+        VisitString('');
 
-    # Create header
-    VisitString([String]::Concat('|', [String]::Join('|', $table.Header), '|'));
-    VisitString([String]::Concat(''.PadLeft($headerCount, 'X').Replace('X', '| --- '), '|'));
+        # Create header
+        VisitString([String]::Concat('|', [String]::Join('|', $table.Header), '|'));
+        VisitString([String]::Concat(''.PadLeft($headerCount, 'X').Replace('X', '| --- '), '|'));
 
-    # Write each row
-    foreach ($row in $table.Rows) {
-        Write-Debug -Message "Generating row";
+        # Write each row
+        foreach ($row in $table.Rows) {
+            Write-Debug -Message "Generating row";
 
-        VisitString([String]::Concat('|', [String]::Join('|', [String[]]$row), '|'));
+            VisitString([String]::Concat('|', [String]::Join('|', [String[]]$row), '|'));
+        }
     }
 
     Write-Verbose -Message "[Doc][Processor][Table] END:: [$($table.Rows.Count)]";

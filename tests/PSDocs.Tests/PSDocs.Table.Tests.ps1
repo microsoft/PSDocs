@@ -75,4 +75,24 @@ Describe 'PSDocs -- Table keyword' {
             Get-Content -Path $outputDoc -Raw | Should match '\|LICENSE\|False\|(\n|\r){1,2}\|README.md\|False\|';
         }
     }
+
+    Context 'Table single entry markdown' {
+        
+        # Define a test document with a warning
+        document 'TableSingleEntryMarkdown' {
+            
+            New-Object -TypeName PSObject -Property @{ Name = 'Single' } | Table -Property Name;
+        }
+
+        $outputDoc = "$outputPath\TableSingleEntryMarkdown.md";
+        Invoke-PSDocument -Name 'TableSingleEntryMarkdown' -InputObject $dummyObject -OutputPath $outputPath;
+
+        It 'Should have generated output' {
+            Test-Path -Path $outputDoc | Should be $True;
+        }
+
+        It 'Should match expected format' {
+            Get-Content -Path $outputDoc -Raw | Should match '\|Name\|\r\n\| --- \|\r\n\|Single\|';
+        }
+    }
 }

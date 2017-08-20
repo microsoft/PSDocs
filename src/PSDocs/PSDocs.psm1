@@ -318,7 +318,7 @@ function Table {
     }
 
     end {
-        $headers = $rowData | ForEach-Object -Process {
+        [String[]]$headers = $rowData | ForEach-Object -Process {
             $_.PSObject.Properties
         } | Where-Object -FilterScript {
             $_.IsGettable -and $_.IsInstance
@@ -343,7 +343,7 @@ function Table {
 
         $table;
 
-        Write-Verbose -Message "[Doc][Table] END::";
+        Write-Verbose -Message "[Doc][Table] END:: [$($headers.Length)]";
     }
 }
 
