@@ -38,6 +38,12 @@ Write-Verbose -Message "[Test] -- Creating output paths";
 
 # STEP : Run tests
 
+$pesterModule = Get-Module -Name Pester -ListAvailable | Where-Object -FilterScript { $_.Version -like '3.4.0' };
+
+if ($Null -eq $pesterModule) {
+    Install-Module -Name Pester -RequiredVersion '3.4.0' -Force -Confirm:$False -Scope CurrentUser;
+}
+
 # Load Pester module
 Import-Module -Name Pester -Verbose:$False;
 
