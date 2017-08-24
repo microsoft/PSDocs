@@ -125,4 +125,19 @@ Describe 'PSDocs.Dsc' {
             Get-Content -Path "$outputPath\Instance3.md" -Raw | Should match '|Content=Instance3|';
         }
     }
+
+    Context 'Generate a document with an external script' {
+
+        TestConfiguration -OutputPath $outputPath -ComputerName 'WithExternalScript';
+
+        Invoke-DscNodeDocument -Script "$here\Templates\WithExternalScript.ps1" -DocumentName 'WithExternalScript' -InstanceName 'WithExternalScript' -Path $outputPath -OutputPath $outputPath;
+
+        It 'Should generate an output named WithExternalScript.md' {
+            Test-Path -Path "$outputPath\WithExternalScript.md" | Should be $True;
+        }
+
+        It 'Should contain instance name' {
+            Get-Content -Path "$outputPath\WithExternalScript.md" -Raw | Should match '|Content=WithExternalScript|';
+        }
+    }
 }

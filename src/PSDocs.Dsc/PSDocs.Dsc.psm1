@@ -135,17 +135,17 @@ function BuildDocumentation {
             return;
         }
 
-        # if ($PSBoundParameters.ContainsKey('Script')) {
+        if ($PSBoundParameters.ContainsKey('Script')) {
 
-        #     try {
-        #         # Import-PSDocumentTemplate -Path $Script -Verbose:$VerbosePreference;
-        #     }
-        #     catch {
-        #         Write-Error -Message ($LocalizedData.ImportDocumentTemplateFailed -f $Script, $_.Exception.Message) -Exception $_.Exception;
+            try {
+                Import-PSDocumentTemplate -Path $Script -Verbose:$VerbosePreference;
+            }
+            catch {
+                Write-Error -Message ($LocalizedData.ImportDocumentTemplateFailed -f $Script, $_.Exception.Message) -Exception $_.Exception;
 
-        #         return;
-        #     }   
-        # }
+                return;
+            }   
+        }
 
         foreach ($r in $referenceConfig) {
             # Write-Verbose -Message "[Doc][Mof] -- Analysing document: $($r.Path)";
