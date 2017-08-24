@@ -47,7 +47,7 @@ if ($Null -eq $pesterModule) {
 # Load Pester module
 Import-Module -Name Pester -Verbose:$False;
 
-@('PSDocs') | RunTest -Path $testPath -OutputPath $reportsPath -Verbose:$VerbosePreference;
+@('PSDocs', 'PSDocs.Dsc') | RunTest -Path $testPath -OutputPath $reportsPath -Verbose:$VerbosePreference;
 
 # STEP : Publish results
 

@@ -1,11 +1,11 @@
 #
-# PSDocs module
+# PSDocs Dsc extensions module
 #
 
 @{
 
 # Script module or binary module file associated with this manifest.
-RootModule = 'PSDocs.psm1'
+RootModule = 'PSDocs.Dsc.psm1'
 
 # Version number of this module.
 ModuleVersion = '0.1.0'
@@ -14,7 +14,7 @@ ModuleVersion = '0.1.0'
 # CompatiblePSEditions = @()
 
 # ID used to uniquely identify this module
-GUID = '1f6df554-c081-40d8-9aca-32c1abe4a1b6'
+GUID = '9c6339e5-174f-447d-b7a7-7dd58ae9a13d'
 
 # Author of this module
 Author = 'Microsoft Corporation'
@@ -26,7 +26,7 @@ CompanyName = 'Microsoft Corporation'
 Copyright = '(c) Microsoft Corporation. All rights reserved.'
 
 # Description of the functionality provided by this module
-Description = 'Generate markdown from PowerShell.'
+Description = 'Desired State Configuration (DSC) extensions for PSDocs.'
 
 # Minimum version of the Windows PowerShell engine required by this module
 # PowerShellVersion = ''
@@ -47,7 +47,9 @@ Description = 'Generate markdown from PowerShell.'
 # ProcessorArchitecture = ''
 
 # Modules that must be imported into the global environment prior to importing this module
-# RequiredModules = @()
+RequiredModules = @(
+    @{ ModuleName = 'PSDocs'; ModuleVersion = '0.1.0'; }
+)
 
 # Assemblies that must be loaded prior to importing this module
 # RequiredAssemblies = @()
@@ -66,9 +68,8 @@ Description = 'Generate markdown from PowerShell.'
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
 FunctionsToExport = @(
-    'Document'
-    'Invoke-PSDocument'
-    'Import-PSDocumentTemplate'
+    'Invoke-DscNodeDocument'
+    'Get-DscMofDocument'
 )
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.

@@ -86,6 +86,21 @@ function Invoke-PSDocument {
     }
 }
 
+function Import-PSDocumentTemplate {
+
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $True)]
+        [String]$Path
+    )
+
+    process {
+        Write-Verbose -Message "[Doc] -- Reading template: $Path";
+
+        ReadTemplate @PSBoundParameters;
+    }
+}
+
 #
 # Internal language keywords
 #
@@ -726,9 +741,71 @@ function NewMarkdownProcessor {
     )
 
     process {
-        $result = Import-Module $PSScriptRoot\PSDocsProcessor\Markdown -AsCustomObject -PassThru;
+        # Create an instanced of a markdown processor from an external module
+        $result = Import-Module $PSScriptRoot\PSDocsProcessor\Markdown -AsCustomObject -PassThru -Verbose:$False;
 
+        # Return the processor
         $result;
+    }
+}
+
+function ReadTemplate {
+    
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $True)]
+        [String]$Path
+    )
+
+    process {
+
+        # Read the contents of a .ps1 file
+        $template = Get-Content -Path $Path -Raw;
+
+        # Invoke the contents of the .ps1 file as a script block
+        $templateScriptBlock = [ScriptBlock]::Create($template);
+        $templateScriptBlock.Invoke();
+    }
+}
+
+function ReadYamlHeader {
+
+    [CmdletBinding()]
+    [OutputType([System.Collections.Hashtable])]
+    param (
+        [Parameter(Mandatory = $True)]
+        [String]$Path
+    )
+
+    process {
+
+        # Read the file
+        $content = Get-Content -Path $Path -Raw;
+
+        # Detect Yaml header
+        if (![String]::IsNullOrEmpty($content) -and $content -match '^(---\r\n(?<yaml>([A-Z0-9]{1,}:[A-Z0-9 ]{1,}(\r\n){0,}){1,})\r\n---\r\n)') {
+
+            Write-Verbose -Message "[Doc][Toc]`t-- Reading Yaml header: $Path";
+
+            # Extract yaml header key value pair
+            [String[]]$yamlHeader = $Matches.yaml -split "`n";
+
+            $result = @{ };
+
+            # Read key values into hashtable
+            foreach ($item in $yamlHeader) {
+                $kv = $item.Split(':', 2, [System.StringSplitOptions]::RemoveEmptyEntries);
+
+                Write-Debug -Message "Found yaml keypair from: $item";
+
+                if ($kv.Length -eq 2) {
+                    $result[$kv[0].Trim()] = $kv[1].Trim();
+                }
+            }
+
+            # Emit result to the pipeline
+            return $result;
+        }
     }
 }
 
@@ -736,6 +813,6 @@ function NewMarkdownProcessor {
 # Export module
 #
 
-Export-ModuleMember -Function 'Document','Invoke-PSDocument';
+Export-ModuleMember -Function 'Document','Invoke-PSDocument','Import-PSDocumentTemplate';
 
 # EOM
