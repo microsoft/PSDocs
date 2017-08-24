@@ -18,7 +18,7 @@ Warning [-Body] <ScriptBlock>
 Document 'Test' {
 
     Warning {
-        'This is a note.'
+        'This is a warning.'
     }
 }
 
