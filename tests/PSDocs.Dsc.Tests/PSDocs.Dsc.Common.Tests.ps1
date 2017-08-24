@@ -43,6 +43,11 @@ configuration TestConfiguration {
             DestinationPath = 'C:\environment.tag'
             Contents = "Node=$($Node.NodeName)"
         }
+
+        WindowsFeature SMB1 {
+            Ensure = 'Absent'
+            Name = 'FS-SMB1'
+        }
     }
 }
 
@@ -114,7 +119,7 @@ Describe 'PSDocs.Dsc' {
         }
 
         It 'Should contain instance name Instance2' {
-            Get-Content -Path "$outputPath\Instance2.md" -Raw | Should match '|Content=Instance2|';
+            Get-Content -Path "$outputPath\Instance2.md" -Raw | Should match '\|Node\=Instance2\|';
         }
 
         It 'Should generate an output named Instance3.md' {
@@ -122,7 +127,7 @@ Describe 'PSDocs.Dsc' {
         }
 
         It 'Should contain instance name Instance3' {
-            Get-Content -Path "$outputPath\Instance3.md" -Raw | Should match '|Content=Instance3|';
+            Get-Content -Path "$outputPath\Instance3.md" -Raw | Should match '\|Node\=Instance3\|';
         }
     }
 
@@ -137,7 +142,7 @@ Describe 'PSDocs.Dsc' {
         }
 
         It 'Should contain instance name' {
-            Get-Content -Path "$outputPath\WithExternalScript.md" -Raw | Should match '|Content=WithExternalScript|';
+            Get-Content -Path "$outputPath\WithExternalScript.md" -Raw | Should match '\|FS\-SMB1\|';
         }
     }
 }
