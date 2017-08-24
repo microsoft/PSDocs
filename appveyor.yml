@@ -1,0 +1,5 @@
+version: 0.1.0.{build}
+image: Visual Studio 2017
+build: off
+test_script:
+- ps: .\scripts\test.ps1

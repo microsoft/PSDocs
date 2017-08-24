@@ -1,0 +1,26 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "taskName": "test",
+            "type": "shell",
+            "command": ".\\scripts\\test.ps1",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "problemMatcher": [ "$pester" ]
+        },
+        {
+            "taskName": "build",
+            "type": "shell",
+            "command": ".\\scripts\\build.ps1 -Clean -Module PSDocs",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}

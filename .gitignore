@@ -1,0 +1,9 @@
+
+/**/.vs/
+/**/bin/
+/**/obj/
+/artifacts/
+/build/
+/reports/
+/**/*.user
+/.vscode/settings.json
