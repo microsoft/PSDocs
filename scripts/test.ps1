@@ -41,7 +41,9 @@ Write-Verbose -Message "[Test] -- Creating output paths";
 $pesterModule = Get-Module -Name Pester -ListAvailable | Where-Object -FilterScript { $_.Version -like '3.4.0' };
 
 if ($Null -eq $pesterModule) {
-    Install-Module -Name Pester -RequiredVersion '3.4.0' -Force -Confirm:$False -Scope CurrentUser;
+    Install-PackageProvider -Name NuGet -Force -Scope CurrentUser;   
+     
+    Install-Module -Name Pester -RequiredVersion '3.4.0' -Force -Scope CurrentUser;
 }
 
 # Load Pester module
