@@ -14,6 +14,12 @@
             "problemMatcher": [ "$pester" ]
         },
         {
+            "taskName": "coverage",
+            "type": "shell",
+            "command": ".\\scripts\\test.ps1 -Clean -CodeCoverage",
+            "problemMatcher": [ "$pester" ]
+        },
+        {
             "taskName": "build",
             "type": "shell",
             "command": ".\\scripts\\build.ps1 -Clean -Module PSDocs",
