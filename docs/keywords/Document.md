@@ -16,7 +16,7 @@ Document [-Name] <String>
 
 ```powershell
 Document 'Test' {
-
+    # Insert content here
 }
 ```
 

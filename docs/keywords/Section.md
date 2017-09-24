@@ -17,6 +17,7 @@ Section [-Name] <String> [-When <ScriptBlock>]
 ```powershell
 Document 'Test' {
 
+    # Create a section called 'Directory list'
     Section 'Directory list' {
         Get-ChildItem -Path 'C:\' | Table -Property Name,PSIsContainer;
     }
@@ -32,6 +33,7 @@ Generates a new Test.md document containing a table listing all items directly w
 ```powershell
 Document 'Test' {
 
+    # Create a section called 'Directory list'
     Section 'Directory list' -When { Test-Path -Path 'C:\' } {
         Get-ChildItem -Path 'C:\' | Table -Property Name,PSIsContainer;
     }

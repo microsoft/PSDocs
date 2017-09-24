@@ -20,13 +20,14 @@ Document 'Test' {
     Yaml @{
         title = 'An example title'
     }
+
+    'Yaml header may not be rendered by some markdown viewers. See source to view yaml.'
 }
 
 Invoke-PSDocument -Name 'Test';
 ```
 
-Generates a new Test.md document containing a yaml header.
-
+Generates a new Test.md document containing a yaml header. An example of the output generated is available [here](/docs/examples/Yaml-header-output.md).
 
 ## PARAMETERS
 
