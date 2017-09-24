@@ -17,6 +17,7 @@ function Visit {
     }
 
     switch ($InputObject.Type) {
+        'Document' { return VisitDocument($InputObject); }
         'Code' { return VisitCode($InputObject); }
         'Section' { return VisitSection($InputObject); }
         'Title' { return VisitTitle($InputObject); }
@@ -132,7 +133,7 @@ function VisitYaml {
     
     VisitString('---');
 
-    foreach ($kv in $InputObject.Content.GetEnumerator()) {
+    foreach ($kv in $InputObject.Metadata.GetEnumerator()) {
         VisitString("$($kv.Key): $($kv.Value)");
     }
 
@@ -167,4 +168,13 @@ function VisitTable {
     }
 
     Write-Verbose -Message "[Doc][Processor][Table] END:: [$($table.Rows.Count)]";
+}
+
+function VisitDocument {
+
+    param (
+        $InputObject
+    )
+
+    VisitYaml -InputObject $InputObject;
 }

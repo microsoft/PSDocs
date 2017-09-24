@@ -101,6 +101,27 @@ function Import-PSDocumentTemplate {
     }
 }
 
+function Get-PSDocumentHeader {
+
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $False, ValueFromPipelineByPropertyName = $True)]
+        [Alias('FullName')]
+        [String]$Path = $PWD
+    )
+
+    process {
+
+        $filteredItems = Get-ChildItem -Path "$Path\*" -File;
+
+        foreach ($item in $filteredItems) {
+            
+            ReadYamlHeader -Path $item.FullName -Verbose:$VerbosePreference;
+        }
+
+    }
+}
+
 #
 # Internal language keywords
 #
@@ -277,14 +298,16 @@ function Yaml {
     [CmdletBinding()]
     param (
         [Parameter(Position = 0, Mandatory = $True)]
-        [Hashtable]$Body
+        [System.Collections.IDictionary]$Body
     )
 
     process {
 
-        $result = New-Object -TypeName PSObject -Property @{ Type = 'Yaml'; Node = @(); Content = $Body; };
-
-        $result;
+        # Process eaxch key value pair in the supplied dictionary/hashtable
+        foreach ($kv in $Body.GetEnumerator()) {
+            
+            $Document.Metadata[$kv.Key] = $kv.Value;
+        }
     }
 }
 
@@ -550,16 +573,26 @@ function GenerateDocument {
 
             Write-Verbose -Message "[Doc] -- Processing: $instance";
 
+            $document = New-Object -TypeName PSObject -Property @{ Type = 'Document'; Metadata = ([Ordered]@{ }); };
+
             # Define built-in variables
             [PSVariable[]]$variablesToDefine = @(
                 New-Object -TypeName PSVariable -ArgumentList ('InstanceName', $instance)
                 New-Object -TypeName PSVariable -ArgumentList ('InputObject', $InputObject)
                 New-Object -TypeName PSVariable -ArgumentList ('Parameter', $parameter)
                 New-Object -TypeName PSVariable -ArgumentList ('Section', $Section)
-            );
+                New-Object -TypeName PSVariable -ArgumentList ('Document', $document)
+            )
 
-            # Invoke the body of the document definition and get the output
-            $innerResult = $body.InvokeWithContext($functionsToDefine, $variablesToDefine);
+            try {
+                # Invoke the body of the document definition and get the output
+                $innerResult = $body.InvokeWithContext($functionsToDefine, $variablesToDefine);
+            }
+            catch {
+                Write-Error -Message ($LocalizedData.DocumentProcessFailure) -Exception $_.Exception -Category OperationStopped -ErrorId 'PSDocs.Document.ProcessFailure' -ErrorAction Stop;
+            }
+
+            $innerResult.Insert(0, $document);
 
             # Create a document object model based on the output
             $dom = New-Object -TypeName PSObject -Property @{ Node = $innerResult; };
@@ -813,6 +846,11 @@ function ReadYamlHeader {
 # Export module
 #
 
-Export-ModuleMember -Function 'Document','Invoke-PSDocument','Import-PSDocumentTemplate';
+Export-ModuleMember -Function @(
+    'Document'
+    'Invoke-PSDocument'
+    'Import-PSDocumentTemplate'
+    'Get-PSDocumentHeader'
+);
 
 # EOM
