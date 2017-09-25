@@ -86,7 +86,7 @@ function VisitTitle {
 
     Write-Verbose -Message "[Doc][Processor] -- Visit title";
 
-    VisitString("# $($InputObject.Content)");
+    VisitString("# $($InputObject.Title)");
 }
 
 function VisitList {
@@ -178,5 +178,9 @@ function VisitDocument {
 
     if ($Null -ne $InputObject.Metadata -and $InputObject.Metadata.Count -gt 0) {
         VisitYaml -InputObject $InputObject;
+    }
+
+    if (![String]::IsNullOrEmpty($InputObject.Title)) {
+        VisitTitle -InputObject $InputObject;
     }
 }

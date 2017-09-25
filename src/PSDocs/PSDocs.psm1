@@ -197,13 +197,12 @@ function Title {
     param (
         [Parameter(Position = 0, Mandatory = $True)]
         [AllowEmptyString()]
-        [String]$Title
+        [String]$Content
     )
 
     process {
-        $result = New-Object -TypeName PSObject -Property @{ Type = 'Title'; Content = $Title; };
-
-        $result;
+        # Update the document title
+        $Document.Title = $Content;
     }
 }
 
@@ -573,7 +572,7 @@ function GenerateDocument {
 
             Write-Verbose -Message "[Doc] -- Processing: $instance";
 
-            $document = New-Object -TypeName PSObject -Property @{ Type = 'Document'; Metadata = ([Ordered]@{ }); };
+            $document = New-Object -TypeName PSObject -Property @{ Type = 'Document'; Metadata = ([Ordered]@{ }); Title = [String]::Empty; };
 
             # Define built-in variables
             [PSVariable[]]$variablesToDefine = @(
