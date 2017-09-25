@@ -176,5 +176,7 @@ function VisitDocument {
         $InputObject
     )
 
-    VisitYaml -InputObject $InputObject;
+    if ($Null -ne $InputObject.Metadata -and $InputObject.Metadata.Count -gt 0) {
+        VisitYaml -InputObject $InputObject;
+    }
 }

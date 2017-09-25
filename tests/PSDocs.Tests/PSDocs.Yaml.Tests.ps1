@@ -137,6 +137,28 @@ Describe 'PSDocs -- Yaml keyword' {
         }
     }
 
+    Context 'Document without Yaml block' {
+
+        # Define a test document without yaml content
+        document 'NoYaml' {
+
+            Section 'Test' {
+                'A test section.'
+            }
+        }
+
+        $outputDoc = "$outputPath\NoYaml.md";
+        Invoke-PSDocument -Name 'NoYaml' -InputObject $dummyObject -OutputPath $outputPath;
+
+        It 'Should have generated output' {
+            Test-Path -Path $outputDoc | Should be $True;
+        }
+
+        It 'Should match expected format' {
+            Get-Content -Path $outputDoc -Raw | Should not match '---\r\n';
+        }
+    }
+
     Context 'Get Yaml header' {
         
         $result = Get-PSDocumentHeader -Path $outputPath;
