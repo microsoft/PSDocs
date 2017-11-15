@@ -2,11 +2,12 @@
 # Code
 
 ## SYNOPSIS
+
 Creates a formatted code section.
 
 ## SYNTAX
 
-```
+```text
 Code [-Body] <ScriptBlock>
 ```
 

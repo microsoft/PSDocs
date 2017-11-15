@@ -2,11 +2,12 @@
 # Invoke-DscNodeDocument
 
 ## SYNOPSIS
+
 Calls a document definition.
 
 ## SYNTAX
 
-```
+```text
 Invoke-DscNodeDocument -DocumentName <String> [-Path <String>] [-OutputPath <String>]
 ```
 

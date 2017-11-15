@@ -58,9 +58,7 @@ Save-Module -Name 'PSDocs' -Path '.\modules';
 Save-Module -Name 'PSDocs.Dsc' -Path '.\modules';
 ```
 
-### 3. Usage
-
-#### Example 1
+### Generate a document from a directory listing
 
 ```powershell
 # Import PSDocs module
@@ -85,7 +83,7 @@ Invoke-PSDocument -Name 'Sample' -InputObject 'C:\';
 
 An example of the output generated is available [here](/docs/examples/Get-child-item-output.md).
 
-#### Example 2
+### Generate documentation from Desired State Configuration
 
 ```powershell
 # Import PSDocs.Dsc module

@@ -2,11 +2,12 @@
 # Document
 
 ## SYNOPSIS
+
 Defines a named block that can be called to output documentation.
 
 ## SYNTAX
 
-```
+```text
 Document [-Name] <String>
 ```
 

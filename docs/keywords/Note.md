@@ -2,11 +2,12 @@
 # Note
 
 ## SYNOPSIS
+
 Creates a formatted note block.
 
 ## SYNTAX
 
-```
+```text
 Note [-Body] <ScriptBlock>
 ```
 

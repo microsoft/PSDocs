@@ -2,11 +2,12 @@
 # Section
 
 ## SYNOPSIS
+
 Creates a new document section that contains content.
 
 ## SYNTAX
 
-```
+```text
 Section [-Name] <String> [-When <ScriptBlock>]
 ```
 
