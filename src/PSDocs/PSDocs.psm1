@@ -175,11 +175,20 @@ function Section {
 
             $Section = $result;
 
-            # Invoke the Section body and collect the results
-            $innerResult = $Body.Invoke();
+            try {
+                # Invoke the Section body and collect the results
+                $innerResult = $Body.Invoke();
+    
+                foreach ($r in $innerResult) {
+                    $result.Node += $r;
+                }
+            }
+            catch {
+                
+                # Report non-terminating error
+                Write-Error -Message ($LocalizedData.SectionProcessFailure -f $_.Exception.Message) -Exception $_.Exception -ErrorId 'PSDocs.Section.ProcessFailure';
 
-            foreach ($r in $innerResult) {
-                $result.Node += $r;
+                return;
             }
 
             # Emit Section object to the pipeline
@@ -314,7 +323,8 @@ function Table {
 
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory = $True, ValueFromPipeline = $True)]
+        [Parameter(Mandatory = $False, ValueFromPipeline = $True)]
+        [AllowNull()]
         [Object]$InputObject,
 
         [Parameter(Mandatory = $False, Position = 0)]
@@ -588,7 +598,7 @@ function GenerateDocument {
                 $innerResult = $body.InvokeWithContext($functionsToDefine, $variablesToDefine);
             }
             catch {
-                Write-Error -Message ($LocalizedData.DocumentProcessFailure) -Exception $_.Exception -Category OperationStopped -ErrorId 'PSDocs.Document.ProcessFailure' -ErrorAction Stop;
+                Write-Error -Message $LocalizedData.DocumentProcessFailure -Exception $_.Exception -Category OperationStopped -ErrorId 'PSDocs.Document.ProcessFailure' -ErrorAction Stop;
             }
 
             $innerResult.Insert(0, $document);
