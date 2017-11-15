@@ -1,7 +1,7 @@
 ---
 external help file: PSDocs.Dsc-help.xml
 Module Name: PSDocs.Dsc
-online version: 
+online version: https://github.com/BernieWhite/PSDocs/blob/master/docs/commands/PSDocs.Dsc/en-US/Invoke-DscNodeDocument.md
 schema: 2.0.0
 ---
 
@@ -44,9 +44,6 @@ Invoke-DscNodeDocument -DocumentName 'Test' -Path '.\nodes' -OutputPath '.\docs'
 ```
 
 Generates a new markdown document for each node .mof in the path `.\nodes`.
-
-
-{{ Add example description here }}
 
 ## PARAMETERS
 

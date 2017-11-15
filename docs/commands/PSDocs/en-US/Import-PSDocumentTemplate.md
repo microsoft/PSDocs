@@ -1,28 +1,31 @@
 ---
 external help file: PSDocs-help.xml
 Module Name: PSDocs
-online version: 
+online version: https://github.com/BernieWhite/PSDocs/blob/master/docs/commands/PSDocs/en-US/Import-PSDocumentTemplate.md
 schema: 2.0.0
 ---
 
 # Import-PSDocumentTemplate
 
 ## SYNOPSIS
+
 {{Fill in the Synopsis}}
 
 ## SYNTAX
 
-```
+```text
 Import-PSDocumentTemplate [-Path] <String>
 ```
 
 ## DESCRIPTION
+
 {{Fill in the Description}}
 
 ## EXAMPLES
 
 ### Example 1
-```
+
+```powershell
 PS C:\> {{ Add example code here }}
 ```
 
@@ -31,12 +34,13 @@ PS C:\> {{ Add example code here }}
 ## PARAMETERS
 
 ### -Path
+
 {{Fill Path Description}}
 
 ```yaml
 Type: String
 Parameter Sets: (All)
-Aliases: 
+Aliases:
 
 Required: True
 Position: 0
@@ -49,7 +53,6 @@ Accept wildcard characters: False
 
 ### None
 
-
 ## OUTPUTS
 
 ### System.Object
@@ -57,4 +60,3 @@ Accept wildcard characters: False
 ## NOTES
 
 ## RELATED LINKS
-

@@ -1,7 +1,7 @@
 ---
 external help file: PSDocs.Dsc-help.xml
 Module Name: PSDocs.Dsc
-online version: 
+online version: https://github.com/BernieWhite/PSDocs/blob/master/docs/commands/PSDocs.Dsc/en-US/Get-DscMofDocument.md
 schema: 2.0.0
 ---
 
