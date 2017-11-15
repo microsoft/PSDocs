@@ -4,7 +4,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "taskName": "test",
+            "label": "test",
             "type": "shell",
             "command": ".\\scripts\\test.ps1",
             "group": {
@@ -14,13 +14,13 @@
             "problemMatcher": [ "$pester" ]
         },
         {
-            "taskName": "coverage",
+            "label": "coverage",
             "type": "shell",
             "command": ".\\scripts\\test.ps1 -Clean -CodeCoverage",
             "problemMatcher": [ "$pester" ]
         },
         {
-            "taskName": "build",
+            "label": "build",
             "type": "shell",
             "command": ".\\scripts\\build.ps1 -Clean -Module PSDocs",
             "group": {
