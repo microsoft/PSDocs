@@ -16,7 +16,7 @@ Import-LocalizedData -BindingVariable LocalizedData -FileName 'PSDocs.Resources.
 # Public functions
 #
 
-# Implement the document keyword
+# .ExternalHelp PSDocs-Help.xml
 function Document {
     [CmdletBinding()]
     param (
@@ -42,6 +42,7 @@ function Document {
     }
 }
 
+# .ExternalHelp PSDocs-Help.xml
 function Invoke-PSDocument {
 
     [CmdletBinding()]
@@ -86,6 +87,7 @@ function Invoke-PSDocument {
     }
 }
 
+# .ExternalHelp PSDocs-Help.xml
 function Import-PSDocumentTemplate {
 
     [CmdletBinding()]
@@ -101,6 +103,7 @@ function Import-PSDocumentTemplate {
     }
 }
 
+# .ExternalHelp PSDocs-Help.xml
 function Get-PSDocumentHeader {
 
     [CmdletBinding()]

@@ -6,3 +6,4 @@
 /build/
 /reports/
 /**/*.user
+/src/**/*-help.xml
