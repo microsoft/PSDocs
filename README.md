@@ -125,6 +125,9 @@ PSDocs extends PowerShell with domain specific lanagage (DSL) keywords and cmdle
 
 - [Invoke-PSDocument](/docs/commands/PSDocs/en-US/Invoke-PSDocument.md)
 - [Invoke-DscNodeDocument](/docs/commands/PSDocs.Dsc/en-US/Invoke-DscNodeDocument.md)
+- [Get-PSDocumentHeader](/docs/commands/PSDocs/en-US/Get-PSDocumentHeader.md)
+- [Import-PSDocumentTemplate](/docs/commands/PSDocs/en-US/Import-PSDocumentTemplate.md)
+- [Get-DscMofDocument](/docs/commands/PSDocs.Dsc/en-US/Get-DscMofDocument.md)
 
 ## Changes and versioning
 
