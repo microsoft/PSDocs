@@ -10,17 +10,17 @@ Locale: en-US
 
 ## Description
 
-{{Manually Enter Description Here}}
+Generate markdown from PowerShell.
 
 ## PSDocs Cmdlets
 
 ### [Document](Document.md)
 
-{{Manually Enter Document Description Here}}
+Defines a named block that can be called to output documentation.
 
 ### [Get-PSDocumentHeader](Get-PSDocumentHeader.md)
 
-{{Manually Enter Get-PSDocumentHeader Description Here}}
+Get the Yaml header from a PSDocs generated markdown file.
 
 ### [Import-PSDocumentTemplate](Import-PSDocumentTemplate.md)
 
@@ -28,4 +28,4 @@ Locale: en-US
 
 ### [Invoke-PSDocument](Invoke-PSDocument.md)
 
-{{Manually Enter Invoke-PSDocument Description Here}}
+Create markdown from an input object.

@@ -10,14 +10,14 @@ Locale: en-US
 
 ## Description
 
-{{Manually Enter Description Here}}
+Desired State Configuration (DSC) extensions for PSDocs.
 
 ## PSDocs.Dsc Cmdlets
 
 ### [Get-DscMofDocument](Get-DscMofDocument.md)
 
-{{Manually Enter Get-DscMofDocument Description Here}}
+Get document graph from .mof file.
 
 ### [Invoke-DscNodeDocument](Invoke-DscNodeDocument.md)
 
-{{Manually Enter Invoke-DscNodeDocument Description Here}}
+Create markdown from Desired State Configuration (DSC) .mof file.

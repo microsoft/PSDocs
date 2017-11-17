@@ -9,7 +9,7 @@ schema: 2.0.0
 
 ## SYNOPSIS
 
-{{Fill in the Synopsis}}
+Import a document template script file into the current environment.
 
 ## SYNTAX
 
@@ -19,23 +19,23 @@ Import-PSDocumentTemplate [-Path] <String>
 
 ## DESCRIPTION
 
-{{Fill in the Description}}
+Import a document template script file into the current environment.
 
 ## EXAMPLES
 
 ### Example 1
 
 ```powershell
-PS C:\> {{ Add example code here }}
+PS C:\> Import-PSDocumentTemplate -Path '.\template.ps1';
 ```
 
-{{ Add example description here }}
+Imports a document template into the current environment.
 
 ## PARAMETERS
 
 ### -Path
 
-{{Fill Path Description}}
+The file path to a script file containing a documentation template.
 
 ```yaml
 Type: String

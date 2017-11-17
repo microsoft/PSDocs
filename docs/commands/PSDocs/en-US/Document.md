@@ -9,7 +9,7 @@ schema: 2.0.0
 
 ## SYNOPSIS
 
-{{Fill in the Synopsis}}
+Defines a named block that can be called to output documentation.
 
 ## SYNTAX
 
@@ -19,23 +19,25 @@ Document [-Name] <String> [-Body] <ScriptBlock>
 
 ## DESCRIPTION
 
-{{Fill in the Description}}
+Defines a named block that can be called to output documentation.
 
 ## EXAMPLES
 
 ### Example 1
 
 ```powershell
-PS C:\> {{ Add example code here }}
+Document 'Test' {
+    # Insert content here
+}
 ```
 
-{{ Add example description here }}
+Define an empty document template called Test.
 
 ## PARAMETERS
 
 ### -Body
 
-{{Fill Body Description}}
+A script block containing the document definition.
 
 ```yaml
 Type: ScriptBlock
@@ -51,7 +53,7 @@ Accept wildcard characters: False
 
 ### -Name
 
-{{Fill Name Description}}
+The name of the document.
 
 ```yaml
 Type: String

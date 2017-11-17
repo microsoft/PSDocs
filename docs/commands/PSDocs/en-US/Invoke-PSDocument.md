@@ -9,7 +9,7 @@ schema: 2.0.0
 
 ## SYNOPSIS
 
-Calls a document definition.
+Create markdown from an input object.
 
 ## SYNTAX
 
@@ -22,17 +22,17 @@ Invoke-PSDocument [-Name] <String> [-InstanceName <String[]>] [-InputObject <PSO
 
 ## DESCRIPTION
 
-{{Fill in the Description}}
+Create markdown from an input object.
 
 ## EXAMPLES
 
 ### Example 1
 
 ```powershell
-PS C:\> {{ Add example code here }}
+PS C:\> Invoke-PSDocument -Name 'Sample' -InputObject 'C:\';
 ```
 
-{{ Add example description here }}
+Create markdown using the Sample documentation template for 'C:\'.
 
 ## PARAMETERS
 
@@ -54,7 +54,7 @@ Accept wildcard characters: False
 
 ### -Function
 
-{{Fill Function Description}}
+This option can be used to define documentation specific functions that can be used using markdown creation.
 
 ```yaml
 Type: System.Collections.Generic.Dictionary`2[System.String,System.Management.Automation.ScriptBlock]
@@ -70,7 +70,7 @@ Accept wildcard characters: False
 
 ### -InputObject
 
-{{Fill InputObject Description}}
+An input object that will be used to build markdown.
 
 ```yaml
 Type: PSObject
@@ -102,7 +102,7 @@ Accept wildcard characters: False
 
 ### -Name
 
-{{Fill Name Description}}
+The name of a specific document template to use to generate markdown.
 
 ```yaml
 Type: String
@@ -118,7 +118,7 @@ Accept wildcard characters: False
 
 ### -OutputPath
 
-{{Fill OutputPath Description}}
+The directory path to store markdown files created based on the specified document template.
 
 ```yaml
 Type: String

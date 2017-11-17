@@ -9,7 +9,7 @@ schema: 2.0.0
 
 ## SYNOPSIS
 
-{{Fill in the Synopsis}}
+Get document graph from .mof file.
 
 ## SYNTAX
 
@@ -19,23 +19,25 @@ Get-DscMofDocument [-Path] <String>
 
 ## DESCRIPTION
 
-{{Fill in the Description}}
+Get a Managed Object Format (MOF) graph from a .mof file.
+
+This cmdlet will return a DscMofDocument object, containing ResourceId and ResourceType properties that enumerate Desired State Configuration (DSC) resources defined in the .mof file.
 
 ## EXAMPLES
 
 ### Example 1
 
 ```powershell
-PS C:\> {{ Add example code here }}
+PS C:\> Get-DscMofDocument -Path '.\node1.mof';
 ```
 
-{{ Add example description here }}
+Get resources from a .mof file.
 
 ## PARAMETERS
 
 ### -Path
 
-{{Fill Path Description}}
+The file path to a .mof file.
 
 ```yaml
 Type: String

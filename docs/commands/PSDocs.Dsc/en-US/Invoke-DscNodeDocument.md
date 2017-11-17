@@ -9,7 +9,7 @@ schema: 2.0.0
 
 ## SYNOPSIS
 
-Calls a document definition.
+Create markdown from Desired State Configuration (DSC) .mof file.
 
 ## SYNTAX
 
@@ -20,7 +20,7 @@ Invoke-DscNodeDocument [[-DocumentName] <String>] [[-Script] <String>] [[-Instan
 
 ## DESCRIPTION
 
-{{Fill in the Description}}
+Create markdown from Desired State Configuration (DSC) .mof file.
 
 ## EXAMPLES
 
@@ -49,7 +49,7 @@ Generates a new markdown document for each node .mof in the path `.\nodes`.
 
 ### -DocumentName
 
-{{Fill DocumentName Description}}
+The name of the document template.
 
 ```yaml
 Type: String
@@ -65,7 +65,7 @@ Accept wildcard characters: False
 
 ### -InstanceName
 
-{{Fill InstanceName Description}}
+The name(s) of the .mof instance to create markdown for. If this option is not specified, markdown will be created for all instances.
 
 ```yaml
 Type: String[]
@@ -81,7 +81,7 @@ Accept wildcard characters: False
 
 ### -OutputPath
 
-{{Fill OutputPath Description}}
+The directory path to store generated markdown files.
 
 ```yaml
 Type: String
@@ -97,7 +97,7 @@ Accept wildcard characters: False
 
 ### -Path
 
-{{Fill Path Description}}
+The path to search for .mof files in.
 
 ```yaml
 Type: String
@@ -113,7 +113,7 @@ Accept wildcard characters: False
 
 ### -Script
 
-{{Fill Script Description}}
+A file path to a script file containing the documentation template to use.
 
 ```yaml
 Type: String
