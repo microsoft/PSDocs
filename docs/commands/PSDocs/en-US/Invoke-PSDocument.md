@@ -15,14 +15,14 @@ Create markdown from an input object.
 
 ```text
 Invoke-PSDocument [-Name] <String> [-InstanceName <String[]>] [-InputObject <PSObject>]
- [-ConfigurationData <Object>] [-Path <String>] [-OutputPath <String>]
+ [-ConfigurationData <Object>] [-OutputPath <String>]
  [-Function <System.Collections.Generic.Dictionary`2[System.String,System.Management.Automation.ScriptBlock]>]
  [-PassThru]
 ```
 
 ## DESCRIPTION
 
-Create markdown from an input object.
+Create markdown from an input object using a document definition. A document is defined using the Document keyword.
 
 ## EXAMPLES
 
@@ -32,7 +32,7 @@ Create markdown from an input object.
 PS C:\> Invoke-PSDocument -Name 'Sample' -InputObject 'C:\';
 ```
 
-Create markdown using the Sample documentation template for 'C:\'.
+Create markdown using the Sample documentation definition for 'C:\'.
 
 ## PARAMETERS
 
@@ -86,7 +86,11 @@ Accept wildcard characters: False
 
 ### -InstanceName
 
-{{Fill InstanceName Description}}
+The name of the resulting markdown file. During execution of this command, the variable $InstanceName will be available within the document definition for use by expressions.
+
+If InstanceName is not specified the name of the document definition will be used instead.
+
+If more then one InstanceName is specified, multiple markdown files will be generated in the order they were specified.
 
 ```yaml
 Type: String[]
@@ -134,26 +138,10 @@ Accept wildcard characters: False
 
 ### -PassThru
 
-{{Fill PassThru Description}}
+When specified generated markdown will be returned to the pipeline instead of being written to file.
 
 ```yaml
 Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -Path
-
-{{Fill Path Description}}
-
-```yaml
-Type: String
 Parameter Sets: (All)
 Aliases:
 

@@ -61,8 +61,8 @@ function Invoke-PSDocument {
         [Object]$ConfigurationData,
 
         # The path to look for document definitions in
-        [Parameter(Mandatory = $False)]
-        [String]$Path = $PWD,
+        # [Parameter(Mandatory = $False)]
+        # [String]$Path = $PWD,
 
         # The output path to save generated documentation
         [Parameter(Mandatory = $False)]
