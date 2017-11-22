@@ -29,7 +29,20 @@ Create markdown from an input object using a document definition. A document is 
 ### Example 1
 
 ```powershell
-PS C:\> Invoke-PSDocument -Name 'Sample' -InputObject 'C:\';
+# Define a document called Sample
+Document Sample {
+
+    # Add an introduction section
+    Section Introduction {
+        # Add a comment
+        "This is a sample file list from $InputObject"
+
+        # Generate a table
+        Get-ChildItem -Path $InputObject | Table -Property Name,PSIsContainer
+    }
+}
+
+Invoke-PSDocument -Name 'Sample' -InputObject 'C:\';
 ```
 
 Create markdown using the Sample documentation definition for 'C:\'.

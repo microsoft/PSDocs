@@ -32,6 +32,7 @@ Import-LocalizedData -BindingVariable LocalizedData -FileName 'PSDocs.Dsc.Resour
 # Public functions
 #
 
+# .ExternalHelp PSDocs.Dsc-Help.xml
 function Invoke-DscNodeDocument {
 
     [CmdletBinding()]
@@ -70,6 +71,7 @@ function Invoke-DscNodeDocument {
     }
 }
 
+# .ExternalHelp PSDocs.Dsc-Help.xml
 function Get-DscMofDocument {
 
     [CmdletBinding()]

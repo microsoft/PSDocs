@@ -27,23 +27,23 @@ Create markdown from Desired State Configuration (DSC) .mof file.
 ### Example 1
 
 ```powershell
-PS C:\> {{ Add example code here }}
-```
+# Define a document called Sample
+Document 'Sample' {
 
-```powershell
-Document 'Test' {
-
+    # Add an 'Installed features' section in the document
     Section 'Installed features' {
+        # Add a comment
         'The following Windows features have been installed.'
 
-        $InputObject.ResourceType.WindowsFeature | Table -Property Name,Ensure;
+        # Generate a table of Windows Features
+        $InputObject.ResourceType.WindowsFeature | Table -Property Name,Ensure
     }
 }
 
-Invoke-DscNodeDocument -DocumentName 'Test' -Path '.\nodes' -OutputPath '.\docs';
+Invoke-DscNodeDocument -DocumentName 'Sample' -Path '.\nodes' -OutputPath '.\docs';
 ```
 
-Generates a new markdown document for each node .mof in the path `.\nodes`.
+Generates a new markdown document for each node .mof in the path '.\nodes'.
 
 ## PARAMETERS
 
