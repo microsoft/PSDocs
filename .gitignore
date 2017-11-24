@@ -7,3 +7,4 @@
 /reports/
 /**/*.user
 /src/**/*-help.xml
+/src/**/*.help.txt
