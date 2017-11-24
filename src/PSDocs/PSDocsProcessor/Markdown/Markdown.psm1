@@ -78,7 +78,16 @@ function VisitCode {
 
     Write-Verbose -Message "[Doc][Processor] -- Visit code";
 
-    VisitString("   $($InputObject.Content)");
+    if ([String]::IsNullOrEmpty($InputObject.Info)) {
+        VisitString('```');
+        VisitString($InputObject.Content);
+        VisitString('```');
+    }
+    else {
+        VisitString("``````$($InputObject.Info)");
+        VisitString($InputObject.Content);
+        VisitString('```');
+    }
 }
 
 function VisitTitle {

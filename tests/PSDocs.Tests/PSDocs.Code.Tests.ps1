@@ -35,7 +35,7 @@ Describe 'PSDocs -- Code keyword' {
         document 'CodeTests' {
             
             Code {
-                'This is code'
+                This is code
             }
         }
 
@@ -58,29 +58,71 @@ Describe 'PSDocs -- Code keyword' {
         }
 
         It 'Should have expected content' {
-            $Global:TestVars['VisitCode'].Content | Should be 'This is code';
+            $Global:TestVars['VisitCode'].Content | Should match 'This is code';
         }
     }
 
     Context 'Code markdown' {
         
         # Define a test document with a table
-        document 'CodeTests' {
+        document 'CodeMarkdown' {
             
             Code {
-                'This is code'
+                This is code
             }
         }
 
-        $outputDoc = "$outputPath\Code.md";
-        Invoke-PSDocument -Name 'CodeTests' -InstanceName 'Code' -InputObject $dummyObject -OutputPath $outputPath;
+        $outputDoc = "$outputPath\CodeMarkdown.md";
+        Invoke-PSDocument -Name 'CodeMarkdown' -InputObject $dummyObject -OutputPath $outputPath;
 
         It 'Should have generated output' {
             Test-Path -Path $outputDoc | Should be $True;
         }
 
         It 'Should match expected format' {
-            Get-Content -Path $outputDoc -Raw | Should match '   This is code';
+            Get-Content -Path $outputDoc -Raw | Should match 'This is code';
+        }
+    }
+
+    Context 'Code markdown with named format' {
+        
+        # Define a test document with a table
+        document 'CodeMarkdownNamedFormat' {
+            
+            Code powershell {
+                Get-Content
+            }
+        }
+
+        $outputDoc = "$outputPath\CodeMarkdownNamedFormat.md";
+        Invoke-PSDocument -Name 'CodeMarkdownNamedFormat' -InputObject $dummyObject -OutputPath $outputPath;
+
+        It 'Should have generated output' {
+            Test-Path -Path $outputDoc | Should be $True;
+        }
+
+        It 'Should match expected format' {
+            Get-Content -Path $outputDoc -Raw | Should match '```powershell\r\nGet-Content\r\n```';
+        }
+    }
+
+    Context 'Code markdown with evaluation' {
+        
+        # Define a test document with a table
+        document 'CodeMarkdownEval' {
+            
+            $a = 1; $a += 1; $a | Code powershell;
+        }
+
+        $outputDoc = "$outputPath\CodeMarkdownEval.md";
+        Invoke-PSDocument -Name 'CodeMarkdownEval' -InputObject $dummyObject -OutputPath $outputPath;
+
+        It 'Should have generated output' {
+            Test-Path -Path $outputDoc | Should be $True;
+        }
+
+        It 'Should match expected format' {
+            Get-Content -Path $outputDoc -Raw | Should match '```powershell\r\n2\r\n```';
         }
     }
 }

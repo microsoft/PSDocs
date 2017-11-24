@@ -5,6 +5,10 @@
 - Improved cmdlet help
 - Fix to improve handling when `Title` block is used multiple times
 - Fix to prevent yaml header being created when `Yaml` block is not used
+- Code blocks now generate fenced sections instead of indented sections
+- [Breaking change] The body of Code blocks are now no longer evaluated as an expression
+  - This change improves editing of document templates, allowing editors to complete valid PowerShell syntax
+  - Define an expression and the pipe the results to the Code keyword to dynamically generate the contents of a code block
 
 ## v0.2.0
 

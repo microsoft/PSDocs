@@ -221,17 +221,39 @@ function Title {
 function Code {
     [CmdletBinding()]
     param (
-        [Parameter(Position = 0, Mandatory = $True)]
-        [ScriptBlock]$Body
+        # Body of the code block
+        [Parameter(Position = 0, Mandatory = $True, ParameterSetName = 'Default', ValueFromPipeline = $True)]
+        [Parameter(Position = 1, Mandatory = $True, ParameterSetName = 'InfoString', ValueFromPipeline = $True)]
+        [ScriptBlock]$Body,
+
+        [Parameter(Mandatory = $True, ParameterSetName = 'StringDefault', ValueFromPipeline = $True)]
+        [Parameter(Mandatory = $True, ParameterSetName = 'StringInfoString', ValueFromPipeline = $True)]
+        [String]$BodyString,
+
+        # Info-string
+        [Parameter(Position = 0, Mandatory = $True, ParameterSetName = 'InfoString')]
+        [Parameter(Position = 0, Mandatory = $True, ParameterSetName = 'StringInfoString')]
+        [String]$Info
     )
 
     process {
-        $result = New-Object -TypeName PSObject -Property @{ Type = 'Code'; Content = ''; };
+        $result = New-Object -TypeName PSObject -Property @{ Type = 'Code'; Info = ''; Content = ''; };
 
-        $innerResult = $Body.InvokeWithContext($Null, $Null);
+        if (![String]::IsNullOrWhiteSpace($Info)) {
+            $result.Info = $Info.Trim();
+        }
 
-        foreach ($r in $innerResult) {
-            $result.Content += $r;
+        if ($PSCmdlet.ParameterSetName -eq 'StringDefault' -or $PSCmdlet.ParameterSetName -eq 'StringInfoString') {
+            $result.Content = $BodyString;
+        }
+        else {
+            $result.Content = $Body.ToString();
+        }
+
+        # Cleanup indent
+
+        if ($result.Content -match '^\r\n(?<indent> {1,})') {
+            $result.Content = $result.Content -replace "\r\n {1,$($Matches.indent.length)}", '';
         }
 
         $result;
