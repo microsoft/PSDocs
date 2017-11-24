@@ -1,3 +1,9 @@
+---
+external help file: PSDocs-help.xml
+Module Name: PSDocs
+online version: https://github.com/BernieWhite/PSDocs/blob/master/docs/keywords/PSDocs/en-US/Node.md
+schema: 2.0.0
+---
 
 # Note
 
@@ -28,16 +34,16 @@ Invoke-PSDocument -Name 'Test';
 
 Generates a new Test.md document containing a block quote formatted as a DFM note.
 
-
 ## PARAMETERS
 
 ### -Body
+
 A block of inline text to insert.
 
 ```yaml
 Type: ScriptBlock
 Parameter Sets: (All)
-Aliases: 
+Aliases:
 
 Required: True
 Position: 1

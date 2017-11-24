@@ -1,3 +1,9 @@
+---
+external help file: PSDocs-help.xml
+Module Name: PSDocs
+online version: https://github.com/BernieWhite/PSDocs/blob/master/docs/keywords/PSDocs/en-US/Section.md
+schema: 2.0.0
+---
 
 # Section
 
@@ -48,12 +54,13 @@ Generates a new Test.md document containing a table listing all items directly w
 ## PARAMETERS
 
 ### -Name
+
 The name of the section.
 
 ```yaml
 Type: String
 Parameter Sets: (All)
-Aliases: 
+Aliases:
 
 Required: True
 Position: 1
@@ -63,12 +70,13 @@ Accept wildcard characters: False
 ```
 
 ### -When
+
 An optional condition that must be met before the section is included.
 
 ```yaml
 Type: ScriptBlock
 Parameter Sets: (All)
-Aliases: 
+Aliases:
 
 Required: False
 Position: None

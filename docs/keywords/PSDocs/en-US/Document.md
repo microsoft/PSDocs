@@ -1,3 +1,9 @@
+---
+external help file: PSDocs-help.xml
+Module Name: PSDocs
+online version: https://github.com/BernieWhite/PSDocs/blob/master/docs/keywords/PSDocs/en-US/Document.md
+schema: 2.0.0
+---
 
 # Document
 
@@ -24,12 +30,13 @@ Document 'Test' {
 ## PARAMETERS
 
 ### -Name
+
 The name of the document.
 
 ```yaml
 Type: String
 Parameter Sets: (All)
-Aliases: 
+Aliases:
 
 Required: True
 Position: 1

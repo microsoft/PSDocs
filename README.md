@@ -7,7 +7,7 @@ A PowerShell module with commands to generate markdown from objects using PowerS
 | [![av-image][]][av-site] | [![cc-image][]][cc-site] |
 
 [av-image]: https://ci.appveyor.com/api/projects/status/pl7tu7ktue388n7s
-[av-site]: https://ci.appveyor.com/project/BernieWhite/psdocs
+[av-site]: https://ci.appveyor.com/project/BernieWhite/PSDocs
 [cc-image]: https://codecov.io/gh/BernieWhite/PSDocs/branch/master/graph/badge.svg
 [cc-site]: https://codecov.io/gh/BernieWhite/PSDocs
 
@@ -112,14 +112,14 @@ PSDocs extends PowerShell with domain specific lanagage (DSL) keywords and cmdle
 
 ### Keywords
 
-- [Document](/docs/keywords/Document.md) - Defines a named documentation block
-- [Section](/docs/keywords/Section.md) - Creates a named section
-- [Title](/docs/keywords/Title.md) - Sets the document title
-- [Code](/docs/keywords/Code.md) - Inserts a block of code
-- [Note](/docs/keywords/Note.md) - Inserts a note using DocFx formatted markdown (DFM)
-- [Warning](/docs/keywords/Warning.md) - Inserts a warnding usinf DocFx formatted markdown (DFM)
-- [Yaml](/docs/keywords/Yaml.md) - Inserts a YAML header
-- [Table](/docs/keywords/Table.md) - Inserts a table from pipeline objects
+- [Document](/docs/keywords/PSDocs/en-US/Document.md) - Defines a named documentation block
+- [Section](/docs/keywords/PSDocs/en-US/Section.md) - Creates a named section
+- [Title](/docs/keywords/PSDocs/en-US/Title.md) - Sets the document title
+- [Code](/docs/keywords/PSDocs/en-US/Code.md) - Inserts a block of code
+- [Note](/docs/keywords/PSDocs/en-US/Note.md) - Inserts a note using DocFx formatted markdown (DFM)
+- [Warning](/docs/keywords/PSDocs/en-US/Warning.md) - Inserts a warnding usinf DocFx formatted markdown (DFM)
+- [Yaml](/docs/keywords/PSDocs/en-US/Yaml.md) - Inserts a YAML header
+- [Table](/docs/keywords/PSDocs/en-US/Table.md) - Inserts a table from pipeline objects
 
 ### Commands
 
@@ -131,7 +131,7 @@ PSDocs extends PowerShell with domain specific lanagage (DSL) keywords and cmdle
 
 ## Changes and versioning
 
-Modules in this repository will use the [semantic versioning](http://semver.org/) model to delcare breaking changes from v1.0.0. Prior to v1.0.0, breaking changes may be introduced in minor (0.x.0) version increments. For a list of module changes please see the [change log](changelog.md).
+Modules in this repository will use the [semantic versioning](http://semver.org/) model to delcare breaking changes from v1.0.0. Prior to v1.0.0, breaking changes may be introduced in minor (0.x.0) version increments. For a list of module changes please see the [change log](CHANGELOG.md).
 
 ## Maintainers
 
