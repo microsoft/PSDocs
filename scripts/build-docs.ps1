@@ -14,6 +14,12 @@ if ($Scaffold) {
     return;
 }
 
+if (Test-Path -Path '.\build\docs') {
+    Remove-Item -Path '.\build\docs' -Recurse -Force;
+
+    New-Item -Path '.\build\docs' -ItemType Directory -Force | Out-Null;
+}
+
 # Generate external help files
 New-ExternalHelp -OutputPath '.\build\docs\PSDocs' -Path '.\docs\commands\PSDocs\en-US','.\docs\keywords\PSDocs\en-US' -Force;
 New-ExternalHelp -OutputPath '.\build\docs\PSDocs.Dsc' -Path '.\docs\commands\PSDocs.Dsc\en-US' -Force;
