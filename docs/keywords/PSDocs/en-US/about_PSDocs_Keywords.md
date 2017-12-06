@@ -98,7 +98,6 @@ Document 'Sample' {
 Invoke-PSDocument -Name 'Sample' -InputObject '';
 ```
 
-
 ```powershell
 # A document definition named Sample
 Document 'Sample' {
@@ -135,37 +134,47 @@ Code [-Info <String>] [-Body] <ScriptBlock>
 Examples:
 
 ```powershell
-Document 'Test' {
+# A document definition named CodeBlock
+Document 'CodeBlock' {
 
+    # Define a code block that will be rendered as markdown instead of being executed
     Code {
         powershell.exe -Help
     }
 }
 
-Invoke-PSDocument -Name 'Test' -InputObject $Null;
+# Generate markdown from the document definition
+Invoke-PSDocument -Name 'CodeBlock' -InputObject $Null;
 ```
 
-Generates a new `Test.md` document containing the `powershell.exe -Help` command line.
+Generates a new `CodeBlock.md` document containing the `powershell.exe -Help` command line.
 
 ```powershell
-Document 'Test' {
+# A document definition named CodeBlockWithInfo
+Document 'CodeBlockWithInfo' {
 
+    # Define a code block that will be rendered in markdown as PowerShell
     Code powershell {
         Get-Item -Path .\;
     }
 }
 
-Invoke-PSDocument -Name 'Test' -InputObject $Null;
+# Generate markdown from the document definition
+Invoke-PSDocument -Name 'CodeBlockWithInfo' -InputObject $Null;
 ```
 
 Generates a new `Test.md` document containing script code formatted with the powershell info string.
 
 ```powershell
-Document 'Test' {
+# A document definition named CodeBlockFromPipeline
+Document 'CodeBlockFromPipeline' {
 
-    # Get the output of the Get-Help command
+    # Execute Get-Help then create a code block from the output of the Get-Help command
     Get-Help 'Invoke-PSDocument' | Code
 }
+
+# Generate markdown from the document definition
+Invoke-PSDocument -Name 'CodeBlockWithInfo' -InputObject $Null;
 ```
 
 ### Note
@@ -181,17 +190,20 @@ Note [-Body] <ScriptBlock>
 Examples:
 
 ```powershell
-Document 'Test' {
+# A document definition named NoteBlock
+Document 'NoteBlock' {
 
+    # Define a note block
     Note {
         'This is a note.'
     }
 }
 
-Invoke-PSDocument -Name 'Test' -InputObject $Null;
+# Generate markdown from the document definition
+Invoke-PSDocument -Name 'NoteBlock' -InputObject $Null;
 ```
 
-Generates a new `Test.md` document containing a block quote formatted as a DFM note.
+Generates a new `NoteBlock.md` document containing a block quote formatted as a DFM note.
 
 ### Warning
 
@@ -206,17 +218,19 @@ Warning [-Body] <ScriptBlock>
 Examples:
 
 ```powershell
-Document 'Test' {
+# A document definition named WarningBlock
+Document 'WarningBlock' {
 
     Warning {
         'This is a warning.'
     }
 }
 
-Invoke-PSDocument -Name 'Test' -InputObject $Null;
+# Generate markdown from the document definition
+Invoke-PSDocument -Name 'WarningBlock' -InputObject $Null;
 ```
 
-Generates a new `Test.md` document containing a block quote formatted as a DFM warning.
+Generates a new `WarningBlock.md` document containing a block quote formatted as a DFM warning.
 
 ### Table
 
@@ -233,7 +247,8 @@ Table [-Property <String[]>]
 Examples:
 
 ```powershell
-Document 'Test' {
+# A document definition named Table
+Document 'Table' {
 
     Section 'Directory list' {
 
@@ -242,10 +257,11 @@ Document 'Test' {
     }
 }
 
-Invoke-PSDocument -Name 'Test';
+# Generate markdown from the document definition
+Invoke-PSDocument -Name 'Table';
 ```
 
-Generates a new `Test.md` document containing a table populated with a row for each item. Only the properties Name and PSIsContainer are added as columns.
+Generates a new `Table.md` document containing a table populated with a row for each item. Only the properties Name and PSIsContainer are added as columns.
 
 ### Yaml
 
@@ -260,19 +276,23 @@ Yaml [-Body] <Hashtable>
 Examples:
 
 ```powershell
-Document 'Test' {
+# A document definition named YamlBlock
+Document 'YamlBlock' {
 
+    # Create a Yaml block of key value pairs
     Yaml @{
         title = 'An example title'
     }
 
+    # Additional text to add to the document
     'Yaml header may not be rendered by some markdown viewers. See source to view yaml.'
 }
 
-Invoke-PSDocument -Name 'Test';
+# Generate markdown from the document definition
+Invoke-PSDocument -Name 'YamlBlock';
 ```
 
-Generates a new Test.md document containing a yaml header. An example of the output generated is available [here](/docs/examples/Yaml-header-output.md).
+Generates a new YamlBlock.md document containing a yaml header. An example of the output generated is available [here](/docs/examples/Yaml-header-output.md).
 
 ## EXAMPLES
 
@@ -291,6 +311,8 @@ Document 'Sample' {
     }
 }
 
+# Generate markdown from the document definition
+Invoke-PSDocument -Name 'Sample';
 ```
 
 ## NOTE
