@@ -3,6 +3,7 @@
 
 - Improved `Yaml` block handling to allow yaml header to be defined throughout the document and merged when multiple blocks are defined
 - Improved cmdlet help
+- Output path is automatically created by `Invoke-PSDocument` if it doesn't exist
 - Fix to improve handling when `Title` block is used multiple times
 - Fix to prevent yaml header being created when `Yaml` block is not used
 - Code blocks now generate fenced sections instead of indented sections

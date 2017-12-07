@@ -119,7 +119,7 @@ Accept wildcard characters: False
 
 ### -OutputPath
 
-The directory path to store markdown files created based on the specified document template.
+The directory path to store markdown files created based on the specified document template. This path will be automatically created if it doesn't exist.
 
 ```yaml
 Type: String

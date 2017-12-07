@@ -634,6 +634,13 @@ function GenerateDocument {
             # Build a path for the document
             $documentPath = Join-Path -Path $OutputPath -ChildPath "$instance.md";
 
+            # Create parent path if it doesn't exist
+            $documentParent = Split-Path -Path $documentPath -Parent;
+
+            if (!(Test-Path -Path $documentParent)) {
+                New-Item -Path $documentParent -ItemType Directory -Force | Out-Null;
+            }
+
             # Parse the model
             ParseDom -Dom $dom -Processor (NewMarkdownProcessor) -Verbose:$VerbosePreference | WriteDocumentContent -Path $documentPath -PassThru:$PassThru;
         }
