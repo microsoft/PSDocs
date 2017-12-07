@@ -22,7 +22,7 @@
         {
             "label": "build",
             "type": "shell",
-            "command": ".\\scripts\\build.ps1 -Clean -Module PSDocs",
+            "command": ".\\scripts\\build.ps1 -Clean -Module PSDocs,PSDocs.Dsc",
             "group": {
                 "kind": "build",
                 "isDefault": true
