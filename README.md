@@ -21,8 +21,8 @@ The following modules are included in this repository.
 
 | Module     | Description | Latest version |
 | ------     | ----------- | -------------- |
-| PSDocs     | Generate markdown from PowerShell | [v0.2.0][psg-psdocs] |
-| PSDocs.Dsc | Extension for PSDocs to generate markdown from Desired State Configuration | [v0.2.0][psg-psdocsdsc] |
+| PSDocs     | Generate markdown from PowerShell | [v0.3.0][psg-psdocs] |
+| PSDocs.Dsc | Extension for PSDocs to generate markdown from Desired State Configuration | [v0.3.0][psg-psdocsdsc] |
 
 [psg-psdocs]: https://www.powershellgallery.com/packages/PSDocs
 [psg-psdocsdsc]: https://www.powershellgallery.com/packages/PSDocs.Dsc

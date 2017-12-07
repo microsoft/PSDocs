@@ -1,6 +1,8 @@
 
 ## Unreleased
 
+## v0.3.0
+
 - Improved `Yaml` block handling to allow yaml header to be defined throughout the document and merged when multiple blocks are defined
 - Improved cmdlet help
 - Output path is automatically created by `Invoke-PSDocument` if it doesn't exist
