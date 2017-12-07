@@ -9,6 +9,7 @@
 - [Breaking change] The body of Code blocks are now no longer evaluated as an expression
   - This change improves editing of document templates, allowing editors to complete valid PowerShell syntax
   - Define an expression and the pipe the results to the Code keyword to dynamically generate the contents of a code block
+- [Breaking change] `-ConfigurationData` parameter of `Invoke-PSDocument` has been removed while purpose and future use of the parameter is reconsidered
 
 ## v0.2.0
 

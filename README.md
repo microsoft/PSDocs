@@ -112,6 +112,8 @@ PSDocs extends PowerShell with domain specific lanagage (DSL) keywords and cmdle
 
 ### Keywords
 
+The following language keywords are used by the `PSDocs` module:
+
 - [Document](/docs/keywords/PSDocs/en-US/Document.md) - Defines a named documentation block
 - [Section](/docs/keywords/PSDocs/en-US/Section.md) - Creates a named section
 - [Title](/docs/keywords/PSDocs/en-US/Title.md) - Sets the document title
@@ -123,11 +125,16 @@ PSDocs extends PowerShell with domain specific lanagage (DSL) keywords and cmdle
 
 ### Commands
 
+The following commands exist in the `PSDocs` module:
+
 - [Invoke-PSDocument](/docs/commands/PSDocs/en-US/Invoke-PSDocument.md)
-- [Invoke-DscNodeDocument](/docs/commands/PSDocs.Dsc/en-US/Invoke-DscNodeDocument.md)
 - [Get-PSDocumentHeader](/docs/commands/PSDocs/en-US/Get-PSDocumentHeader.md)
 - [Import-PSDocumentTemplate](/docs/commands/PSDocs/en-US/Import-PSDocumentTemplate.md)
+
+The following commands exist in the `PSDocs.Dsc` module:
+
 - [Get-DscMofDocument](/docs/commands/PSDocs.Dsc/en-US/Get-DscMofDocument.md)
+- [Invoke-DscNodeDocument](/docs/commands/PSDocs.Dsc/en-US/Invoke-DscNodeDocument.md)
 
 ## Changes and versioning
 
