@@ -57,8 +57,8 @@ function Invoke-PSDocument {
         [Parameter(Mandatory = $False, ValueFromPipeline = $True)]
         [PSObject]$InputObject,
 
-        [Parameter(Mandatory = $False)]
-        [Object]$ConfigurationData,
+        # [Parameter(Mandatory = $False)]
+        # [Object]$ConfigurationData,
 
         # The path to look for document definitions in
         # [Parameter(Mandatory = $False)]
@@ -500,8 +500,8 @@ function GenerateDocumentFn {
         [Parameter(Mandatory = $True, ValueFromPipeline = $True)]
         [PSObject]$InputObject,
 
-        [Parameter(Mandatory = $False)]
-        [Object]$ConfigurationData,
+        # [Parameter(Mandatory = $False)]
+        # [Object]$ConfigurationData,
 
         [Parameter(Mandatory = $False)]
         [String]$OutputPath = $PWD

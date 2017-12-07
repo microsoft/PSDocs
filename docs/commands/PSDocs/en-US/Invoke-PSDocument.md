@@ -14,8 +14,7 @@ Create markdown from an input object.
 ## SYNTAX
 
 ```text
-Invoke-PSDocument [-Name] <String> [-InstanceName <String[]>] [-InputObject <PSObject>]
- [-ConfigurationData <Object>] [-OutputPath <String>]
+Invoke-PSDocument [-Name] <String> [-InstanceName <String[]>] [-InputObject <PSObject>] [-OutputPath <String>]
  [-Function <System.Collections.Generic.Dictionary`2[System.String,System.Management.Automation.ScriptBlock]>]
  [-PassThru] [<CommonParameters>]
 ```
@@ -34,6 +33,7 @@ Document Sample {
 
     # Add an introduction section
     Section Introduction {
+
         # Add a comment
         "This is a sample file list from $InputObject"
 
@@ -48,22 +48,6 @@ Invoke-PSDocument -Name 'Sample' -InputObject 'C:\';
 Create markdown using the Sample documentation definition for 'C:\'.
 
 ## PARAMETERS
-
-### -ConfigurationData
-
-{{Fill ConfigurationData Description}}
-
-```yaml
-Type: Object
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
 
 ### -Function
 
