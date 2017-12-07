@@ -9,7 +9,6 @@ param (
 
 # Setup error handling
 $ErrorActionPreference = 'Stop';
-Set-StrictMode -Version latest;
 
 # Setup tests paths
 $rootPath = (Resolve-Path $PSScriptRoot\..\..).Path;
@@ -78,7 +77,7 @@ Describe 'PSDocs -- Table keyword' {
 
     Context 'Table single entry markdown' {
         
-        # Define a test document with a warning
+        # Define a test document with a table
         document 'TableSingleEntryMarkdown' {
             
             New-Object -TypeName PSObject -Property @{ Name = 'Single' } | Table -Property Name;
@@ -93,6 +92,29 @@ Describe 'PSDocs -- Table keyword' {
 
         It 'Should match expected format' {
             Get-Content -Path $outputDoc -Raw | Should match '\|Name\|\r\n\| --- \|\r\n\|Single\|';
+        }
+    }
+    
+    Context 'Table with null' {
+        
+        # Define a test document with section and table
+        document 'TableWithNull' {
+
+            Section 'Windows features' {
+            
+                $InputObject.ResourceType.WindowsFeature | Table -Property Name,Ensure;
+            }
+        }
+
+        $outputDoc = "$outputPath\TableWithNull.md";
+        Invoke-PSDocument -Name 'TableWithNull' -InputObject @{ ResourceType = @{  } } -OutputPath $outputPath;
+
+        It 'Should have generated output' {
+            Test-Path -Path $outputDoc | Should be $True;
+        }
+
+        It 'Should match expected format' {
+            Get-Content -Path $outputDoc -Raw | Should match '(## Windows features\r\n)$';
         }
     }
 }

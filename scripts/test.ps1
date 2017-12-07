@@ -9,7 +9,11 @@
 param (
     # Should output paths be cleaned first
     [Parameter(Mandatory = $False)]
-    [Switch]$Clean = $False
+    [Switch]$Clean = $False,
+
+    # Code coverage should be calculated
+    [Parameter(Mandatory = $False)]
+    [Switch]$CodeCoverage = $False
 )
 
 Write-Verbose -Message "[Test] BEGIN::";
@@ -47,9 +51,9 @@ if ($Null -eq $pesterModule) {
 }
 
 # Load Pester module
-Import-Module -Name Pester -Verbose:$False;
+Import-Module -Name Pester -RequiredVersion '3.4.0' -Verbose:$False;
 
-@('PSDocs', 'PSDocs.Dsc') | RunTest -Path $testPath -OutputPath $reportsPath -Verbose:$VerbosePreference;
+@('PSDocs', 'PSDocs.Dsc') | RunTest -Path $testPath -OutputPath $reportsPath -CodeCoverage:$CodeCoverage -Verbose:$VerbosePreference;
 
 # STEP : Publish results
 

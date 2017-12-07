@@ -49,11 +49,11 @@ Describe 'PSDocs -- Warning keyword' {
 
         Invoke-PSDocument -Name 'WarningVisitor' -InputObject $dummyObject -OutputPath $outputPath;
 
-        It 'Should process Note keyword' {
+        It 'Should process keyword' {
             Assert-MockCalled -CommandName 'VisitWarning' -ModuleName 'Markdown' -Times 1;
         }
 
-        It 'Should be Note object' {
+        It 'Should be expected type' {
             $Global:TestVars['VisitWarning'].Type | Should be 'Warning';
         }
 

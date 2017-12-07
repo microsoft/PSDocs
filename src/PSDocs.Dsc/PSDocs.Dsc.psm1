@@ -32,6 +32,7 @@ Import-LocalizedData -BindingVariable LocalizedData -FileName 'PSDocs.Dsc.Resour
 # Public functions
 #
 
+# .ExternalHelp PSDocs.Dsc-Help.xml
 function Invoke-DscNodeDocument {
 
     [CmdletBinding()]
@@ -70,6 +71,7 @@ function Invoke-DscNodeDocument {
     }
 }
 
+# .ExternalHelp PSDocs.Dsc-Help.xml
 function Get-DscMofDocument {
 
     [CmdletBinding()]
@@ -130,9 +132,7 @@ function BuildDocumentation {
             }
         }
         catch {
-            Write-Error -Message ($LocalizedData.ImportMofFailed -f $Path, $_.Exception.Message) -Exception $_.Exception;
-
-            return;
+            Write-Error -Message ($LocalizedData.ImportMofFailed -f $Path, $_.Exception.Message) -Exception $_.Exception -ErrorAction Stop;
         }
 
         if ($PSBoundParameters.ContainsKey('Script')) {
@@ -141,9 +141,7 @@ function BuildDocumentation {
                 Import-PSDocumentTemplate -Path $Script -Verbose:$VerbosePreference;
             }
             catch {
-                Write-Error -Message ($LocalizedData.ImportDocumentTemplateFailed -f $Script, $_.Exception.Message) -Exception $_.Exception;
-
-                return;
+                Write-Error -Message ($LocalizedData.ImportDocumentTemplateFailed -f $Script, $_.Exception.Message) -Exception $_.Exception -ErrorAction Stop;
             }   
         }
 

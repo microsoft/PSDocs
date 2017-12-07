@@ -17,6 +17,7 @@ function Visit {
     }
 
     switch ($InputObject.Type) {
+        'Document' { return VisitDocument($InputObject); }
         'Code' { return VisitCode($InputObject); }
         'Section' { return VisitSection($InputObject); }
         'Title' { return VisitTitle($InputObject); }
@@ -77,7 +78,16 @@ function VisitCode {
 
     Write-Verbose -Message "[Doc][Processor] -- Visit code";
 
-    VisitString("   $($InputObject.Content)");
+    if ([String]::IsNullOrEmpty($InputObject.Info)) {
+        VisitString('```');
+        VisitString($InputObject.Content);
+        VisitString('```');
+    }
+    else {
+        VisitString("``````$($InputObject.Info)");
+        VisitString($InputObject.Content);
+        VisitString('```');
+    }
 }
 
 function VisitTitle {
@@ -85,7 +95,7 @@ function VisitTitle {
 
     Write-Verbose -Message "[Doc][Processor] -- Visit title";
 
-    VisitString("# $($InputObject.Content)");
+    VisitString("# $($InputObject.Title)");
 }
 
 function VisitList {
@@ -132,7 +142,7 @@ function VisitYaml {
     
     VisitString('---');
 
-    foreach ($kv in $InputObject.Content.GetEnumerator()) {
+    foreach ($kv in $InputObject.Metadata.GetEnumerator()) {
         VisitString("$($kv.Key): $($kv.Value)");
     }
 
@@ -167,4 +177,19 @@ function VisitTable {
     }
 
     Write-Verbose -Message "[Doc][Processor][Table] END:: [$($table.Rows.Count)]";
+}
+
+function VisitDocument {
+
+    param (
+        $InputObject
+    )
+
+    if ($Null -ne $InputObject.Metadata -and $InputObject.Metadata.Count -gt 0) {
+        VisitYaml -InputObject $InputObject;
+    }
+
+    if (![String]::IsNullOrEmpty($InputObject.Title)) {
+        VisitTitle -InputObject $InputObject;
+    }
 }

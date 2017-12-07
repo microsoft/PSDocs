@@ -9,7 +9,6 @@ param (
 
 # Setup error handling
 $ErrorActionPreference = 'Stop';
-Set-StrictMode -Version latest;
 
 # Setup tests paths
 $rootPath = (Resolve-Path $PSScriptRoot\..\..).Path;
@@ -19,6 +18,7 @@ $temp = "$here\..\..\build";
 # $sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path) -replace '\.Tests\.', '.';
 
 Import-Module $src -Force;
+Import-Module $src\..\PSDocs -Force;
 
 $outputPath = "$temp\PSDocs.Dsc.Tests\Common";
 Remove-Item -Path $outputPath -Force -Recurse -Confirm:$False -ErrorAction SilentlyContinue;
@@ -50,6 +50,26 @@ configuration TestConfiguration {
         }
     }
 }
+
+configuration TestConfiguration2 {
+    
+        param (
+            [Parameter(Mandatory = $True)]
+            [String[]]$ComputerName
+        )
+    
+        Import-DscResource -ModuleName PSDesiredStateConfiguration;
+    
+        node $ComputerName {
+    
+            File FileResource {
+                Ensure = 'Present'
+                Type = 'File'
+                DestinationPath = 'C:\environment.tag'
+                Contents = "Node=$($Node.NodeName)"
+            }
+        }
+    }
 
 Describe 'PSDocs.Dsc' {
     Context 'Generate a document without an instance name' {
@@ -143,6 +163,27 @@ Describe 'PSDocs.Dsc' {
 
         It 'Should contain instance name' {
             Get-Content -Path "$outputPath\WithExternalScript.md" -Raw | Should match '\|FS\-SMB1\|';
+        }
+    }
+
+    Context 'Generate a document with missing data' {
+        
+        # Define a test document with a table
+        document 'WithMissingData' {
+
+            Section 'Windows features' {
+            
+                # Reference a resource type that is not included in the configuration
+                $InputObject.ResourceType.WindowsFeature | Table -Property Name,Ensure;
+            }
+        }
+
+        TestConfiguration2 -OutputPath $outputPath -ComputerName 'WithMissingData';
+
+        Invoke-DscNodeDocument -DocumentName 'WithMissingData' -InstanceName 'WithMissingData' -Path $outputPath -OutputPath $outputPath;
+
+        It 'Should output' {
+            Test-Path -Path "$outputPath\WithMissingData.md" | Should be $True;
         }
     }
 }

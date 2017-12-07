@@ -8,7 +8,7 @@
 RootModule = 'PSDocs.Dsc.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.2.0'
+ModuleVersion = '0.3.0'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -48,7 +48,7 @@ Description = 'Desired State Configuration (DSC) extensions for PSDocs.'
 
 # Modules that must be imported into the global environment prior to importing this module
 RequiredModules = @(
-    @{ ModuleName = 'PSDocs'; ModuleVersion = '0.2.0'; }
+    @{ ModuleName = 'PSDocs'; ModuleVersion = '0.3.0'; }
 )
 
 # Assemblies that must be loaded prior to importing this module

@@ -6,4 +6,5 @@
 /build/
 /reports/
 /**/*.user
-/.vscode/settings.json
+/src/**/*-help.xml
+/src/**/*.help.txt

@@ -42,7 +42,10 @@ function RunTest {
         [String]$Path,
 
         [Parameter(Mandatory = $True)]
-        [String]$OutputPath
+        [String]$OutputPath,
+
+        [Parameter(Mandatory = $False)]
+        [Switch]$CodeCoverage = $False
     )
 
     begin {
@@ -60,6 +63,10 @@ function RunTest {
 
             # Run Pester tests
             $pesterParams = @{ OutputFile = "$OutputPath\$TestGroup.xml"; OutputFormat = 'NUnitXml'; PesterOption = @{ IncludeVSCodeMarker = $True }; };
+
+            if ($CodeCoverage) {
+                $pesterParams.Add('CodeCoverage', "$Path\..\src\$TestGroup\*.psm1");
+            }
 
             Invoke-Pester @pesterParams;
 

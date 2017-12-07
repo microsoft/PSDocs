@@ -85,4 +85,33 @@ Describe 'PSDocs -- Section keyword' {
             Get-Content -Path $outputDoc -Raw | Should match '## Test(\n|\r){1,2}Content';
         }
     }
+
+    Context 'Conditional section block' {
+
+        # Define a test document with a section block
+        document 'SectionWhen' {
+            Section 'Section 1' -When { $False } {
+                'Content 1'
+            }
+
+            Section 'Section 2' -When { $True } {
+                'Content 2'
+            }
+        }
+
+        $outputDoc = "$outputPath\SectionWhen.md";
+        Invoke-PSDocument -Name 'SectionWhen' -InputObject $dummyObject -OutputPath $outputPath;
+
+        It 'Should have generated output' {
+            Test-Path -Path $outputDoc | Should be $True;
+        }
+
+        It 'Should contain Section 2' {
+            Get-Content -Path $outputDoc -Raw | Should match '## Section 2\r\nContent 2';
+        }
+
+        It 'Should not contain Section 1' {
+            Get-Content -Path $outputDoc -Raw | Should not match '## Section 1\r\nContent 1';
+        }
+    }
 }

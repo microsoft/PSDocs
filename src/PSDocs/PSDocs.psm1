@@ -16,7 +16,7 @@ Import-LocalizedData -BindingVariable LocalizedData -FileName 'PSDocs.Resources.
 # Public functions
 #
 
-# Implement the document keyword
+# .ExternalHelp PSDocs-Help.xml
 function Document {
     [CmdletBinding()]
     param (
@@ -42,6 +42,7 @@ function Document {
     }
 }
 
+# .ExternalHelp PSDocs-Help.xml
 function Invoke-PSDocument {
 
     [CmdletBinding()]
@@ -56,12 +57,12 @@ function Invoke-PSDocument {
         [Parameter(Mandatory = $False, ValueFromPipeline = $True)]
         [PSObject]$InputObject,
 
-        [Parameter(Mandatory = $False)]
-        [Object]$ConfigurationData,
+        # [Parameter(Mandatory = $False)]
+        # [Object]$ConfigurationData,
 
         # The path to look for document definitions in
-        [Parameter(Mandatory = $False)]
-        [String]$Path = $PWD,
+        # [Parameter(Mandatory = $False)]
+        # [String]$Path = $PWD,
 
         # The output path to save generated documentation
         [Parameter(Mandatory = $False)]
@@ -86,6 +87,7 @@ function Invoke-PSDocument {
     }
 }
 
+# .ExternalHelp PSDocs-Help.xml
 function Import-PSDocumentTemplate {
 
     [CmdletBinding()]
@@ -98,6 +100,28 @@ function Import-PSDocumentTemplate {
         Write-Verbose -Message "[Doc] -- Reading template: $Path";
 
         ReadTemplate @PSBoundParameters;
+    }
+}
+
+# .ExternalHelp PSDocs-Help.xml
+function Get-PSDocumentHeader {
+
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $False, ValueFromPipelineByPropertyName = $True)]
+        [Alias('FullName')]
+        [String]$Path = $PWD
+    )
+
+    process {
+
+        $filteredItems = Get-ChildItem -Path "$Path\*" -File;
+
+        foreach ($item in $filteredItems) {
+            
+            ReadYamlHeader -Path $item.FullName -Verbose:$VerbosePreference;
+        }
+
     }
 }
 
@@ -154,11 +178,20 @@ function Section {
 
             $Section = $result;
 
-            # Invoke the Section body and collect the results
-            $innerResult = $Body.Invoke();
+            try {
+                # Invoke the Section body and collect the results
+                $innerResult = $Body.Invoke();
+    
+                foreach ($r in $innerResult) {
+                    $result.Node += $r;
+                }
+            }
+            catch {
+                
+                # Report non-terminating error
+                Write-Error -Message ($LocalizedData.SectionProcessFailure -f $_.Exception.Message) -Exception $_.Exception -ErrorId 'PSDocs.Section.ProcessFailure';
 
-            foreach ($r in $innerResult) {
-                $result.Node += $r;
+                return;
             }
 
             # Emit Section object to the pipeline
@@ -176,30 +209,51 @@ function Title {
     param (
         [Parameter(Position = 0, Mandatory = $True)]
         [AllowEmptyString()]
-        [String]$Title
+        [String]$Content
     )
 
     process {
-        $result = New-Object -TypeName PSObject -Property @{ Type = 'Title'; Content = $Title; };
-
-        $result;
+        # Update the document title
+        $Document.Title = $Content;
     }
 }
 
 function Code {
     [CmdletBinding()]
     param (
-        [Parameter(Position = 0, Mandatory = $True)]
-        [ScriptBlock]$Body
+        # Body of the code block
+        [Parameter(Position = 0, Mandatory = $True, ParameterSetName = 'Default', ValueFromPipeline = $True)]
+        [Parameter(Position = 1, Mandatory = $True, ParameterSetName = 'InfoString', ValueFromPipeline = $True)]
+        [ScriptBlock]$Body,
+
+        [Parameter(Mandatory = $True, ParameterSetName = 'StringDefault', ValueFromPipeline = $True)]
+        [Parameter(Mandatory = $True, ParameterSetName = 'StringInfoString', ValueFromPipeline = $True)]
+        [String]$BodyString,
+
+        # Info-string
+        [Parameter(Position = 0, Mandatory = $True, ParameterSetName = 'InfoString')]
+        [Parameter(Position = 0, Mandatory = $True, ParameterSetName = 'StringInfoString')]
+        [String]$Info
     )
 
     process {
-        $result = New-Object -TypeName PSObject -Property @{ Type = 'Code'; Content = ''; };
+        $result = New-Object -TypeName PSObject -Property @{ Type = 'Code'; Info = ''; Content = ''; };
 
-        $innerResult = $Body.InvokeWithContext($Null, $Null);
+        if (![String]::IsNullOrWhiteSpace($Info)) {
+            $result.Info = $Info.Trim();
+        }
 
-        foreach ($r in $innerResult) {
-            $result.Content += $r;
+        if ($PSCmdlet.ParameterSetName -eq 'StringDefault' -or $PSCmdlet.ParameterSetName -eq 'StringInfoString') {
+            $result.Content = $BodyString;
+        }
+        else {
+            $result.Content = $Body.ToString();
+        }
+
+        # Cleanup indent
+
+        if ($result.Content -match '^\r\n(?<indent> {1,})') {
+            $result.Content = $result.Content -replace "\r\n {1,$($Matches.indent.length)}", '';
         }
 
         $result;
@@ -277,14 +331,16 @@ function Yaml {
     [CmdletBinding()]
     param (
         [Parameter(Position = 0, Mandatory = $True)]
-        [Hashtable]$Body
+        [System.Collections.IDictionary]$Body
     )
 
     process {
 
-        $result = New-Object -TypeName PSObject -Property @{ Type = 'Yaml'; Node = @(); Content = $Body; };
-
-        $result;
+        # Process eaxch key value pair in the supplied dictionary/hashtable
+        foreach ($kv in $Body.GetEnumerator()) {
+            
+            $Document.Metadata[$kv.Key] = $kv.Value;
+        }
     }
 }
 
@@ -292,7 +348,8 @@ function Table {
 
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory = $True, ValueFromPipeline = $True)]
+        [Parameter(Mandatory = $False, ValueFromPipeline = $True)]
+        [AllowNull()]
         [Object]$InputObject,
 
         [Parameter(Mandatory = $False, Position = 0)]
@@ -443,8 +500,8 @@ function GenerateDocumentFn {
         [Parameter(Mandatory = $True, ValueFromPipeline = $True)]
         [PSObject]$InputObject,
 
-        [Parameter(Mandatory = $False)]
-        [Object]$ConfigurationData,
+        # [Parameter(Mandatory = $False)]
+        # [Object]$ConfigurationData,
 
         [Parameter(Mandatory = $False)]
         [String]$OutputPath = $PWD
@@ -550,22 +607,39 @@ function GenerateDocument {
 
             Write-Verbose -Message "[Doc] -- Processing: $instance";
 
+            $document = New-Object -TypeName PSObject -Property @{ Type = 'Document'; Metadata = ([Ordered]@{ }); Title = [String]::Empty; };
+
             # Define built-in variables
             [PSVariable[]]$variablesToDefine = @(
                 New-Object -TypeName PSVariable -ArgumentList ('InstanceName', $instance)
                 New-Object -TypeName PSVariable -ArgumentList ('InputObject', $InputObject)
                 New-Object -TypeName PSVariable -ArgumentList ('Parameter', $parameter)
                 New-Object -TypeName PSVariable -ArgumentList ('Section', $Section)
-            );
+                New-Object -TypeName PSVariable -ArgumentList ('Document', $document)
+            )
 
-            # Invoke the body of the document definition and get the output
-            $innerResult = $body.InvokeWithContext($functionsToDefine, $variablesToDefine);
+            try {
+                # Invoke the body of the document definition and get the output
+                $innerResult = $body.InvokeWithContext($functionsToDefine, $variablesToDefine);
+            }
+            catch {
+                Write-Error -Message $LocalizedData.DocumentProcessFailure -Exception $_.Exception -Category OperationStopped -ErrorId 'PSDocs.Document.ProcessFailure' -ErrorAction Stop;
+            }
+
+            $innerResult.Insert(0, $document);
 
             # Create a document object model based on the output
             $dom = New-Object -TypeName PSObject -Property @{ Node = $innerResult; };
             
             # Build a path for the document
             $documentPath = Join-Path -Path $OutputPath -ChildPath "$instance.md";
+
+            # Create parent path if it doesn't exist
+            $documentParent = Split-Path -Path $documentPath -Parent;
+
+            if (!(Test-Path -Path $documentParent)) {
+                New-Item -Path $documentParent -ItemType Directory -Force | Out-Null;
+            }
 
             # Parse the model
             ParseDom -Dom $dom -Processor (NewMarkdownProcessor) -Verbose:$VerbosePreference | WriteDocumentContent -Path $documentPath -PassThru:$PassThru;
@@ -813,6 +887,11 @@ function ReadYamlHeader {
 # Export module
 #
 
-Export-ModuleMember -Function 'Document','Invoke-PSDocument','Import-PSDocumentTemplate';
+Export-ModuleMember -Function @(
+    'Document'
+    'Invoke-PSDocument'
+    'Import-PSDocumentTemplate'
+    'Get-PSDocumentHeader'
+);
 
 # EOM

@@ -1,0 +1,10 @@
+{
+    "files.exclude": {
+        ".vs": true,
+        "artifacts": true,
+        "reports": true
+    },
+    "search.exclude": {
+        "build": true
+    }
+}
