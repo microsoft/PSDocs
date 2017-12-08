@@ -119,6 +119,34 @@ Document 'Sample' {
 Invoke-PSDocument -Name 'Sample' -InputObject '';
 ```
 
+### Title
+
+You can use the Title statement to set the title of the document.
+
+Syntax:
+
+```text
+Title [-Content] <String>
+```
+
+- `Content` - Set the title for the document.
+
+Examples:
+
+```powershell
+# A document definition named Title
+Document 'Title' {
+
+    # Set the title for the document
+    Title 'An example document'
+}
+
+# Generate markdown from the document definition
+Invoke-PSDocument -Name 'Title' -InputObject $Null;
+```
+
+Generates a new `Title.md` document containing the heading `An example document`.
+
 ### Code
 
 You can use the Code statement to generate fenced code sections in markdown. An info string can optionally be specified using the `-Info` parameter.
