@@ -114,14 +114,14 @@ PSDocs extends PowerShell with domain specific lanagage (DSL) keywords and cmdle
 
 The following language keywords are used by the `PSDocs` module:
 
-- [Document](/docs/keywords/PSDocs/en-US/Document.md) - Defines a named documentation block
-- [Section](/docs/keywords/PSDocs/en-US/Section.md) - Creates a named section
-- [Title](/docs/keywords/PSDocs/en-US/Title.md) - Sets the document title
-- [Code](/docs/keywords/PSDocs/en-US/Code.md) - Inserts a block of code
-- [Note](/docs/keywords/PSDocs/en-US/Note.md) - Inserts a note using DocFx formatted markdown (DFM)
-- [Warning](/docs/keywords/PSDocs/en-US/Warning.md) - Inserts a warnding usinf DocFx formatted markdown (DFM)
-- [Yaml](/docs/keywords/PSDocs/en-US/Yaml.md) - Inserts a YAML header
-- [Table](/docs/keywords/PSDocs/en-US/Table.md) - Inserts a table from pipeline objects
+- [Document](/docs/keywords/PSDocs/en-US/about_PSDocs_Keywords.md#Document) - Defines a named documentation block
+- [Section](/docs/keywords/PSDocs/en-US/about_PSDocs_Keywords.md#Section) - Creates a named section
+- [Title](/docs/keywords/PSDocs/en-US/about_PSDocs_Keywords.md#Title) - Sets the document title
+- [Code](/docs/keywords/PSDocs/en-US/about_PSDocs_Keywords.md#Code) - Inserts a block of code
+- [Note](/docs/keywords/PSDocs/en-US/about_PSDocs_Keywords.md#Note) - Inserts a note using DocFx formatted markdown (DFM)
+- [Warning](/docs/keywords/PSDocs/en-US/about_PSDocs_Keywords.md#Warning) - Inserts a warnding usinf DocFx formatted markdown (DFM)
+- [Yaml](/docs/keywords/PSDocs/en-US/about_PSDocs_Keywords.md#Yaml) - Inserts a YAML header
+- [Table](/docs/keywords/PSDocs/en-US/about_PSDocs_Keywords.md#Table) - Inserts a table from pipeline objects
 
 ### Commands
 
