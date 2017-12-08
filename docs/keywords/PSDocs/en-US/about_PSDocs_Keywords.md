@@ -145,7 +145,7 @@ Document 'Title' {
 Invoke-PSDocument -Name 'Title' -InputObject $Null;
 ```
 
-Generates a new `Title.md` document containing with the heading `An example document`.
+Generates a new `Title.md` document containing the heading `An example document`.
 
 ### Code
 
