@@ -21,11 +21,8 @@ The following modules are included in this repository.
 
 | Module     | Description | Latest version |
 | ------     | ----------- | -------------- |
-| PSDocs     | Generate markdown from PowerShell | [v0.3.0][psg-psdocs] |
-| PSDocs.Dsc | Extension for PSDocs to generate markdown from Desired State Configuration | [v0.3.0][psg-psdocsdsc] |
-
-[psg-psdocs]: https://www.powershellgallery.com/packages/PSDocs
-[psg-psdocsdsc]: https://www.powershellgallery.com/packages/PSDocs.Dsc
+| PSDocs     | Generate markdown from PowerShell | [![psg-psdocs-version-badge][]][psg-psdocs] [![psg-psdocs-installs-badge][]][psg-psdocs] |
+| PSDocs.Dsc | Extension for PSDocs to generate markdown from Desired State Configuration | [![psg-psdocsdsc-version-badge][]][psg-psdocsdsc] [![psg-psdocsdsc-installs-badge][]][psg-psdocsdsc] |
 
 ## Getting started
 
@@ -108,7 +105,7 @@ Invoke-DscNodeDocument -DocumentName 'Sample' -Path '.\nodes' -OutputPath '.\doc
 
 ## Language reference
 
-PSDocs extends PowerShell with domain specific lanagage (DSL) keywords and cmdlets.
+PSDocs extends PowerShell with domain specific language (DSL) keywords and cmdlets.
 
 ### Keywords
 
@@ -138,7 +135,7 @@ The following commands exist in the `PSDocs.Dsc` module:
 
 ## Changes and versioning
 
-Modules in this repository will use the [semantic versioning](http://semver.org/) model to delcare breaking changes from v1.0.0. Prior to v1.0.0, breaking changes may be introduced in minor (0.x.0) version increments. For a list of module changes please see the [change log](CHANGELOG.md).
+Modules in this repository will use the [semantic versioning](http://semver.org/) model to declare breaking changes from v1.0.0. Prior to v1.0.0, breaking changes may be introduced in minor (0.x.0) version increments. For a list of module changes please see the [change log](CHANGELOG.md).
 
 ## Maintainers
 
@@ -149,3 +146,8 @@ Modules in this repository will use the [semantic versioning](http://semver.org/
 This project is [licensed under the MIT License](LICENSE).
 
 [psg-psdocs]: https://www.powershellgallery.com/packages/PSDocs
+[psg-psdocs-version-badge]: https://img.shields.io/powershellgallery/v/PSDocs.svg
+[psg-psdocs-installs-badge]: https://img.shields.io/powershellgallery/dt/PSDocs.svg
+[psg-psdocsdsc]: https://www.powershellgallery.com/packages/PSDocs.Dsc
+[psg-psdocsdsc-version-badge]: https://img.shields.io/powershellgallery/v/PSDocs.Dsc.svg
+[psg-psdocsdsc-installs-badge]: https://img.shields.io/powershellgallery/dt/PSDocs.Dsc.svg
