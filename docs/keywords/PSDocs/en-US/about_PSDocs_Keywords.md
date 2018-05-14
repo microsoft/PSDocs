@@ -15,13 +15,13 @@ PSDocs lets you generate dynamic markdown documents using PowerShell blocks. To 
 - Title - Sets the document title
 - Code - Inserts a block of code
 - Note - Inserts a note using DocFx formatted markdown (DFM)
-- Warning - Inserts a warnding usinf DocFx formatted markdown (DFM)
+- Warning - Inserts a warning using DocFx formatted markdown (DFM)
 - Table - Inserts a table from pipeline objects
 - Yaml - Inserts a YAML header
 
 ### Document
 
-Defines a named block that can be called to output documentation. The document keyword can be defined inline or in a seperate script file.
+Defines a named block that can be called to output documentation. The document keyword can be defined inline or in a separate script file.
 
 Syntax:
 
@@ -65,7 +65,7 @@ Examples:
 Document 'Sample' {
 
     # Define a section named Introduction
-    Section 'Intoduction' {
+    Section 'Introduction' {
 
         # Content of the Introduction section
         'This is a sample document that uses PSDocs keywords to construct a dynamic document.'
@@ -108,7 +108,7 @@ Document 'Sample' {
         # SEction and section content is included in generated markdown
     }
 
-    # Sections can be optional if the When parameter is specified the expressnio evaluates to $False
+    # Sections can be optional if the When parameter is specified the expression evaluates to $False
     Section 'Not included in output' -When { $False } {
 
         # Section and section content is not included in generated markdown
