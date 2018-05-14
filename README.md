@@ -26,7 +26,7 @@ The following modules are included in this repository.
 
 ## Getting started
 
-### Prerequsits
+### Prerequisites
 
 - Windows Management Framework (WMF) 5.0 or greater
 - .NET Framework 4.6 or greater
@@ -116,7 +116,7 @@ The following language keywords are used by the `PSDocs` module:
 - [Title](/docs/keywords/PSDocs/en-US/about_PSDocs_Keywords.md#Title) - Sets the document title
 - [Code](/docs/keywords/PSDocs/en-US/about_PSDocs_Keywords.md#Code) - Inserts a block of code
 - [Note](/docs/keywords/PSDocs/en-US/about_PSDocs_Keywords.md#Note) - Inserts a note using DocFx formatted markdown (DFM)
-- [Warning](/docs/keywords/PSDocs/en-US/about_PSDocs_Keywords.md#Warning) - Inserts a warnding usinf DocFx formatted markdown (DFM)
+- [Warning](/docs/keywords/PSDocs/en-US/about_PSDocs_Keywords.md#Warning) - Inserts a warning using DocFx formatted markdown (DFM)
 - [Yaml](/docs/keywords/PSDocs/en-US/about_PSDocs_Keywords.md#Yaml) - Inserts a YAML header
 - [Table](/docs/keywords/PSDocs/en-US/about_PSDocs_Keywords.md#Table) - Inserts a table from pipeline objects
 
