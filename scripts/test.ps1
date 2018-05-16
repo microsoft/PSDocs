@@ -42,16 +42,16 @@ Write-Verbose -Message "[Test] -- Creating output paths";
 
 # STEP : Run tests
 
-$pesterModule = Get-Module -Name Pester -ListAvailable | Where-Object -FilterScript { $_.Version -like '3.4.0' };
+$pesterModule = Get-Module -Name Pester -ListAvailable | Where-Object -FilterScript { $_.Version -like '4.*' };
 
 if ($Null -eq $pesterModule) {
     Install-PackageProvider -Name NuGet -Force -Scope CurrentUser;   
      
-    Install-Module -Name Pester -RequiredVersion '3.4.0' -Force -Scope CurrentUser;
+    Install-Module -Name Pester -MinimumVersion '4.0.0' -Force -Scope CurrentUser -SkipPublisherCheck;
 }
 
 # Load Pester module
-Import-Module -Name Pester -RequiredVersion '3.4.0' -Verbose:$False;
+Import-Module -Name Pester -Verbose:$False;
 
 @('PSDocs', 'PSDocs.Dsc') | RunTest -Path $testPath -OutputPath $reportsPath -CodeCoverage:$CodeCoverage -Verbose:$VerbosePreference;
 
