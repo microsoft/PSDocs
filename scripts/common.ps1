@@ -35,11 +35,11 @@ function CreatePath {
 function RunTest {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory = $True, ValueFromPipeline = $True)]
-        [String]$TestGroup,
-
         [Parameter(Mandatory = $True)]
         [String]$Path,
+
+        [Parameter(Mandatory = $True)]
+        [String]$SourcePath,
 
         [Parameter(Mandatory = $True)]
         [String]$OutputPath,
@@ -54,25 +54,16 @@ function RunTest {
 
     process {
 
-        $currentPath = $PWD;
+        Write-Verbose -Message "[RunTest] -- Running tests: $Path";
 
-        try {
-            Set-Location -Path "$Path\$TestGroup.Tests" -ErrorAction Stop;
+        # Run Pester tests
+        $pesterParams = @{ Path = $Path; OutputFile = "$OutputPath\Pester.xml"; OutputFormat = 'NUnitXml'; PesterOption = @{ IncludeVSCodeMarker = $True }; PassThru = $True; };
 
-            Write-Verbose -Message "[RunTest] -- Running tests: $Path\$TestGroup.Tests";
-
-            # Run Pester tests
-            $pesterParams = @{ OutputFile = "$OutputPath\$TestGroup.xml"; OutputFormat = 'NUnitXml'; PesterOption = @{ IncludeVSCodeMarker = $True }; };
-
-            if ($CodeCoverage) {
-                $pesterParams.Add('CodeCoverage', "$Path\..\src\$TestGroup\*.psm1");
-            }
-
-            Invoke-Pester @pesterParams;
-
-        } finally {
-            Set-Location -Path $currentPath;
+        if ($CodeCoverage) {
+            $pesterParams.Add('CodeCoverage', "$SourcePath\**\*.psm1");
         }
+
+        Invoke-Pester @pesterParams;
     }
 
     end {

@@ -255,6 +255,10 @@ function Code {
         if ($result.Content -match '^\r\n(?<indent> {1,})') {
             $result.Content = $result.Content -replace "\r\n {1,$($Matches.indent.length)}", '';
         }
+        # Check for \n line endings
+        elseif ($result.Content -match '^\n(?<indent> {1,})') {
+            $result.Content = $result.Content -replace "\n {1,$($Matches.indent.length)}", '';
+        }
 
         $result;
     }
