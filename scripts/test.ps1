@@ -61,4 +61,13 @@ if (![String]::IsNullOrEmpty($Env:APPVEYOR_JOB_ID)) {
     SendAppveyorTestResult -Uri "https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)" -Path '.\reports' -Include '*.xml';
 }
 
+# Throw an error if pester tests failed
+
+if ($Null -eq $results) {
+    throw 'Failed to get Pester test results.';
+}
+elseif ($results.FailedCount -gt 0) {
+    throw "$($results.FailedCount) tests failed.";
+}
+
 Write-Verbose -Message "[Test] END::";
