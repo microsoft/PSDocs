@@ -53,7 +53,7 @@ if ($Null -eq $pesterModule) {
 # Load Pester module
 Import-Module -Name Pester -Verbose:$False;
 
-@('PSDocs', 'PSDocs.Dsc') | RunTest -Path $testPath -OutputPath $reportsPath -CodeCoverage:$CodeCoverage -Verbose:$VerbosePreference;
+$results = RunTest -Path $testPath -SourcePath $sourcePath -OutputPath $reportsPath -CodeCoverage:$CodeCoverage -Verbose:$VerbosePreference;
 
 # STEP : Publish results
 
