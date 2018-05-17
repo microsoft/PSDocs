@@ -105,7 +105,7 @@ namespace PSDocs.Configuration
 
             object value;
 
-            if (index.TryGetValue("markdown.wrapseperator", out value))
+            if (index.TryGetValue("markdown.wrapseparator", out value))
             {
                 option.Markdown.WrapSeparator = (string)value;
             }

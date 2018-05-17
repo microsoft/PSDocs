@@ -4,8 +4,13 @@
 
 function Visit {
 
+    [CmdletBinding()]
     param (
-        $InputObject
+        [Parameter()]
+        $InputObject,
+
+        [Parameter()]
+        [PSDocs.Configuration.PSDocumentOption]$Option
     )
 
     if ($Null -eq $InputObject) {
@@ -33,23 +38,32 @@ function Visit {
 
 function VisitString {
 
+    [CmdletBinding()]
+    [OutputType([String])]
     param (
+        [Parameter(ValueFromPipeline = $True)]
         $InputObject
     )
 
-    Write-Verbose -Message "Visit string $InputObject";
+    process {
+        Write-Verbose -Message "Visit string $InputObject";
 
-    if ($InputObject -isnot [String]) {
-        return $InputObject.ToString() -replace '\\', '\\';
+        [String]$result = $InputObject.ToString() -replace '\\', '\\';
+
+        [String]$wrapSeparator = $Option.Markdown.WrapSeparator;
+
+        if ($result.Contains("`n") -or $result.Contains("`r")) {
+            $result = ($result -replace "\r\n", $wrapSeparator) -replace "\n|\r", $wrapSeparator;
+        }
+
+        return $result;
     }
-
-    return $InputObject -replace '\\', '\\';
 }
 
 function VisitSection {
 
     param (
-        $InputObject
+        [PSDocs.Models.Section]$InputObject
     )
 
     $section = $InputObject;
@@ -152,7 +166,7 @@ function VisitYaml {
 function VisitTable {
 
     param (
-        $InputObject
+        [PSDocs.Models.Table]$InputObject
     )
 
     $table = $InputObject;
@@ -172,7 +186,9 @@ function VisitTable {
         foreach ($row in $table.Rows) {
             Write-Debug -Message "Generating row";
 
-            VisitString([String]::Concat('|', [String]::Join('|', [String[]]$row), '|'));
+            [String[]]$columns = $row | VisitString;
+
+            VisitString([String]::Concat('|', [String]::Join('|', $columns), '|'));
         }
     }
 
