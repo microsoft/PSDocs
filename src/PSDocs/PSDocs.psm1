@@ -389,7 +389,7 @@ function Warning {
     }
 }
 
-function Yaml {
+function Metadata {
 
     [CmdletBinding()]
     param (
@@ -660,7 +660,8 @@ function GenerateDocument {
         $functionsToDefine['Code'] = ${function:Code};
         $functionsToDefine['Note'] = ${function:Note};
         $functionsToDefine['Warning'] = ${function:Warning};
-        $functionsToDefine['Yaml'] = ${function:Yaml};
+        $functionsToDefine['Metadata'] = ${function:Metadata};
+        $functionsToDefine['Yaml'] = ${function:Metadata};
         $functionsToDefine['Table'] = ${function:Table};
         $functionsToDefine['Format-Table'] = ${function:Table};
         $functionsToDefine['Format-List'] = ${function:FormatList};

@@ -30,7 +30,6 @@ function Visit {
         'Table' { return VisitTable($InputObject); }
         'Note' { return VisitNote($InputObject); }
         'Warning' { return VisitWarning($InputObject); }
-        'Yaml' { return VisitYaml($InputObject); }
 
         default { return VisitString($InputObject); }
     }
@@ -163,10 +162,10 @@ function VisitWarning {
     }
 }
 
-function VisitYaml {
+function VisitMetadata {
     param ($InputObject)
 
-    Write-Verbose -Message "[Doc][Processor] -- Visit yaml";
+    Write-Verbose -Message "[Doc][Processor] -- Visit metadata";
     
     VisitString('---');
 
@@ -220,7 +219,7 @@ function VisitDocument {
     )
 
     if ($Null -ne $InputObject.Metadata -and $InputObject.Metadata.Count -gt 0) {
-        VisitYaml -InputObject $InputObject;
+        VisitMetadata -InputObject $InputObject;
     }
 
     if (![String]::IsNullOrEmpty($InputObject.Title)) {

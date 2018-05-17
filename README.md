@@ -117,7 +117,7 @@ The following language keywords are used by the `PSDocs` module:
 - [Code](/docs/keywords/PSDocs/en-US/about_PSDocs_Keywords.md#code) - Inserts a block of code
 - [Note](/docs/keywords/PSDocs/en-US/about_PSDocs_Keywords.md#note) - Inserts a note using DocFx formatted markdown (DFM)
 - [Warning](/docs/keywords/PSDocs/en-US/about_PSDocs_Keywords.md#warning) - Inserts a warning using DocFx formatted markdown (DFM)
-- [Yaml](/docs/keywords/PSDocs/en-US/about_PSDocs_Keywords.md#yaml) - Inserts a YAML header
+- [Metadata](/docs/keywords/PSDocs/en-US/about_PSDocs_Keywords.md#metadata) - Inserts a yaml header
 - [Table](/docs/keywords/PSDocs/en-US/about_PSDocs_Keywords.md#table) - Inserts a table from pipeline objects
 
 ### Commands

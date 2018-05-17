@@ -78,6 +78,11 @@ Document 'Sample' {
 Invoke-PSDocument -Name 'Sample' -InputObject '';
 ```
 
+```markdown
+## Introduction
+This is a sample document that uses PSDocs keywords to construct a dynamic document.
+```
+
 ```powershell
 # A document definition named Sample
 Document 'Sample' {
@@ -96,6 +101,11 @@ Document 'Sample' {
 
 # Generate markdown from the document definition
 Invoke-PSDocument -Name 'Sample' -InputObject '';
+```
+
+```markdown
+## Level2
+### Level3
 ```
 
 ```powershell
@@ -117,6 +127,10 @@ Document 'Sample' {
 
 # Generate markdown from the document definition
 Invoke-PSDocument -Name 'Sample' -InputObject '';
+```
+
+```markdown
+## Included in output
 ```
 
 ### Title
@@ -202,7 +216,7 @@ Document 'CodeBlockFromPipeline' {
 }
 
 # Generate markdown from the document definition
-Invoke-PSDocument -Name 'CodeBlockWithInfo' -InputObject $Null;
+Invoke-PSDocument -Name 'CodeBlockFromPipeline' -InputObject $Null;
 ```
 
 ### Note
@@ -231,6 +245,11 @@ Document 'NoteBlock' {
 Invoke-PSDocument -Name 'NoteBlock' -InputObject $Null;
 ```
 
+```markdown
+> [!NOTE]
+> This is a note.
+```
+
 Generates a new `NoteBlock.md` document containing a block quote formatted as a DFM note.
 
 ### Warning
@@ -256,6 +275,11 @@ Document 'WarningBlock' {
 
 # Generate markdown from the document definition
 Invoke-PSDocument -Name 'WarningBlock' -InputObject $Null;
+```
+
+```markdown
+> [!WARNING]
+> This is a warning.
 ```
 
 Generates a new `WarningBlock.md` document containing a block quote formatted as a DFM warning.
@@ -289,27 +313,43 @@ Document 'Table' {
 Invoke-PSDocument -Name 'Table';
 ```
 
+```markdown
+## Directory list
+
+|Name|PSIsContainer|
+| --- | --- |
+|Program Files|True|
+|Program Files (x86)|True|
+|Users|True|
+|Windows|True|
+```
+
 Generates a new `Table.md` document containing a table populated with a row for each item. Only the properties Name and PSIsContainer are added as columns.
 
-### Yaml
+### Metadata
 
-Creates a yaml header.
+Creates a metadata header, that will be rendered as yaml front matter. Multiple `Metadata` blocks can be used and they will be aggregated together.
 
 Syntax:
 
 ```text
-Yaml [-Body] <Hashtable>
+Metadata [-Body] <Hashtable>
 ```
 
 Examples:
 
 ```powershell
-# A document definition named YamlBlock
-Document 'YamlBlock' {
+# A document definition named MetadataBlock
+Document 'MetadataBlock' {
 
-    # Create a Yaml block of key value pairs
-    Yaml @{
+    # Create a Metadata block of key value pairs
+    Metadata @{
         title = 'An example title'
+    }
+
+    Metadata @{
+        author = $Env:USERNAME
+        'last-updated' = (Get-Date).ToString('yyyy-MM-dd')
     }
 
     # Additional text to add to the document
@@ -317,10 +357,10 @@ Document 'YamlBlock' {
 }
 
 # Generate markdown from the document definition
-Invoke-PSDocument -Name 'YamlBlock';
+Invoke-PSDocument -Name 'MetadataBlock';
 ```
 
-Generates a new YamlBlock.md document containing a yaml header. An example of the output generated is available [here](/docs/examples/Yaml-header-output.md).
+Generates a new MetadataBlock.md document containing a yaml front matter. An example of the output generated is available [here](/docs/examples/Yaml-header-output.md).
 
 ## EXAMPLES
 

@@ -2,7 +2,9 @@
     "files.exclude": {
         ".vs": true,
         "artifacts": true,
-        "reports": true
+        "reports": true,
+        "**/bin/": true,
+        "**/obj/": true
     },
     "search.exclude": {
         "build": true
