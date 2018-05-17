@@ -105,7 +105,7 @@ Document 'Sample' {
     # By default each section is included when markdown in generated
     Section 'Included in output' {
 
-        # SEction and section content is included in generated markdown
+        # Section and section content is included in generated markdown
     }
 
     # Sections can be optional if the When parameter is specified the expression evaluates to $False
