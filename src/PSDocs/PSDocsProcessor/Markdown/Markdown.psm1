@@ -62,7 +62,9 @@ function VisitString {
 
 function VisitSection {
 
+    [CmdletBinding()]
     param (
+        [Parameter()]
         [PSDocs.Models.Section]$InputObject
     )
 
@@ -86,8 +88,10 @@ function VisitSection {
 
 function VisitCode { 
 
+    [CmdletBinding()]
     param (
-        $InputObject
+        [Parameter()]
+        [PSDocs.Models.Code]$InputObject
     )
 
     Write-Verbose -Message "[Doc][Processor] -- Visit code";
@@ -124,7 +128,12 @@ function VisitList {
 }
 
 function VisitNote {
-    param ($InputObject)
+
+    [CmdletBinding()]
+    param (
+        [Parameter()]
+        [PSDocs.Models.Note]$InputObject
+    )
 
     Write-Verbose -Message "[Doc][Processor] -- Visit note";
     
@@ -137,7 +146,12 @@ function VisitNote {
 }
 
 function VisitWarning {
-    param ($InputObject)
+
+    [CmdletBinding()]
+    param (
+        [Parameter()]
+        [PSDocs.Models.Warning]$InputObject
+    )
 
     Write-Verbose -Message "[Doc][Processor] -- Visit warning";
     
@@ -162,10 +176,12 @@ function VisitYaml {
 
     VisitString('---');
 }
-   
+
 function VisitTable {
 
+    [CmdletBinding()]
     param (
+        [Parameter()]
         [PSDocs.Models.Table]$InputObject
     )
 
@@ -197,8 +213,10 @@ function VisitTable {
 
 function VisitDocument {
 
+    [CmdletBinding()]
     param (
-        $InputObject
+        [Parameter()]
+        [PSDocs.Models.Document]$InputObject
     )
 
     if ($Null -ne $InputObject.Metadata -and $InputObject.Metadata.Count -gt 0) {

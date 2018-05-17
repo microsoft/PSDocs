@@ -228,10 +228,10 @@ function Section {
         if ($shouldProcess) {
             Write-Verbose -Message "[Doc][Section] -- Adding section: $Name";
 
+            # Create a section
             $result = [PSDocs.Models.ModelHelper]::NewSection($Name, $Section.Level+1);
 
-            # $result = New-Object -TypeName PSObject -Property @{ Content = $Name; Type = 'Section'; Node = @(); Level = ($Section.Level+1) };
-
+            # Store as section to be referenced in nested calls
             $Section = $result;
 
             try {
@@ -275,7 +275,9 @@ function Title {
 }
 
 function Code {
+
     [CmdletBinding()]
+    [OutputType([PSDocs.Models.Code])]
     param (
         # Body of the code block
         [Parameter(Position = 0, Mandatory = $True, ParameterSetName = 'Default', ValueFromPipeline = $True)]
@@ -293,7 +295,8 @@ function Code {
     )
 
     process {
-        $result = New-Object -TypeName PSObject -Property @{ Type = 'Code'; Info = ''; Content = ''; };
+
+        $result = [PSDocs.Models.ModelHelper]::NewCode();
 
         if (![String]::IsNullOrWhiteSpace($Info)) {
             $result.Info = $Info.Trim();
@@ -352,7 +355,7 @@ function Note {
 
     process {
 
-        $result = New-Object -TypeName PSObject -Property @{ Type = 'Note'; Node = @(); Content = [String[]]@(); };
+        $result = [PSDocs.Models.ModelHelper]::NewNote();
 
         $innerResult = $Body.InvokeWithContext($Null, $Null);
 
@@ -374,7 +377,7 @@ function Warning {
 
     process {
 
-        $result = New-Object -TypeName PSObject -Property @{ Type = 'Warning'; Node = @(); Content = [String[]]@(); };
+        $result = [PSDocs.Models.ModelHelper]::NewWarning();
 
         $innerResult = $Body.InvokeWithContext($Null, $Null);
 
@@ -419,9 +422,8 @@ function Table {
     begin {
         Write-Verbose -Message "[Doc][Table] BEGIN::";
 
+        # Create a table
         $table = [PSDocs.Models.ModelHelper]::NewTable();
-
-        # $table = New-Object -TypeName PSObject -Property @{ Type = 'Table'; Header = @(); Rows = (New-Object -TypeName Collections.Generic.List[String[]]); ColumnCount = 0; };
 
         $recordIndex = 0;
 
@@ -680,7 +682,7 @@ function GenerateDocument {
 
             Write-Verbose -Message "[Doc] -- Processing: $instance";
 
-            $document = New-Object -TypeName PSObject -Property @{ Type = 'Document'; Metadata = ([Ordered]@{ }); Title = [String]::Empty; };
+            $document = [PSDocs.Models.ModelHelper]::NewDocument();
 
             # Define built-in variables
             [PSVariable[]]$variablesToDefine = @(

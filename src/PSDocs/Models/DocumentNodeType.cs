@@ -6,6 +6,12 @@
 
         Section,
 
-        Table
+        Table,
+
+        Code,
+
+        Note,
+
+        Warning
     }
 }
