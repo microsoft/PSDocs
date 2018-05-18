@@ -7,7 +7,7 @@ branches:
   - master
 
 build_script:
-- ps: .\scripts\build.ps1
+- ps: .\scripts\build.ps1 -Module PSDocs,PSDocs.Dsc
 
 test_script:
 - ps: .\scripts\test.ps1
