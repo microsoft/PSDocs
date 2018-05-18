@@ -777,7 +777,7 @@ function ParseDom {
         $innerResult = $Dom.Node | ForEach-Object -Process {
             $node = $_;
 
-            Write-Verbose -Message "[Doc][ParseDom] -- Processing node";
+            Write-Verbose -Message "[Doc][ParseDom] -- Processing node [$nodeCounter]";
 
             if ($Null -ne $node) {
 
