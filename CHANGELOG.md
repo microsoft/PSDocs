@@ -1,6 +1,11 @@
 
 ## Unreleased
 
+- Fix handling of line break for multiline table columns using a wrap separator
+- Added `New-PSDocumentOption` cmdlet to configure document generation
+- Added `-Option` parameter to `Invoke-PSDocument` cmdlet to accept configuration options
+- Renamed `Yaml` keyword to `Metadata`. `Yaml` keyword is still supported but deprecated, switch to using `Metadata` instead
+
 ## v0.3.0
 
 - Improved `Yaml` block handling to allow YAML header to be defined throughout the document and merged when multiple blocks are defined

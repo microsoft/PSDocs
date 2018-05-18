@@ -16,7 +16,7 @@ Create markdown from an input object.
 ```text
 Invoke-PSDocument [-Name] <String> [-InstanceName <String[]>] [-InputObject <PSObject>] [-OutputPath <String>]
  [-Function <System.Collections.Generic.Dictionary`2[System.String,System.Management.Automation.ScriptBlock]>]
- [-PassThru] [<CommonParameters>]
+ [-PassThru] [-Option <PSDocumentOption>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -149,7 +149,24 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -Option
+
+Additional options that configure document generation. A `PSDocumentOption` can be created by using the `New-PSDocumentOption` cmdlet. Alternatively a hashtable or path to YAML file can be specified with options.
+
+```yaml
+Type: PSDocumentOption
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### CommonParameters
+
 This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS

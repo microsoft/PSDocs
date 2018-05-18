@@ -94,11 +94,96 @@ function BuildModule {
             Remove-Item -Path "$OutputPath\$Module" -Recurse -Force;
         }
 
-        Copy-Item -Path "$Path\$Module" -Destination $OutputPath -Recurse -Force;
+        $sourcePath = Join-Path -Path $Path -ChildPath $Module;
+        $destinationPath = Join-Path -Path $OutputPath -ChildPath $Module;
+
+        if ($Null -ne (Get-ChildItem -Path $sourcePath -Filter '*.csproj')) {
+
+            Write-Verbose -Message "[BuildModule] -- Building .NET modules";
+
+            # Restore packages
+            DotNetRestore -Path $sourcePath;
+            
+            # Build and publish
+            DotNetPublish -Path $sourcePath;
+        }
+
+        Write-Verbose -Message "[BuildModule] -- Copying output to: $destinationPath";
+
+        Get-ChildItem -Path $sourcePath -Recurse | Where-Object -FilterScript {
+            ($_.FullName -notmatch '(\.(cs|csproj)|(\\|\/)obj)')
+        } | ForEach-Object -Process {
+            $filePath = $_.FullName.Replace($sourcePath, $destinationPath);
+
+            Copy-Item -Path $_.FullName -Destination $filePath -Force;
+        };
+
+        # Copy-Item -Path $sourcePath -Destination $OutputPath -Recurse -Force;
+
     }
 
     end {
         Write-Verbose -Message "[BuildModule] END::";
+    }
+}
+
+function DotNetRestore {
+
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $True)]
+        [String]$Path
+    )
+
+    process {
+
+        Write-Verbose -Message "[DotNetRestore] -- Restoring .NET dependencies to: $Path";
+
+        dotnet restore $Path;
+    }
+}
+
+function DotNetPublish {
+    
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $True)]
+        [String]$Path
+    )
+
+    process {
+
+        $projectFiles = Get-ChildItem -Path $Path -Filter '*.csproj';
+
+        foreach ($p in $projectFiles) {
+            $frameworks = GetProjectFramework -Path $p.FullName -Verbose:$VerbosePreference;
+
+            foreach ($f in $frameworks) {
+                dotnet publish -f $f $p.FullName;
+            }
+        }
+    }
+}
+
+function GetProjectFramework {
+
+    [CmdletBinding()]
+    [OutputType([String])]
+    param (
+        [Parameter(Mandatory = $True)]
+        [String]$Path
+    )
+
+    process {
+        Write-Verbose -Message "[GetProjectFramework] -- Checking .NET framework support for: $Path";
+
+        $csProject = [Xml](Get-Content -Path $Path);
+
+        $frameworks = $csProject.Project.PropertyGroup.TargetFrameworks;
+
+        foreach ($f in $frameworks) {
+            $f -Split ';';
+        }
     }
 }
 

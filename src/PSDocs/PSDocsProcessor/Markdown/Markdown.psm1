@@ -4,8 +4,13 @@
 
 function Visit {
 
+    [CmdletBinding()]
     param (
-        $InputObject
+        [Parameter()]
+        $InputObject,
+
+        [Parameter()]
+        [PSDocs.Configuration.PSDocumentOption]$Option
     )
 
     if ($Null -eq $InputObject) {
@@ -25,7 +30,6 @@ function Visit {
         'Table' { return VisitTable($InputObject); }
         'Note' { return VisitNote($InputObject); }
         'Warning' { return VisitWarning($InputObject); }
-        'Yaml' { return VisitYaml($InputObject); }
 
         default { return VisitString($InputObject); }
     }
@@ -33,23 +37,34 @@ function Visit {
 
 function VisitString {
 
+    [CmdletBinding()]
+    [OutputType([String])]
     param (
+        [Parameter(ValueFromPipeline = $True)]
         $InputObject
     )
 
-    Write-Verbose -Message "Visit string $InputObject";
+    process {
+        Write-Verbose -Message "Visit string $InputObject";
 
-    if ($InputObject -isnot [String]) {
-        return $InputObject.ToString() -replace '\\', '\\';
+        [String]$result = $InputObject.ToString() -replace '\\', '\\';
+
+        [String]$wrapSeparator = $Option.Markdown.WrapSeparator;
+
+        if ($result.Contains("`n") -or $result.Contains("`r")) {
+            $result = ($result -replace "\r\n", $wrapSeparator) -replace "\n|\r", $wrapSeparator;
+        }
+
+        return $result;
     }
-
-    return $InputObject -replace '\\', '\\';
 }
 
 function VisitSection {
 
+    [CmdletBinding()]
     param (
-        $InputObject
+        [Parameter()]
+        [PSDocs.Models.Section]$InputObject
     )
 
     $section = $InputObject;
@@ -72,8 +87,10 @@ function VisitSection {
 
 function VisitCode { 
 
+    [CmdletBinding()]
     param (
-        $InputObject
+        [Parameter()]
+        [PSDocs.Models.Code]$InputObject
     )
 
     Write-Verbose -Message "[Doc][Processor] -- Visit code";
@@ -110,7 +127,12 @@ function VisitList {
 }
 
 function VisitNote {
-    param ($InputObject)
+
+    [CmdletBinding()]
+    param (
+        [Parameter()]
+        [PSDocs.Models.Note]$InputObject
+    )
 
     Write-Verbose -Message "[Doc][Processor] -- Visit note";
     
@@ -123,7 +145,12 @@ function VisitNote {
 }
 
 function VisitWarning {
-    param ($InputObject)
+
+    [CmdletBinding()]
+    param (
+        [Parameter()]
+        [PSDocs.Models.Warning]$InputObject
+    )
 
     Write-Verbose -Message "[Doc][Processor] -- Visit warning";
     
@@ -135,10 +162,10 @@ function VisitWarning {
     }
 }
 
-function VisitYaml {
+function VisitMetadata {
     param ($InputObject)
 
-    Write-Verbose -Message "[Doc][Processor] -- Visit yaml";
+    Write-Verbose -Message "[Doc][Processor] -- Visit metadata";
     
     VisitString('---');
 
@@ -148,11 +175,13 @@ function VisitYaml {
 
     VisitString('---');
 }
-   
+
 function VisitTable {
 
+    [CmdletBinding()]
     param (
-        $InputObject
+        [Parameter()]
+        [PSDocs.Models.Table]$InputObject
     )
 
     $table = $InputObject;
@@ -172,7 +201,9 @@ function VisitTable {
         foreach ($row in $table.Rows) {
             Write-Debug -Message "Generating row";
 
-            VisitString([String]::Concat('|', [String]::Join('|', [String[]]$row), '|'));
+            [String[]]$columns = $row | VisitString;
+
+            VisitString([String]::Concat('|', [String]::Join('|', $columns), '|'));
         }
     }
 
@@ -181,12 +212,14 @@ function VisitTable {
 
 function VisitDocument {
 
+    [CmdletBinding()]
     param (
-        $InputObject
+        [Parameter()]
+        [PSDocs.Models.Document]$InputObject
     )
 
     if ($Null -ne $InputObject.Metadata -and $InputObject.Metadata.Count -gt 0) {
-        VisitYaml -InputObject $InputObject;
+        VisitMetadata -InputObject $InputObject;
     }
 
     if (![String]::IsNullOrEmpty($InputObject.Title)) {

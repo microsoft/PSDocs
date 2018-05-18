@@ -2,6 +2,19 @@
 # PSDocs module
 #
 
+# Import helper classes
+if (!$PSVersionTable.PSEdition -or $PSVersionTable.PSEdition -eq 'Desktop') {
+    Add-Type -Path (Join-Path -Path $PSScriptRoot -ChildPath "/bin/Debug/net451/publish/PSDocs.dll") | Out-Null;
+}
+else {
+    Add-Type -Path (Join-Path -Path $PSScriptRoot -ChildPath "/bin/Debug/netstandard2.0/publish/PSDocs.dll") | Out-Null;
+}
+
+[PSDocs.Configuration.PSDocumentOption]::GetWorkingPath = {
+
+    return Get-Location;
+}
+
 #
 # Localization
 #
@@ -73,7 +86,10 @@ function Invoke-PSDocument {
         [System.Collections.Generic.Dictionary[String, ScriptBlock]]$Function,
 
         [Parameter(Mandatory = $False)]
-        [Switch]$PassThru = $False
+        [Switch]$PassThru = $False,
+
+        [Parameter(Mandatory = $False)]
+        [PSDocs.Configuration.PSDocumentOption]$Option
     )
 
     process {
@@ -122,6 +138,44 @@ function Get-PSDocumentHeader {
             ReadYamlHeader -Path $item.FullName -Verbose:$VerbosePreference;
         }
 
+    }
+}
+
+# .ExternalHelp PSDocs-Help.xml
+function New-PSDocumentOption {
+
+    [CmdletBinding()]
+    [OutputType([PSDocs.Configuration.PSDocumentOption])]
+    param (
+        [Parameter(Mandatory = $False)]
+        [PSDocs.Configuration.PSDocumentOption]$Option,
+
+        [Parameter(Mandatory = $False)]
+        [String]$Path = '.\.psdocs.yml'
+    )
+
+    process {
+
+        if ($PSBoundParameters.ContainsKey('Option')) {
+            $Option = $Option.Clone();
+        }
+        elseif ($PSBoundParameters.ContainsKey('Path')) {
+
+            if (!(Test-Path -Path $Path)) {
+                
+            }
+
+            $Path = Resolve-Path -Path $Path;
+
+            $Option = [PSDocs.Configuration.PSDocumentOption]::FromFile($Path);
+        }
+        else {
+            Write-Verbose -Message "Attempting to read: $Path";
+
+            $Option = [PSDocs.Configuration.PSDocumentOption]::FromFile($Path, $True);
+        }
+
+        return $Option;
     }
 }
 
@@ -174,8 +228,10 @@ function Section {
         if ($shouldProcess) {
             Write-Verbose -Message "[Doc][Section] -- Adding section: $Name";
 
-            $result = New-Object -TypeName PSObject -Property @{ Content = $Name; Type = 'Section'; Node = @(); Level = ($Section.Level+1) };
+            # Create a section
+            $result = [PSDocs.Models.ModelHelper]::NewSection($Name, $Section.Level+1);
 
+            # Store as section to be referenced in nested calls
             $Section = $result;
 
             try {
@@ -219,7 +275,9 @@ function Title {
 }
 
 function Code {
+
     [CmdletBinding()]
+    [OutputType([PSDocs.Models.Code])]
     param (
         # Body of the code block
         [Parameter(Position = 0, Mandatory = $True, ParameterSetName = 'Default', ValueFromPipeline = $True)]
@@ -237,7 +295,8 @@ function Code {
     )
 
     process {
-        $result = New-Object -TypeName PSObject -Property @{ Type = 'Code'; Info = ''; Content = ''; };
+
+        $result = [PSDocs.Models.ModelHelper]::NewCode();
 
         if (![String]::IsNullOrWhiteSpace($Info)) {
             $result.Info = $Info.Trim();
@@ -296,7 +355,7 @@ function Note {
 
     process {
 
-        $result = New-Object -TypeName PSObject -Property @{ Type = 'Note'; Node = @(); Content = [String[]]@(); };
+        $result = [PSDocs.Models.ModelHelper]::NewNote();
 
         $innerResult = $Body.InvokeWithContext($Null, $Null);
 
@@ -318,7 +377,7 @@ function Warning {
 
     process {
 
-        $result = New-Object -TypeName PSObject -Property @{ Type = 'Warning'; Node = @(); Content = [String[]]@(); };
+        $result = [PSDocs.Models.ModelHelper]::NewWarning();
 
         $innerResult = $Body.InvokeWithContext($Null, $Null);
 
@@ -330,7 +389,7 @@ function Warning {
     }
 }
 
-function Yaml {
+function Metadata {
 
     [CmdletBinding()]
     param (
@@ -363,7 +422,8 @@ function Table {
     begin {
         Write-Verbose -Message "[Doc][Table] BEGIN::";
 
-        $table = New-Object -TypeName PSObject -Property @{ Type = 'Table'; Header = @(); Rows = (New-Object -TypeName Collections.Generic.List[String[]]); ColumnCount = 0; };
+        # Create a table
+        $table = [PSDocs.Models.ModelHelper]::NewTable();
 
         $recordIndex = 0;
 
@@ -547,7 +607,11 @@ function GenerateDocument {
         [System.Collections.Generic.Dictionary[String, ScriptBlock]]$Function,
 
         [Parameter(Mandatory = $False)]
-        [Switch]$PassThru = $False
+        [Switch]$PassThru = $False,
+
+        [Parameter(Mandatory = $False)]
+        [AllowNull()]
+        [PSDocs.Configuration.PSDocumentOption]$Option
     )
 
     begin {
@@ -556,6 +620,13 @@ function GenerateDocument {
             Write-Error -Message ($LocalizedData.DocumentNotFound -f $Name) -ErrorAction Stop;
 
             return;
+        }
+
+        if ($Null -eq $Option) {
+            $Option = New-PSDocumentOption;
+        }
+        else {
+            $Option = $Option.Clone();
         }
 
         [Hashtable]$parameter = $Null;
@@ -589,7 +660,8 @@ function GenerateDocument {
         $functionsToDefine['Code'] = ${function:Code};
         $functionsToDefine['Note'] = ${function:Note};
         $functionsToDefine['Warning'] = ${function:Warning};
-        $functionsToDefine['Yaml'] = ${function:Yaml};
+        $functionsToDefine['Metadata'] = ${function:Metadata};
+        $functionsToDefine['Yaml'] = ${function:Metadata};
         $functionsToDefine['Table'] = ${function:Table};
         $functionsToDefine['Format-Table'] = ${function:Table};
         $functionsToDefine['Format-List'] = ${function:FormatList};
@@ -611,7 +683,7 @@ function GenerateDocument {
 
             Write-Verbose -Message "[Doc] -- Processing: $instance";
 
-            $document = New-Object -TypeName PSObject -Property @{ Type = 'Document'; Metadata = ([Ordered]@{ }); Title = [String]::Empty; };
+            $document = [PSDocs.Models.ModelHelper]::NewDocument();
 
             # Define built-in variables
             [PSVariable[]]$variablesToDefine = @(
@@ -646,7 +718,7 @@ function GenerateDocument {
             }
 
             # Parse the model
-            ParseDom -Dom $dom -Processor (NewMarkdownProcessor) -Verbose:$VerbosePreference | WriteDocumentContent -Path $documentPath -PassThru:$PassThru;
+            ParseDom -Dom $dom -Processor (NewMarkdownProcessor) -Option $Option -Verbose:$VerbosePreference | WriteDocumentContent -Path $documentPath -PassThru:$PassThru;
         }
     }
 }
@@ -691,7 +763,10 @@ function ParseDom {
         [PSObject]$Dom,
 
         [Parameter(Mandatory = $True)]
-        [PSObject]$Processor
+        [PSObject]$Processor,
+
+        [Parameter(Mandatory = $True)]
+        [PSDocs.Configuration.PSDocumentOption]$Option
     )
 
     process {
@@ -702,12 +777,12 @@ function ParseDom {
         $innerResult = $Dom.Node | ForEach-Object -Process {
             $node = $_;
 
-            Write-Verbose -Message "[Doc][ParseDom] -- Processing node";
+            Write-Verbose -Message "[Doc][ParseDom] -- Processing node [$nodeCounter]";
 
             if ($Null -ne $node) {
 
                 # Visit the node
-                $Processor.Visit($node);
+                $Processor.Visit($node, $Option);
             }
 
             $nodeCounter++;
@@ -896,6 +971,7 @@ Export-ModuleMember -Function @(
     'Invoke-PSDocument'
     'Import-PSDocumentTemplate'
     'Get-PSDocumentHeader'
+    'New-PSDocumentOption'
 );
 
 # EOM

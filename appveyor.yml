@@ -1,5 +1,13 @@
 version: 0.3.0.{build}
 image: Visual Studio 2017
-build: off
+
+# Only build master branch
+branches:
+  only:
+  - master
+
+build_script:
+- ps: .\scripts\build.ps1 -Module PSDocs,PSDocs.Dsc
+
 test_script:
 - ps: .\scripts\test.ps1
