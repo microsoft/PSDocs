@@ -213,6 +213,8 @@ function VisitTable {
 
             VisitString -InputObject ([String]::Concat('|', [String]::Join('|', $columns), '|'));
         }
+
+        VisitString -InputObject '';
     }
 
     Write-Verbose -Message "[Doc][Processor][Table] END:: [$($table.Rows.Count)]";
