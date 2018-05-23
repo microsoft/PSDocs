@@ -17,8 +17,8 @@ $src = ($here -replace '\\tests\\', '\\src\\') -replace '\.Tests', '';
 $temp = "$here\..\..\build";
 # $sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path) -replace '\.Tests\.', '.';
 
-Import-Module $src -Force;
 Import-Module $src\..\PSDocs -Force;
+Import-Module $src -Force;
 
 $outputPath = "$temp\PSDocs.Dsc.Tests\Common";
 Remove-Item -Path $outputPath -Force -Recurse -Confirm:$False -ErrorAction SilentlyContinue;
