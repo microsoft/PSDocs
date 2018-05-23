@@ -69,8 +69,12 @@ Describe 'PSDocs -- Section keyword' {
 
         # Define a test document with a section block
         document 'SectionBlockTests' {
-            Section 'Test' {
-                'Content'
+            Section 'SingleLine' {
+                'This is a single line markdown section.'
+            }
+
+            Section 'MultiLine' {
+                "This is a multiline`r`ntest."
             }
         }
 
@@ -82,7 +86,7 @@ Describe 'PSDocs -- Section keyword' {
         }
 
         It 'Should match expected format' {
-            Get-Content -Path $outputDoc -Raw | Should match '## Test(\n|\r){1,2}Content';
+            Get-Content -Path $outputDoc -Raw | Should match '## SingleLine(\n|\r){1,2}This is a single line markdown section.(\n|\r){4}## MultiLine(\n|\r){1,2}This is a multiline(\n|\r){1,2}test.';
         }
     }
 

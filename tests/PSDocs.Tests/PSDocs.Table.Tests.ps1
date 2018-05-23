@@ -61,6 +61,8 @@ Describe 'PSDocs -- Table keyword' {
         document 'TableTests' {
             
             Get-ChildItem -Path $rootPath | Where-Object -FilterScript { 'README.md','LICENSE' -contains $_.Name } | Format-Table -Property 'Name','PSIsContainer'
+
+            'EOF'
         }
 
         $outputDoc = "$outputPath\Table.md";
@@ -71,7 +73,7 @@ Describe 'PSDocs -- Table keyword' {
         }
 
         It 'Should match expected format' {
-            Get-Content -Path $outputDoc -Raw | Should -Match '\|LICENSE\|False\|(\n|\r){1,2}\|README.md\|False\|';
+            Get-Content -Path $outputDoc -Raw | Should -Match '\|LICENSE\|False\|(\n|\r){1,2}\|README.md\|False\|\r\n\r\nEOF';
         }
     }
 

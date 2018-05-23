@@ -18,7 +18,7 @@ function Visit {
     }
 
     if ($InputObject -is [String]) {
-        return VisitString($InputObject);
+        return VisitString -InputObject $InputObject;
     }
 
     switch ($InputObject.Type) {
@@ -31,7 +31,7 @@ function Visit {
         'Note' { return VisitNote($InputObject); }
         'Warning' { return VisitWarning($InputObject); }
 
-        default { return VisitString($InputObject); }
+        default { return VisitString -InputObject $InputObject; }
     }
 }
 
@@ -41,7 +41,10 @@ function VisitString {
     [OutputType([String])]
     param (
         [Parameter(ValueFromPipeline = $True)]
-        $InputObject
+        $InputObject,
+
+        [Parameter(Mandatory = $False)]
+        [Switch]$ShouldWrap = $False
     )
 
     process {
@@ -49,9 +52,12 @@ function VisitString {
 
         [String]$result = $InputObject.ToString() -replace '\\', '\\';
 
-        [String]$wrapSeparator = $Option.Markdown.WrapSeparator;
+        if ($ShouldWrap -and ($result.Contains("`n") -or $result.Contains("`r"))) {
 
-        if ($result.Contains("`n") -or $result.Contains("`r")) {
+            # Get the wrap separator
+            [String]$wrapSeparator = $Option.Markdown.WrapSeparator;
+
+            # Replace new line characters with separator
             $result = ($result -replace "\r\n", $wrapSeparator) -replace "\n|\r", $wrapSeparator;
         }
 
@@ -73,8 +79,10 @@ function VisitSection {
 
     Write-Verbose -Message "[Doc][Processor][Section] -- Writing section: $($section.Content)";
 
+    $sectionPadding = ''.PadLeft($section.Level, '#');
+
     # Generate markdown for the section name
-    VisitString("`n$(''.PadLeft($section.Level, '#')) $($section.Content)");
+    VisitString -InputObject "`r`n$sectionPadding $($section.Content)";
 
     foreach ($n in $section.Node) {
 
@@ -96,14 +104,14 @@ function VisitCode {
     Write-Verbose -Message "[Doc][Processor] -- Visit code";
 
     if ([String]::IsNullOrEmpty($InputObject.Info)) {
-        VisitString('```');
-        VisitString($InputObject.Content);
-        VisitString('```');
+        VisitString -InputObject '```';
+        VisitString -InputObject $InputObject.Content;
+        VisitString -InputObject '```';
     }
     else {
-        VisitString("``````$($InputObject.Info)");
-        VisitString($InputObject.Content);
-        VisitString('```');
+        VisitString -InputObject "``````$($InputObject.Info)";
+        VisitString -InputObject $InputObject.Content;
+        VisitString -InputObject '```';
     }
 }
 
@@ -112,7 +120,7 @@ function VisitTitle {
 
     Write-Verbose -Message "[Doc][Processor] -- Visit title";
 
-    VisitString("# $($InputObject.Title)");
+    VisitString -InputObject "# $($InputObject.Title)";
 }
 
 function VisitList {
@@ -136,11 +144,11 @@ function VisitNote {
 
     Write-Verbose -Message "[Doc][Processor] -- Visit note";
     
-    VisitString('');
-    VisitString('> [!NOTE]');
+    VisitString -InputObject '';
+    VisitString -InputObject '> [!NOTE]';
 
     foreach ($n in $InputObject.Content) {
-        VisitString("> $n");
+        VisitString -InputObject "> $n";
     }
 }
 
@@ -154,11 +162,11 @@ function VisitWarning {
 
     Write-Verbose -Message "[Doc][Processor] -- Visit warning";
     
-    VisitString('');
-    VisitString('> [!WARNING]');
+    VisitString -InputObject '';
+    VisitString -InputObject '> [!WARNING]';
 
     foreach ($w in $InputObject.Content) {
-        VisitString("> $w");
+        VisitString -InputObject "> $w";
     }
 }
 
@@ -167,13 +175,13 @@ function VisitMetadata {
 
     Write-Verbose -Message "[Doc][Processor] -- Visit metadata";
     
-    VisitString('---');
+    VisitString -InputObject '---';
 
     foreach ($kv in $InputObject.Metadata.GetEnumerator()) {
-        VisitString("$($kv.Key): $($kv.Value)");
+        VisitString -InputObject "$($kv.Key): $($kv.Value)";
     }
 
-    VisitString('---');
+    VisitString -InputObject '---';
 }
 
 function VisitTable {
@@ -191,20 +199,22 @@ function VisitTable {
     $headerCount = $table.Header.Length;
 
     if ($Null -ne $table.Header -and $table.Header.Length -gt 0) {
-        VisitString('');
+        VisitString -InputObject '';
 
         # Create header
-        VisitString([String]::Concat('|', [String]::Join('|', $table.Header), '|'));
-        VisitString([String]::Concat(''.PadLeft($headerCount, 'X').Replace('X', '| --- '), '|'));
+        VisitString -InputObject ([String]::Concat('|', [String]::Join('|', $table.Header), '|'));
+        VisitString -InputObject ([String]::Concat(''.PadLeft($headerCount, 'X').Replace('X', '| --- '), '|'));
 
         # Write each row
         foreach ($row in $table.Rows) {
             Write-Debug -Message "Generating row";
 
-            [String[]]$columns = $row | VisitString;
+            [String[]]$columns = $row | VisitString -ShouldWrap;
 
-            VisitString([String]::Concat('|', [String]::Join('|', $columns), '|'));
+            VisitString -InputObject ([String]::Concat('|', [String]::Join('|', $columns), '|'));
         }
+
+        VisitString -InputObject '';
     }
 
     Write-Verbose -Message "[Doc][Processor][Table] END:: [$($table.Rows.Count)]";
