@@ -1,10 +1,11 @@
 
 ## Unreleased
 
-- Fix handling of line break for multiline table columns using a wrap separator
+- Fix handling of line break for multiline table columns using a wrap separator [#11](https://github.com/BernieWhite/PSDocs/issues/11)
 - Added `New-PSDocumentOption` cmdlet to configure document generation
 - Added `-Option` parameter to `Invoke-PSDocument` cmdlet to accept configuration options
 - Renamed `Yaml` keyword to `Metadata`. `Yaml` keyword is still supported but deprecated, switch to using `Metadata` instead
+- Added support for encoding markdown content output using the `-Encoding` parameter of `Invoke-PSDocument` [#16](https://github.com/BernieWhite/PSDocs/issues/16)
 
 ## v0.3.0
 

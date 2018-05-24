@@ -99,4 +99,20 @@ Describe 'PSDocs' {
             Get-Content -Path "$outputPath\Instance3.md" -Raw | Should match 'Instance3';
         }
     }
+
+    Context 'Generate a document with a specific encoding' {
+
+        document 'WithEncoding' {
+            $InstanceName;
+        }
+
+        # Check each encoding can be written then read
+        foreach ($encoding in @('UTF8', 'UTF7', 'Unicode', 'ASCII')) {
+
+            It "Should generate $encoding encoded content" {
+                Invoke-PSDocument -Name 'WithEncoding' -InstanceName "With$encoding" -InputObject $dummyObject -OutputPath $outputPath -Encoding $encoding;
+                Get-Content -Path (Join-Path -Path $outputPath -ChildPath "With$encoding.md") -Raw -Encoding $encoding | Should -BeExactly "With$encoding`r`n";
+            }
+        }
+    }
 }

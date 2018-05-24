@@ -755,9 +755,11 @@ function WriteDocumentContent {
         $contentEncoding = $Script:UTF8_NO_BOM;
 
         switch ($Encoding) {
-            @('UTF8', 'UTF7', 'Unicode', 'UTF32', 'ASCII') {
-                $contentEncoding = [System.Text.Encoding]::GetEncoding($Encoding);
-            }
+            'UTF8' { $contentEncoding = [System.Text.Encoding]::GetEncoding('UTF-8'); break; }
+            'UTF7' { $contentEncoding = [System.Text.Encoding]::GetEncoding('UTF-7'); break; }
+            'Unicode' { $contentEncoding = [System.Text.Encoding]::GetEncoding('Unicode'); break; }
+            'UTF32' { $contentEncoding = [System.Text.Encoding]::GetEncoding('UTF-32'); break; }
+            'ASCII' { $contentEncoding = [System.Text.Encoding]::GetEncoding('ASCII'); break; }
         }
     }
 
