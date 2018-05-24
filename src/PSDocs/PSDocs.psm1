@@ -15,6 +15,8 @@ else {
     return Get-Location;
 }
 
+$Script:UTF8_NO_BOM = New-Object -TypeName System.Text.UTF8Encoding -ArgumentList $False;
+
 #
 # Localization
 #
@@ -89,7 +91,10 @@ function Invoke-PSDocument {
         [Switch]$PassThru = $False,
 
         [Parameter(Mandatory = $False)]
-        [PSDocs.Configuration.PSDocumentOption]$Option
+        [PSDocs.Configuration.PSDocumentOption]$Option,
+
+        [Parameter(Mandatory = $False)]
+        [PSDocs.Configuration.MarkdownEncoding]$Encoding = [PSDocs.Configuration.MarkdownEncoding]::Default
     )
 
     process {
@@ -611,7 +616,10 @@ function GenerateDocument {
 
         [Parameter(Mandatory = $False)]
         [AllowNull()]
-        [PSDocs.Configuration.PSDocumentOption]$Option
+        [PSDocs.Configuration.PSDocumentOption]$Option,
+
+        [Parameter(Mandatory = $False)]
+        [PSDocs.Configuration.MarkdownEncoding]$Encoding = [PSDocs.Configuration.MarkdownEncoding]::Default
     )
 
     begin {
@@ -718,7 +726,7 @@ function GenerateDocument {
             }
 
             # Parse the model
-            ParseDom -Dom $dom -Processor (NewMarkdownProcessor) -Option $Option -Verbose:$VerbosePreference | WriteDocumentContent -Path $documentPath -PassThru:$PassThru;
+            ParseDom -Dom $dom -Processor (NewMarkdownProcessor) -Option $Option -Verbose:$VerbosePreference | WriteDocumentContent -Path $documentPath -PassThru:$PassThru -Encoding:$Encoding;
         }
     }
 }
@@ -735,22 +743,35 @@ function WriteDocumentContent {
         [String]$Path,
 
         [Parameter(Mandatory = $False)]
-        [Switch]$PassThru = $False
+        [Switch]$PassThru = $False,
+
+        [Parameter(Mandatory = $False)]
+        [PSDocs.Configuration.MarkdownEncoding]$Encoding
     )
 
     begin {
-        $content = @();
+        $stringBuilder = New-Object -TypeName System.Text.StringBuilder;
+
+        $contentEncoding = $Script:UTF8_NO_BOM;
+
+        switch ($Encoding) {
+            'UTF8' { $contentEncoding = [System.Text.Encoding]::GetEncoding('UTF-8'); break; }
+            'UTF7' { $contentEncoding = [System.Text.Encoding]::GetEncoding('UTF-7'); break; }
+            'Unicode' { $contentEncoding = [System.Text.Encoding]::GetEncoding('Unicode'); break; }
+            'UTF32' { $contentEncoding = [System.Text.Encoding]::GetEncoding('UTF-32'); break; }
+            'ASCII' { $contentEncoding = [System.Text.Encoding]::GetEncoding('ASCII'); break; }
+        }
     }
 
     process {
-        $content += $InputObject; 
+        $stringBuilder.AppendLine($InputObject);
     }
 
     end {
         if ($PassThru) {
-            $content;
+            $stringBuilder.ToString();
         } else {
-            $content | Set-Content -Path $Path;
+            [System.IO.File]::WriteAllText($Path, $stringBuilder.ToString(), $contentEncoding);
         }
         
     }
