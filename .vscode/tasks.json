@@ -38,7 +38,7 @@
         {
             "label": "scaffold-docs",
             "type": "shell",
-            "command": ".\\scripts\\build-docs.ps1 -Scaffold",
+            "command": "Invoke-Build ScaffoldHelp",
             "problemMatcher": []
         },
         {

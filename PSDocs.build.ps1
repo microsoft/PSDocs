@@ -1,6 +1,10 @@
 # use 4.0 MSBuild
 
 param (
+    [Parameter(Mandatory = $False)]
+    [String]$ModuleVersion,
+
+    [Parameter(Mandatory = $False)]
     [String]$NuGetApiKey
 )
 
@@ -82,7 +86,7 @@ task BuildModule {
 
     exec {
         # Build library
-        dotnet publish src/PSDocs -c Release -f net451 -o $(Join-Path -Path $PWD -ChildPath out/modules/PSDocs)
+        dotnet publish src/PSDocs -c Release -f net451 -o $(Join-Path -Path $PWD -ChildPath out/modules/PSDocs/bin/net451)
     }
 
     CopyModule -Path src/PSDocs -DestinationPath out/modules/PSDocs;
@@ -103,6 +107,15 @@ task BuildHelp BuildModule, {
     $Null = Copy-Item -Path out/docs/PSDocs.Dsc/* -Destination out/modules/PSDocs.Dsc/en-AU;
 }
 
+task ScaffoldHelp BuildModule, {
+
+    Import-Module (Join-Path -Path $PWD -ChildPath out/modules/PSDocs) -Force;
+    Import-Module (Join-Path -Path $PWD -ChildPath out/modules/PSDocs.Dsc) -Force;
+
+    Update-MarkdownHelp -Path '.\docs\commands\PSDocs\en-US';
+    Update-MarkdownHelp -Path '.\docs\commands\PSDocs.Dsc\en-US';
+}
+
 # Synopsis: Remove temp files.
 task Clean {
     Remove-Item -Path out,reports -Recurse -Force -ErrorAction SilentlyContinue;
@@ -110,7 +123,18 @@ task Clean {
 
 task PublishModule Build, {
 
-    # Publish-Module -Name '' -Path '' -NuGetApiKey $NuGetApiKey;
+    if ($Null -ne 'ModuleVersion') {
+        Update-ModuleManifest -Path out/modules/PSDocs/PSDocs.psd1 -ModuleVersion $ModuleVersion
+        Update-ModuleManifest -Path out/modules/PSDocs.Dsc/PSDocs.Dsc.psd1 -ModuleVersion $ModuleVersion -RequiredModules @(
+            @{ ModuleName = 'PSDocs'; ModuleVersion = "$ModuleVersion" }
+        )
+    }
+
+    if ($Null -ne 'NuGetApiKey') {
+
+        Publish-Module -Path out/modules/PSDocs -NuGetApiKey $NuGetApiKey -Verbose
+        Publish-Module -Path out/modules/PSDocs.Dsc -NuGetApiKey $NuGetApiKey;
+    }
 }
 
 task NuGet {

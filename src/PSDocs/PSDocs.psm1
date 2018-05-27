@@ -4,11 +4,11 @@
 
 # Import helper classes
 if (!$PSVersionTable.PSEdition -or $PSVersionTable.PSEdition -eq 'Desktop') {
-    Add-Type -Path (Join-Path -Path $PSScriptRoot -ChildPath "/bin/Debug/net451/publish/PSDocs.dll") | Out-Null;
+    Add-Type -Path (Join-Path -Path $PSScriptRoot -ChildPath "/bin/net451/PSDocs.dll") | Out-Null;
 }
-else {
-    Add-Type -Path (Join-Path -Path $PSScriptRoot -ChildPath "/bin/Debug/netstandard2.0/publish/PSDocs.dll") | Out-Null;
-}
+# else {
+#     Add-Type -Path (Join-Path -Path $PSScriptRoot -ChildPath "/bin/netstandard2.0/PSDocs.dll") | Out-Null;
+# }
 
 [PSDocs.Configuration.PSDocumentOption]::GetWorkingPath = {
 
@@ -156,7 +156,10 @@ function New-PSDocumentOption {
         [PSDocs.Configuration.PSDocumentOption]$Option,
 
         [Parameter(Mandatory = $False)]
-        [String]$Path = '.\.psdocs.yml'
+        [String]$Path = '.\.psdocs.yml',
+
+        [Parameter(Mandatory = $False)]
+        [PSDocs.Configuration.MarkdownEncoding]$Encoding
     )
 
     process {
@@ -178,6 +181,10 @@ function New-PSDocumentOption {
             Write-Verbose -Message "Attempting to read: $Path";
 
             $Option = [PSDocs.Configuration.PSDocumentOption]::FromFile($Path, $True);
+        }
+
+        if ($PSBoundParameters.ContainsKey('Encoding')) {
+            $Option.Markdown.Encoding = $Encoding;
         }
 
         return $Option;
@@ -630,11 +637,20 @@ function GenerateDocument {
             return;
         }
 
-        if ($Null -eq $Option) {
-            $Option = New-PSDocumentOption;
+        $optionParams = @{ };
+
+        if ($PSBoundParameters.ContainsKey('Option')) {
+            $optionParams['Option'] =  $Option;
         }
-        else {
-            $Option = $Option.Clone();
+
+        if ($PSBoundParameters.ContainsKey('Encoding')) {
+            $optionParams['Encoding'] = $Encoding;
+        }
+
+        $Option = New-PSDocumentOption @optionParams;
+
+        $PSDocs = New-Object -TypeName PSObject -Property @{
+            Option = $Option;
         }
 
         [Hashtable]$parameter = $Null;
@@ -700,6 +716,7 @@ function GenerateDocument {
                 New-Object -TypeName PSVariable -ArgumentList ('Parameter', $parameter)
                 New-Object -TypeName PSVariable -ArgumentList ('Section', $Section)
                 New-Object -TypeName PSVariable -ArgumentList ('Document', $document)
+                New-Object -TypeName PSVariable -ArgumentList ('PSDocs', $PSDocs)
             )
 
             try {
@@ -726,7 +743,7 @@ function GenerateDocument {
             }
 
             # Parse the model
-            ParseDom -Dom $dom -Processor (NewMarkdownProcessor) -Option $Option -Verbose:$VerbosePreference | WriteDocumentContent -Path $documentPath -PassThru:$PassThru -Encoding:$Encoding;
+            ParseDom -Dom $dom -Processor (NewMarkdownProcessor) -Option $Option -Verbose:$VerbosePreference | WriteDocumentContent -Path $documentPath -PassThru:$PassThru -Encoding:$Option.Markdown.Encoding;
         }
     }
 }

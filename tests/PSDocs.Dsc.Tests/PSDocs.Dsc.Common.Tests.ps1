@@ -13,12 +13,11 @@ $ErrorActionPreference = 'Stop';
 # Setup tests paths
 $rootPath = (Resolve-Path $PSScriptRoot\..\..).Path;
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path;
-$src = ($here -replace '\\tests\\', '\\src\\') -replace '\.Tests', '';
 $temp = "$here\..\..\build";
 # $sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path) -replace '\.Tests\.', '.';
 
-Import-Module $src\..\PSDocs -Force;
-Import-Module $src -Force;
+Import-Module (Join-Path -Path $rootPath -ChildPath "out/modules/PSDocs") -Force;
+Import-Module (Join-Path -Path $rootPath -ChildPath "out/modules/PSDocs.Dsc") -Force;
 
 $outputPath = "$temp\PSDocs.Dsc.Tests\Common";
 Remove-Item -Path $outputPath -Force -Recurse -Confirm:$False -ErrorAction SilentlyContinue;
@@ -53,23 +52,23 @@ configuration TestConfiguration {
 
 configuration TestConfiguration2 {
     
-        param (
-            [Parameter(Mandatory = $True)]
-            [String[]]$ComputerName
-        )
-    
-        Import-DscResource -ModuleName PSDesiredStateConfiguration;
-    
-        node $ComputerName {
-    
-            File FileResource {
-                Ensure = 'Present'
-                Type = 'File'
-                DestinationPath = 'C:\environment.tag'
-                Contents = "Node=$($Node.NodeName)"
-            }
+    param (
+        [Parameter(Mandatory = $True)]
+        [String[]]$ComputerName
+    )
+
+    Import-DscResource -ModuleName PSDesiredStateConfiguration;
+
+    node $ComputerName {
+
+        File FileResource {
+            Ensure = 'Present'
+            Type = 'File'
+            DestinationPath = 'C:\environment.tag'
+            Contents = "Node=$($Node.NodeName)"
         }
     }
+}
 
 Describe 'PSDocs.Dsc' {
     Context 'Generate a document without an instance name' {
@@ -184,6 +183,21 @@ Describe 'PSDocs.Dsc' {
 
         It 'Should output' {
             Test-Path -Path "$outputPath\WithMissingData.md" | Should be $True;
+        }
+    }
+
+    Context 'Generate a document with encoding' {
+
+        document 'EncodingTest' {
+            $PSDocs.Option.Markdown.Encoding
+        }
+
+        TestConfiguration2 -OutputPath $outputPath -ComputerName 'EncodingTest';
+
+        Invoke-DscNodeDocument -DocumentName 'EncodingTest' -InstanceName 'EncodingTest' -Encoding 'UTF8' -Path $outputPath -OutputPath $outputPath;
+
+        It 'Called Invoke-PSDocument with Encoding' {
+            Get-Content -Path (Join-Path -Path $outputPath -ChildPath 'EncodingTest.md') -Raw | Should -Match 'UTF8';
         }
     }
 }
