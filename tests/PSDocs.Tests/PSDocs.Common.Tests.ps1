@@ -125,7 +125,7 @@ Describe 'PSDocs' {
         }
 
         # Check each encoding can be written then read
-        foreach ($encoding in @('UTF8', 'UTF7', 'Unicode', 'ASCII', 'UTF-32')) {
+        foreach ($encoding in @('UTF8', 'UTF7', 'Unicode', 'ASCII', 'UTF32')) {
 
             It "Should generate $encoding encoded content" {
                 Invoke-PSDocument -Name 'WithEncoding' -InstanceName "With$encoding" -InputObject $dummyObject -OutputPath $outputPath -Encoding $encoding;
