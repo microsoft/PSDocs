@@ -1,4 +1,3 @@
-# use 4.0 MSBuild
 
 param (
     [Parameter(Mandatory = $False)]
@@ -97,7 +96,7 @@ task BuildModule {
 }
 
 # Synopsis: Build help
-task BuildHelp BuildModule, {
+task BuildHelp BuildModule, PlatyPS, {
 
     # Generate MAML and about topics
     $Null = New-ExternalHelp -OutputPath out/docs/PSDocs -Path '.\docs\commands\PSDocs\en-US','.\docs\keywords\PSDocs\en-US' -Force;
@@ -152,6 +151,16 @@ task Pester {
     }
 
     Import-Module -Name Pester -Verbose:$False;
+}
+
+task platyPS {
+
+    # Install pester if v4+ is not currently installed
+    if ($Null -eq (Get-Module -Name PlatyPS -ListAvailable)) {
+        Install-Module -Name PlatyPS -Force -Scope CurrentUser;
+    }
+
+    Import-Module -Name PlatyPS -Verbose:$False;
 }
 
 task TestModule Pester, {
