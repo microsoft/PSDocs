@@ -14,12 +14,10 @@ Set-StrictMode -Version latest;
 # Setup tests paths
 $rootPath = (Resolve-Path $PSScriptRoot\..\..).Path;
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path;
-$src = ($here -replace '\\tests\\', '\\src\\') -replace '\.Tests', '';
 $temp = "$here\..\..\build";
-# $sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path) -replace '\.Tests\.', '.';
 
-Import-Module $src -Force;
-Import-Module $src\PSDocsProcessor\Markdown -Force;
+Import-Module (Join-Path -Path $rootPath -ChildPath "out/modules/PSDocs") -Force;
+Import-Module (Join-Path -Path $rootPath -ChildPath "out/modules/PSDocs/PSDocsProcessor/Markdown") -Force;
 
 $outputPath = "$temp\PSDocs.Tests\Title";
 New-Item $outputPath -ItemType Directory -Force | Out-Null;

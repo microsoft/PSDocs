@@ -15,7 +15,7 @@ Create markdown from Desired State Configuration (DSC) .mof file.
 
 ```text
 Invoke-DscNodeDocument [[-DocumentName] <String>] [[-Script] <String>] [[-InstanceName] <String[]>]
- [[-Path] <String>] [[-OutputPath] <String>] [<CommonParameters>]
+ [[-Path] <String>] [[-OutputPath] <String>] [-Encoding <MarkdownEncoding>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -123,6 +123,23 @@ Aliases:
 Required: False
 Position: 1
 Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Encoding
+
+Specifies the file encoding for generated markdown files. By default, UTF-8 without byte order mark (BOM) will be used. To use UTF-8 with BOM specify `UTF8`.
+
+```yaml
+Type: MarkdownEncoding
+Parameter Sets: (All)
+Aliases:
+Accepted values: Default, UTF8, UTF7, Unicode, UTF32, ASCII
+
+Required: False
+Position: Named
+Default value: Default
 Accept pipeline input: False
 Accept wildcard characters: False
 ```

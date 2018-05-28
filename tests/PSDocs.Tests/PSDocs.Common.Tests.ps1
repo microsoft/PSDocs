@@ -14,17 +14,26 @@ Set-StrictMode -Version latest;
 # Setup tests paths
 $rootPath = (Resolve-Path $PSScriptRoot\..\..).Path;
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path;
-$src = ($here -replace '\\tests\\', '\\src\\') -replace '\.Tests', '';
 $temp = "$here\..\..\build";
-# $sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path) -replace '\.Tests\.', '.';
 
-Import-Module $src -Force;
+Import-Module (Join-Path -Path $rootPath -ChildPath "out/modules/PSDocs") -Force;
+Import-Module (Join-Path -Path $rootPath -ChildPath "out/modules/PSDocs/PSDocsProcessor/Markdown") -Force;
 
 $outputPath = "$temp\PSDocs.Tests\Common";
 Remove-Item -Path $outputPath -Force -Recurse -Confirm:$False -ErrorAction SilentlyContinue;
 New-Item -Path $outputPath -ItemType Directory -Force | Out-Null;
 
-$dummyObject = New-Object -TypeName PSObject;
+$dummyObject = New-Object -TypeName PSObject -Property @{
+    Object = [PSObject]@{
+        Name = 'ObjectName'
+        Value = 'ObjectValue'
+    }
+
+    Hashtable = @{
+        Name = 'HashName'
+        Value = 'HashValue'
+    }
+}
 
 $Global:TestVars = @{ };
 
@@ -34,6 +43,10 @@ Describe 'PSDocs' {
         # Define a test document with a table
         document 'WithoutInstanceName' {
             $InstanceName;
+
+            $InputObject.Object.Name;
+
+            $InputObject.Hashtable.Name;
         }
 
         $outputDoc = "$outputPath\WithoutInstanceName.md";
@@ -44,7 +57,12 @@ Describe 'PSDocs' {
         }
 
         It 'Should contain document name' {
-            Get-Content -Path $outputDoc -Raw | Should match 'WithoutInstanceName';
+            Get-Content -Path $outputDoc -Raw | Should -Match 'WithoutInstanceName';
+        }
+
+        It 'Should contain object properties' {
+            Get-Content -Path $outputDoc -Raw | Should -Match 'ObjectName';
+            Get-Content -Path $outputDoc -Raw | Should -Match 'HashName';
         }
     }
 
@@ -107,7 +125,7 @@ Describe 'PSDocs' {
         }
 
         # Check each encoding can be written then read
-        foreach ($encoding in @('UTF8', 'UTF7', 'Unicode', 'ASCII')) {
+        foreach ($encoding in @('UTF8', 'UTF7', 'Unicode', 'ASCII', 'UTF32')) {
 
             It "Should generate $encoding encoded content" {
                 Invoke-PSDocument -Name 'WithEncoding' -InstanceName "With$encoding" -InputObject $dummyObject -OutputPath $outputPath -Encoding $encoding;

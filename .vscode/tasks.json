@@ -6,7 +6,7 @@
         {
             "label": "test",
             "type": "shell",
-            "command": ".\\scripts\\test.ps1",
+            "command": "Invoke-Build Test",
             "group": {
                 "kind": "test",
                 "isDefault": true
@@ -16,13 +16,13 @@
         {
             "label": "coverage",
             "type": "shell",
-            "command": ".\\scripts\\test.ps1 -Clean -CodeCoverage",
+            "command": "Invoke-Build Test -CodeCoverage",
             "problemMatcher": [ "$pester" ]
         },
         {
             "label": "build",
             "type": "shell",
-            "command": ".\\scripts\\build.ps1 -Clean -Module PSDocs,PSDocs.Dsc",
+            "command": "Invoke-Build Build",
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -32,19 +32,19 @@
         {
             "label": "build-docs",
             "type": "shell",
-            "command": ".\\scripts\\build-docs.ps1",
+            "command": "Invoke-Build BuildHelp",
             "problemMatcher": []
         },
         {
             "label": "scaffold-docs",
             "type": "shell",
-            "command": ".\\scripts\\build-docs.ps1 -Scaffold",
+            "command": "Invoke-Build ScaffoldHelp",
             "problemMatcher": []
         },
         {
             "label": "clean",
             "type": "shell",
-            "command": "Remove-Item -Path .\\build -Recurse -Force",
+            "command": "Invoke-Build Clean",
             "problemMatcher": []
         }
     ]

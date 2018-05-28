@@ -54,7 +54,10 @@ function Invoke-DscNodeDocument {
 
         # The path to output documentation
         [Parameter(Mandatory = $False)]
-        [String]$OutputPath = $PWD
+        [String]$OutputPath = $PWD,
+
+        [Parameter(Mandatory = $False)]
+        [PSDocs.Configuration.MarkdownEncoding]$Encoding = [PSDocs.Configuration.MarkdownEncoding]::Default
     )
 
     begin {
@@ -111,7 +114,10 @@ function BuildDocumentation {
 
         # The output path to store documentaion
         [Parameter(Mandatory = $False)]
-        [String]$OutputPath = $PWD
+        [String]$OutputPath = $PWD,
+
+        [Parameter(Mandatory = $False)]
+        [PSDocs.Configuration.MarkdownEncoding]$Encoding
     )
 
     process {
@@ -145,13 +151,22 @@ function BuildDocumentation {
             }   
         }
 
+        $docParams = @{
+            Name = $DocumentName
+            OutputPath = $OutputPath
+        };
+
+        if ($PSBoundParameters.ContainsKey('Encoding')) {
+            $docParams['Encoding'] = $Encoding;
+        }
+
         foreach ($r in $referenceConfig) {
             # Write-Verbose -Message "[Doc][Mof] -- Analysing document: $($r.Path)";
 
             # Write-Verbose -Message "[Doc] -- Generating documentation: $OutputPath";
 
             # Generate a document for the configuration
-            Invoke-PSDocument -InputObject $r -InstanceName $r.InstanceName -Name $DocumentName -OutputPath $OutputPath -Verbose:$VerbosePreference;
+            Invoke-PSDocument -InputObject $r -InstanceName $r.InstanceName @docParams -Verbose:$VerbosePreference;
         }
 
         # Write-Verbose -Message "[Doc][$dokOperation] -- Update TOC: $($buildResult.FullName)";

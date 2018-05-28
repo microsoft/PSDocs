@@ -14,7 +14,8 @@ Create options to configure document generation.
 ## SYNTAX
 
 ```text
-New-PSDocumentOption [-Option <PSDocumentOption>] [-Path <String>] [<CommonParameters>]
+New-PSDocumentOption [-Option <PSDocumentOption>] [-Path <String>] [-Encoding <MarkdownEncoding>]
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -66,10 +67,26 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -Encoding
+
+Specifies the file encoding for generated markdown files. By default, UTF-8 without byte order mark (BOM) will be used. To use UTF-8 with BOM specify `UTF8`.
+
+```yaml
+Type: MarkdownEncoding
+Parameter Sets: (All)
+Aliases:
+Accepted values: Default, UTF8, UTF7, Unicode, UTF32, ASCII
+
+Required: False
+Position: Named
+Default value: Default
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### CommonParameters
 
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
-For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
@@ -81,6 +98,4 @@ For more information, see about_CommonParameters (http://go.microsoft.com/fwlink
 
 ## RELATED LINKS
 
-[Invoke-PSDocument]
-
-[Invoke-PSDocument]: Invoke-PSDocument.md
+[Invoke-PSDocument](Invoke-PSDocument.md)
