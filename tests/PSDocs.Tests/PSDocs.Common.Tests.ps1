@@ -23,7 +23,17 @@ $outputPath = "$temp\PSDocs.Tests\Common";
 Remove-Item -Path $outputPath -Force -Recurse -Confirm:$False -ErrorAction SilentlyContinue;
 New-Item -Path $outputPath -ItemType Directory -Force | Out-Null;
 
-$dummyObject = New-Object -TypeName PSObject;
+$dummyObject = New-Object -TypeName PSObject -Property @{
+    Object = [PSObject]@{
+        Name = 'ObjectName'
+        Value = 'ObjectValue'
+    }
+
+    Hashtable = @{
+        Name = 'HashName'
+        Value = 'HashValue'
+    }
+}
 
 $Global:TestVars = @{ };
 
@@ -33,6 +43,10 @@ Describe 'PSDocs' {
         # Define a test document with a table
         document 'WithoutInstanceName' {
             $InstanceName;
+
+            $InputObject.Object.Name;
+
+            $InputObject.Hashtable.Name;
         }
 
         $outputDoc = "$outputPath\WithoutInstanceName.md";
@@ -43,7 +57,12 @@ Describe 'PSDocs' {
         }
 
         It 'Should contain document name' {
-            Get-Content -Path $outputDoc -Raw | Should match 'WithoutInstanceName';
+            Get-Content -Path $outputDoc -Raw | Should -Match 'WithoutInstanceName';
+        }
+
+        It 'Should contain object properties' {
+            Get-Content -Path $outputDoc -Raw | Should -Match 'ObjectName';
+            Get-Content -Path $outputDoc -Raw | Should -Match 'HashName';
         }
     }
 
@@ -106,7 +125,7 @@ Describe 'PSDocs' {
         }
 
         # Check each encoding can be written then read
-        foreach ($encoding in @('UTF8', 'UTF7', 'Unicode', 'ASCII')) {
+        foreach ($encoding in @('UTF8', 'UTF7', 'Unicode', 'ASCII', 'UTF-32')) {
 
             It "Should generate $encoding encoded content" {
                 Invoke-PSDocument -Name 'WithEncoding' -InstanceName "With$encoding" -InputObject $dummyObject -OutputPath $outputPath -Encoding $encoding;

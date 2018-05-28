@@ -5,7 +5,10 @@ param (
     [String]$ModuleVersion,
 
     [Parameter(Mandatory = $False)]
-    [String]$NuGetApiKey
+    [String]$NuGetApiKey,
+
+    [Parameter(Mandatory = $False)]
+    [Switch]$CodeCoverage = $False
 )
 
 # Copy the PowerShell modules files to the destination path
@@ -151,42 +154,41 @@ task Pester {
     Import-Module -Name Pester -Verbose:$False;
 }
 
-task PublishAppveyorReport -If (![String]::IsNullOrEmpty($Env:APPVEYOR_JOB_ID)) {
-
-    SendAppveyorTestResult -Uri "https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)" -Path '.\reports' -Include '*.xml';
-
-    # Throw an error if pester tests failed
-
-    if ($Null -eq $results) {
-        throw 'Failed to get Pester test results.';
-    }
-    elseif ($results.FailedCount -gt 0) {
-        throw "$($results.FailedCount) tests failed.";
-    }
-}
-
-task TestModule Build,Pester,PublishAppveyorReport, {
+task TestModule Pester, {
 
     # Run Pester tests
     $pesterParams = @{ Path = $PWD; OutputFile = 'reports/Pester.xml'; OutputFormat = 'NUnitXml'; PesterOption = @{ IncludeVSCodeMarker = $True }; PassThru = $True; };
 
-    # if ($CodeCoverage) {
-    #     $pesterParams.Add('CodeCoverage', "SourcePath\**\*.psm1");
-    # }
+    if ($CodeCoverage) {
+        $pesterParams.Add('CodeCoverage', (Join-Path -Path $PWD -ChildPath 'out/modules/**/*.psm1'));
+    }
 
     if (!(Test-Path -Path reports)) {
         $Null = New-Item -Path reports -ItemType Directory -Force;
     }
 
-    Invoke-Pester @pesterParams;
+    $results = Invoke-Pester @pesterParams;
+
+    if (![String]::IsNullOrEmpty($Env:APPVEYOR_JOB_ID)) {
+        SendAppveyorTestResult -Uri "https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)" -Path '.\reports' -Include '*.xml';
+
+        # Throw an error if pester tests failed
+
+        if ($Null -eq $results) {
+            throw 'Failed to get Pester test results.';
+        }
+        elseif ($results.FailedCount -gt 0) {
+            throw "$($results.FailedCount) tests failed.";
+        }
+    }
 }
 
 # Synopsis: Build and clean.
-task . Build
+task . Build, Test
 
 # Synopsis: Build the project
 task Build Clean, BuildModule, BuildHelp
 
-task Test TestModule
+task Test Build, TestModule
 
 task Publish PublishModule

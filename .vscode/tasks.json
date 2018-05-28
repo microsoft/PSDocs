@@ -16,7 +16,7 @@
         {
             "label": "coverage",
             "type": "shell",
-            "command": ".\\scripts\\test.ps1 -Clean -CodeCoverage",
+            "command": "Invoke-Build Test -CodeCoverage",
             "problemMatcher": [ "$pester" ]
         },
         {
