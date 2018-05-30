@@ -1,6 +1,8 @@
 
 ## Unreleased
 
+## v0.4.0
+
 - Fix handling of line break for multiline table columns using a wrap separator [#11](https://github.com/BernieWhite/PSDocs/issues/11)
 - Added `New-PSDocumentOption` cmdlet to configure document generation
 - Added `-Option` parameter to `Invoke-PSDocument` cmdlet to accept configuration options
