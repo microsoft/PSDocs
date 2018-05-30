@@ -129,7 +129,7 @@ task PublishModule Build, {
     if ($Null -ne 'ModuleVersion') {
         Update-ModuleManifest -Path out/modules/PSDocs/PSDocs.psd1 -ModuleVersion $ModuleVersion;
 
-        Import-Module out/modules/PSDocs -Force;
+        Import-Module ./out/modules/PSDocs -Force;
 
         Update-ModuleManifest -Path out/modules/PSDocs.Dsc/PSDocs.Dsc.psd1 -ModuleVersion $ModuleVersion -RequiredModules @(
             [PSObject]@{ ModuleName = 'PSDocs'; ModuleVersion = "$ModuleVersion" }
