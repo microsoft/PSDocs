@@ -125,12 +125,19 @@ task Clean {
 
 task PublishModule Build, {
 
+    # Update module version
     if ($Null -ne 'ModuleVersion') {
-        Update-ModuleManifest -Path out/modules/PSDocs/PSDocs.psd1 -ModuleVersion $ModuleVersion
+        Update-ModuleManifest -Path out/modules/PSDocs/PSDocs.psd1 -ModuleVersion $ModuleVersion;
+
+        Import-Module ./out/modules/PSDocs -Force;
+
         Update-ModuleManifest -Path out/modules/PSDocs.Dsc/PSDocs.Dsc.psd1 -ModuleVersion $ModuleVersion -RequiredModules @(
-            @{ ModuleName = 'PSDocs'; ModuleVersion = "$ModuleVersion" }
-        )
+            [PSObject]@{ ModuleName = 'PSDocs'; ModuleVersion = "$ModuleVersion" }
+        );
     }
+}
+
+task ReleaseModule {
 
     if ($Null -ne 'NuGetApiKey') {
 
@@ -201,3 +208,5 @@ task Build Clean, BuildModule, BuildHelp
 task Test Build, TestModule
 
 task Publish PublishModule
+
+task Release ReleaseModule
