@@ -7,7 +7,7 @@
 - Added `New-PSDocumentOption` cmdlet to configure document generation
 - Added `-Option` parameter to `Invoke-PSDocument` cmdlet to accept configuration options
 - **Important change**: Renamed `Yaml` keyword to `Metadata`. `Yaml` keyword is still supported but deprecated, switch to using `Metadata` instead
-- **Important change**: Added support for encoding markdown content output [#16](https://github.com/BernieWhite/PSDocs/issues/16)
+- **Breaking change**: Added support for encoding markdown content output [#16](https://github.com/BernieWhite/PSDocs/issues/16)
   - To specify the encoding use the `-Encoding` parameter of `Invoke-PSDocument` and `Invoke-DscNodeDocument`
   - Output now defaults to UTF-8 without byte order mark (BOM) instead of ASCII
 
