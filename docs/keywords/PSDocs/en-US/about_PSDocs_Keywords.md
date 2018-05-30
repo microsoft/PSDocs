@@ -389,7 +389,7 @@ An online version of this document is available at https://github.com/BernieWhit
 
 ## SEE ALSO
 
-- [Invoke-PSDocument](Invoke-PSDocument.md)
+- [Invoke-PSDocument](https://github.com/BernieWhite/PSDocs/blob/master/docs/commands/PSDocs/en-US/Invoke-PSDocument.md)
 
 ## KEYWORDS
 
