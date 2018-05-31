@@ -428,7 +428,7 @@ function Table {
         [Object]$InputObject,
 
         [Parameter(Mandatory = $False, Position = 0)]
-        [String[]]$Property
+        [Object[]]$Property
     )
 
     begin {
@@ -440,12 +440,6 @@ function Table {
         $recordIndex = 0;
 
         $rowData = New-Object -TypeName Collections.Generic.List[Object];
-
-        # if ($Property -is [Hashtable[]]) {
-        #     $Property = $Property -as [Hashtable[]];
-        # } else {
-        #     $Property = $Property -as [String[]];
-        # }
     }
 
     process {
@@ -466,6 +460,7 @@ function Table {
     }
 
     end {
+        # Extract out the column names based on the resulting objects
         [String[]]$headers = $rowData | ForEach-Object -Process {
             $_.PSObject.Properties
         } | Where-Object -FilterScript {
@@ -781,7 +776,7 @@ function WriteDocumentContent {
     }
 
     process {
-        $stringBuilder.AppendLine($InputObject);
+        $Null = $stringBuilder.AppendLine($InputObject);
     }
 
     end {

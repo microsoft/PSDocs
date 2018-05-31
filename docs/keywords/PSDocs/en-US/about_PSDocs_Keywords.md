@@ -291,10 +291,10 @@ Creates a formatted table from pipeline objects.
 Syntax:
 
 ```text
-Table [-Property <String[]>]
+Table [-Property <Object[]>]
 ```
 
-- `-Property` - Filter the table to only the named columns.
+- `-Property` - Filter the table to only the named columns. Either a named column or expression can be used.
 
 Examples:
 
@@ -305,7 +305,7 @@ Document 'Table' {
     Section 'Directory list' {
 
         # Create a row for each child item of C:\
-        Get-ChildItem -Path 'C:\' | Table -Property Name,PSIsContainer;
+        Get-ChildItem -Path 'C:\' | Table -Property Name,@{ Name = 'IsContainer'; Expression = { $_.PSIsContainer }};
     }
 }
 
@@ -316,7 +316,7 @@ Invoke-PSDocument -Name 'Table';
 ```markdown
 ## Directory list
 
-|Name|PSIsContainer|
+|Name|IsContainer|
 | --- | --- |
 |Program Files|True|
 |Program Files (x86)|True|
@@ -324,7 +324,7 @@ Invoke-PSDocument -Name 'Table';
 |Windows|True|
 ```
 
-Generates a new `Table.md` document containing a table populated with a row for each item. Only the properties Name and PSIsContainer are added as columns.
+Generates a new `Table.md` document containing a table populated with a row for each item. Only the properties Name and IsContainer are added as columns. A property expression is used on the `PSIsContainer` property to render the column as `IsContainer`.
 
 ### Metadata
 
