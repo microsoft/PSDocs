@@ -1,6 +1,9 @@
 
 ## Unreleased
 
+- Fix to prevent string builder properties being outputted each time `Invoke-PSDocument` is called
+- Added support for property expressions with the `Table` keyword
+
 ## v0.4.0
 
 - Fix handling of line break for multiline table columns using a wrap separator [#11](https://github.com/BernieWhite/PSDocs/issues/11)

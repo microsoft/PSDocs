@@ -75,6 +75,36 @@ Describe 'PSDocs -- Table keyword' {
         }
     }
 
+    Context 'Table with property expression' {
+
+        # Define table with property expressions
+        document 'TableWithExpression' {
+            
+            $object = [PSCustomObject]@{
+                Name = 'Dummy'
+                Property = @{
+                    Value1 = 1
+                    Value2 = 2
+                }
+            }
+
+            $object | Table -Property Name,@{ Name = 'Value1'; Expression = { $_.Property.Value1 }},@{ Name = 'Value2'; Expression = { $_.Property.Value2 }};
+
+            'EOF'
+        }
+
+        $outputDoc = "$outputPath\TableWithExpression.md";
+        Invoke-PSDocument -Name 'TableWithExpression' -OutputPath $outputPath -Verbose
+
+        It 'Should have generated output' {
+            Test-Path -Path $outputDoc | Should be $True;
+        }
+
+        It 'Should match expected format' {
+            Get-Content -Path $outputDoc -Raw | Should -Match '\|Dummy\|1\|2\|\r\n\r\nEOF';
+        }
+    }
+
     Context 'Table single entry markdown' {
         
         # Define a test document with a table
