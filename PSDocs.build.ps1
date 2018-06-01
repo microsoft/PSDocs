@@ -11,7 +11,7 @@ param (
 )
 
 # Copy the PowerShell modules files to the destination path
-function CopyModule {
+function CopyModuleFiles {
 
     param (
         [Parameter(Mandatory = $True)]
@@ -83,17 +83,20 @@ function SendAppveyorTestResult {
     }
 }
 
-# Synopsis: Build modules only
-task BuildModule {
-
+task BuildDotNet {
     exec {
         # Build library
         dotnet publish src/PSDocs -c Release -f net451 -o $(Join-Path -Path $PWD -ChildPath out/modules/PSDocs/bin/net451)
     }
-
-    CopyModule -Path src/PSDocs -DestinationPath out/modules/PSDocs;
-    CopyModule -Path src/PSDocs.Dsc -DestinationPath out/modules/PSDocs.Dsc;
 }
+
+task CopyModule {
+    CopyModuleFiles -Path src/PSDocs -DestinationPath out/modules/PSDocs;
+    CopyModuleFiles -Path src/PSDocs.Dsc -DestinationPath out/modules/PSDocs.Dsc;
+}
+
+# Synopsis: Build modules only
+task BuildModule BuildDotNet, CopyModule
 
 # Synopsis: Build help
 task BuildHelp BuildModule, PlatyPS, {
