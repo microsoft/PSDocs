@@ -45,7 +45,15 @@ Document Sample {
 Invoke-PSDocument -Name 'Sample' -InputObject 'C:\';
 ```
 
-Create markdown using the Sample documentation definition for 'C:\'.
+Create markdown using the inline documentation definition called Sample using as input 'C:\'.
+
+### Example 2
+
+```powershell
+Invoke-PSDocument -Path .;
+```
+
+Create markdown using *.doc.ps1 files loaded from the current working directory.
 
 ## PARAMETERS
 
