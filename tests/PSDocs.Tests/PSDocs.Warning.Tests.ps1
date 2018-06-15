@@ -45,7 +45,7 @@ Describe 'PSDocs -- Warning keyword' {
             $Global:TestVars['VisitWarning'] = $InputObject;
         }
 
-        Invoke-PSDocument -Name 'WarningVisitor' -InputObject $dummyObject -OutputPath $outputPath;
+        WarningVisitor -InputObject $dummyObject -OutputPath $outputPath;
 
         It 'Should process keyword' {
             Assert-MockCalled -CommandName 'VisitWarning' -ModuleName 'Markdown' -Times 1;
@@ -71,7 +71,7 @@ Describe 'PSDocs -- Warning keyword' {
         }
 
         $outputDoc = "$outputPath\WarningSingleMarkdown.md";
-        Invoke-PSDocument -Name 'WarningSingleMarkdown' -InputObject $dummyObject -OutputPath $outputPath;
+        WarningSingleMarkdown -InputObject $dummyObject -OutputPath $outputPath;
 
         It 'Should have generated output' {
             Test-Path -Path $outputDoc | Should be $True;
@@ -94,7 +94,7 @@ Describe 'PSDocs -- Warning keyword' {
         }
 
         $outputDoc = "$outputPath\WarningMultiMarkdown.md";
-        Invoke-PSDocument -Name 'WarningMultiMarkdown' -InputObject $dummyObject -OutputPath $outputPath;
+        WarningMultiMarkdown -InputObject $dummyObject -OutputPath $outputPath;
 
         It 'Should have generated output' {
             Test-Path -Path $outputDoc | Should be $True;

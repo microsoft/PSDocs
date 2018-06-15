@@ -74,8 +74,8 @@ Document Sample {
     }
 }
 
-# Call the document definition and generate markdown from an object
-Invoke-PSDocument -Name 'Sample' -InputObject 'C:\';
+# Call the document definition as a function to generate markdown from an object
+Sample -InputObject 'C:\';
 ```
 
 An example of the output generated is available [here](/docs/examples/Get-child-item-output.md).

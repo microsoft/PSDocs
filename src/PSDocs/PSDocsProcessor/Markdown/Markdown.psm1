@@ -7,7 +7,7 @@ function Visit {
     [CmdletBinding()]
     param (
         [Parameter()]
-        $InputObject,
+        [Object]$InputObject,
 
         [Parameter()]
         [PSDocs.Configuration.PSDocumentOption]$Option
@@ -87,7 +87,7 @@ function VisitSection {
     foreach ($n in $section.Node) {
 
         # Visit each node within the section
-        Visit($n);
+        Visit -InputObject $n -Option $Option;
     }
 
     Write-Verbose -Message "[Doc][Processor][Section] END:: [$($section.Node.Length)]";
@@ -228,11 +228,19 @@ function VisitDocument {
         [PSDocs.Models.Document]$InputObject
     )
 
-    if ($Null -ne $InputObject.Metadata -and $InputObject.Metadata.Count -gt 0) {
-        VisitMetadata -InputObject $InputObject;
+    $document = $InputObject;
+
+    if ($Null -ne $document.Metadata -and $document.Metadata.Count -gt 0) {
+        VisitMetadata -InputObject $document;
     }
 
-    if (![String]::IsNullOrEmpty($InputObject.Title)) {
-        VisitTitle -InputObject $InputObject;
+    if (![String]::IsNullOrEmpty($document.Title)) {
+        VisitTitle -InputObject $document;
+    }
+
+    foreach ($n in $document.Node) {
+
+        # Visit each node within the document
+        Visit -InputObject $n -Option $Option;
     }
 }

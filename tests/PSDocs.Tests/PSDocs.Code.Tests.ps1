@@ -45,7 +45,7 @@ Describe 'PSDocs -- Code keyword' {
             $Global:TestVars['VisitCode'] = $InputObject;
         }
 
-        Invoke-PSDocument -Name 'CodeTests' -InstanceName 'Code' -InputObject $dummyObject -OutputPath $outputPath;
+        CodeTests -InstanceName 'Code' -InputObject $dummyObject -OutputPath $outputPath;
 
         It 'Should process Code keyword' {
             Assert-MockCalled -CommandName 'VisitCode' -ModuleName 'Markdown' -Times 1;
@@ -71,7 +71,7 @@ Describe 'PSDocs -- Code keyword' {
         }
 
         $outputDoc = "$outputPath\CodeMarkdown.md";
-        Invoke-PSDocument -Name 'CodeMarkdown' -InputObject $dummyObject -OutputPath $outputPath;
+        CodeMarkdown -InputObject $dummyObject -OutputPath $outputPath;
 
         It 'Should have generated output' {
             Test-Path -Path $outputDoc | Should be $True;
@@ -93,7 +93,7 @@ Describe 'PSDocs -- Code keyword' {
         }
 
         $outputDoc = "$outputPath\CodeMarkdownNamedFormat.md";
-        Invoke-PSDocument -Name 'CodeMarkdownNamedFormat' -InputObject $dummyObject -OutputPath $outputPath;
+        CodeMarkdownNamedFormat -InputObject $dummyObject -OutputPath $outputPath;
 
         It 'Should have generated output' {
             Test-Path -Path $outputDoc | Should be $True;
@@ -113,7 +113,7 @@ Describe 'PSDocs -- Code keyword' {
         }
 
         $outputDoc = "$outputPath\CodeMarkdownEval.md";
-        Invoke-PSDocument -Name 'CodeMarkdownEval' -InputObject $dummyObject -OutputPath $outputPath;
+        CodeMarkdownEval -InputObject $dummyObject -OutputPath $outputPath;
 
         It 'Should have generated output' {
             Test-Path -Path $outputDoc | Should be $True;

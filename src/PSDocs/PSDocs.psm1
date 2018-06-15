@@ -38,6 +38,9 @@ function Document {
         [Parameter(Position = 0, Mandatory = $True)]
         [String]$Name,
 
+        [Parameter(Mandatory = $False)]
+        [String[]]$Tag,
+
         [Parameter(Position = 1, Mandatory = $True)]
         [ScriptBlock]$Body
     )
@@ -46,12 +49,67 @@ function Document {
 
         Write-Verbose -Message "[Document]::BEGIN"
 
-        InitDocumentContext;
+        # Check if document is being defined
+        if ($Null -eq $PSDocs) {
+            InitDocumentContext;
 
-        $Script:DocumentBody[$Name] = $Body;
+            $Script:DocumentBody[$Name] = $Body;
 
-        # Export documentation function
-        Set-Item -Path "function:global:$Name" -Value (${function:GenerateDocumentFn});
+            # Export definition as a function
+            Set-Item -Path "function:global:$Name" -Value (${function:GenerateDocumentFn});
+        }
+        else {
+            Write-Verbose -Message "[Doc] -- Calling document block: $Name";
+
+            $matchTags = [PSDocs.Models.PSDocsHelper]::MatchTags($Tag, $PSDocs.Context.Tag);
+
+            if (($Null -eq $PSDocs.Context.Name -or $Name -in $PSDocs.Context.Name) -and $matchTags) {
+
+                [String[]]$instances = @($InstanceName);
+
+                # If an instance name is not specified, default to the document name
+                if ($Null -eq $InstanceName) {
+                    $instances = @($Name);
+                }
+
+                foreach ($instance in $instances) {
+
+                    # Set the default section level so that sections in the document start from 2
+                    $Section = @{ Level = 1; };
+
+                    $document = [PSDocs.Models.ModelHelper]::NewDocument();
+
+                    # Build a path for the document
+                    $document.Path = Join-Path -Path $PSDocs.Context.OutputPath -ChildPath "$instance.md";
+
+                    # Define built-in variables
+                    [PSVariable[]]$variablesToDefine = @(
+                        New-Object -TypeName PSVariable -ArgumentList ('InstanceName', $instance)
+                        New-Object -TypeName PSVariable -ArgumentList ('InputObject', $InputObject)
+                        New-Object -TypeName PSVariable -ArgumentList ('Parameter', $parameter)
+                        New-Object -TypeName PSVariable -ArgumentList ('Section', $Section)
+                        New-Object -TypeName PSVariable -ArgumentList ('Document', $document)
+                        New-Object -TypeName PSVariable -ArgumentList ('PSDocs', $PSDocs)
+                    )
+
+                    $innerResult = $Body.InvokeWithContext($PSDocs.Context.Function, $variablesToDefine);
+
+                    $document.Node.AddRange($innerResult);
+
+                    Write-Verbose -Message "[Doc] -- Document results [$($document.Node.Length)]";
+
+                    # Create parent path if it doesn't exist
+                    $documentParent = Split-Path -Path $document.Path -Parent;
+
+                    if (!(Test-Path -Path $documentParent)) {
+                        New-Item -Path $documentParent -ItemType Directory -Force | Out-Null;
+                    }
+
+                    # Parse the model
+                    ParseDom -Document $document -Processor (NewMarkdownProcessor) -Option $Option -Verbose:$VerbosePreference | WriteDocumentContent -Path $document.Path -PassThru:$PassThru -Encoding:$PSDocs.Option.Markdown.Encoding;
+                }
+            }
+        }
 
         Write-Verbose -Message "[Document]::END"
     }
@@ -60,11 +118,15 @@ function Document {
 # .ExternalHelp PSDocs-Help.xml
 function Invoke-PSDocument {
 
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'Inline')]
     param (
         # The name of the document
-        [Parameter(Position = 0, Mandatory = $True)]
-        [String]$Name,
+        [Parameter(Mandatory = $False, ParameterSetName = 'Path')]
+        [Parameter(Position = 0, Mandatory = $True, ParameterSetName = 'Inline')]
+        [String[]]$Name,
+
+        [Parameter(Mandatory = $False, ParameterSetName = 'Path')]
+        [String[]]$Tag,
 
         [Parameter(Mandatory = $False)]
         [String[]]$InstanceName,
@@ -72,12 +134,10 @@ function Invoke-PSDocument {
         [Parameter(Mandatory = $False, ValueFromPipeline = $True)]
         [PSObject]$InputObject,
 
-        # [Parameter(Mandatory = $False)]
-        # [Object]$ConfigurationData,
-
         # The path to look for document definitions in
-        # [Parameter(Mandatory = $False)]
-        # [String]$Path = $PWD,
+        [Parameter(Position = 0, Mandatory = $True, ParameterSetName = 'Path')]
+        [PSDefaultValue(Help = '.')]
+        [String]$Path = $PWD,
 
         # The output path to save generated documentation
         [Parameter(Mandatory = $False)]
@@ -97,12 +157,18 @@ function Invoke-PSDocument {
         [PSDocs.Configuration.MarkdownEncoding]$Encoding = [PSDocs.Configuration.MarkdownEncoding]::Default
     )
 
+    begin {
+        if ($PSCmdlet.ParameterSetName -eq 'Inline') {
+            Write-Warning -Message "Invoke-PSDocument with inline document block is depricated."
+        }
+    }
+
     process {
         Write-Verbose -Message "[Invoke-PSDocument]::BEGIN";
 
         $fnParams = $PSBoundParameters;
 
-        GenerateDocument @fnParams;
+        GenerateDocumentPath @fnParams;
         
         Write-Verbose -Message "[Invoke-PSDocument]::END";
     }
@@ -565,17 +631,27 @@ function InitDocumentContext {
     }
 }
 
+# Proxy function is used when executing the Document keyword like a function
 function GenerateDocumentFn {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory = $True, ValueFromPipeline = $True)]
+        [Parameter(Mandatory = $False, ValueFromPipeline = $True)]
         [PSObject]$InputObject,
 
-        # [Parameter(Mandatory = $False)]
-        # [Object]$ConfigurationData,
+        [Parameter(Mandatory = $False)]
+        [String]$OutputPath = $PWD,
 
         [Parameter(Mandatory = $False)]
-        [String]$OutputPath = $PWD
+        [String[]]$InstanceName,
+
+        [Parameter(Mandatory = $False)]
+        [Switch]$PassThru = $False,
+
+        [Parameter(Mandatory = $False)]
+        [PSDocs.Configuration.PSDocumentOption]$Option,
+
+        [Parameter(Mandatory = $False)]
+        [PSDocs.Configuration.MarkdownEncoding]$Encoding = [PSDocs.Configuration.MarkdownEncoding]::Default
     )
 
     process {
@@ -583,26 +659,27 @@ function GenerateDocumentFn {
 
         $fnParams = $PSBoundParameters;
 
-        GenerateDocument -Name $MyInvocation.InvocationName @fnParams;
+        GenerateDocumentInline -Name $MyInvocation.InvocationName @fnParams;
         
         Write-Verbose -Message "[$($MyInvocation.InvocationName)]::END";
     }
 }
 
-function GenerateDocument {
+function GenerateDocumentPath {
+
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory = $True)]
-        [String]$Name,
+        [Parameter(Mandatory = $False)]
+        [String[]]$Name,
+
+        [Parameter(Mandatory = $False)]
+        [String[]]$Tag,
 
         [Parameter(Mandatory = $False)]
         [String[]]$InstanceName,
 
         [Parameter(Mandatory = $False)]
         [PSObject]$InputObject,
-
-        [Parameter(Mandatory = $False)]
-        [Object]$ConfigurationData,
 
         [Parameter(Mandatory = $False)]
         [String]$Path = $PWD,
@@ -625,13 +702,18 @@ function GenerateDocument {
     )
 
     begin {
-        if ($Null -eq $Script:DocumentBody -or !$Script:DocumentBody.ContainsKey($Name)) {
-            
-            Write-Error -Message ($LocalizedData.DocumentNotFound -f $Name) -ErrorAction Stop;
+
+        # Check if the path is a directory
+        if (!(Test-Path -Path $Path)) {
+            Write-Error -Message $LocalizedData.PathNotFound -ErrorAction Stop;
 
             return;
         }
 
+        # Get matching document scripts
+        [String[]]$docScripts = (Get-ChildItem -Path $Path -Include '*.doc.ps1' -Recurse -File).FullName;
+
+        # Get parameter options, which will override options from other sources
         $optionParams = @{ };
 
         if ($PSBoundParameters.ContainsKey('Option')) {
@@ -642,25 +724,255 @@ function GenerateDocument {
             $optionParams['Encoding'] = $Encoding;
         }
 
+        # Get an options object
         $Option = New-PSDocumentOption @optionParams;
 
+        # Create PSDocs variable
+        $PSDocs = New-Object -TypeName PSObject -Property @{
+            Option = $Option
+            Context = @{
+                Function = GetLanguageContext -Function $Function
+                OutputPath = $OutputPath
+                Name = $Name
+                Tag = $Tag
+            }
+        }
+
+        [Hashtable]$parameter = $Null;
+    }
+
+    process {
+
+        try {
+
+           
+
+            # foreach ($instance in $instances) {
+
+                Write-Verbose -Message "[Doc] -- Processing: $instance";
+
+                try {
+
+                    foreach ($p in $docScripts) {
+                        $innerResult = InvokePath -Path $p -Verbose:$VerbosePreference;
+                    }
+                }
+                catch {
+                    Write-Verbose -Message "Failed to invoke: $($_.Exception.Message)";
+                    # Write-Error -Message $LocalizedData.DocumentProcessFailure -Exception $_.Exception -Category OperationStopped -ErrorId 'PSDocs.Document.ProcessFailure' -ErrorAction Stop;
+                }
+            # }
+        }
+        catch {
+            # ([Exception]$_.Exception).StackTrace[]
+            # Write-Verbose -Message "Engine error $((Get-PSCallStack).ScriptLineNumber)"
+            Write-Verbose -Message "Engine error";
+        }
+    }
+}
+
+function GenerateDocumentInline {
+
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $False)]
+        [String]$Name,
+
+        [Parameter(Mandatory = $False)]
+        [String[]]$InstanceName,
+
+        [Parameter(Mandatory = $False)]
+        [PSObject]$InputObject,
+
+        [Parameter(Mandatory = $False)]
+        [String]$Path = $PWD,
+
+        [Parameter(Mandatory = $False)]
+        [String]$OutputPath = $PWD,
+
+        [Parameter(Mandatory = $False)]
+        [System.Collections.Generic.Dictionary[String, ScriptBlock]]$Function,
+
+        [Parameter(Mandatory = $False)]
+        [Switch]$PassThru = $False,
+
+        [Parameter(Mandatory = $False)]
+        [AllowNull()]
+        [PSDocs.Configuration.PSDocumentOption]$Option,
+
+        [Parameter(Mandatory = $False)]
+        [PSDocs.Configuration.MarkdownEncoding]$Encoding = [PSDocs.Configuration.MarkdownEncoding]::Default
+    )
+
+    begin {
+
+        $useInline = $False;
+
+        # Check if existing document is inline
+        if ($PSBoundParameters.ContainsKey('Name') -and !$PSBoundParameters.ContainsKey('Path')) {
+
+            if ($Null -eq $Script:DocumentBody -or !$Script:DocumentBody.ContainsKey($Name)) {
+            
+                Write-Error -Message ($LocalizedData.DocumentNotFound -f $Name) -ErrorAction Stop;
+    
+                return;
+            }
+            else {
+                $useInline = $True;
+            }
+        }
+
+        # Check if the path is a directory
+        if (!(Test-Path -Path $Path)) {
+            Write-Error -Message $LocalizedData.PathNotFound -ErrorAction Stop;
+
+            return;
+        }
+
+        # Get matching document scripts
+        [String[]]$docScripts = (Get-ChildItem -Path $Path -Include '*.doc.ps1' -Recurse -File).FullName;
+
+        # Get parameter options, which will override options from other sources
+        $optionParams = @{ };
+
+        if ($PSBoundParameters.ContainsKey('Option')) {
+            $optionParams['Option'] =  $Option;
+        }
+
+        if ($PSBoundParameters.ContainsKey('Encoding')) {
+            $optionParams['Encoding'] = $Encoding;
+        }
+
+        # Get an options object
+        $Option = New-PSDocumentOption @optionParams;
+
+        # Create PSDocs variable
         $PSDocs = New-Object -TypeName PSObject -Property @{
             Option = $Option;
         }
 
         [Hashtable]$parameter = $Null;
 
-        # Import configuration data from either a hashtable or .psd1 file
-        if ($ConfigurationData -is [Hashtable]) {
-            $parameter = $ConfigurationData
-        } elseif ($ConfigurationData -is [String] -and (Test-Path -Path $ConfigurationData -File)) {
-            $parentPath = Split-Path -Parent -Path $ConfigurationData;
-            $leafPath = Split-Path -Left -Path $ConfigurationData;
+        $functionsToDefine = GetLanguageContext -Function $Function;
+    }
 
-            Import-LocalizedData -BindingVariable parameter -BaseDirectory $parentPath -FileName $leafPath;
+    process {
+
+        try {
+
+            [String[]]$instances = @($InstanceName);
+
+            # If an instance name is not specified, default to the document name
+            if ($Null -eq $InstanceName) {
+                $instances = @($Name);
+            }
+
+            # Set the default section level so that sections in the document start from 2
+            $Section = @{ Level = 1; };
+
+            foreach ($instance in $instances) {
+
+                Write-Verbose -Message "[Doc] -- Processing: $instance";
+
+                $document = [PSDocs.Models.ModelHelper]::NewDocument();
+
+                # Build a path for the document
+                $document.Path = Join-Path -Path $OutputPath -ChildPath "$instance.md";
+
+                # Define built-in variables
+                [PSVariable[]]$variablesToDefine = @(
+                    New-Object -TypeName PSVariable -ArgumentList ('InstanceName', $instance)
+                    New-Object -TypeName PSVariable -ArgumentList ('InputObject', $InputObject)
+                    New-Object -TypeName PSVariable -ArgumentList ('Parameter', $parameter)
+                    New-Object -TypeName PSVariable -ArgumentList ('Section', $Section)
+                    New-Object -TypeName PSVariable -ArgumentList ('Document', $document)
+                    New-Object -TypeName PSVariable -ArgumentList ('PSDocs', $PSDocs)
+                )
+
+                try {
+                    if ($useInline) {
+
+                        # Invoke the body of the document definition and get the output
+                        $body = $Script:DocumentBody[$Name];
+                        $innerResult = $body.InvokeWithContext($functionsToDefine, $variablesToDefine);
+                    }
+                    else {
+
+                        foreach ($p in $docScripts) {
+                            $innerResult = InvokePath -Path $p -Verbose:$VerbosePreference;
+                        }
+                    }
+                }
+                catch {
+                    Write-Verbose -Message "Failed to invoke: $($_.Exception.Message)";
+                    # Write-Error -Message $LocalizedData.DocumentProcessFailure -Exception $_.Exception -Category OperationStopped -ErrorId 'PSDocs.Document.ProcessFailure' -ErrorAction Stop;
+                }
+
+                $document.Node.AddRange($innerResult);
+
+                Write-Verbose -Message "[Doc] -- Document results [$($document.Node.Length)]";
+
+                # Create parent path if it doesn't exist
+                $documentParent = Split-Path -Path $document.Path -Parent;
+
+                if (!(Test-Path -Path $documentParent)) {
+                    New-Item -Path $documentParent -ItemType Directory -Force | Out-Null;
+                }
+
+                # Parse the model
+                ParseDom -Document $document -Processor (NewMarkdownProcessor) -Option $Option -Verbose:$VerbosePreference | WriteDocumentContent -Path $document.Path -PassThru:$PassThru -Encoding:$Option.Markdown.Encoding;
+            }
         }
+        catch {
+            # ([Exception]$_.Exception).StackTrace[]
+            # Write-Verbose -Message "Engine error $((Get-PSCallStack).ScriptLineNumber)"
+            Write-Verbose -Message "Engine error"
+        }
+    }
+}
 
+function InvokePath {
+
+    [CmdletBinding()]
+    param (
+        [String]$Path,
+
+        [String[]]$Name,
+
+        [String[]]$Tag
+    )
+
+    process {
+
+        Write-Verbose -Message "[Doc] -- Using $Path"
+
+        . $Path
+    }
+}
+
+function InvokeInline {
+
+    [CmdletBinding()]
+    param (
+        [String]$Name
+    )
+
+    process {
         $body = $Script:DocumentBody[$Name];
+    }
+}
+
+function GetLanguageContext {
+
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $False)]
+        [AllowNull()]
+        [System.Collections.Generic.Dictionary[String, ScriptBlock]]$Function
+    )
+
+    process {
+        Write-Verbose -Message "[Doc] -- Getting language context";
 
         # Prepare PSDocs language functions
         $functionsToDefine = New-Object -TypeName 'System.Collections.Generic.Dictionary[String,ScriptBlock]'([System.StringComparer]::OrdinalIgnoreCase);
@@ -684,62 +996,8 @@ function GenerateDocument {
         $functionsToDefine['Table'] = ${function:Table};
         $functionsToDefine['Format-Table'] = ${function:Table};
         $functionsToDefine['Format-List'] = ${function:FormatList};
-    }
 
-    process {
-
-        [String[]]$instances = @($InstanceName);
-
-        # If an instance name is not specified, default to the document name
-        if ($Null -eq $InstanceName) {
-            $instances = @($Name);
-        }
-
-        # Set the default section level so that sections in the document start from 2
-        $Section = @{ Level = 1; };
-
-        foreach ($instance in $instances) {
-
-            Write-Verbose -Message "[Doc] -- Processing: $instance";
-
-            $document = [PSDocs.Models.ModelHelper]::NewDocument();
-
-            # Define built-in variables
-            [PSVariable[]]$variablesToDefine = @(
-                New-Object -TypeName PSVariable -ArgumentList ('InstanceName', $instance)
-                New-Object -TypeName PSVariable -ArgumentList ('InputObject', $InputObject)
-                New-Object -TypeName PSVariable -ArgumentList ('Parameter', $parameter)
-                New-Object -TypeName PSVariable -ArgumentList ('Section', $Section)
-                New-Object -TypeName PSVariable -ArgumentList ('Document', $document)
-                New-Object -TypeName PSVariable -ArgumentList ('PSDocs', $PSDocs)
-            )
-
-            try {
-                # Invoke the body of the document definition and get the output
-                $innerResult = $body.InvokeWithContext($functionsToDefine, $variablesToDefine);
-            }
-            catch {
-                Write-Error -Message $LocalizedData.DocumentProcessFailure -Exception $_.Exception -Category OperationStopped -ErrorId 'PSDocs.Document.ProcessFailure' -ErrorAction Stop;
-            }
-
-            $innerResult.Insert(0, $document);
-
-            # Create a document object model based on the output
-            $dom = New-Object -TypeName PSObject -Property @{ Node = $innerResult; };
-            
-            # Build a path for the document
-            $documentPath = Join-Path -Path $OutputPath -ChildPath "$instance.md";
-
-            # Create parent path if it doesn't exist
-            $documentParent = Split-Path -Path $documentPath -Parent;
-
-            if (!(Test-Path -Path $documentParent)) {
-                New-Item -Path $documentParent -ItemType Directory -Force | Out-Null;
-            }
-
-            # Parse the model
-            ParseDom -Dom $dom -Processor (NewMarkdownProcessor) -Option $Option -Verbose:$VerbosePreference | WriteDocumentContent -Path $documentPath -PassThru:$PassThru -Encoding:$Option.Markdown.Encoding;
-        }
+        return $functionsToDefine;
     }
 }
 
@@ -790,10 +1048,11 @@ function WriteDocumentContent {
 }
 
 function ParseDom {
+
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $True)]
-        [PSObject]$Dom,
+        [PSDocs.Models.Document]$Document,
 
         [Parameter(Mandatory = $True)]
         [PSObject]$Processor,
@@ -804,24 +1063,8 @@ function ParseDom {
 
     process {
 
-        $nodeCounter = 0;
-
-        # Process each node of the DOM
-        $innerResult = $Dom.Node | ForEach-Object -Process {
-            $node = $_;
-
-            Write-Verbose -Message "[Doc][ParseDom] -- Processing node [$nodeCounter]";
-
-            if ($Null -ne $node) {
-
-                # Visit the node
-                $Processor.Visit($node, $Option);
-            }
-
-            $nodeCounter++;
-        }
-
-        $innerResult;
+        # Visit the document with the specified processor
+        $Processor.Visit($Document, $Option);
     }
 }
 

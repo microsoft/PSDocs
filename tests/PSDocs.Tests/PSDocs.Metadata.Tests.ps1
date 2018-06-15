@@ -45,7 +45,7 @@ Describe 'PSDocs -- Metadata keyword' {
             $Global:TestVars['VisitMetadata'] = $InputObject;
         }
 
-        Invoke-PSDocument -Name 'MetadataVisitor' -InputObject $dummyObject -OutputPath $outputPath;
+        MetadataVisitor -InputObject $dummyObject -OutputPath $outputPath;
 
         It 'Should process keyword' {
             Assert-MockCalled -CommandName 'VisitMetadata' -ModuleName 'Markdown' -Times 1;
@@ -71,7 +71,7 @@ Describe 'PSDocs -- Metadata keyword' {
         }
 
         $outputDoc = "$outputPath\MetadataSingleEntry.md";
-        Invoke-PSDocument -Name 'MetadataSingleEntry' -InputObject $dummyObject -OutputPath $outputPath;
+        MetadataSingleEntry -InputObject $dummyObject -OutputPath $outputPath;
 
         It 'Should have generated output' {
             Test-Path -Path $outputDoc | Should be $True;
@@ -94,7 +94,7 @@ Describe 'PSDocs -- Metadata keyword' {
         }
 
         $outputDoc = "$outputPath\MetadataMultipleEntry.md";
-        Invoke-PSDocument -Name 'MetadataMultipleEntry' -InputObject $dummyObject -OutputPath $outputPath;
+        MetadataMultipleEntry -InputObject $dummyObject -OutputPath $outputPath;
 
         It 'Should have generated output' {
             Test-Path -Path $outputDoc | Should be $True;
@@ -124,7 +124,7 @@ Describe 'PSDocs -- Metadata keyword' {
         }
 
         $outputDoc = "$outputPath\MetadataMultipleBlock.md";
-        Invoke-PSDocument -Name 'MetadataMultipleBlock' -InputObject $dummyObject -OutputPath $outputPath;
+        MetadataMultipleBlock -InputObject $dummyObject -OutputPath $outputPath;
 
         It 'Should have generated output' {
             Test-Path -Path $outputDoc | Should be $True;
@@ -146,7 +146,7 @@ Describe 'PSDocs -- Metadata keyword' {
         }
 
         $outputDoc = "$outputPath\NoMetdata.md";
-        Invoke-PSDocument -Name 'NoMetdata' -InputObject $dummyObject -OutputPath $outputPath;
+        NoMetdata -InputObject $dummyObject -OutputPath $outputPath;
 
         It 'Should have generated output' {
             Test-Path -Path $outputDoc | Should be $True;

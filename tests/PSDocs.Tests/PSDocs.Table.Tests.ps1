@@ -42,7 +42,7 @@ Describe 'PSDocs -- Table keyword' {
             $Global:TestVars['VisitTable'] = $InputObject;
         }
 
-        Invoke-PSDocument -Name 'WithSingleNamedProperty' -InputObject $dummyObject -OutputPath $outputPath;
+        WithSingleNamedProperty -InputObject $dummyObject -OutputPath $outputPath;
 
         It 'Should process Table keyword' {
             Assert-MockCalled -CommandName 'VisitTable' -ModuleName 'Markdown' -Times 1;
@@ -64,7 +64,7 @@ Describe 'PSDocs -- Table keyword' {
         }
 
         $outputDoc = "$outputPath\Table.md";
-        Invoke-PSDocument -Name 'TableTests' -InstanceName 'Table' -InputObject $dummyObject -OutputPath $outputPath;
+        TableTests -InstanceName 'Table' -InputObject $dummyObject -OutputPath $outputPath;
 
         It 'Should have generated output' {
             Test-Path -Path $outputDoc | Should be $True;
@@ -94,7 +94,7 @@ Describe 'PSDocs -- Table keyword' {
         }
 
         $outputDoc = "$outputPath\TableWithExpression.md";
-        Invoke-PSDocument -Name 'TableWithExpression' -OutputPath $outputPath -Verbose
+        TableWithExpression -OutputPath $outputPath;
 
         It 'Should have generated output' {
             Test-Path -Path $outputDoc | Should be $True;
@@ -114,7 +114,7 @@ Describe 'PSDocs -- Table keyword' {
         }
 
         $outputDoc = "$outputPath\TableSingleEntryMarkdown.md";
-        Invoke-PSDocument -Name 'TableSingleEntryMarkdown' -InputObject $dummyObject -OutputPath $outputPath;
+        TableSingleEntryMarkdown -InputObject $dummyObject -OutputPath $outputPath;
 
         It 'Should have generated output' {
             Test-Path -Path $outputDoc | Should be $True;
@@ -137,7 +137,7 @@ Describe 'PSDocs -- Table keyword' {
         }
 
         $outputDoc = "$outputPath\TableWithNull.md";
-        Invoke-PSDocument -Name 'TableWithNull' -InputObject @{ ResourceType = @{  } } -OutputPath $outputPath;
+        TableWithNull -InputObject @{ ResourceType = @{  } } -OutputPath $outputPath;
 
         It 'Should have generated output' {
             Test-Path -Path $outputDoc | Should -Be $True;
@@ -161,7 +161,7 @@ Describe 'PSDocs -- Table keyword' {
         }
 
         $outputDoc = "$outputPath\TableWithMultilineColumn.md";
-        Invoke-PSDocument -Name 'TableWithMultilineColumn' -OutputPath $outputPath;
+        TableWithMultilineColumn -OutputPath $outputPath;
 
         It 'Should have generated output' {
             Test-Path -Path $outputDoc | Should -Be $True;
@@ -176,7 +176,7 @@ Describe 'PSDocs -- Table keyword' {
         }
 
         $outputDoc = "$outputPath\TableWithMultilineColumnCustom.md";
-        Invoke-PSDocument -Name 'TableWithMultilineColumn' -InstanceName 'TableWithMultilineColumnCustom' -OutputPath $outputPath -Option $option;
+        TableWithMultilineColumn -InstanceName 'TableWithMultilineColumnCustom' -OutputPath $outputPath -Option $option;
 
         It 'Should use wrap separator' {
             Get-Content -Path $outputDoc -Raw | Should -Match 'This is a\<br /\>description\<br /\>split\<br /\>over\<br /\>multiple\<br /\>lines\.';

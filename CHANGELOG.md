@@ -2,7 +2,12 @@
 ## Unreleased
 
 - Fix to prevent string builder properties being outputted each time `Invoke-PSDocument` is called
-- Added support for property expressions with the `Table` keyword
+- Added support for property expressions with the `Table` keyword [#27](https://github.com/BernieWhite/PSDocs/issues/27)
+- **Important change**: Deprecated support for using `Invoke-PSDocument` with inline document definitions
+  - Improved support for using named document definitions inline, this is the recommended way to call inline document definitions
+- Added support for building all document definitions from a path using the `-Path` parameter [#25](https://github.com/BernieWhite/PSDocs/issues/25)
+  - Additionally document definitions can be filtered with the `-Name` and `-Tag` parameter
+  - This is the recommended way to build documents going forward
 
 ## v0.4.0
 
