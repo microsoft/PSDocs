@@ -14,14 +14,16 @@ Create markdown from an input object.
 ## SYNTAX
 
 ### Inline (Default)
-```
+
+```text
 Invoke-PSDocument -Name <String[]> [-InstanceName <String[]>] [-InputObject <PSObject>] [-OutputPath <String>]
  [-Function <System.Collections.Generic.Dictionary`2[System.String,System.Management.Automation.ScriptBlock]>]
  [-PassThru] [-Option <PSDocumentOption>] [-Encoding <MarkdownEncoding>] [<CommonParameters>]
 ```
 
 ### Path
-```
+
+```text
 Invoke-PSDocument [-Name <String[]>] [-Tag <String[]>] [-InstanceName <String[]>] [-InputObject <PSObject>]
  [-Path] <String> [-OutputPath <String>]
  [-Function <System.Collections.Generic.Dictionary`2[System.String,System.Management.Automation.ScriptBlock]>]
@@ -37,7 +39,32 @@ Create markdown from an input object using a document definition. A document is 
 ### Example 1
 
 ```powershell
-# Define a document called Sample
+# Create a new document definition called Sample in sample.doc.ps1
+Set-Content -Path .\sample.doc.ps1 -Value @'
+Document Sample {
+
+    # Add an introduction section
+    Section Introduction {
+
+        # Add a comment
+        "This is a sample file list from $InputObject"
+
+        # Generate a table
+        Get-ChildItem -Path $InputObject | Table -Property Name,PSIsContainer
+    }
+}
+'@
+
+# Discover document definitions in the current working path (and subdirectories) within .doc.ps1 files
+Invoke-PSDocument -Path .;
+```
+
+Create markdown using *.doc.ps1 files loaded from the current working directory.
+
+### Example 2
+
+```powershell
+# Define an inline document called Sample
 Document Sample {
 
     # Add an introduction section
@@ -51,18 +78,14 @@ Document Sample {
     }
 }
 
+# Calling an inline document definition by name using Invoke-PSDocument is depricated
 Invoke-PSDocument -Name 'Sample' -InputObject 'C:\';
+
+# This is recommended way to call Sample
+Sample -InputObject 'C:\';
 ```
 
 Create markdown using the inline documentation definition called Sample using as input 'C:\'.
-
-### Example 2
-
-```powershell
-Invoke-PSDocument -Path .;
-```
-
-Create markdown using *.doc.ps1 files loaded from the current working directory.
 
 ## PARAMETERS
 
