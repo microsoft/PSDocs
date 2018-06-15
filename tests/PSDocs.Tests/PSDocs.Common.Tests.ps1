@@ -37,7 +37,7 @@ $dummyObject = New-Object -TypeName PSObject -Property @{
 
 $Global:TestVars = @{ };
 
-Describe 'PSDocs' {
+Describe 'PSDocs instance names' {
     Context 'Generate a document without an instance name' {
 
         # Define a test document with a table
@@ -50,7 +50,7 @@ Describe 'PSDocs' {
         }
 
         $outputDoc = "$outputPath\WithoutInstanceName.md";
-        Invoke-PSDocument -Name 'WithoutInstanceName' -InputObject $dummyObject -OutputPath $outputPath;
+        WithoutInstanceName -InputObject $dummyObject -OutputPath $outputPath;
 
         It 'Should generate an output named WithoutInstanceName.md' {
             Test-Path -Path $outputDoc | Should be $True;
@@ -73,7 +73,7 @@ Describe 'PSDocs' {
             $InstanceName;
         }
 
-        Invoke-PSDocument -Name 'WithInstanceName' -InstanceName 'Instance1' -InputObject $dummyObject -OutputPath $outputPath;
+        WithInstanceName -InstanceName 'Instance1' -InputObject $dummyObject -OutputPath $outputPath;
 
         It 'Should not create a output with the document name' {
             Test-Path -Path "$outputPath\WithInstanceName.md" | Should be $False;
@@ -95,7 +95,7 @@ Describe 'PSDocs' {
             $InstanceName;
         }
 
-        Invoke-PSDocument -Name 'WithMultiInstanceName' -InstanceName 'Instance2','Instance3' -InputObject $dummyObject -OutputPath $outputPath;
+        WithMultiInstanceName -InstanceName 'Instance2','Instance3' -InputObject $dummyObject -OutputPath $outputPath;
 
         It 'Should not create a output with the document name' {
             Test-Path -Path "$outputPath\WithMultiInstanceName.md" | Should be $False;
@@ -128,9 +128,30 @@ Describe 'PSDocs' {
         foreach ($encoding in @('UTF8', 'UTF7', 'Unicode', 'ASCII', 'UTF32')) {
 
             It "Should generate $encoding encoded content" {
-                Invoke-PSDocument -Name 'WithEncoding' -InstanceName "With$encoding" -InputObject $dummyObject -OutputPath $outputPath -Encoding $encoding;
+                WithEncoding -InstanceName "With$encoding" -InputObject $dummyObject -OutputPath $outputPath -Encoding $encoding;
                 Get-Content -Path (Join-Path -Path $outputPath -ChildPath "With$encoding.md") -Raw -Encoding $encoding | Should -BeExactly "With$encoding`r`n";
             }
+        }
+    }
+}
+
+Describe 'Invoke-PSDocument' -Tag 'FromPath' {
+    Context 'With -Path' {
+
+        # Only generate documents for the named document
+        Invoke-PSDocument -Path $here -OutputPath $outputPath -Name 'FromFileTest2' -Verbose;
+
+        It 'Should generate named documents' {
+            Test-Path -Path "$outputPath\FromFileTest1.md" | Should be $False;
+            Test-Path -Path "$outputPath\FromFileTest2.md" | Should be $True;
+            Test-Path -Path "$outputPath\FromFileTest3.md" | Should be $False;
+        }
+
+        Invoke-PSDocument -Path $here -OutputPath $outputPath -Tag 'Test3' -Verbose;
+
+        It 'Should generate tagged documents' {
+            Test-Path -Path "$outputPath\FromFileTest1.md" | Should be $False;
+            Test-Path -Path "$outputPath\FromFileTest3.md" | Should be $True;
         }
     }
 }

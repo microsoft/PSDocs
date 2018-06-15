@@ -43,7 +43,7 @@ Describe 'PSDocs -- Title keyword' {
             $Global:TestVars['VisitTitle'] = $InputObject;
         }
 
-        Invoke-PSDocument -Name 'VisitTitle' -InstanceName 'VisitTitle' -InputObject $dummyObject -OutputPath $outputPath;
+        VisitTitle -InstanceName 'VisitTitle' -InputObject $dummyObject -OutputPath $outputPath;
 
         It 'Should process Title keyword' {
             Assert-MockCalled -CommandName 'VisitTitle' -ModuleName 'Markdown' -Times 1;
@@ -67,7 +67,7 @@ Describe 'PSDocs -- Title keyword' {
         }
 
         $outputDoc = "$outputPath\SingleTitle.md";
-        Invoke-PSDocument -Name 'SingleTitle' -InputObject $dummyObject -OutputPath $outputPath;
+        SingleTitle -InputObject $dummyObject -OutputPath $outputPath;
 
         It 'Should have generated output' {
             Test-Path -Path $outputDoc | Should be $True;
@@ -89,7 +89,7 @@ Describe 'PSDocs -- Title keyword' {
         }
 
         $outputDoc = "$outputPath\MultipleTitle.md";
-        Invoke-PSDocument -Name 'MultipleTitle' -InputObject $dummyObject -OutputPath $outputPath;
+        MultipleTitle -InputObject $dummyObject -OutputPath $outputPath;
 
         It 'Should have generated output' {
             Test-Path -Path $outputDoc | Should be $True;

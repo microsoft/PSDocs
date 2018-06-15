@@ -44,7 +44,7 @@ Describe 'PSDocs -- Section keyword' {
             $Global:TestVars['VisitSection'] = $InputObject;
         }
 
-        $result = Invoke-PSDocument -Name 'SectionBlockTests' -InstanceName 'Section' -InputObject $dummyObject -OutputPath $outputPath -PassThru;
+        $result = SectionBlockTests -InstanceName 'Section' -InputObject $dummyObject -OutputPath $outputPath -PassThru;
 
         It 'Should process Section keyword' {
             Assert-MockCalled -CommandName 'VisitSection' -ModuleName 'Markdown' -Times 1;
@@ -77,7 +77,7 @@ Describe 'PSDocs -- Section keyword' {
         }
 
         $outputDoc = "$outputPath\Section.md";
-        Invoke-PSDocument -Name 'SectionBlockTests' -InstanceName 'Section' -InputObject $dummyObject -OutputPath $outputPath;
+        SectionBlockTests -InstanceName 'Section' -InputObject $dummyObject -OutputPath $outputPath;
 
         It 'Should have generated output' {
             Test-Path -Path $outputDoc | Should be $True;
@@ -102,7 +102,7 @@ Describe 'PSDocs -- Section keyword' {
         }
 
         $outputDoc = "$outputPath\SectionWhen.md";
-        Invoke-PSDocument -Name 'SectionWhen' -InputObject $dummyObject -OutputPath $outputPath;
+        SectionWhen -InputObject $dummyObject -OutputPath $outputPath;
 
         It 'Should have generated output' {
             Test-Path -Path $outputDoc | Should be $True;

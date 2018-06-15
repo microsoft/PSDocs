@@ -45,7 +45,7 @@ Describe 'PSDocs -- Note keyword' {
             $Global:TestVars['VisitNote'] = $InputObject;
         }
 
-        Invoke-PSDocument -Name 'NoteVisitor' -InputObject $dummyObject -OutputPath $outputPath;
+        NoteVisitor -InputObject $dummyObject -OutputPath $outputPath;
 
         It 'Should process Note keyword' {
             Assert-MockCalled -CommandName 'VisitNote' -ModuleName 'Markdown' -Times 1;
@@ -71,7 +71,7 @@ Describe 'PSDocs -- Note keyword' {
         }
 
         $outputDoc = "$outputPath\NoteSingleMarkdown.md";
-        Invoke-PSDocument -Name 'NoteSingleMarkdown' -InputObject $dummyObject -OutputPath $outputPath;
+        NoteSingleMarkdown -InputObject $dummyObject -OutputPath $outputPath;
 
         It 'Should have generated output' {
             Test-Path -Path $outputDoc | Should be $True;
@@ -94,7 +94,7 @@ Describe 'PSDocs -- Note keyword' {
         }
 
         $outputDoc = "$outputPath\NoteMultiMarkdown.md";
-        Invoke-PSDocument -Name 'NoteMultiMarkdown' -InputObject $dummyObject -OutputPath $outputPath;
+        NoteMultiMarkdown -InputObject $dummyObject -OutputPath $outputPath;
 
         It 'Should have generated output' {
             Test-Path -Path $outputDoc | Should be $True;

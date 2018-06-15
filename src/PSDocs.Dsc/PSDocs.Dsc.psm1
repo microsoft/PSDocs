@@ -152,7 +152,6 @@ function BuildDocumentation {
         }
 
         $docParams = @{
-            Name = $DocumentName
             OutputPath = $OutputPath
         };
 
@@ -166,7 +165,7 @@ function BuildDocumentation {
             # Write-Verbose -Message "[Doc] -- Generating documentation: $OutputPath";
 
             # Generate a document for the configuration
-            Invoke-PSDocument -InputObject $r -InstanceName $r.InstanceName @docParams -Verbose:$VerbosePreference;
+            [ScriptBlock]::Create("$DocumentName" + ' -InputObject $r -InstanceName $r.InstanceName @docParams -Verbose:$VerbosePreference; ').Invoke();
         }
 
         # Write-Verbose -Message "[Doc][$dokOperation] -- Update TOC: $($buildResult.FullName)";
