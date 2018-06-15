@@ -13,8 +13,17 @@ Create markdown from an input object.
 
 ## SYNTAX
 
-```text
-Invoke-PSDocument [-Name] <String> [-InstanceName <String[]>] [-InputObject <PSObject>] [-OutputPath <String>]
+### Inline (Default)
+```
+Invoke-PSDocument -Name <String[]> [-InstanceName <String[]>] [-InputObject <PSObject>] [-OutputPath <String>]
+ [-Function <System.Collections.Generic.Dictionary`2[System.String,System.Management.Automation.ScriptBlock]>]
+ [-PassThru] [-Option <PSDocumentOption>] [-Encoding <MarkdownEncoding>] [<CommonParameters>]
+```
+
+### Path
+```
+Invoke-PSDocument [-Name <String[]>] [-Tag <String[]>] [-InstanceName <String[]>] [-InputObject <PSObject>]
+ [-Path] <String> [-OutputPath <String>]
  [-Function <System.Collections.Generic.Dictionary`2[System.String,System.Management.Automation.ScriptBlock]>]
  [-PassThru] [-Option <PSDocumentOption>] [-Encoding <MarkdownEncoding>] [<CommonParameters>]
 ```
@@ -114,12 +123,24 @@ Accept wildcard characters: False
 The name of a specific document template to use to generate markdown.
 
 ```yaml
-Type: String
-Parameter Sets: (All)
+Type: String[]
+Parameter Sets: Inline
 Aliases:
 
 Required: True
-Position: 0
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+```yaml
+Type: String[]
+Parameter Sets: Path
+Aliases:
+
+Required: False
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -186,6 +207,38 @@ Accepted values: Default, UTF8, UTF7, Unicode, UTF32, ASCII
 Required: False
 Position: Named
 Default value: Default
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Path
+
+A directory path to read document definitions recursively from. Document definitions are discovered within files ending in `.doc.ps1`.
+
+```yaml
+Type: String
+Parameter Sets: Path
+Aliases:
+
+Required: True
+Position: 0
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Tag
+
+One or more tags that the document definition must contain. If more then one tag is specified, all tags be present on the document definition to be evaluated.
+
+```yaml
+Type: String[]
+Parameter Sets: Path
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
