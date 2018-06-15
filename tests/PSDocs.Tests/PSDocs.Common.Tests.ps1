@@ -153,5 +153,13 @@ Describe 'Invoke-PSDocument' -Tag 'FromPath' {
             Test-Path -Path "$outputPath\FromFileTest1.md" | Should be $False;
             Test-Path -Path "$outputPath\FromFileTest3.md" | Should be $True;
         }
+
+        Invoke-PSDocument -Path $here -OutputPath $outputPath -Tag 'Test4','Test5' -Verbose;
+
+        It 'Should generate tagged documents' {
+            Test-Path -Path "$outputPath\FromFileTest1.md" | Should be $False;
+            Test-Path -Path "$outputPath\FromFileTest4.md" | Should be $False;
+            Test-Path -Path "$outputPath\FromFileTest5.md" | Should be $True;
+        }
     }
 }

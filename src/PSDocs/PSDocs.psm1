@@ -61,7 +61,9 @@ function Document {
         else {
             Write-Verbose -Message "[Doc] -- Calling document block: $Name";
 
-            if (($Null -eq $PSDocs.Context.Name -or $Name -in $PSDocs.Context.Name) -and ($Null -eq $PSDocs.Context.Tag -or $Tag -in $PSDocs.Context.Tag)) {
+            $matchTags = [PSDocs.Models.PSDocsHelper]::MatchTags($Tag, $PSDocs.Context.Tag);
+
+            if (($Null -eq $PSDocs.Context.Name -or $Name -in $PSDocs.Context.Name) -and $matchTags) {
 
                 [String[]]$instances = @($InstanceName);
 
