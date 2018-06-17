@@ -163,3 +163,31 @@ Describe 'Invoke-PSDocument' -Tag 'FromPath' {
         }
     }
 }
+
+Describe 'New-PSDocumentOption' -Tag 'Option' {
+    Context 'Read Markdown.Encoding' {
+
+        It 'from Hashtable' {
+            $option = New-PSDocumentOption -Option @{ 'Markdown.Encoding' = 'UTF8' };
+            $option.Markdown.Encoding | Should -Be 'UTF8';
+        }
+
+        It 'from YAML' {
+            $option = New-PSDocumentOption -Option (Join-Path -Path $here -ChildPath 'psdocs.yml');
+            $option.Markdown.Encoding | Should -Be 'UTF8';
+        }
+    }
+
+    Context 'Read Markdown.WrapSeparator' {
+
+        It 'from Hashtable' {
+            $option = New-PSDocumentOption -Option @{ 'Markdown.WrapSeparator' = 'ZZZ' };
+            $option.Markdown.WrapSeparator | Should -Be 'ZZZ';
+        }
+
+        It 'from YAML' {
+            $option = New-PSDocumentOption -Option (Join-Path -Path $here -ChildPath 'psdocs.yml');
+            $option.Markdown.WrapSeparator | Should -Be 'ZZZ';
+        }
+    }
+}

@@ -25,7 +25,8 @@ namespace PSDocs.Configuration
             // Set from existing option instance
             Markdown = new MarkdownOption
             {
-                WrapSeparator = option.Markdown.WrapSeparator
+                WrapSeparator = option.Markdown.WrapSeparator,
+                Encoding = option.Markdown.Encoding
             };
         }
 
@@ -108,6 +109,11 @@ namespace PSDocs.Configuration
             if (index.TryGetValue("markdown.wrapseparator", out value))
             {
                 option.Markdown.WrapSeparator = (string)value;
+            }
+
+            if (index.TryGetValue("markdown.encoding", out value))
+            {
+                option.Markdown.Encoding = (MarkdownEncoding)Enum.Parse(typeof(MarkdownEncoding), (string)value);
             }
 
             return option;
