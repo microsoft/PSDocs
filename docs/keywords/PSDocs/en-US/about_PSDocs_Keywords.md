@@ -17,7 +17,7 @@ PSDocs lets you generate dynamic markdown documents using PowerShell blocks. To 
 - Note - Inserts a note using DocFx formatted markdown (DFM)
 - Warning - Inserts a warning using DocFx formatted markdown (DFM)
 - Table - Inserts a table from pipeline objects
-- Yaml - Inserts a YAML header
+- Metadata - Inserts a YAML header
 
 ### Document
 
