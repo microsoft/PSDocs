@@ -102,7 +102,7 @@ task BuildModule BuildDotNet, CopyModule
 task BuildHelp BuildModule, PlatyPS, {
 
     # Generate MAML and about topics
-    $Null = New-ExternalHelp -OutputPath out/docs/PSDocs -Path '.\docs\commands\PSDocs\en-US','.\docs\keywords\PSDocs\en-US' -Force;
+    $Null = New-ExternalHelp -OutputPath out/docs/PSDocs -Path '.\docs\commands\PSDocs\en-US','.\docs\keywords\PSDocs\en-US','.\docs\concepts\PSDocs\en-US' -Force;
     $Null = New-ExternalHelp -OutputPath out/docs/PSDocs.Dsc -Path '.\docs\commands\PSDocs.Dsc\en-US' -Force;
 
     # Copy generated help into module out path

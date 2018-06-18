@@ -25,7 +25,8 @@ namespace PSDocs.Configuration
             // Set from existing option instance
             Markdown = new MarkdownOption
             {
-                WrapSeparator = option.Markdown.WrapSeparator
+                WrapSeparator = option.Markdown.WrapSeparator,
+                Encoding = option.Markdown.Encoding
             };
         }
 
@@ -33,6 +34,11 @@ namespace PSDocs.Configuration
         /// A callback that is overridden by PowerShell so that the current working path can be retrieved.
         /// </summary>
         public static GetWorkingPathDelegate GetWorkingPath = () => Directory.GetCurrentDirectory();
+
+        /// <summary>
+        /// Reserved for internal use.
+        /// </summary>
+        public string Generator { get; set; }
 
         /// <summary>
         /// Options that affect markdown formatting.
@@ -108,6 +114,11 @@ namespace PSDocs.Configuration
             if (index.TryGetValue("markdown.wrapseparator", out value))
             {
                 option.Markdown.WrapSeparator = (string)value;
+            }
+
+            if (index.TryGetValue("markdown.encoding", out value))
+            {
+                option.Markdown.Encoding = (MarkdownEncoding)Enum.Parse(typeof(MarkdownEncoding), (string)value);
             }
 
             return option;

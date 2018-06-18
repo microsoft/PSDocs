@@ -8,6 +8,7 @@
 - Added support for building all document definitions from a path using the `-Path` parameter [#25](https://github.com/BernieWhite/PSDocs/issues/25)
   - Additionally document definitions can be filtered with the `-Name` and `-Tag` parameter
   - This is the recommended way to build documents going forward
+- Added support for providing options for `Invoke-PSDocument` using YAML, see `about_PSDocs_Options`
 
 ## v0.4.0
 
@@ -34,7 +35,7 @@
 
 ## v0.2.0
 
-- Added Desired State Configuration (DSC) extension module PSDocs.Dsc to generate markdown from DSC .mof files
+- Added Desired State Configuration (DSC) extension module `PSDocs.Dsc` to generate markdown from DSC `.mof` files
 - Moved markdown processor to a separate module
 - Fix handling of multi-line notes and warnings
 - Added support to include documentation from external script file

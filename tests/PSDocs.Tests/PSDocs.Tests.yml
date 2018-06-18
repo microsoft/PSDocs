@@ -1,0 +1,4 @@
+# These are test options
+markdown:
+  encoding: UTF8
+  wrapSeparator: 'ZZZ'
