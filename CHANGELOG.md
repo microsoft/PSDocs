@@ -8,7 +8,7 @@
 - Added support for building all document definitions from a path using the `-Path` parameter [#25](https://github.com/BernieWhite/PSDocs/issues/25)
   - Additionally document definitions can be filtered with the `-Name` and `-Tag` parameter
   - This is the recommended way to build documents going forward
-- Added support for providing options for `Invoke-PSDocument` using YAML
+- Added support for providing options for `Invoke-PSDocument` using YAML, see `about_PSDocs_Options`
 
 ## v0.4.0
 
