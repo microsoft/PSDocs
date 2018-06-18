@@ -141,6 +141,7 @@ The following conceptual topics exist in the `PSDocs` module:
 - [Options](/docs/concepts/PSDocs/en-US/about_PSDocs_Options.md)
   - [Markdown.WrapSeparator](/docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#wrap-separator)
   - [Markdown.Encoding](/docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#encoding)
+  - [Markdown.SkipEmptySections](/docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#skip-empty-sections)
 
 ## Changes and versioning
 

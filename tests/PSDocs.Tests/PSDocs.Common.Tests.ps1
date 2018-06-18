@@ -199,4 +199,17 @@ Describe 'New-PSDocumentOption' -Tag 'Option' {
             $option.Markdown.WrapSeparator | Should -Be 'ZZZ';
         }
     }
+
+    Context 'Read Markdown.SkipEmptySections' {
+
+        It 'from Hashtable' {
+            $option = New-PSDocumentOption -Option @{ 'Markdown.SkipEmptySections' = $False };
+            $option.Markdown.SkipEmptySections | Should -Be $False;
+        }
+
+        It 'from YAML' {
+            $option = New-PSDocumentOption -Option (Join-Path -Path $here -ChildPath 'PSDocs.Tests.yml');
+            $option.Markdown.SkipEmptySections | Should -Be $False;
+        }
+    }
 }

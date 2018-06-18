@@ -9,6 +9,8 @@
   - Additionally document definitions can be filtered with the `-Name` and `-Tag` parameter
   - This is the recommended way to build documents going forward
 - Added support for providing options for `Invoke-PSDocument` using YAML, see `about_PSDocs_Options`
+- **Breaking change**: Empty `Section` blocks are not rendered by default [#32](https://github.com/BernieWhite/PSDocs/issues/32)
+  - Use `-Force` parameter on specific sections or `Markdown.SkipEmptySections = $False` option to force the empty sections to written
 
 ## v0.4.0
 
