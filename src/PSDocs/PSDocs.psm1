@@ -222,7 +222,7 @@ function New-PSDocumentOption {
         [PSDocs.Configuration.PSDocumentOption]$Option,
 
         [Parameter(Mandatory = $False)]
-        [String]$Path = '.\.psdocs.yml',
+        [String]$Path = '.\psdocs.yml',
 
         [Parameter(Mandatory = $False)]
         [PSDocs.Configuration.MarkdownEncoding]$Encoding

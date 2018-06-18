@@ -36,6 +36,11 @@ namespace PSDocs.Configuration
         public static GetWorkingPathDelegate GetWorkingPath = () => Directory.GetCurrentDirectory();
 
         /// <summary>
+        /// Reserved for internal use.
+        /// </summary>
+        public string Generator { get; set; }
+
+        /// <summary>
         /// Options that affect markdown formatting.
         /// </summary>
         public MarkdownOption Markdown { get; set; }
