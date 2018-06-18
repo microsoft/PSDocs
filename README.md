@@ -136,7 +136,11 @@ The following commands exist in the `PSDocs.Dsc` module:
 
 ### Concepts
 
-- [Markdown options](/docs/concepts/PSDocs/en-US/about_PSDocs_Options.md)
+The following conceptual topics exist in the `PSDocs` module:
+
+- [Options](/docs/concepts/PSDocs/en-US/about_PSDocs_Options.md)
+  - [Markdown.WrapSeparator](/docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#wrap-separator)
+  - [Markdown.Encoding](/docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#encoding)
 
 ## Changes and versioning
 

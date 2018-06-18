@@ -8,28 +8,67 @@ Describes additional options that can be used during markdown generation.
 
 ## LONG DESCRIPTION
 
-PSDocs lets you define configuration parameters in a YAML file. This YAML file can be used with `Invoke-PSDocument` to quickly build documentation in a repeatable way.
+PSDocs lets you use options when calling `Invoke-PSDocument` to change how documents are generated. This topic describes what options are available, when to and how to use them.
 
-## Markdown
+Options can be used by:
 
-This options control generation of markdown.
+- Using the `-Option` parameter of `Invoke-PSDocument` with an object created with `New-PSDocumentOption`
+- Using the `-Option` parameter of `Invoke-PSDocument` with a hash table
+- Using the `-Option` parameter of `Invoke-PSDocument` with a YAML file
+- Configuring the default options file `.psdocs.yml`
 
-### Wrap Separator
+As mentioned above, a options object can be created with `New-PSDocumentOption` see cmdlet help for syntax and examples.
 
-Examples:
+When using a hash table, `@{}`, one or more options can be specified with the `-Option` parameter using a dotted notation.
+
+For example:
 
 ```powershell
-$option = New-PSDocumentOption -Option @{ 'markdown.wrapseparator' = ' ' }
+$option = @{ 'markdown.wrapseparator' = ' '; 'markdown.encoding' = 'UTF8' };
+Invoke-PSDocument -Path . -Option $option;
+```
+
+`markdown.wrapseparator` is an example of an option that can be used. Please see the following sections for other options can be used.
+
+Another option is to use an external file, formatted as YAML, instead of having to create an options object manually each time. This YAML file can be used with `Invoke-PSDocument` to quickly build documentation in a repeatable way.
+
+YAML properties are specified using lower camel case, for example:
+
+```yaml
+markdown:
+  wrapSeparator: '\'
+```
+
+By default PSDocs will automatically look for a file named `psdocs.yml` in the current working directory. Alternatively, you can specify a YAML file in the `-Option` parameter.
+
+For example:
+
+```powershell
+Invoke-PSDocument -Path . -Option '.\myconfig.yml'.
+```
+
+### Wrap separator
+
+This option specifies the character/string to use when wrapping lines in a table cell. When a table cell contains CR and LF characters, these characters must be substituted so that the table in rendered correctly because they also have special meaning in markdown.
+
+By default a single space is used. However different markdown parsers may be able to natively render a line break using alternative combinations such as `\` or `<br />`.
+
+This option can be specified using:
+
+```powershell
+# PowerShell: Using the Markdown.WrapSeparator hash table key
+$option = New-PSDocumentOption -Option @{ 'Markdown.WrapSeparator' = '\' }
 ```
 
 ```yaml
-- Markdown:
-  - WrapSeparator: ' '
+# psdocs.yml: Using the markdown/wrapSeparator YAML property
+markdown:
+  wrapSeparator: '\'
 ```
 
 ### Encoding
 
-The encoding used for markdown output. One of the following values can be used:
+Sets the text encoding used for markdown output files. One of the following values can be used:
 
 - Default
 - UTF8
@@ -38,23 +77,31 @@ The encoding used for markdown output. One of the following values can be used:
 - UTF32
 - ASCII
 
-Examples:
+By default `Default` is used which is UTF-8 without byte order mark (BOM) is used.
+
+This option can be specified using:
 
 ```powershell
-$option = New-PSDocumentOption -Option @{ 'markdown.encoding' = 'UTF8' }
+# PowerShell: Using the Markdown.Encoding hash table key
+$option = New-PSDocumentOption -Option @{ 'Markdown.Encoding' = 'UTF8' }
 ```
 
 ```yaml
-- Markdown:
-  - Encoding: UTF8
+# psdocs.yml: Using the markdown/encoding YAML property
+markdown:
+  encoding: UTF8
 ```
+
+Additionally `Invoke-PSDocument` has a `-Encoding` parameter. When the `-Encoding` parameter is used, it always takes precedence over an encoding set through `-Option` or `psdocs.yml`.
 
 ## EXAMPLES
 
 ```yaml
+# Set markdown options
 markdown:
+  # Use UTF-8 with BOM
   encoding: UTF8
-  wrapSeparator: 'ZZZ'
+  wrapSeparator: '\'
 ```
 
 ## NOTE
