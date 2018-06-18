@@ -9,10 +9,13 @@ namespace PSDocs.Configuration
 
         private const MarkdownEncoding DEFAULT_ENCODING = MarkdownEncoding.Default;
 
+        private const bool DEFAULT_SKIP_EMPTY_SECTIONS = true;
+
         public MarkdownOption()
         {
             WrapSeparator = DEFAULT_WRAP_SEPARATOR;
             Encoding = DEFAULT_ENCODING;
+            SkipEmptySections = DEFAULT_SKIP_EMPTY_SECTIONS;
         }
 
         [DefaultValue(DEFAULT_WRAP_SEPARATOR)]
@@ -20,5 +23,8 @@ namespace PSDocs.Configuration
 
         [DefaultValue(DEFAULT_ENCODING)]
         public MarkdownEncoding Encoding { get; set; }
+
+        [DefaultValue(DEFAULT_SKIP_EMPTY_SECTIONS)]
+        public bool SkipEmptySections { get; set; }
     }
 }

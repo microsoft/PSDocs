@@ -26,7 +26,8 @@ namespace PSDocs.Configuration
             Markdown = new MarkdownOption
             {
                 WrapSeparator = option.Markdown.WrapSeparator,
-                Encoding = option.Markdown.Encoding
+                Encoding = option.Markdown.Encoding,
+                SkipEmptySections = option.Markdown.SkipEmptySections
             };
         }
 
@@ -119,6 +120,11 @@ namespace PSDocs.Configuration
             if (index.TryGetValue("markdown.encoding", out value))
             {
                 option.Markdown.Encoding = (MarkdownEncoding)Enum.Parse(typeof(MarkdownEncoding), (string)value);
+            }
+
+            if (index.TryGetValue("markdown.skipemptysections", out value))
+            {
+                option.Markdown.SkipEmptySections = (bool)value;
             }
 
             return option;

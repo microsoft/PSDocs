@@ -74,17 +74,40 @@ Describe 'PSDocs -- Section keyword' {
             Section 'MultiLine' {
                 "This is a multiline`r`ntest."
             }
+
+            Section 'Empty' {
+
+            }
+
+            Section 'Forced' -Force {
+
+            }
         }
 
         $outputDoc = "$outputPath\Section.md";
         SectionBlockTests -InstanceName 'Section' -InputObject $dummyObject -OutputPath $outputPath;
 
         It 'Should have generated output' {
-            Test-Path -Path $outputDoc | Should be $True;
+            Test-Path -Path $outputDoc | Should -Be $True;
         }
 
         It 'Should match expected format' {
-            Get-Content -Path $outputDoc -Raw | Should match '## SingleLine(\n|\r){1,2}This is a single line markdown section.(\n|\r){4}## MultiLine(\n|\r){1,2}This is a multiline(\n|\r){1,2}test.';
+            Get-Content -Path $outputDoc -Raw | Should -Match '## SingleLine(\n|\r){1,2}This is a single line markdown section.(\n|\r){4}## MultiLine(\n|\r){1,2}This is a multiline(\n|\r){1,2}test.';
+        }
+
+        It 'Empty section is not present' {
+            Get-Content -Path $outputDoc -Raw | Should -Not -Match '## Empty'
+        }
+
+        It 'Forced section is present' {
+            Get-Content -Path $outputDoc -Raw | Should -Match '## Forced'
+        }
+
+        $outputDoc = "$outputPath\Section2.md";
+        SectionBlockTests -InstanceName 'Section2' -InputObject $dummyObject -OutputPath $outputPath -Option @{ 'Markdown.SkipEmptySections' = $False };
+
+        It 'Empty sections are include with option' {
+            Get-Content -Path $outputDoc -Raw | Should -Match '## Empty'
         }
     }
 

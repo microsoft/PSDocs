@@ -277,7 +277,11 @@ function Section {
 
         # Optionally a condition that must be met prior to including the Section
         [Parameter(Mandatory = $False)]
-        [ScriptBlock]$When
+        [ScriptBlock]$When,
+
+        # Optionally create a section block even when it is empty
+        [Parameter(Mandatory = $False)]
+        [Switch]$Force = $False
     )
 
     begin {
@@ -328,8 +332,13 @@ function Section {
                 return;
             }
 
-            # Emit Section object to the pipeline
-            $result;
+            if ($result.Node.Length -gt 0 -or $Force -or $PSDocs.Option.Markdown.SkipEmptySections -eq $False) {
+                # Emit Section object to the pipeline
+                $result;
+            }
+            else {
+                Write-Verbose -Message "[Doc][Section] -- Skipped, section is empty";
+            }
         }
     }
 

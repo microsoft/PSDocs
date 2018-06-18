@@ -42,7 +42,7 @@ Document 'Sample' {
 }
 
 # Generate markdown from the document definition
-Invoke-PSDocument -Name 'Sample' -InputObject '';
+Sample -InputObject '';
 ```
 
 ### Section
@@ -52,11 +52,12 @@ Creates a new document section block containing content. Each section will be co
 Syntax:
 
 ```text
-Section [-Name] <String> [-When <ScriptBlock>] [-Body] <ScriptBlock>
+Section [-Name] <String> [-When <ScriptBlock>] [-Force] [-Body] <ScriptBlock>
 ```
 
 - `Name` - The name or header of the section.
 - `When` - A condition to determine if the section block should be included in the markdown document.
+- `Force` - Force the creation of the section even if the section has not content.
 
 Examples:
 
@@ -75,7 +76,7 @@ Document 'Sample' {
 }
 
 # Generate markdown from the document definition
-Invoke-PSDocument -Name 'Sample' -InputObject '';
+Sample -InputObject '';
 ```
 
 ```markdown
@@ -90,7 +91,7 @@ Document 'Sample' {
     # Sections can be nested
     Section 'Level2' {
 
-        Section 'Level3' {
+        Section 'Level3' -Force {
 
             # Define level 3 section content here
         }
@@ -100,7 +101,7 @@ Document 'Sample' {
 }
 
 # Generate markdown from the document definition
-Invoke-PSDocument -Name 'Sample' -InputObject '';
+Sample -InputObject '';
 ```
 
 ```markdown
@@ -113,7 +114,7 @@ Invoke-PSDocument -Name 'Sample' -InputObject '';
 Document 'Sample' {
 
     # By default each section is included when markdown in generated
-    Section 'Included in output' {
+    Section 'Included in output' -Force {
 
         # Section and section content is included in generated markdown
     }
@@ -126,7 +127,7 @@ Document 'Sample' {
 }
 
 # Generate markdown from the document definition
-Invoke-PSDocument -Name 'Sample' -InputObject '';
+Sample -InputObject '';
 ```
 
 ```markdown

@@ -94,14 +94,49 @@ markdown:
 
 Additionally `Invoke-PSDocument` has a `-Encoding` parameter. When the `-Encoding` parameter is used, it always takes precedence over an encoding set through `-Option` or `psdocs.yml`.
 
+Prior to PSDocs v0.4.0 the only encoding supported was ASCII.
+
+### Skip empty sections
+
+From PSDocs v0.5.0 onward, `Section` blocks that are empty are omitted from markdown output by default. i.e. `Markdown.SkipEmptySections` is `$True`.
+
+To include empty sections (PSDocs v0.4.0 or older) in markdown output either use the `-Force` parameter on a specific `Section` block or set `Markdown.SkipEmptySections = $False`.
+
+This option can be specified using:
+
+```powershell
+# PowerShell: Using the Markdown.SkipEmptySections hash table key
+$option = New-PSDocumentOption -Option @{ 'Markdown.SkipEmptySections' = $False }
+```
+
+```yaml
+# psdocs.yml: Using the markdown/skipEmptySections YAML property
+markdown:
+  skipEmptySections: false
+```
+
 ## EXAMPLES
+
+### Example PSDocs.yml
 
 ```yaml
 # Set markdown options
 markdown:
   # Use UTF-8 with BOM
   encoding: UTF8
+  skipEmptySections: false
   wrapSeparator: '\'
+```
+
+### Default PSDocs.yml
+
+```yaml
+# These are the default options.
+# Only properties that differ from the default values need to be specified.
+markdown:
+  encoding: Default
+  skipEmptySections: true
+  wrapSeparator: ' '
 ```
 
 ## NOTE
