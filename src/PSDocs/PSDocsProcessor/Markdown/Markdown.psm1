@@ -93,7 +93,7 @@ function VisitSection {
     Write-Verbose -Message "[Doc][Processor][Section] END:: [$($section.Node.Length)]";
 }
 
-function VisitCode { 
+function VisitCode {
 
     [CmdletBinding()]
     param (
@@ -143,7 +143,7 @@ function VisitNote {
     )
 
     Write-Verbose -Message "[Doc][Processor] -- Visit note";
-    
+
     VisitString -InputObject '';
     VisitString -InputObject '> [!NOTE]';
 
@@ -161,7 +161,7 @@ function VisitWarning {
     )
 
     Write-Verbose -Message "[Doc][Processor] -- Visit warning";
-    
+
     VisitString -InputObject '';
     VisitString -InputObject '> [!WARNING]';
 
@@ -174,7 +174,7 @@ function VisitMetadata {
     param ($InputObject)
 
     Write-Verbose -Message "[Doc][Processor] -- Visit metadata";
-    
+
     VisitString -InputObject '---';
 
     foreach ($kv in $InputObject.Metadata.GetEnumerator()) {

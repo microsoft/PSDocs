@@ -34,7 +34,7 @@ function CopyModuleFiles {
             if (!(Test-Path -Path $parentPath)) {
                 $Null = New-Item -Path $parentPath -ItemType Directory -Force;
             }
-    
+
             Copy-Item -Path $_.FullName -Destination $filePath -Force;
         };
     }

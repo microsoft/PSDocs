@@ -1,6 +1,8 @@
 
 ## Unreleased
 
+## v0.5.0
+
 - Fix to prevent string builder properties being outputted each time `Invoke-PSDocument` is called
 - Added support for property expressions with the `Table` keyword [#27](https://github.com/BernieWhite/PSDocs/issues/27)
 - **Important change**: Deprecated support for using `Invoke-PSDocument` with inline document definitions
@@ -10,7 +12,7 @@
   - This is the recommended way to build documents going forward
 - Added support for providing options for `Invoke-PSDocument` using YAML, see `about_PSDocs_Options`
 - **Breaking change**: Empty `Section` blocks are not rendered by default [#32](https://github.com/BernieWhite/PSDocs/issues/32)
-  - Use `-Force` parameter on specific sections or `Markdown.SkipEmptySections = $False` option to force the empty sections to written
+  - Use `-Force` parameter on specific sections or `Markdown.SkipEmptySections = $False` option to force empty sections to be written
 
 ## v0.4.0
 
