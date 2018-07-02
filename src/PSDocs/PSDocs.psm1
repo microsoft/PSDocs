@@ -22,7 +22,7 @@ $Script:UTF8_NO_BOM = New-Object -TypeName System.Text.UTF8Encoding -ArgumentLis
 #
 
 $LocalizedData = data {
-    
+
 }
 
 Import-LocalizedData -BindingVariable LocalizedData -FileName 'PSDocs.Resources.psd1' -ErrorAction SilentlyContinue;
@@ -130,7 +130,7 @@ function Invoke-PSDocument {
 
         [Parameter(Mandatory = $False)]
         [String[]]$InstanceName,
-        
+
         [Parameter(Mandatory = $False, ValueFromPipeline = $True)]
         [PSObject]$InputObject,
 
@@ -169,7 +169,7 @@ function Invoke-PSDocument {
         $fnParams = $PSBoundParameters;
 
         GenerateDocumentPath @fnParams;
-        
+
         Write-Verbose -Message "[Invoke-PSDocument]::END";
     }
 }
@@ -205,7 +205,7 @@ function Get-PSDocumentHeader {
         $filteredItems = Get-ChildItem -Path "$Path\*" -File;
 
         foreach ($item in $filteredItems) {
-            
+
             ReadYamlHeader -Path $item.FullName -Verbose:$VerbosePreference;
         }
 
@@ -236,7 +236,7 @@ function New-PSDocumentOption {
         elseif ($PSBoundParameters.ContainsKey('Path')) {
 
             if (!(Test-Path -Path $Path)) {
-                
+
             }
 
             $Path = Resolve-Path -Path $Path;
@@ -262,7 +262,7 @@ function New-PSDocumentOption {
 #
 
 # Implement the Section keyword
-function Section {
+function Write-PSDocumentSection {
 
     [CmdletBinding()]
     [OutputType([PSObject])]
@@ -319,13 +319,13 @@ function Section {
             try {
                 # Invoke the Section body and collect the results
                 $innerResult = $Body.Invoke();
-    
+
                 foreach ($r in $innerResult) {
                     $result.Node += $r;
                 }
             }
             catch {
-                
+
                 # Report non-terminating error
                 Write-Error -Message ($LocalizedData.SectionProcessFailure -f $_.Exception.Message) -Exception $_.Exception -ErrorId 'PSDocs.Section.ProcessFailure';
 
@@ -488,7 +488,6 @@ function Metadata {
 
         # Process eaxch key value pair in the supplied dictionary/hashtable
         foreach ($kv in $Body.GetEnumerator()) {
-            
             $Document.Metadata[$kv.Key] = $kv.Value;
         }
     }
@@ -591,7 +590,7 @@ function FormatList {
         [String[]]$objectFields = @($Property);
 
         if ($Null -ne $InputObject) {
-            
+
             for ($i = 0; $i -lt $table.Header.Count; $i++) {
                 $field = GetObjectField -InputObject $InputObject -Field $objectFields[$i] -Verbose:$VerbosePreference;
 
@@ -669,7 +668,7 @@ function GenerateDocumentFn {
         $fnParams = $PSBoundParameters;
 
         GenerateDocumentInline -Name $MyInvocation.InvocationName @fnParams;
-        
+
         Write-Verbose -Message "[$($MyInvocation.InvocationName)]::END";
     }
 }
@@ -752,9 +751,9 @@ function GenerateDocumentPath {
 
     process {
 
-        try {
+        # try {
 
-           
+
 
             # foreach ($instance in $instances) {
 
@@ -767,16 +766,16 @@ function GenerateDocumentPath {
                     }
                 }
                 catch {
-                    Write-Verbose -Message "Failed to invoke: $($_.Exception.Message)";
-                    # Write-Error -Message $LocalizedData.DocumentProcessFailure -Exception $_.Exception -Category OperationStopped -ErrorId 'PSDocs.Document.ProcessFailure' -ErrorAction Stop;
+                    # Write-Verbose -Message "Failed to invoke: $($_.Exception.Message)";
+                    Write-Error -Message $LocalizedData.DocumentProcessFailure -Exception $_.Exception -Category OperationStopped -ErrorId 'PSDocs.Document.ProcessFailure';
                 }
             # }
-        }
-        catch {
-            # ([Exception]$_.Exception).StackTrace[]
-            # Write-Verbose -Message "Engine error $((Get-PSCallStack).ScriptLineNumber)"
-            Write-Verbose -Message "Engine error";
-        }
+        # }
+        # catch {
+        #     # ([Exception]$_.Exception).StackTrace[]
+        #     Write-Error -Message "Engine error $((Get-PSCallStack)[0].ScriptLineNumber)"
+        #     # throw "Engine error: $_";
+        # }
     }
 }
 
@@ -821,9 +820,9 @@ function GenerateDocumentInline {
         if ($PSBoundParameters.ContainsKey('Name') -and !$PSBoundParameters.ContainsKey('Path')) {
 
             if ($Null -eq $Script:DocumentBody -or !$Script:DocumentBody.ContainsKey($Name)) {
-            
+
                 Write-Error -Message ($LocalizedData.DocumentNotFound -f $Name) -ErrorAction Stop;
-    
+
                 return;
             }
             else {
@@ -994,7 +993,7 @@ function GetLanguageContext {
         }
 
         # Define built-in functions
-        $functionsToDefine['Section'] = ${function:Section};
+        $functionsToDefine['Section'] = ${function:Write-PSDocumentSection};
         $functionsToDefine['Title'] = ${function:Title};
         $functionsToDefine['List'] = ${function:List};
         $functionsToDefine['Code'] = ${function:Code};
@@ -1052,7 +1051,6 @@ function WriteDocumentContent {
         } else {
             [System.IO.File]::WriteAllText($Path, $stringBuilder.ToString(), $contentEncoding);
         }
-        
     }
 }
 
@@ -1188,7 +1186,7 @@ function NewMarkdownProcessor {
 }
 
 function ReadTemplate {
-    
+
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $True)]
@@ -1247,6 +1245,27 @@ function ReadYamlHeader {
     }
 }
 
+function InitEditorServices {
+
+    [CmdletBinding()]
+    param (
+
+    )
+
+    process {
+
+        New-Alias -Name 'Section' -Value Write-PSDocumentSection -Option AllScope -Force -Scope Global;
+    }
+}
+
+#
+# Editor services
+#
+
+if ($Null -ne $psEditor) {
+    InitEditorServices;
+}
+
 #
 # Export module
 #
@@ -1257,6 +1276,7 @@ Export-ModuleMember -Function @(
     'Import-PSDocumentTemplate'
     'Get-PSDocumentHeader'
     'New-PSDocumentOption'
+    'Write-PSDocumentSection'
 );
 
 # EOM
