@@ -17,16 +17,18 @@ ModuleVersion = '0.0.1'
 GUID = '9c6339e5-174f-447d-b7a7-7dd58ae9a13d'
 
 # Author of this module
-Author = 'Microsoft Corporation'
+Author = 'Bernie White'
 
 # Company or vendor of this module
-CompanyName = 'Microsoft Corporation'
+CompanyName = 'Bernie White'
 
 # Copyright statement for this module
-Copyright = '(c) Microsoft Corporation. All rights reserved.'
+Copyright = '(c) Bernie White. All rights reserved.'
 
 # Description of the functionality provided by this module
-Description = 'Desired State Configuration (DSC) extensions for PSDocs.'
+Description = 'Desired State Configuration (DSC) extensions for PSDocs.
+
+This project is to be considered a proof-of-concept and not a supported.'
 
 # Minimum version of the Windows PowerShell engine required by this module
 # PowerShellVersion = ''
