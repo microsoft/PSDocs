@@ -17,16 +17,18 @@ ModuleVersion = '0.0.1'
 GUID = '1f6df554-c081-40d8-9aca-32c1abe4a1b6'
 
 # Author of this module
-Author = 'Microsoft Corporation'
+Author = 'Bernie White'
 
 # Company or vendor of this module
-CompanyName = 'Microsoft Corporation'
+CompanyName = 'Bernie White'
 
 # Copyright statement for this module
-Copyright = '(c) Microsoft Corporation. All rights reserved.'
+Copyright = '(c) Bernie White. All rights reserved.'
 
 # Description of the functionality provided by this module
-Description = 'Generate markdown from PowerShell.'
+Description = 'Generate markdown from PowerShell.
+
+This project is to be considered a proof-of-concept and not a supported product.'
 
 # Minimum version of the Windows PowerShell engine required by this module
 # PowerShellVersion = ''

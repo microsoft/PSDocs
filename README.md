@@ -13,7 +13,7 @@ A PowerShell module with commands to generate markdown from objects using PowerS
 
 ## Disclaimer
 
-This project is to be considered a **proof-of-concept** and **not a supported Microsoft product**.
+This project is to be considered a **proof-of-concept** and **not a supported product**.
 
 ## Modules
 
