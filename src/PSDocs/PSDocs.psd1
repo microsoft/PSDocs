@@ -28,7 +28,7 @@ Copyright = '(c) Bernie White. All rights reserved.'
 # Description of the functionality provided by this module
 Description = 'Generate markdown from PowerShell.
 
-This project is to be considered a proof-of-concept and not a supported.'
+This project is to be considered a proof-of-concept and not a supported product.'
 
 # Minimum version of the Windows PowerShell engine required by this module
 # PowerShellVersion = ''
