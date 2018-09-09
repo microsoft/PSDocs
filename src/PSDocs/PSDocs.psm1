@@ -2,16 +2,27 @@
 # PSDocs module
 #
 
-# Import helper classes
-if (!$PSVersionTable.PSEdition -or $PSVersionTable.PSEdition -eq 'Desktop') {
-    Add-Type -Path (Join-Path -Path $PSScriptRoot -ChildPath "/bin/net451/PSDocs.dll") | Out-Null;
-}
-# else {
-#     Add-Type -Path (Join-Path -Path $PSScriptRoot -ChildPath "/bin/netstandard2.0/PSDocs.dll") | Out-Null;
+Set-StrictMode -Version latest;
+
+# Set up some helper variables to make it easier to work with the module
+$PSModule = $ExecutionContext.SessionState.Module;
+$PSModuleRoot = $PSModule.ModuleBase;
+
+# Import the appropriate nested binary module based on the current PowerShell version
+$binModulePath = Join-Path -Path $PSModuleRoot -ChildPath '/desktop/PSDocs.dll';
+
+# if (($PSVersionTable.Keys -contains 'PSEdition') -and ($PSVersionTable.PSEdition -ne 'Desktop')) {
+    $binModulePath = Join-Path -Path $PSModuleRoot -ChildPath '/core/PSDocs.dll';
 # }
 
-[PSDocs.Configuration.PSDocumentOption]::GetWorkingPath = {
+$binaryModule = Import-Module -Name $binModulePath -PassThru;
 
+# When the module is unloaded, remove the nested binary module that was loaded with it
+$PSModule.OnRemove = {
+    Remove-Module -ModuleInfo $binaryModule;
+}
+
+[PSDocs.Configuration.PSDocumentOption]::GetWorkingPath = {
     return Get-Location;
 }
 
@@ -47,10 +58,10 @@ function Document {
 
     process {
 
-        Write-Verbose -Message "[Document]::BEGIN"
+        # Write-Verbose -Message "[Document]::BEGIN"
 
         # Check if document is being defined
-        if ($Null -eq $PSDocs) {
+        if ($Null -eq (Get-Variable -Name PSDocs -ErrorAction SilentlyContinue)) {
             InitDocumentContext;
 
             $Script:DocumentBody[$Name] = $Body;
@@ -59,11 +70,10 @@ function Document {
             Set-Item -Path "function:global:$Name" -Value (${function:GenerateDocumentFn});
         }
         else {
-            Write-Verbose -Message "[Doc] -- Calling document block: $Name";
+            # Write-Verbose -Message "[Doc] -- Checking document block: $Name";
 
-            $matchTags = [PSDocs.Models.PSDocsHelper]::MatchTags($Tag, $PSDocs.Context.Tag);
-
-            if (($Null -eq $PSDocs.Context.Name -or $Name -in $PSDocs.Context.Name) -and $matchTags) {
+            if ($PSDocs.Filter.Match($Name, $Tag)) {
+                Write-Verbose -Message "[Doc] -- Calling document block: $Name";
 
                 [String[]]$instances = @($InstanceName);
 
@@ -80,7 +90,7 @@ function Document {
                     $document = [PSDocs.Models.ModelHelper]::NewDocument();
 
                     # Build a path for the document
-                    $document.Path = Join-Path -Path $PSDocs.Context.OutputPath -ChildPath "$instance.md";
+                    $document.Path = Join-Path -Path $PSDocs.OutputPath -ChildPath "$instance.md";
 
                     # Define built-in variables
                     [PSVariable[]]$variablesToDefine = @(
@@ -92,26 +102,30 @@ function Document {
                         New-Object -TypeName PSVariable -ArgumentList ('PSDocs', $PSDocs)
                     )
 
-                    $innerResult = $Body.InvokeWithContext($PSDocs.Context.Function, $variablesToDefine);
+                    $innerResult = $Body.InvokeWithContext($PSDocs.Context.Function, $variablesToDefine) | ConvertToNode;
 
-                    $document.Node.AddRange($innerResult);
+                    foreach ($r in $innerResult) {
+                        $document.Node.Add($r);
+                    }
 
-                    Write-Verbose -Message "[Doc] -- Document results [$($document.Node.Length)]";
+                    Write-Verbose -Message "[Doc] -- Document results [$($document.Node.Count)]";
 
                     # Create parent path if it doesn't exist
                     $documentParent = Split-Path -Path $document.Path -Parent;
 
                     if (!(Test-Path -Path $documentParent)) {
-                        New-Item -Path $documentParent -ItemType Directory -Force | Out-Null;
+                        $Null = New-Item -Path $documentParent -ItemType Directory -Force;
                     }
 
+                    Write-Verbose -Message "[Doc] -- Document output path: $($document.Path)";
+
                     # Parse the model
-                    ParseDom -Document $document -Processor (NewMarkdownProcessor) -Option $Option -Verbose:$VerbosePreference | WriteDocumentContent -Path $document.Path -PassThru:$PassThru -Encoding:$PSDocs.Option.Markdown.Encoding;
+                    $PSDocs.WriteDocument($document);
                 }
             }
         }
 
-        Write-Verbose -Message "[Document]::END"
+        # Write-Verbose -Message "[Document]::END"
     }
 }
 
@@ -184,9 +198,7 @@ function Import-PSDocumentTemplate {
     )
 
     process {
-        Write-Verbose -Message "[Doc] -- Reading template: $Path";
-
-        ReadTemplate @PSBoundParameters;
+        InvokeTemplate @PSBoundParameters;
     }
 }
 
@@ -318,10 +330,10 @@ function Write-PSDocumentSection {
 
             try {
                 # Invoke the Section body and collect the results
-                $innerResult = $Body.Invoke();
+                $innerResult = $Body.InvokeReturnAsIs($Null) | ConvertToNode;
 
                 foreach ($r in $innerResult) {
-                    $result.Node += $r;
+                    $result.Node.Add($r);
                 }
             }
             catch {
@@ -332,7 +344,7 @@ function Write-PSDocumentSection {
                 return;
             }
 
-            if ($result.Node.Length -gt 0 -or $Force -or $PSDocs.Option.Markdown.SkipEmptySections -eq $False) {
+            if ($result.Node.Count -gt 0 -or $Force -or $PSDocs.Option.Markdown.SkipEmptySections -eq $False) {
                 # Emit Section object to the pipeline
                 $result;
             }
@@ -535,20 +547,20 @@ function Table {
 
     end {
         # Extract out the column names based on the resulting objects
-        [String[]]$headers = $rowData | ForEach-Object -Process {
+        $rowData | ForEach-Object -Process {
             $_.PSObject.Properties
         } | Where-Object -FilterScript {
             $_.IsGettable -and $_.IsInstance
-        } | Select-Object -Unique -ExpandProperty Name;
-
-        $table.Header = @($headers);
+        } | Select-Object -Unique -ExpandProperty Name | ForEach-Object -Process {
+            $table.Header.Add([String]$_);
+        }
 
         foreach ($r in $rowData) {
 
-            $row = New-Object -TypeName 'String[]' -ArgumentList $headers.Length;
+            [String[]]$row = New-Object -TypeName 'String[]' -ArgumentList $table.Header.Count;
 
             for ($i = 0; $i -lt $row.Length; $i++) {
-                $field = GetObjectField -InputObject $r -Field $headers[$i] -Verbose:$VerbosePreference;
+                $field = GetObjectField -InputObject $r -Field $table.Header[$i] -Verbose:$VerbosePreference;
 
                 if ($Null -ne $field -and $Null -ne $field.Value) {
                     $row[$i] = $field.Value.ToString();
@@ -560,7 +572,7 @@ function Table {
 
         $table;
 
-        Write-Verbose -Message "[Doc][Table] END:: [$($headers.Length)]";
+        Write-Verbose -Message "[Doc][Table] END:: [$($table.Header.Count)]";
     }
 }
 
@@ -633,7 +645,7 @@ function InitDocumentContext {
 
     process {
 
-        if ($Null -eq $Script:DocumentBody) {
+        if ($Null -eq (Get-Variable -Name DocumentBody -Scope Script -ErrorAction SilentlyContinue)) {
             $Script:DocumentBody = @{ };
         }
     }
@@ -736,17 +748,26 @@ function GenerateDocumentPath {
         $Option = New-PSDocumentOption @optionParams;
 
         # Create PSDocs variable
-        $PSDocs = New-Object -TypeName PSObject -Property @{
-            Option = $Option
-            Context = @{
-                Function = GetLanguageContext -Function $Function
-                OutputPath = $OutputPath
-                Name = $Name
-                Tag = $Tag
-            }
+        $PSDocs = [PSDocs.Models.PSDocsContext]::Create(
+            $Option,
+            $Name,
+            $Tag
+        );
+
+        $PSDocs.WriteDocumentHook = {
+                param ([PSDocs.Configuration.PSDocumentOption]$option, [PSDocs.Models.Document]$document)
+
+                Write-Verbose -Message "[zDoc] -- Processing document model";
+
+                # Visit the document with the specified processor
+                (NewMarkdownProcessor).Process($option, $document) | WriteDocumentContent -Path $document.Path -PassThru:$PassThru -Encoding:$option.Markdown.Encoding;
         }
 
-        [Hashtable]$parameter = $Null;
+        $PSDocs.OutputPath = $OutputPath;
+
+        $PSDocs = Add-Member -PassThru -InputObject $PSDocs -MemberType NoteProperty -Name Context -Value @{
+            Function = GetLanguageContext -Function $Function
+        }
     }
 
     process {
@@ -757,18 +778,18 @@ function GenerateDocumentPath {
 
             # foreach ($instance in $instances) {
 
-                Write-Verbose -Message "[Doc] -- Processing: $instance";
+                # Write-Verbose -Message "[Doc] -- Processing: $instance";
 
-                try {
+                # try {
 
                     foreach ($p in $docScripts) {
-                        $innerResult = InvokePath -Path $p -Verbose:$VerbosePreference;
+                        InvokeTemplate -Path $p -Option $Option -Verbose:$VerbosePreference;
                     }
-                }
-                catch {
-                    # Write-Verbose -Message "Failed to invoke: $($_.Exception.Message)";
-                    Write-Error -Message $LocalizedData.DocumentProcessFailure -Exception $_.Exception -Category OperationStopped -ErrorId 'PSDocs.Document.ProcessFailure';
-                }
+                # }
+                # catch {
+                #     # Write-Verbose -Message "Failed to invoke: $($_.Exception.Message)";
+                #     Write-Error -Message $LocalizedData.DocumentProcessFailure -Exception $_.Exception -Category OperationStopped -ErrorId 'PSDocs.Document.ProcessFailure';
+                # }
             # }
         # }
         # catch {
@@ -855,9 +876,17 @@ function GenerateDocumentInline {
         $Option = New-PSDocumentOption @optionParams;
 
         # Create PSDocs variable
-        $PSDocs = New-Object -TypeName PSObject -Property @{
-            Option = $Option;
-        }
+        # $PSDocs = New-Object -TypeName PSObject -Property @{
+        #     Option = $Option;
+        # }
+
+        $PSDocs = [PSDocs.Models.PSDocsContext]::Create(
+            $Option,
+            $Null,
+            $Null
+        );
+
+        $PSDocs.OutputPath = $OutputPath;
 
         [Hashtable]$parameter = $Null;
 
@@ -902,23 +931,25 @@ function GenerateDocumentInline {
 
                         # Invoke the body of the document definition and get the output
                         $body = $Script:DocumentBody[$Name];
-                        $innerResult = $body.InvokeWithContext($functionsToDefine, $variablesToDefine);
+                        $innerResult = $body.InvokeWithContext($functionsToDefine, $variablesToDefine) | ConvertToNode;
                     }
                     else {
 
                         foreach ($p in $docScripts) {
-                            $innerResult = InvokePath -Path $p -Verbose:$VerbosePreference;
+                            $innerResult = InvokeTemplate -Path $p -Verbose:$VerbosePreference;
                         }
                     }
                 }
                 catch {
-                    Write-Verbose -Message "Failed to invoke: $($_.Exception.Message)";
+                    Write-Verbose -Message "Failed to invoke: $($_.Exception.Message). $($_.Exception.ErroRrecord.ScriptStackTrace)";
                     # Write-Error -Message $LocalizedData.DocumentProcessFailure -Exception $_.Exception -Category OperationStopped -ErrorId 'PSDocs.Document.ProcessFailure' -ErrorAction Stop;
                 }
 
-                $document.Node.AddRange($innerResult);
+                foreach ($r in $innerResult) {
+                    $document.Node.Add($r);
+                }
 
-                Write-Verbose -Message "[Doc] -- Document results [$($document.Node.Length)]";
+                Write-Verbose -Message "[Doc] -- Document results [$($document.Node.Count)]";
 
                 # Create parent path if it doesn't exist
                 $documentParent = Split-Path -Path $document.Path -Parent;
@@ -928,33 +959,14 @@ function GenerateDocumentInline {
                 }
 
                 # Parse the model
-                ParseDom -Document $document -Processor (NewMarkdownProcessor) -Option $Option -Verbose:$VerbosePreference | WriteDocumentContent -Path $document.Path -PassThru:$PassThru -Encoding:$Option.Markdown.Encoding;
+                (NewMarkdownProcessor).Process($option, $document) | WriteDocumentContent -Path $document.Path -PassThru:$PassThru -Encoding:$Option.Markdown.Encoding;
             }
         }
         catch {
             # ([Exception]$_.Exception).StackTrace[]
             # Write-Verbose -Message "Engine error $((Get-PSCallStack).ScriptLineNumber)"
-            Write-Verbose -Message "Engine error"
+            Write-Verbose -Message "Engine error: $($_.Exception.Message)"
         }
-    }
-}
-
-function InvokePath {
-
-    [CmdletBinding()]
-    param (
-        [String]$Path,
-
-        [String[]]$Name,
-
-        [String[]]$Tag
-    )
-
-    process {
-
-        Write-Verbose -Message "[Doc] -- Using $Path"
-
-        . $Path
     }
 }
 
@@ -966,7 +978,7 @@ function InvokeInline {
     )
 
     process {
-        $body = $Script:DocumentBody[$Name];
+        $Null = $Script:DocumentBody[$Name];
     }
 }
 
@@ -1049,6 +1061,8 @@ function WriteDocumentContent {
         if ($PassThru) {
             $stringBuilder.ToString();
         } else {
+
+            Write-Verbose -Message "[Doc] -- Writing to path: $Path";
             [System.IO.File]::WriteAllText($Path, $stringBuilder.ToString(), $contentEncoding);
         }
     }
@@ -1070,8 +1084,35 @@ function ParseDom {
 
     process {
 
+        Write-Verbose -Message "[Doc] -- Processing document model";
+
         # Visit the document with the specified processor
         $Processor.Visit($Document, $Option);
+    }
+}
+
+function ConvertToNode {
+
+    [CmdletBinding()]
+    [OutputType([PSDocs.Models.DocumentNode])]
+    param (
+        [Parameter(Mandatory = $True, ValueFromPipeline = $True)]
+        $InputObject
+    )
+
+    process {
+
+        if ($InputObject -is [PSDocs.Models.DocumentNode]) {
+            return $InputObject;
+        }
+
+        if ($InputObject -is [PSObject]) {
+            if ($InputObject.PSObject.BaseObject -is [PSDocs.Models.DocumentNode]) {
+                return $InputObject.PSObject.BaseObject;
+            }
+        }
+
+        return [PSDocs.Models.ModelHelper]::Text($InputObject.ToString());
     }
 }
 
@@ -1171,36 +1212,98 @@ function GetObjectField {
 
 function NewMarkdownProcessor {
 
-    [CmdletBinding()]
-    param (
-
-    )
-
     process {
-        # Create an instanced of a markdown processor from an external module
-        $result = Import-Module $PSScriptRoot\PSDocsProcessor\Markdown -AsCustomObject -PassThru -Verbose:$False;
-
-        # Return the processor
-        $result;
+        return New-Object -TypeName PSDocs.Processor.Markdown.MarkdownProcessor;
     }
 }
 
-function ReadTemplate {
+function InvokeTemplate {
 
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $True)]
-        [String]$Path
+        [String]$Path,
+
+        [Parameter(Mandatory = $False)]
+        [PSDocs.Configuration.PSDocumentOption]$Option
     )
 
     process {
 
-        # Read the contents of a .ps1 file
-        $template = Get-Content -Path $Path -Raw;
+        if (!(Test-Path -Path $Path)) {
+            Write-Error -Message "Failed to find template" -Category ObjectNotFound;
+        }
 
-        # Invoke the contents of the .ps1 file as a script block
-        $templateScriptBlock = [ScriptBlock]::Create($template);
-        $templateScriptBlock.Invoke();
+        Write-Verbose -Message "[Doc] -- Using: $Path"
+
+        try {
+            # Create a PS environment for execution
+            # A constrained environment will be used if DeviceGuard is enabled
+            $runspace = GetRunspace;
+            $ps = [powershell]::Create();
+            $ps.Runspace = $runspace;
+
+            $ps.AddScript($Path);
+            $Null = $ps.Invoke();
+
+            # Replay verbose messages
+            $ps.Streams.Verbose | ForEach-Object -Process {
+                Write-Verbose -Message $_.Message
+            }
+        }
+        catch {
+            Write-Error "failed: $($_.Exception.Message)";
+        }
+        finally {
+            # if ($Null -ne $ps) { $ps.Dispose() }
+            # if ($Null -ne $runspace) { $runspace.Dispose() }
+        }
+    }
+}
+
+function GetRunspace {
+
+    process {
+
+        $isDeviceGuard = IsDeviceGuardEnabled;
+
+        # # Define built-in functions
+        # $functionsToDefine['Section'] = ${function:Write-PSDocumentSection};
+        # $functionsToDefine['Title'] = ${function:Title};
+        # $functionsToDefine['List'] = ${function:List};
+        # $functionsToDefine['Code'] = ${function:Code};
+        # $functionsToDefine['Note'] = ${function:Note};
+        # $functionsToDefine['Warning'] = ${function:Warning};
+        # $functionsToDefine['Metadata'] = ${function:Metadata};
+        # $functionsToDefine['Yaml'] = ${function:Metadata};
+        # $functionsToDefine['Table'] = ${function:Table};
+        # $functionsToDefine['Format-Table'] = ${function:Table};
+        # $functionsToDefine['Format-List'] = ${function:FormatList};
+
+        $iss = [InitialSessionState]::CreateDefault2();
+        $iss.Commands.Add((New-Object -TypeName System.Management.Automation.Runspaces.SessionStateFunctionEntry -ArgumentList @(
+            'Document',
+            ${function:Document}
+        )));
+        $iss.Variables.Add((New-Object -TypeName System.Management.Automation.Runspaces.SessionStateVariableEntry -ArgumentList @(
+            'PSDocs',
+            $PSDocs,
+            $Null
+        )));
+        $iss.Variables.Add((New-Object -TypeName System.Management.Automation.Runspaces.SessionStateVariableEntry -ArgumentList @(
+            'VerbosePreference',
+            [System.Management.Automation.ActionPreference]::Continue,
+            $Null
+        )));
+        $rs = [RunspaceFactory]::CreateRunspace($iss);
+        $rs.Open();
+
+        # If DeviceGuard is enabled, get a contrained execution environment
+        if ($isDeviceGuard) {
+            $rs.LanguageMode = 'ConstrainedLanguage';
+        }
+
+        return $rs;
     }
 }
 
@@ -1245,6 +1348,24 @@ function ReadYamlHeader {
     }
 }
 
+function IsDeviceGuardEnabled
+{
+    
+    if ((Get-Variable -Name IsMacOS -ErrorAction SilentlyContinue) -or (Get-Variable -Name IsLinux -ErrorAction SilentlyContinue))
+    {
+        return $False;
+    }
+
+    # PowerShell 6.0.x does not support Device Guard
+    if ($PSVersionTable.PSVersion -ge '6.0' -and $PSVersionTable.PSVersion -lt '6.1')
+    {
+        return $False;
+    }
+
+    return [System.Management.Automation.Security.SystemPolicy]::GetSystemLockdownPolicy() -eq [System.Management.Automation.Security.SystemEnforcementMode]::Enforce;
+}
+
+
 function InitEditorServices {
 
     [CmdletBinding()]
@@ -1262,7 +1383,7 @@ function InitEditorServices {
 # Editor services
 #
 
-if ($Null -ne $psEditor) {
+if ($Null -ne (Get-Variable -Name psEditor -ErrorAction SilentlyContinue)) {
     InitEditorServices;
 }
 
@@ -1273,7 +1394,6 @@ if ($Null -ne $psEditor) {
 Export-ModuleMember -Function @(
     'Document'
     'Invoke-PSDocument'
-    'Import-PSDocumentTemplate'
     'Get-PSDocumentHeader'
     'New-PSDocumentOption'
     'Write-PSDocumentSection'

@@ -21,7 +21,7 @@ Import-Module (Join-Path -Path $rootPath -ChildPath "out/modules/PSDocs/PSDocsPr
 
 $outputPath = "$temp\PSDocs.Tests\Common";
 Remove-Item -Path $outputPath -Force -Recurse -Confirm:$False -ErrorAction SilentlyContinue;
-New-Item -Path $outputPath -ItemType Directory -Force | Out-Null;
+$Null = New-Item -Path $outputPath -ItemType Directory -Force;
 
 $dummyObject = New-Object -TypeName PSObject -Property @{
     Object = [PSObject]@{
@@ -139,7 +139,7 @@ Describe 'Invoke-PSDocument' -Tag 'FromPath' {
     Context 'With -Path' {
 
         # Only generate documents for the named document
-        Invoke-PSDocument -Path $here -OutputPath $outputPath -Name 'FromFileTest2' -Verbose;
+        Invoke-PSDocument -Path $here -OutputPath $outputPath -Name 'FromFileTest2';
 
         It 'Should generate named documents' {
             Test-Path -Path "$outputPath\FromFileTest1.md" | Should be $False;
@@ -147,19 +147,32 @@ Describe 'Invoke-PSDocument' -Tag 'FromPath' {
             Test-Path -Path "$outputPath\FromFileTest3.md" | Should be $False;
         }
 
-        Invoke-PSDocument -Path $here -OutputPath $outputPath -Tag 'Test3' -Verbose;
+        Invoke-PSDocument -Path $here -OutputPath $outputPath -Tag 'Test3';
 
         It 'Should generate tagged documents' {
             Test-Path -Path "$outputPath\FromFileTest1.md" | Should be $False;
             Test-Path -Path "$outputPath\FromFileTest3.md" | Should be $True;
         }
 
-        Invoke-PSDocument -Path $here -OutputPath $outputPath -Tag 'Test4','Test5' -Verbose;
+        Invoke-PSDocument -Path $here -OutputPath $outputPath -Tag 'Test4','Test5';
 
         It 'Should generate tagged documents' {
             Test-Path -Path "$outputPath\FromFileTest1.md" | Should be $False;
             Test-Path -Path "$outputPath\FromFileTest4.md" | Should be $False;
             Test-Path -Path "$outputPath\FromFileTest5.md" | Should be $True;
+        }
+    }
+
+    Context 'With constrained language' {
+
+        It 'Checks if DeviceGuard is enabled' {
+            Mock -CommandName IsDeviceGuardEnabled -ModuleName PSDocs -Verifiable -MockWith {
+                return $True;
+            }
+
+            Invoke-PSDocument -Path $here -OutputPath $outputPath -Name 'ConstrainedTest1';
+
+            Assert-MockCalled -CommandName IsDeviceGuardEnabled -ModuleName PSDocs -Times 1;
         }
     }
 }

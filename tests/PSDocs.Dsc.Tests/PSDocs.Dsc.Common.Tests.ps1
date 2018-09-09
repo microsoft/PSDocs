@@ -9,6 +9,7 @@ param (
 
 # Setup error handling
 $ErrorActionPreference = 'Stop';
+Set-StrictMode -Version latest;
 
 # Setup tests paths
 $rootPath = (Resolve-Path $PSScriptRoot\..\..).Path;

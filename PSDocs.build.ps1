@@ -4,6 +4,9 @@ param (
     [String]$ModuleVersion,
 
     [Parameter(Mandatory = $False)]
+    [String]$Configuration = 'Debug',
+
+    [Parameter(Mandatory = $False)]
     [String]$NuGetApiKey,
 
     [Parameter(Mandatory = $False)]
@@ -86,7 +89,7 @@ function SendAppveyorTestResult {
 task BuildDotNet {
     exec {
         # Build library
-        dotnet publish src/PSDocs -c Release -f net451 -o $(Join-Path -Path $PWD -ChildPath out/modules/PSDocs/bin/net451)
+        dotnet publish src/PSDocs -c $Configuration -f netstandard2.0 -o $(Join-Path -Path $PWD -ChildPath out/modules/PSDocs/core)
     }
 }
 

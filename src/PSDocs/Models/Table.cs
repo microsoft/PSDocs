@@ -10,13 +10,10 @@ namespace PSDocs.Models
             Rows = new List<string[]>();
         }
 
-        public override DocumentNodeType Type
-        {
-            get { return DocumentNodeType.Table; }
-        }
+        public override DocumentNodeType Type => DocumentNodeType.Table;
 
-        public IEnumerable<string[]> Rows { get; set; }
+        public List<string[]> Rows { get; set; }
 
-        public IEnumerable<string> Header { get; set; }
+        public List<string> Header { get; set; }
     }
 }

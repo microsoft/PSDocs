@@ -10,7 +10,7 @@ namespace PSDocs.Models
             Title = string.Empty;
             Metadata = new OrderedDictionary();
             Path = null;
-            Node = new List<object>();
+            Node = new List<DocumentNode>();
         }
 
         public override DocumentNodeType Type
@@ -24,6 +24,6 @@ namespace PSDocs.Models
 
         public string Path { get; set; }
 
-        public List<object> Node { get; set; }
+        public List<DocumentNode> Node { get; set; }
     }
 }

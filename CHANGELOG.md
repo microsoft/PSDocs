@@ -1,6 +1,8 @@
 
 ## Unreleased
 
+- **Breaking change**: Removed `Import-PSDocumentTemplate` cmdlet. Use `Invoke-PSDocument` instead or dot source
+
 ## v0.5.0
 
 - Fix to prevent string builder properties being outputted each time `Invoke-PSDocument` is called

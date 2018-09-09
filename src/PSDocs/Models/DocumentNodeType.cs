@@ -12,6 +12,8 @@
 
         Note,
 
-        Warning
+        Warning,
+
+        Text
     }
 }

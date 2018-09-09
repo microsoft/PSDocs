@@ -6,7 +6,7 @@ namespace PSDocs.Models
     {
         public Section()
         {
-            Node = new List<object>();
+            Node = new List<DocumentNode>();
         }
 
         public override DocumentNodeType Type
@@ -18,6 +18,6 @@ namespace PSDocs.Models
 
         public int Level { get; set; }
 
-        public List<object> Node { get; set; }
+        public List<DocumentNode> Node { get; set; }
     }
 }

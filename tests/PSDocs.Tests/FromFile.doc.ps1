@@ -33,3 +33,9 @@ document 'FromFileTest5' -Tag 'Test4','Test5' {
         'Test 5'
     }
 }
+
+document 'ConstrainedTest1' {
+    Section 'Test' {
+        'Test 1'
+    }
+}

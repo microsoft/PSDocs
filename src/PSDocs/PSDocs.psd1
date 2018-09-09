@@ -68,7 +68,6 @@ Description = 'Generate markdown from PowerShell.'
 FunctionsToExport = @(
     'Document'
     'Invoke-PSDocument'
-    'Import-PSDocumentTemplate'
     'Get-PSDocumentHeader'
     'New-PSDocumentOption'
     'Write-PSDocumentSection'

@@ -9,6 +9,7 @@ param (
 
 # Setup error handling
 $ErrorActionPreference = 'Stop';
+Set-StrictMode -Version latest;
 
 # Setup tests paths
 $rootPath = (Resolve-Path $PSScriptRoot\..\..).Path;
@@ -19,45 +20,20 @@ Import-Module (Join-Path -Path $rootPath -ChildPath "out/modules/PSDocs") -Force
 Import-Module (Join-Path -Path $rootPath -ChildPath "out/modules/PSDocs/PSDocsProcessor/Markdown") -Force;
 
 $outputPath = "$temp\PSDocs.Tests\Table";
-New-Item $outputPath -ItemType Directory -Force | Out-Null;
+Remove-Item -Path $outputPath -Force -Recurse -Confirm:$False -ErrorAction SilentlyContinue;
+$Null = New-Item -Path $outputPath -ItemType Directory -Force;
 
 $dummyObject = New-Object -TypeName PSObject;
 
 $Global:TestVars = @{ };
 
 Describe 'PSDocs -- Table keyword' {
-    Context 'Table with a single named property' {
-
-        # Define a test document with a table
-        document 'WithSingleNamedProperty' {
-            
-            Get-ChildItem -Path '.\' | Table -Property 'Name'
-        }
-
-        Mock -CommandName 'VisitTable' -ModuleName 'Markdown' -Verifiable -MockWith {
-            param (
-                $InputObject
-            )
-
-            $Global:TestVars['VisitTable'] = $InputObject;
-        }
-
-        WithSingleNamedProperty -InputObject $dummyObject -OutputPath $outputPath;
-
-        It 'Should process Table keyword' {
-            Assert-MockCalled -CommandName 'VisitTable' -ModuleName 'Markdown' -Times 1;
-        }
-
-        It 'Should be Table object' {
-            $Global:TestVars['VisitTable'].Type | Should be 'Table';
-        }
-    }
 
     Context 'Table markdown' {
-        
+
         # Define a test document with a table
         document 'TableTests' {
-            
+
             Get-ChildItem -Path $rootPath | Where-Object -FilterScript { 'README.md','LICENSE' -contains $_.Name } | Format-Table -Property 'Name','PSIsContainer'
 
             'EOF'
@@ -71,7 +47,7 @@ Describe 'PSDocs -- Table keyword' {
         }
 
         It 'Should match expected format' {
-            Get-Content -Path $outputDoc -Raw | Should -Match '\|LICENSE\|False\|(\n|\r){1,2}\|README.md\|False\|\r\n\r\nEOF';
+            $outputDoc | Should -FileContentMatchMultiline '\|LICENSE\|False\|(\n|\r){1,2}\|README.md\|False\|\r\n\r\nEOF';
         }
     }
 
@@ -101,7 +77,7 @@ Describe 'PSDocs -- Table keyword' {
         }
 
         It 'Should match expected format' {
-            Get-Content -Path $outputDoc -Raw | Should -Match '\|Dummy\|1\|2\|\r\n\r\nEOF';
+            $outputDoc | Should -FileContentMatchMultiline '\|Dummy\|1\|2\|\r\n\r\nEOF';
         }
     }
 
@@ -121,7 +97,7 @@ Describe 'PSDocs -- Table keyword' {
         }
 
         It 'Should match expected format' {
-            Get-Content -Path $outputDoc -Raw | Should match '\|Name\|\r\n\| --- \|\r\n\|Single\|';
+            $outputDoc | Should -FileContentMatchMultiline '\|Name\|\r\n\| --- \|\r\n\|Single\|';
         }
     }
     
@@ -137,14 +113,14 @@ Describe 'PSDocs -- Table keyword' {
         }
 
         $outputDoc = "$outputPath\TableWithNull.md";
-        TableWithNull -InputObject @{ ResourceType = @{  } } -OutputPath $outputPath;
+        TableWithNull -InputObject @{ ResourceType = @{ WindowsFeature = @() } } -OutputPath $outputPath;
 
         It 'Should have generated output' {
             Test-Path -Path $outputDoc | Should -Be $True;
         }
 
         It 'Should match expected format' {
-            Get-Content -Path $outputDoc -Raw | Should -Match '(## Windows features\r\n)$';
+            $outputDoc | Should -FileContentMatchMultiline '(## Windows features\r\n)$';
         }
     }
 

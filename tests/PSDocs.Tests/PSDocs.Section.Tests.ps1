@@ -20,48 +20,14 @@ Import-Module (Join-Path -Path $rootPath -ChildPath "out/modules/PSDocs") -Force
 Import-Module (Join-Path -Path $rootPath -ChildPath "out/modules/PSDocs/PSDocsProcessor/Markdown") -Force;
 
 $outputPath = "$temp\PSDocs.Tests\Section";
-New-Item $outputPath -ItemType Directory -Force | Out-Null;
+Remove-Item -Path $outputPath -Force -Recurse -Confirm:$False -ErrorAction SilentlyContinue;
+$Null = New-Item -Path $outputPath -ItemType Directory -Force;
 
 $dummyObject = New-Object -TypeName PSObject;
 
 $Global:TestVars = @{ };
 
 Describe 'PSDocs -- Section keyword' {
-    Context 'Simple Section block' {
-
-        # Define a test document with a section block
-        document 'SectionBlockTests' {
-            Section 'Test' {
-                'Content'
-            }
-        }
-
-        Mock -CommandName 'VisitSection' -ModuleName 'Markdown' -Verifiable -MockWith {
-            param (
-                $InputObject
-            )
-
-            $Global:TestVars['VisitSection'] = $InputObject;
-        }
-
-        $result = SectionBlockTests -InstanceName 'Section' -InputObject $dummyObject -OutputPath $outputPath -PassThru;
-
-        It 'Should process Section keyword' {
-            Assert-MockCalled -CommandName 'VisitSection' -ModuleName 'Markdown' -Times 1;
-        }
-
-        It 'Should be Section object' {
-            $Global:TestVars['VisitSection'].Type | Should be 'Section';
-        }
-
-        It 'Should have expected section name' {
-            $Global:TestVars['VisitSection'].Content | Should be 'Test';
-        }
-
-        It 'Should have expected section level' {
-            $Global:TestVars['VisitSection'].Level | Should be 2;
-        }
-    }
 
     Context 'Section markdown' {
 
@@ -92,22 +58,22 @@ Describe 'PSDocs -- Section keyword' {
         }
 
         It 'Should match expected format' {
-            Get-Content -Path $outputDoc -Raw | Should -Match '## SingleLine(\n|\r){1,2}This is a single line markdown section.(\n|\r){4}## MultiLine(\n|\r){1,2}This is a multiline(\n|\r){1,2}test.';
+            $outputDoc | Should -FileContentMatchMultiline '## SingleLine\r\nThis is a single line markdown section.(\n|\r){4}## MultiLine\r\nThis is a multiline(\n|\r){1,2}test.';
         }
 
         It 'Empty section is not present' {
-            Get-Content -Path $outputDoc -Raw | Should -Not -Match '## Empty'
+            $outputDoc | Should -Not -FileContentMatch '## Empty'
         }
 
         It 'Forced section is present' {
-            Get-Content -Path $outputDoc -Raw | Should -Match '## Forced'
+            $outputDoc | Should -FileContentMatch '## Forced'
         }
 
         $outputDoc = "$outputPath\Section2.md";
         SectionBlockTests -InstanceName 'Section2' -InputObject $dummyObject -OutputPath $outputPath -Option @{ 'Markdown.SkipEmptySections' = $False };
 
         It 'Empty sections are include with option' {
-            Get-Content -Path $outputDoc -Raw | Should -Match '## Empty'
+            $outputDoc | Should -FileContentMatch '## Empty'
         }
     }
 
@@ -128,15 +94,15 @@ Describe 'PSDocs -- Section keyword' {
         SectionWhen -InputObject $dummyObject -OutputPath $outputPath;
 
         It 'Should have generated output' {
-            Test-Path -Path $outputDoc | Should be $True;
+            Test-Path -Path $outputDoc | Should -Be $True;
         }
 
         It 'Should contain Section 2' {
-            Get-Content -Path $outputDoc -Raw | Should match '## Section 2\r\nContent 2';
+            $outputDoc | Should -FileContentMatchMultiline '## Section 2\r\nContent 2';
         }
 
         It 'Should not contain Section 1' {
-            Get-Content -Path $outputDoc -Raw | Should not match '## Section 1\r\nContent 1';
+            $outputDoc | Should -Not -FileContentMatchMultiline '## Section 1\r\nContent 1';
         }
     }
 }

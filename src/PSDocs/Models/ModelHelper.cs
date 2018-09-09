@@ -50,5 +50,13 @@
 
             };
         }
+
+        public static Text Text(string value)
+        {
+            return new Text
+            {
+                Content = value
+            };
+        }
     }
 }
