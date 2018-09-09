@@ -1054,7 +1054,7 @@ function WriteDocumentContent {
     }
 
     process {
-        $Null = $stringBuilder.AppendLine($InputObject);
+        $Null = $stringBuilder.Append($InputObject);
     }
 
     end {
