@@ -3,14 +3,12 @@ using System.Collections.Specialized;
 
 namespace PSDocs.Models
 {
-    public sealed class Document : DocumentNode
+    public sealed class Document : SectionNode
     {
         public Document()
         {
-            Title = string.Empty;
             Metadata = new OrderedDictionary();
             Path = null;
-            Node = new List<DocumentNode>();
         }
 
         public override DocumentNodeType Type
@@ -18,12 +16,8 @@ namespace PSDocs.Models
             get { return DocumentNodeType.Document; }
         }
 
-        public string Title { get; set; }
-
         public OrderedDictionary Metadata { get; set; }
 
         public string Path { get; set; }
-
-        public List<DocumentNode> Node { get; set; }
     }
 }

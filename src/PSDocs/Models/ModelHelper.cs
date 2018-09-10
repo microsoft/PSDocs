@@ -14,7 +14,7 @@
         {
             return new Section
             {
-                Content = name,
+                Title = name,
                 Level = level
             };
         }
