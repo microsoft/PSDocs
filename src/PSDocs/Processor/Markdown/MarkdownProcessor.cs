@@ -120,7 +120,9 @@ namespace PSDocs.Processor.Markdown
         {
             var sectionPadding = string.Empty.PadLeft(section.Level, '#');
 
-            context.WriteLine(sectionPadding, " ", section.Content);
+            context.WriteLine(string.Empty);
+            context.WriteLine(sectionPadding, " ", section.Title);
+            context.WriteLine(string.Empty);
 
             foreach (var node in section.Node)
             {
