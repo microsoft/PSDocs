@@ -37,7 +37,7 @@ namespace PSDocs.Models
             }
 
             // Check for impossible match
-            if (_RequiredTags.Count > tag.Length)
+            if (tag == null || _RequiredTags.Count > tag.Length)
             {
                 return false;
             }
