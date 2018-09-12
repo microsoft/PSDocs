@@ -52,11 +52,11 @@ Creates a new document section block containing content. Each section will be co
 Syntax:
 
 ```text
-Section [-Name] <String> [-When <ScriptBlock>] [-Force] [-Body] <ScriptBlock>
+Section [-Name] <String> [-If <ScriptBlock>] [-Force] [-Body] <ScriptBlock>
 ```
 
 - `Name` - The name or header of the section.
-- `When` - A condition to determine if the section block should be included in the markdown document.
+- `If` - A condition to determine if the section block should be included in the markdown document.
 - `Force` - Force the creation of the section even if the section has not content.
 
 Examples:
@@ -119,8 +119,8 @@ Document 'Sample' {
         # Section and section content is included in generated markdown
     }
 
-    # Sections can be optional if the When parameter is specified the expression evaluates to $False
-    Section 'Not included in output' -When { $False } {
+    # Sections can be optional if the If parameter is specified the expression evaluates to $False
+    Section 'Not included in output' -If { $False } {
 
         # Section and section content is not included in generated markdown
     }

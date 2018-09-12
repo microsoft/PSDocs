@@ -18,6 +18,7 @@ namespace PSDocs.Configuration
         {
             // Set defaults
             Markdown = new MarkdownOption();
+            Execution = new ExecutionOption();
         }
 
         public PSDocumentOption(PSDocumentOption option)
@@ -28,6 +29,11 @@ namespace PSDocs.Configuration
                 WrapSeparator = option.Markdown.WrapSeparator,
                 Encoding = option.Markdown.Encoding,
                 SkipEmptySections = option.Markdown.SkipEmptySections
+            };
+
+            Execution = new ExecutionOption
+            {
+                LanguageMode = option.Execution.LanguageMode
             };
         }
 
@@ -45,6 +51,11 @@ namespace PSDocs.Configuration
         /// Options that affect markdown formatting.
         /// </summary>
         public MarkdownOption Markdown { get; set; }
+
+        /// <summary>
+        /// Options that affect script execution.
+        /// </summary>
+        public ExecutionOption Execution { get; set; }
 
         public string ToYaml()
         {
@@ -125,6 +136,11 @@ namespace PSDocs.Configuration
             if (index.TryGetValue("markdown.skipemptysections", out value))
             {
                 option.Markdown.SkipEmptySections = (bool)value;
+            }
+
+            if (index.TryGetValue("execution.languagemode", out value))
+            {
+                option.Execution.LanguageMode = (LanguageMode)Enum.Parse(typeof(LanguageMode), (string)value);
             }
 
             return option;

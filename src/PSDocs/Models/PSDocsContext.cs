@@ -7,11 +7,13 @@ namespace PSDocs.Models
 
     public sealed class PSDocsContext
     {
-        public PSDocumentOption Option { get; set; }
+        public PSDocumentOption Option { get; private set; }
 
-        public DocumentFilter Filter { get; set; }
+        public DocumentFilter Filter { get; private set; }
 
         public string OutputPath { get; set; }
+
+        public string[] InstanceName { get; set; }
 
         public WriteDocumentDelegate WriteDocumentHook { get; set; }
 

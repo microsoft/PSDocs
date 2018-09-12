@@ -75,34 +75,27 @@ function Document {
             if ($PSDocs.Filter.Match($Name, $Tag)) {
                 Write-Verbose -Message "[Doc] -- Calling document block: $Name";
 
-                [String[]]$instances = @($InstanceName);
+                [String[]]$instances = @($PSDocs.InstanceName);
 
                 # If an instance name is not specified, default to the document name
-                if ($Null -eq $InstanceName) {
+                if ($Null -eq $PSDocs.InstanceName) {
                     $instances = @($Name);
                 }
 
+                Write-Verbose -Message "[Doc] -- Will process instances: $($instances.Length)";
+
                 foreach ($instance in $instances) {
 
-                    # Set the default section level so that sections in the document start from 2
-                    $Section = @{ Level = 1; };
+                    Write-Verbose -Message "[Doc] -- Processing instance: $instance";
 
                     $document = [PSDocs.Models.ModelHelper]::NewDocument();
+                    Set-Variable -Name Section -Value $document;
+                    Set-Variable -Name InstanceName -Value $instance;
 
                     # Build a path for the document
                     $document.Path = Join-Path -Path $PSDocs.OutputPath -ChildPath "$instance.md";
 
-                    # Define built-in variables
-                    [PSVariable[]]$variablesToDefine = @(
-                        New-Object -TypeName PSVariable -ArgumentList ('InstanceName', $instance)
-                        New-Object -TypeName PSVariable -ArgumentList ('InputObject', $InputObject)
-                        New-Object -TypeName PSVariable -ArgumentList ('Parameter', $parameter)
-                        New-Object -TypeName PSVariable -ArgumentList ('Section', $Section)
-                        New-Object -TypeName PSVariable -ArgumentList ('Document', $document)
-                        New-Object -TypeName PSVariable -ArgumentList ('PSDocs', $PSDocs)
-                    )
-
-                    $innerResult = $Body.InvokeWithContext($PSDocs.Context.Function, $variablesToDefine) | ConvertToNode;
+                    $innerResult = $Body.Invoke() | ConvertToNode;
 
                     foreach ($r in $innerResult) {
                         $document.Node.Add($r);
@@ -180,25 +173,36 @@ function Invoke-PSDocument {
     process {
         Write-Verbose -Message "[Invoke-PSDocument]::BEGIN";
 
-        $fnParams = $PSBoundParameters;
+        $invokeParams = $PSBoundParameters;
 
-        GenerateDocumentPath @fnParams;
+        try {
+            GenerateDocumentPath @invokeParams;
+        }
+        catch {
+            # Handle exceptions to provide meaningful errors
+
+            $ex = $_;
+
+            if ($Null -ne $ex.Exception.InnerException) {
+
+                $errorParams = @{
+                    Exception = $ex.Exception
+                    ErrorId = $ex.Exception.InnerException.ErrorRecord.FullyQualifiedErrorId
+                    Category = [System.Management.Automation.ErrorCategory]::OperationStopped
+                }
+
+                if ($ex.Exception -is [PSDocs.Execution.InvokeDocumentException]) {
+                    $errorParams['Category'] = [System.Management.Automation.ErrorCategory]::InvalidOperation;
+                }
+
+                Write-Error @errorParams;
+            }
+            else {
+                throw $ex.Exception;
+            }
+        }
 
         Write-Verbose -Message "[Invoke-PSDocument]::END";
-    }
-}
-
-# .ExternalHelp PSDocs-Help.xml
-function Import-PSDocumentTemplate {
-
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory = $True)]
-        [String]$Path
-    )
-
-    process {
-        InvokeTemplate @PSBoundParameters;
     }
 }
 
@@ -289,7 +293,8 @@ function Write-PSDocumentSection {
 
         # Optionally a condition that must be met prior to including the Section
         [Parameter(Mandatory = $False)]
-        [ScriptBlock]$When,
+        [Alias('When')]
+        [ScriptBlock]$If,
 
         # Optionally create a section block even when it is empty
         [Parameter(Mandatory = $False)]
@@ -302,16 +307,22 @@ function Write-PSDocumentSection {
 
     process {
 
+        if ($Null -eq (Get-Variable -Name Section -ErrorAction Ignore)) {
+            Write-Error -Message "Section, must be defined within a document definition." -Category InvalidOperation;
+
+            return;
+        }
+
         $shouldProcess = $True;
 
         # Evaluate if the Section condition is met
-        if ($Null -ne $When) {
+        if ($Null -ne $If) {
 
-            Write-Verbose -Message "[Doc][Section] -- When: $When";
+            Write-Verbose -Message "[Doc][Section] -- If: $If";
 
-            $conditionResult = $When.InvokeReturnAsIs();
+            $conditionResult = $If.InvokeReturnAsIs();
 
-            Write-Verbose -Message "[Doc][Section] -- When: $conditionResult";
+            Write-Verbose -Message "[Doc][Section] -- If: $conditionResult";
 
             if (($Null -eq $conditionResult) -or ($conditionResult -is [System.Boolean] -and $conditionResult -eq $False)) {
                 $shouldProcess = $False;
@@ -333,7 +344,9 @@ function Write-PSDocumentSection {
                 $innerResult = $Body.InvokeReturnAsIs($Null) | ConvertToNode;
 
                 foreach ($r in $innerResult) {
-                    $result.Node.Add($r);
+                    if ($Null -ne $r) {
+                        $result.Node.Add($r);
+                    }
                 }
             }
             catch {
@@ -532,7 +545,7 @@ function Table {
 
         Write-Verbose -Message "[Doc][Table][$recordIndex] BEGIN::";
 
-        Write-Verbose -Message "[Doc][Table][$recordIndex] -- Adding  '$($InputObject)'";
+        Write-Verbose -Message "[Doc][Table][$recordIndex] -- Adding '$($InputObject)'";
 
         if ($Null -ne $InputObject) {
             $selectedObject = Select-Object -InputObject $InputObject -Property $Property;
@@ -547,7 +560,7 @@ function Table {
 
     end {
         # Extract out the column names based on the resulting objects
-        $rowData | ForEach-Object -Process {
+        $Null = $rowData | ForEach-Object -Process {
             $_.PSObject.Properties
         } | Where-Object -FilterScript {
             $_.IsGettable -and $_.IsInstance
@@ -567,12 +580,14 @@ function Table {
                 }
             }
 
-            $table.Rows.Add($row);
+            $Null = $table.Rows.Add($row);
         }
 
-        $table;
+        if ($table.Rows.Count -gt 0) {
+            $table;
+        }
 
-        Write-Verbose -Message "[Doc][Table] END:: [$($table.Header.Count)]";
+        Write-Verbose -Message "[Doc][Table] END:: [$($table.Rows.Count)]";
     }
 }
 
@@ -679,7 +694,32 @@ function GenerateDocumentFn {
 
         $fnParams = $PSBoundParameters;
 
-        GenerateDocumentInline -Name $MyInvocation.InvocationName @fnParams;
+        try {
+            GenerateDocumentInline -Name $MyInvocation.InvocationName @fnParams;
+        }
+        catch {
+            # Handle exceptions to provide meaningful errors
+
+            $ex = $_;
+
+            if ($Null -ne $ex.Exception.InnerException) {
+
+                $errorParams = @{
+                    Exception = $ex.Exception
+                    ErrorId = $ex.Exception.InnerException.ErrorRecord.FullyQualifiedErrorId
+                    Category = [System.Management.Automation.ErrorCategory]::OperationStopped
+                }
+
+                if ($ex.Exception -is [PSDocs.Execution.InvokeDocumentException]) {
+                    $errorParams['Category'] = [System.Management.Automation.ErrorCategory]::InvalidOperation;
+                }
+
+                Write-Error @errorParams;
+            }
+            else {
+                throw $ex.Exception;
+            }
+        }
 
         Write-Verbose -Message "[$($MyInvocation.InvocationName)]::END";
     }
@@ -757,46 +797,29 @@ function GenerateDocumentPath {
         $PSDocs.WriteDocumentHook = {
                 param ([PSDocs.Configuration.PSDocumentOption]$option, [PSDocs.Models.Document]$document)
 
-                Write-Verbose -Message "[zDoc] -- Processing document model";
+                Write-Verbose -Message "[zDoc] -- Processing document model $($document.Path)";
+
+                if ($Null -eq $document) {
+                    Write-Verbose "Document is null";
+                }
+
+                if ($Null -eq $option) {
+                    Write-Verbose "Option is null";
+                }
 
                 # Visit the document with the specified processor
                 (NewMarkdownProcessor).Process($option, $document) | WriteDocumentContent -Path $document.Path -PassThru:$PassThru -Encoding:$option.Markdown.Encoding;
         }
 
         $PSDocs.OutputPath = $OutputPath;
-
-        $PSDocs = Add-Member -PassThru -InputObject $PSDocs -MemberType NoteProperty -Name Context -Value @{
-            Function = GetLanguageContext -Function $Function
-        }
+        $PSDocs.InstanceName = $InstanceName;
     }
 
     process {
 
-        # try {
-
-
-
-            # foreach ($instance in $instances) {
-
-                # Write-Verbose -Message "[Doc] -- Processing: $instance";
-
-                # try {
-
-                    foreach ($p in $docScripts) {
-                        InvokeTemplate -Path $p -Option $Option -Verbose:$VerbosePreference;
-                    }
-                # }
-                # catch {
-                #     # Write-Verbose -Message "Failed to invoke: $($_.Exception.Message)";
-                #     Write-Error -Message $LocalizedData.DocumentProcessFailure -Exception $_.Exception -Category OperationStopped -ErrorId 'PSDocs.Document.ProcessFailure';
-                # }
-            # }
-        # }
-        # catch {
-        #     # ([Exception]$_.Exception).StackTrace[]
-        #     Write-Error -Message "Engine error $((Get-PSCallStack)[0].ScriptLineNumber)"
-        #     # throw "Engine error: $_";
-        # }
+        foreach ($p in $docScripts) {
+            InvokeTemplate -Path $p -Option $Option -InputObject $InputObject -Verbose:$VerbosePreference;
+        }
     }
 }
 
@@ -834,8 +857,6 @@ function GenerateDocumentInline {
     )
 
     begin {
-
-        $useInline = $False;
 
         # Check if existing document is inline
         if ($PSBoundParameters.ContainsKey('Name') -and !$PSBoundParameters.ContainsKey('Path')) {
@@ -876,109 +897,27 @@ function GenerateDocumentInline {
         $Option = New-PSDocumentOption @optionParams;
 
         # Create PSDocs variable
-        # $PSDocs = New-Object -TypeName PSObject -Property @{
-        #     Option = $Option;
-        # }
-
         $PSDocs = [PSDocs.Models.PSDocsContext]::Create(
             $Option,
             $Null,
             $Null
         );
 
+        $PSDocs.WriteDocumentHook = {
+            param ([PSDocs.Configuration.PSDocumentOption]$option, [PSDocs.Models.Document]$document)
+
+            Write-Verbose -Message "[zDoc] -- Processing document model";
+
+            # Visit the document with the specified processor
+            (NewMarkdownProcessor).Process($option, $document) | WriteDocumentContent -Path $document.Path -PassThru:$PassThru -Encoding:$option.Markdown.Encoding;
+        }
+
         $PSDocs.OutputPath = $OutputPath;
-
-        [Hashtable]$parameter = $Null;
-
-        $functionsToDefine = GetLanguageContext -Function $Function;
+        $PSDocs.InstanceName = $InstanceName;
     }
 
     process {
-
-        try {
-
-            [String[]]$instances = @($InstanceName);
-
-            # If an instance name is not specified, default to the document name
-            if ($Null -eq $InstanceName) {
-                $instances = @($Name);
-            }
-
-            # Set the default section level so that sections in the document start from 2
-            $Section = @{ Level = 1; };
-
-            foreach ($instance in $instances) {
-
-                Write-Verbose -Message "[Doc] -- Processing: $instance";
-
-                $document = [PSDocs.Models.ModelHelper]::NewDocument();
-
-                # Build a path for the document
-                $document.Path = Join-Path -Path $OutputPath -ChildPath "$instance.md";
-
-                # Define built-in variables
-                [PSVariable[]]$variablesToDefine = @(
-                    New-Object -TypeName PSVariable -ArgumentList ('InstanceName', $instance)
-                    New-Object -TypeName PSVariable -ArgumentList ('InputObject', $InputObject)
-                    New-Object -TypeName PSVariable -ArgumentList ('Parameter', $parameter)
-                    New-Object -TypeName PSVariable -ArgumentList ('Section', $Section)
-                    New-Object -TypeName PSVariable -ArgumentList ('Document', $document)
-                    New-Object -TypeName PSVariable -ArgumentList ('PSDocs', $PSDocs)
-                )
-
-                try {
-                    if ($useInline) {
-
-                        # Invoke the body of the document definition and get the output
-                        $body = $Script:DocumentBody[$Name];
-                        $innerResult = $body.InvokeWithContext($functionsToDefine, $variablesToDefine) | ConvertToNode;
-                    }
-                    else {
-
-                        foreach ($p in $docScripts) {
-                            $innerResult = InvokeTemplate -Path $p -Verbose:$VerbosePreference;
-                        }
-                    }
-                }
-                catch {
-                    Write-Verbose -Message "Failed to invoke: $($_.Exception.Message). $($_.Exception.ErroRrecord.ScriptStackTrace)";
-                    # Write-Error -Message $LocalizedData.DocumentProcessFailure -Exception $_.Exception -Category OperationStopped -ErrorId 'PSDocs.Document.ProcessFailure' -ErrorAction Stop;
-                }
-
-                foreach ($r in $innerResult) {
-                    $document.Node.Add($r);
-                }
-
-                Write-Verbose -Message "[Doc] -- Document results [$($document.Node.Count)]";
-
-                # Create parent path if it doesn't exist
-                $documentParent = Split-Path -Path $document.Path -Parent;
-
-                if (!(Test-Path -Path $documentParent)) {
-                    New-Item -Path $documentParent -ItemType Directory -Force | Out-Null;
-                }
-
-                # Parse the model
-                (NewMarkdownProcessor).Process($option, $document) | WriteDocumentContent -Path $document.Path -PassThru:$PassThru -Encoding:$Option.Markdown.Encoding;
-            }
-        }
-        catch {
-            # ([Exception]$_.Exception).StackTrace[]
-            # Write-Verbose -Message "Engine error $((Get-PSCallStack).ScriptLineNumber)"
-            Write-Verbose -Message "Engine error: $($_.Exception.Message)"
-        }
-    }
-}
-
-function InvokeInline {
-
-    [CmdletBinding()]
-    param (
-        [String]$Name
-    )
-
-    process {
-        $Null = $Script:DocumentBody[$Name];
+        InvokeTemplate -Name $Name -ScriptBlock $Script:DocumentBody[$Name] -Option $Option -InputObject $InputObject -Verbose:$VerbosePreference;
     }
 }
 
@@ -1068,51 +1007,31 @@ function WriteDocumentContent {
     }
 }
 
-function ParseDom {
-
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory = $True)]
-        [PSDocs.Models.Document]$Document,
-
-        [Parameter(Mandatory = $True)]
-        [PSObject]$Processor,
-
-        [Parameter(Mandatory = $True)]
-        [PSDocs.Configuration.PSDocumentOption]$Option
-    )
-
-    process {
-
-        Write-Verbose -Message "[Doc] -- Processing document model";
-
-        # Visit the document with the specified processor
-        $Processor.Visit($Document, $Option);
-    }
-}
-
 function ConvertToNode {
 
     [CmdletBinding()]
     [OutputType([PSDocs.Models.DocumentNode])]
     param (
         [Parameter(Mandatory = $True, ValueFromPipeline = $True)]
+        [AllowNull()]
         $InputObject
     )
 
     process {
 
-        if ($InputObject -is [PSDocs.Models.DocumentNode]) {
-            return $InputObject;
-        }
-
-        if ($InputObject -is [PSObject]) {
-            if ($InputObject.PSObject.BaseObject -is [PSDocs.Models.DocumentNode]) {
-                return $InputObject.PSObject.BaseObject;
+        if ($Null -ne $InputObject) {
+            if ($InputObject -is [PSDocs.Models.DocumentNode]) {
+                return $InputObject;
             }
-        }
 
-        return [PSDocs.Models.ModelHelper]::Text($InputObject.ToString());
+            if ($InputObject -is [PSObject]) {
+                if ($InputObject.PSObject.BaseObject -is [PSDocs.Models.DocumentNode]) {
+                    return $InputObject.PSObject.BaseObject;
+                }
+            }
+
+            return [PSDocs.Models.ModelHelper]::Text($InputObject.ToString());
+        }
     }
 }
 
@@ -1221,8 +1140,18 @@ function InvokeTemplate {
 
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory = $True)]
+        [Parameter(Mandatory = $True, ParameterSetName = 'Path')]
         [String]$Path,
+
+        [Parameter(Mandatory = $True, ParameterSetName = 'ScriptBlock')]
+        [String]$Name,
+
+        [Parameter(Mandatory = $True, ParameterSetName = 'ScriptBlock')]
+        [ScriptBlock]$ScriptBlock,
+
+        [Parameter(Mandatory = $False)]
+        [AllowNull()]
+        [PSObject]$InputObject,
 
         [Parameter(Mandatory = $False)]
         [PSDocs.Configuration.PSDocumentOption]$Option
@@ -1230,29 +1159,66 @@ function InvokeTemplate {
 
     process {
 
-        if (!(Test-Path -Path $Path)) {
-            Write-Error -Message "Failed to find template" -Category ObjectNotFound;
-        }
+        $template = $Null;
 
-        Write-Verbose -Message "[Doc] -- Using: $Path"
+        if ($PSCmdlet.ParameterSetName -eq 'Path') {
+            if (!(Test-Path -Path $Path)) {
+                Write-Error -Message "Failed to find template" -Category ObjectNotFound;
+
+                return;
+            }
+    
+            Write-Verbose -Message "[Doc] -- Using: $Path";
+            $template = $Path;
+        }
+        else {
+            $template = [String]::Concat("document ", $Name, " { ", $ScriptBlock.ToString(), "}");
+        }
 
         try {
             # Create a PS environment for execution
             # A constrained environment will be used if DeviceGuard is enabled
-            $runspace = GetRunspace;
-            $ps = [powershell]::Create();
+            $runspace = GetRunspace -Option $Option;
+            $runspace.SessionStateProxy.PSVariable.Set('InputObject', $InputObject);
+            $ps = [PowerShell]::Create();
             $ps.Runspace = $runspace;
 
-            $ps.AddScript($Path);
-            $Null = $ps.Invoke();
+            $Null = $ps.AddScript($template);
+
+            try {
+                $Null = $ps.Invoke();
+            }
+            catch {
+                $baseException = $_.Exception.GetBaseException();
+                $errorRecord = $baseException.ErrorRecord;
+                throw (New-Object -TypeName PSDocs.Execution.InvokeDocumentException -ArgumentList @(
+                    $baseException.Message
+                    $baseException
+                    $Path
+                    $errorRecord.InvocationInfo.PositionMessage
+                ));
+            }
+            
 
             # Replay verbose messages
             $ps.Streams.Verbose | ForEach-Object -Process {
                 Write-Verbose -Message $_.Message
             }
-        }
-        catch {
-            Write-Error "failed: $($_.Exception.Message)";
+
+            # if ($ps.HadErrors) {
+            #     $ps.Streams.Error | ForEach-Object -Process {
+            #         # throw (New-Object -TypeName PSDocs.Execution.InvokeDocumentException -ArgumentList @(
+            #         #     $_.Exception.Message
+            #         #     $_.Exception
+            #         # ))
+
+            #         # $PSCmdlet.ThrowTerminatingError($_);
+
+            #         throw $_.Exception;
+
+            #         # Write-Error -ErrorRecord $_;
+            #     }
+            # }
         }
         finally {
             # if ($Null -ne $ps) { $ps.Dispose() }
@@ -1263,47 +1229,102 @@ function InvokeTemplate {
 
 function GetRunspace {
 
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $False)]
+        [PSDocs.Configuration.PSDocumentOption]$Option
+    )
+
     process {
 
         $isDeviceGuard = IsDeviceGuardEnabled;
-
-        # # Define built-in functions
-        # $functionsToDefine['Section'] = ${function:Write-PSDocumentSection};
-        # $functionsToDefine['Title'] = ${function:Title};
-        # $functionsToDefine['List'] = ${function:List};
-        # $functionsToDefine['Code'] = ${function:Code};
-        # $functionsToDefine['Note'] = ${function:Note};
-        # $functionsToDefine['Warning'] = ${function:Warning};
-        # $functionsToDefine['Metadata'] = ${function:Metadata};
-        # $functionsToDefine['Yaml'] = ${function:Metadata};
-        # $functionsToDefine['Table'] = ${function:Table};
-        # $functionsToDefine['Format-Table'] = ${function:Table};
-        # $functionsToDefine['Format-List'] = ${function:FormatList};
 
         $iss = [InitialSessionState]::CreateDefault2();
         $iss.Commands.Add((New-Object -TypeName System.Management.Automation.Runspaces.SessionStateFunctionEntry -ArgumentList @(
             'Document',
             ${function:Document}
         )));
+        $iss.Commands.Add((New-Object -TypeName System.Management.Automation.Runspaces.SessionStateFunctionEntry -ArgumentList @(
+            'ConvertToNode',
+            ${function:ConvertToNode}
+        )));
+        $iss.Commands.Add((New-Object -TypeName System.Management.Automation.Runspaces.SessionStateFunctionEntry -ArgumentList @(
+            'Section',
+            ${function:Write-PSDocumentSection}
+        )));
+        $iss.Commands.Add((New-Object -TypeName System.Management.Automation.Runspaces.SessionStateFunctionEntry -ArgumentList @(
+            'Title',
+            ${function:Title}
+        )));
+        $iss.Commands.Add((New-Object -TypeName System.Management.Automation.Runspaces.SessionStateFunctionEntry -ArgumentList @(
+            'Table',
+            ${function:Table}
+        )));
+        $iss.Commands.Add((New-Object -TypeName System.Management.Automation.Runspaces.SessionStateFunctionEntry -ArgumentList @(
+            'Code',
+            ${function:Code}
+        )));
+        $iss.Commands.Add((New-Object -TypeName System.Management.Automation.Runspaces.SessionStateFunctionEntry -ArgumentList @(
+            'Note',
+            ${function:Note}
+        )));
+        $iss.Commands.Add((New-Object -TypeName System.Management.Automation.Runspaces.SessionStateFunctionEntry -ArgumentList @(
+            'Warning',
+            ${function:Warning}
+        )));
+        $iss.Commands.Add((New-Object -TypeName System.Management.Automation.Runspaces.SessionStateFunctionEntry -ArgumentList @(
+            'Metadata',
+            ${function:Metadata}
+        )));
+        $iss.Commands.Add((New-Object -TypeName System.Management.Automation.Runspaces.SessionStateFunctionEntry -ArgumentList @(
+            'GetObjectField',
+            ${function:GetObjectField}
+        )));
+        # $iss.Commands.Add((New-Object -TypeName System.Management.Automation.Runspaces.SessionStateFunctionEntry -ArgumentList @(
+        #     'Write-Error',
+        #     ${function:WriteError}
+        # )));
         $iss.Variables.Add((New-Object -TypeName System.Management.Automation.Runspaces.SessionStateVariableEntry -ArgumentList @(
             'PSDocs',
             $PSDocs,
-            $Null
+            $Null,
+            [System.Management.Automation.ScopedItemOptions]::AllScope
         )));
+        # $iss.Variables.Add((New-Object -TypeName System.Management.Automation.Runspaces.SessionStateVariableEntry -ArgumentList @(
+        #     'Section',
+        #     @{ Level = 1; },
+        #     $Null
+        # )));
         $iss.Variables.Add((New-Object -TypeName System.Management.Automation.Runspaces.SessionStateVariableEntry -ArgumentList @(
             'VerbosePreference',
             [System.Management.Automation.ActionPreference]::Continue,
+            $Null
+        )));
+        $iss.Variables.Add((New-Object -TypeName System.Management.Automation.Runspaces.SessionStateVariableEntry -ArgumentList @(
+            'ErrorActionPreference',
+            [System.Management.Automation.ActionPreference]::Stop,
             $Null
         )));
         $rs = [RunspaceFactory]::CreateRunspace($iss);
         $rs.Open();
 
         # If DeviceGuard is enabled, get a contrained execution environment
-        if ($isDeviceGuard) {
+        if ($isDeviceGuard -or $Option.Execution.LanguageMode -eq [PSDocs.Configuration.LanguageMode]::ConstrainedLanguage) {
             $rs.LanguageMode = 'ConstrainedLanguage';
         }
 
         return $rs;
+    }
+}
+
+function WriteError {
+
+    param (
+        [String]$Message
+    )
+
+    process {
+        Write-Error -Message $Message
     }
 }
 
@@ -1348,23 +1369,28 @@ function ReadYamlHeader {
     }
 }
 
-function IsDeviceGuardEnabled
-{
-    
-    if ((Get-Variable -Name IsMacOS -ErrorAction SilentlyContinue) -or (Get-Variable -Name IsLinux -ErrorAction SilentlyContinue))
-    {
-        return $False;
-    }
+function IsDeviceGuardEnabled {
 
-    # PowerShell 6.0.x does not support Device Guard
-    if ($PSVersionTable.PSVersion -ge '6.0' -and $PSVersionTable.PSVersion -lt '6.1')
-    {
-        return $False;
-    }
+    [CmdletBinding()]
+    [OutputType([System.Boolean])]
+    param (
 
-    return [System.Management.Automation.Security.SystemPolicy]::GetSystemLockdownPolicy() -eq [System.Management.Automation.Security.SystemEnforcementMode]::Enforce;
+    )
+
+    process {
+
+        if ((Get-Variable -Name IsMacOS -ErrorAction Ignore) -or (Get-Variable -Name IsLinux -ErrorAction Ignore)) {
+            return $False;
+        }
+
+        # PowerShell 6.0.x does not support Device Guard
+        if ($PSVersionTable.PSVersion -ge '6.0' -and $PSVersionTable.PSVersion -lt '6.1') {
+            return $False;
+        }
+
+        return [System.Management.Automation.Security.SystemPolicy]::GetSystemLockdownPolicy() -eq [System.Management.Automation.Security.SystemEnforcementMode]::Enforce;
+    }
 }
-
 
 function InitEditorServices {
 
@@ -1383,7 +1409,7 @@ function InitEditorServices {
 # Editor services
 #
 
-if ($Null -ne (Get-Variable -Name psEditor -ErrorAction SilentlyContinue)) {
+if ($Null -ne (Get-Variable -Name psEditor -ErrorAction Ignore)) {
     InitEditorServices;
 }
 
@@ -1398,5 +1424,7 @@ Export-ModuleMember -Function @(
     'New-PSDocumentOption'
     'Write-PSDocumentSection'
 );
+
+Export-ModuleMember -Alias *;
 
 # EOM
