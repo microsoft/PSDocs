@@ -17,7 +17,6 @@ $here = Split-Path -Parent $MyInvocation.MyCommand.Path;
 $temp = "$here\..\..\build";
 
 Import-Module (Join-Path -Path $rootPath -ChildPath "out/modules/PSDocs") -Force;
-Import-Module (Join-Path -Path $rootPath -ChildPath "out/modules/PSDocs/PSDocsProcessor/Markdown") -Force;
 
 $outputPath = "$temp\PSDocs.Tests\Section";
 Remove-Item -Path $outputPath -Force -Recurse -Confirm:$False -ErrorAction SilentlyContinue;
@@ -27,7 +26,7 @@ $dummyObject = New-Object -TypeName PSObject;
 
 $Global:TestVars = @{ };
 
-Describe 'PSDocs -- Section keyword' {
+Describe 'PSDocs -- Section keyword' -Tag Section {
 
     Context 'Section markdown' {
 
@@ -58,7 +57,7 @@ Describe 'PSDocs -- Section keyword' {
         }
 
         It 'Should match expected format' {
-            $outputDoc | Should -FileContentMatchMultiline '## SingleLine\r\nThis is a single line markdown section.(\n|\r){4}## MultiLine\r\nThis is a multiline(\n|\r){1,2}test.';
+            $outputDoc | Should -FileContentMatchMultiline '## SingleLine\r\n\r\nThis is a single line markdown section.\r\n\r\n## MultiLine\r\n\r\nThis is a multiline\r\ntest.';
         }
 
         It 'Empty section is not present' {
@@ -98,11 +97,11 @@ Describe 'PSDocs -- Section keyword' {
         }
 
         It 'Should contain Section 2' {
-            $outputDoc | Should -FileContentMatchMultiline '## Section 2\r\nContent 2';
+            $outputDoc | Should -FileContentMatchMultiline '## Section 2\r\n\r\nContent 2';
         }
 
         It 'Should not contain Section 1' {
-            $outputDoc | Should -Not -FileContentMatchMultiline '## Section 1\r\nContent 1';
+            $outputDoc | Should -Not -FileContentMatchMultiline '## Section 1\r\n\r\nContent 1';
         }
     }
 }

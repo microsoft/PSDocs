@@ -17,7 +17,6 @@ $here = Split-Path -Parent $MyInvocation.MyCommand.Path;
 $temp = "$here\..\..\build";
 
 Import-Module (Join-Path -Path $rootPath -ChildPath "out/modules/PSDocs") -Force;
-Import-Module (Join-Path -Path $rootPath -ChildPath "out/modules/PSDocs/PSDocsProcessor/Markdown") -Force;
 
 $outputPath = "$temp\PSDocs.Tests\Common";
 Remove-Item -Path $outputPath -Force -Recurse -Confirm:$False -ErrorAction SilentlyContinue;
@@ -37,7 +36,7 @@ $dummyObject = New-Object -TypeName PSObject -Property @{
 
 $Global:TestVars = @{ };
 
-Describe 'PSDocs instance names' {
+Describe 'PSDocs instance names' -Tag Common {
     Context 'Generate a document without an instance name' {
 
         # Define a test document with a table
@@ -57,12 +56,12 @@ Describe 'PSDocs instance names' {
         }
 
         It 'Should contain document name' {
-            Get-Content -Path $outputDoc -Raw | Should -Match 'WithoutInstanceName';
+            $outputDoc | Should -FileContentMatch 'WithoutInstanceName';
         }
 
         It 'Should contain object properties' {
-            Get-Content -Path $outputDoc -Raw | Should -Match 'ObjectName';
-            Get-Content -Path $outputDoc -Raw | Should -Match 'HashName';
+            $outputDoc | Should -FileContentMatch 'ObjectName';
+            $outputDoc | Should -FileContentMatch 'HashName';
         }
     }
 
@@ -89,13 +88,13 @@ Describe 'PSDocs instance names' {
     }
 
     Context 'Generate a document with multiple instance names' {
-        
+
         # Define a test document with a table
         document 'WithMultiInstanceName' {
             $InstanceName;
         }
 
-        WithMultiInstanceName -InstanceName 'Instance2','Instance3' -InputObject $dummyObject -OutputPath $outputPath;
+        WithMultiInstanceName -InstanceName 'Instance2','Instance3' -InputObject @{} -OutputPath $outputPath;
 
         It 'Should not create a output with the document name' {
             Test-Path -Path "$outputPath\WithMultiInstanceName.md" | Should be $False;
@@ -128,7 +127,7 @@ Describe 'PSDocs instance names' {
         foreach ($encoding in @('UTF8', 'UTF7', 'Unicode', 'ASCII', 'UTF32')) {
 
             It "Should generate $encoding encoded content" {
-                WithEncoding -InstanceName "With$encoding" -InputObject $dummyObject -OutputPath $outputPath -Encoding $encoding;
+                WithEncoding -InstanceName "With$encoding" -InputObject @{} -OutputPath $outputPath -Encoding $encoding;
                 Get-Content -Path (Join-Path -Path $outputPath -ChildPath "With$encoding.md") -Raw -Encoding $encoding | Should -BeExactly "With$encoding`r`n";
             }
         }
@@ -157,9 +156,9 @@ Describe 'Invoke-PSDocument' -Tag 'FromPath' {
         Invoke-PSDocument -Path $here -OutputPath $outputPath -Tag 'Test4','Test5';
 
         It 'Should generate tagged documents' {
-            Test-Path -Path "$outputPath\FromFileTest1.md" | Should be $False;
-            Test-Path -Path "$outputPath\FromFileTest4.md" | Should be $False;
-            Test-Path -Path "$outputPath\FromFileTest5.md" | Should be $True;
+            Test-Path -Path "$outputPath\FromFileTest1.md" | Should -Be $False;
+            Test-Path -Path "$outputPath\FromFileTest4.md" | Should -Be $False;
+            Test-Path -Path "$outputPath\FromFileTest5.md" | Should -Be $True;
         }
     }
 
@@ -171,8 +170,13 @@ Describe 'Invoke-PSDocument' -Tag 'FromPath' {
             }
 
             Invoke-PSDocument -Path $here -OutputPath $outputPath -Name 'ConstrainedTest1';
-
             Assert-MockCalled -CommandName IsDeviceGuardEnabled -ModuleName PSDocs -Times 1;
+        }
+
+        # Check that '[Console]::WriteLine('Should fail')' is not executed
+        It 'Should fail to execute blocked code' {
+            { Invoke-PSDocument -Path $here -OutputPath $outputPath -Name 'ConstrainedTest2' -Option @{ 'execution.mode' = 'ConstrainedLanguage' } -ErrorAction Stop } | Should -Throw 'Cannot invoke method. Method invocation is supported only on core types in this language mode.';
+            Test-Path -Path "$outputPath\ConstrainedTest2.md" | Should -Be $False;
         }
     }
 }

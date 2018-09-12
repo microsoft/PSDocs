@@ -106,8 +106,7 @@ Describe 'PSDocs -- Table keyword' {
         # Define a test document with section and table
         document 'TableWithNull' {
 
-            Section 'Windows features' {
-            
+            Section 'Windows features' -Force {
                 $InputObject.ResourceType.WindowsFeature | Table -Property Name,Ensure;
             }
         }
