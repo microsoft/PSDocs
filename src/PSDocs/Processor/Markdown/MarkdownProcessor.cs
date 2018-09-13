@@ -122,11 +122,15 @@ namespace PSDocs.Processor.Markdown
 
             context.WriteLine(string.Empty);
             context.WriteLine(sectionPadding, " ", section.Title);
-            context.WriteLine(string.Empty);
 
-            foreach (var node in section.Node)
+            if (section.Node.Count > 0)
             {
-                Node(context, node);
+                context.WriteLine(string.Empty);
+
+                foreach (var node in section.Node)
+                {
+                    Node(context, node);
+                }
             }
         }
 

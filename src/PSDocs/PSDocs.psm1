@@ -368,7 +368,7 @@ function Write-PSDocumentSection {
     }
 
     end {
-        Write-Verbose -Message "[Doc][Section] END::";
+        Write-Verbose -Message "[Doc][Section] END:: [$($result.Node.Count)]";
     }
 }
 
@@ -1258,6 +1258,10 @@ function GetRunspace {
         )));
         $iss.Commands.Add((New-Object -TypeName System.Management.Automation.Runspaces.SessionStateFunctionEntry -ArgumentList @(
             'Table',
+            ${function:Table}
+        )));
+        $iss.Commands.Add((New-Object -TypeName System.Management.Automation.Runspaces.SessionStateFunctionEntry -ArgumentList @(
+            'Format-Table',
             ${function:Table}
         )));
         $iss.Commands.Add((New-Object -TypeName System.Management.Automation.Runspaces.SessionStateFunctionEntry -ArgumentList @(

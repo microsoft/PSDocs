@@ -27,7 +27,7 @@ $dummyObject = New-Object -TypeName PSObject;
 
 $Global:TestVars = @{ };
 
-Describe 'PSDocs -- Table keyword' {
+Describe 'PSDocs -- Table keyword' -Tag Table {
 
     Context 'Table markdown' {
 
@@ -105,7 +105,6 @@ Describe 'PSDocs -- Table keyword' {
         
         # Define a test document with section and table
         document 'TableWithNull' {
-
             Section 'Windows features' -Force {
                 $InputObject.ResourceType.WindowsFeature | Table -Property Name,Ensure;
             }
@@ -132,18 +131,18 @@ Describe 'PSDocs -- Table keyword' {
 
         # Define a test document with a multiple column in a table
         document 'TableWithMultilineColumn' {
-            $testObject | Table;
+            $InputObject | Table;
         }
 
         $outputDoc = "$outputPath\TableWithMultilineColumn.md";
-        TableWithMultilineColumn -OutputPath $outputPath;
+        TableWithMultilineColumn -InputObject $testObject -OutputPath $outputPath;
 
         It 'Should have generated output' {
             Test-Path -Path $outputDoc | Should -Be $True;
         }
 
         It 'Should match expected format' {
-            Get-Content -Path $outputDoc -Raw | Should -Match 'This is a description split over multiple lines\.';
+            $outputDoc | Should -FileContentMatch 'This is a description split over multiple lines\.';
         }
 
         $option = New-PSDocumentOption @{
@@ -151,10 +150,10 @@ Describe 'PSDocs -- Table keyword' {
         }
 
         $outputDoc = "$outputPath\TableWithMultilineColumnCustom.md";
-        TableWithMultilineColumn -InstanceName 'TableWithMultilineColumnCustom' -OutputPath $outputPath -Option $option;
+        TableWithMultilineColumn -InputObject $testObject -InstanceName 'TableWithMultilineColumnCustom' -OutputPath $outputPath -Option $option;
 
         It 'Should use wrap separator' {
-            Get-Content -Path $outputDoc -Raw | Should -Match 'This is a\<br /\>description\<br /\>split\<br /\>over\<br /\>multiple\<br /\>lines\.';
+            $outputDoc | Should -FileContentMatch 'This is a\<br /\>description\<br /\>split\<br /\>over\<br /\>multiple\<br /\>lines\.';
         }
     }
 }
