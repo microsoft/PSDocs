@@ -57,11 +57,10 @@ function Document {
     )
 
     process {
-
-        # Write-Verbose -Message "[Document]::BEGIN"
-
         # Check if document is being defined
-        if ($Null -eq (Get-Variable -Name PSDocs -ErrorAction SilentlyContinue)) {
+        if ($Null -eq (Get-Variable -Name PSDocs -ErrorAction Ignore)) {
+            Write-Verbose -Message "[Doc] -- Exporting definition: $Name";
+
             InitDocumentContext;
 
             $Script:DocumentBody[$Name] = $Body;
@@ -70,8 +69,7 @@ function Document {
             Set-Item -Path "function:global:$Name" -Value (${function:GenerateDocumentFn});
         }
         else {
-            # Write-Verbose -Message "[Doc] -- Checking document block: $Name";
-
+            # Check that the filter matches before processing
             if ($PSDocs.Filter.Match($Name, $Tag)) {
                 Write-Verbose -Message "[Doc] -- Calling document block: $Name";
 
@@ -117,8 +115,6 @@ function Document {
                 }
             }
         }
-
-        # Write-Verbose -Message "[Document]::END"
     }
 }
 
@@ -771,7 +767,7 @@ function GenerateDocumentPath {
         }
 
         # Get matching document scripts
-        [String[]]$docScripts = (Get-ChildItem -Path $Path -Include '*.doc.ps1' -Recurse -File).FullName;
+        [String[]]$docScripts = GetDocumentFile -Path $Path -Verbose:$VerbosePreference;
 
         # Get parameter options, which will override options from other sources
         $optionParams = @{ };
@@ -797,27 +793,25 @@ function GenerateDocumentPath {
         $PSDocs.WriteDocumentHook = {
                 param ([PSDocs.Configuration.PSDocumentOption]$option, [PSDocs.Models.Document]$document)
 
-                Write-Verbose -Message "[zDoc] -- Processing document model $($document.Path)";
-
-                if ($Null -eq $document) {
-                    Write-Verbose "Document is null";
-                }
-
-                if ($Null -eq $option) {
-                    Write-Verbose "Option is null";
-                }
-
                 # Visit the document with the specified processor
                 (NewMarkdownProcessor).Process($option, $document) | WriteDocumentContent -Path $document.Path -PassThru:$PassThru -Encoding:$option.Markdown.Encoding;
         }
 
-        $PSDocs.OutputPath = $OutputPath;
+        $PSDocs.OutputPath = [System.IO.Path]::GetFullPath($OutputPath);
         $PSDocs.InstanceName = $InstanceName;
     }
 
     process {
 
+        if ($Null -eq $InputObject) {
+            Write-Verbose -Message "[Doc] -- InputObject is null";
+        }
+        else {
+            Write-Verbose -Message "[Doc] -- InputObject is of type [$($InputObject.GetType().FullName)]";
+        }
+
         foreach ($p in $docScripts) {
+            Write-Verbose -Message "[Doc] -- Processing: $p";
             InvokeTemplate -Path $p -Option $Option -InputObject $InputObject -Verbose:$VerbosePreference;
         }
     }
@@ -879,9 +873,6 @@ function GenerateDocumentInline {
             return;
         }
 
-        # Get matching document scripts
-        [String[]]$docScripts = (Get-ChildItem -Path $Path -Include '*.doc.ps1' -Recurse -File).FullName;
-
         # Get parameter options, which will override options from other sources
         $optionParams = @{ };
 
@@ -906,57 +897,47 @@ function GenerateDocumentInline {
         $PSDocs.WriteDocumentHook = {
             param ([PSDocs.Configuration.PSDocumentOption]$option, [PSDocs.Models.Document]$document)
 
-            Write-Verbose -Message "[zDoc] -- Processing document model";
-
             # Visit the document with the specified processor
             (NewMarkdownProcessor).Process($option, $document) | WriteDocumentContent -Path $document.Path -PassThru:$PassThru -Encoding:$option.Markdown.Encoding;
         }
 
-        $PSDocs.OutputPath = $OutputPath;
+        $PSDocs.OutputPath = [System.IO.Path]::GetFullPath($OutputPath);
         $PSDocs.InstanceName = $InstanceName;
     }
 
     process {
+
+        if ($Null -eq $InputObject) {
+            Write-Verbose -Message "[Doc] -- InputObject is null";
+        }
+        else {
+            Write-Verbose -Message "[Doc] -- InputObject is of type [$($InputObject.GetType().FullName)]";
+        }
+
         InvokeTemplate -Name $Name -ScriptBlock $Script:DocumentBody[$Name] -Option $Option -InputObject $InputObject -Verbose:$VerbosePreference;
     }
 }
 
-function GetLanguageContext {
+function GetDocumentFile {
 
     [CmdletBinding()]
+    [OutputType([String])]
     param (
-        [Parameter(Mandatory = $False)]
-        [AllowNull()]
-        [System.Collections.Generic.Dictionary[String, ScriptBlock]]$Function
+        [Parameter(Mandatory = $True)]
+        [String]$Path
     )
 
     process {
-        Write-Verbose -Message "[Doc] -- Getting language context";
+        Write-Verbose -Message "[Doc] -- Getting document definitions from: $Path";
 
-        # Prepare PSDocs language functions
-        $functionsToDefine = New-Object -TypeName 'System.Collections.Generic.Dictionary[String,ScriptBlock]'([System.StringComparer]::OrdinalIgnoreCase);
-
-        # Add external functions
-        if ($Null -ne $Function -and $Function.Count -gt 0) {
-            foreach ($fn in $Function) {
-                $functionsToDefine.Add($fn.Key, $fn.Value);
+        if (Test-Path -Path $Path -PathType Leaf) {
+            Resolve-Path -Path $Path;
+        }
+        else {
+            foreach ($p in (Get-ChildItem -Path $Path -Include '*.doc.ps1' -Recurse -File)) {
+                $p.FullName;
             }
         }
-
-        # Define built-in functions
-        $functionsToDefine['Section'] = ${function:Write-PSDocumentSection};
-        $functionsToDefine['Title'] = ${function:Title};
-        $functionsToDefine['List'] = ${function:List};
-        $functionsToDefine['Code'] = ${function:Code};
-        $functionsToDefine['Note'] = ${function:Note};
-        $functionsToDefine['Warning'] = ${function:Warning};
-        $functionsToDefine['Metadata'] = ${function:Metadata};
-        $functionsToDefine['Yaml'] = ${function:Metadata};
-        $functionsToDefine['Table'] = ${function:Table};
-        $functionsToDefine['Format-Table'] = ${function:Table};
-        $functionsToDefine['Format-List'] = ${function:FormatList};
-
-        return $functionsToDefine;
     }
 }
 
@@ -1167,8 +1148,7 @@ function InvokeTemplate {
 
                 return;
             }
-    
-            Write-Verbose -Message "[Doc] -- Using: $Path";
+
             $template = $Path;
         }
         else {
@@ -1204,21 +1184,6 @@ function InvokeTemplate {
             $ps.Streams.Verbose | ForEach-Object -Process {
                 Write-Verbose -Message $_.Message
             }
-
-            # if ($ps.HadErrors) {
-            #     $ps.Streams.Error | ForEach-Object -Process {
-            #         # throw (New-Object -TypeName PSDocs.Execution.InvokeDocumentException -ArgumentList @(
-            #         #     $_.Exception.Message
-            #         #     $_.Exception
-            #         # ))
-
-            #         # $PSCmdlet.ThrowTerminatingError($_);
-
-            #         throw $_.Exception;
-
-            #         # Write-Error -ErrorRecord $_;
-            #     }
-            # }
         }
         finally {
             # if ($Null -ne $ps) { $ps.Dispose() }
@@ -1281,24 +1246,19 @@ function GetRunspace {
             ${function:Metadata}
         )));
         $iss.Commands.Add((New-Object -TypeName System.Management.Automation.Runspaces.SessionStateFunctionEntry -ArgumentList @(
+            'Yaml',
+            ${function:Metadata}
+        )));
+        $iss.Commands.Add((New-Object -TypeName System.Management.Automation.Runspaces.SessionStateFunctionEntry -ArgumentList @(
             'GetObjectField',
             ${function:GetObjectField}
         )));
-        # $iss.Commands.Add((New-Object -TypeName System.Management.Automation.Runspaces.SessionStateFunctionEntry -ArgumentList @(
-        #     'Write-Error',
-        #     ${function:WriteError}
-        # )));
         $iss.Variables.Add((New-Object -TypeName System.Management.Automation.Runspaces.SessionStateVariableEntry -ArgumentList @(
             'PSDocs',
             $PSDocs,
             $Null,
             [System.Management.Automation.ScopedItemOptions]::AllScope
         )));
-        # $iss.Variables.Add((New-Object -TypeName System.Management.Automation.Runspaces.SessionStateVariableEntry -ArgumentList @(
-        #     'Section',
-        #     @{ Level = 1; },
-        #     $Null
-        # )));
         $iss.Variables.Add((New-Object -TypeName System.Management.Automation.Runspaces.SessionStateVariableEntry -ArgumentList @(
             'VerbosePreference',
             [System.Management.Automation.ActionPreference]::Continue,
@@ -1318,17 +1278,6 @@ function GetRunspace {
         }
 
         return $rs;
-    }
-}
-
-function WriteError {
-
-    param (
-        [String]$Message
-    )
-
-    process {
-        Write-Error -Message $Message
     }
 }
 
