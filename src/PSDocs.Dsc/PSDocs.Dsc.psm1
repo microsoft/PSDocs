@@ -2,6 +2,8 @@
 # PSDocs DSC extensions module
 #
 
+Set-StrictMode -Version latest;
+
 class DscMofDocument {
 
     [System.Collections.Generic.Dictionary[String, PSObject[]]]$ResourceType
@@ -122,6 +124,12 @@ function BuildDocumentation {
 
     process {
 
+        if (!(Test-Path -Path $Path)) {
+            throw (New-Object -TypeName System.IO.DirectoryNotFoundException);
+        }
+
+        $Path = Resolve-Path -Path $Path;
+
         $referenceConfig = New-Object -TypeName System.Collections.Generic.List[PSObject];
 
         try {
@@ -141,31 +149,36 @@ function BuildDocumentation {
             Write-Error -Message ($LocalizedData.ImportMofFailed -f $Path, $_.Exception.Message) -Exception $_.Exception -ErrorAction Stop;
         }
 
-        if ($PSBoundParameters.ContainsKey('Script')) {
-
-            try {
-                Import-PSDocumentTemplate -Path $Script -Verbose:$VerbosePreference;
-            }
-            catch {
-                Write-Error -Message ($LocalizedData.ImportDocumentTemplateFailed -f $Script, $_.Exception.Message) -Exception $_.Exception -ErrorAction Stop;
-            }   
-        }
-
-        $docParams = @{
-            OutputPath = $OutputPath
-        };
-
-        if ($PSBoundParameters.ContainsKey('Encoding')) {
-            $docParams['Encoding'] = $Encoding;
-        }
-
         foreach ($r in $referenceConfig) {
-            # Write-Verbose -Message "[Doc][Mof] -- Analysing document: $($r.Path)";
+            Write-Verbose -Message "[Doc][Mof] -- Using: $($r.Path)";
 
-            # Write-Verbose -Message "[Doc] -- Generating documentation: $OutputPath";
+            $invokeParams = @{
+                InstanceName = $r.InstanceName
+                InputObject = $r
+                OutputPath = $OutputPath
+            }
 
-            # Generate a document for the configuration
-            [ScriptBlock]::Create("$DocumentName" + ' -InputObject $r -InstanceName $r.InstanceName @docParams -Verbose:$VerbosePreference; ').Invoke();
+            if ($PSBoundParameters.ContainsKey('Encoding')) {
+                $invokeParams['Encoding'] = $Encoding;
+            }
+
+            if ($PSBoundParameters.ContainsKey('Script')) {
+                $invokeParams['Path'] = $Script;
+
+                Invoke-PSDocument @invokeParams -Verbose:$VerbosePreference;
+            }
+            else {
+                $documentFn = Get-ChildItem -Path "Function:\$DocumentName" -ErrorAction Ignore;
+
+                if ($Null -eq $documentFn) {
+                    Write-Error "Failed for find document";
+
+                    continue;
+                }
+
+                # Generate a document for the configuration
+                [ScriptBlock]::Create([String]::Concat($DocumentName,' @invokeParams -Verbose:$VerbosePreference;')).Invoke();
+            }
         }
 
         # Write-Verbose -Message "[Doc][$dokOperation] -- Update TOC: $($buildResult.FullName)";

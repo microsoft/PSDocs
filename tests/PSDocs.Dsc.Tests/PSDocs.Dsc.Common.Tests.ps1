@@ -71,7 +71,7 @@ configuration TestConfiguration2 {
     }
 }
 
-Describe 'PSDocs.Dsc' {
+Describe 'PSDocs.Dsc' -Tag 'Dsc' {
     Context 'Generate a document without an instance name' {
 
         # Define a test document with a table
@@ -97,7 +97,6 @@ Describe 'PSDocs.Dsc' {
         
         # Define a test document with a table
         document 'WithInstanceName' {
-            
             $InputObject.ResourceType.File | Table -Property Contents,DestinationPath;
         }
 
@@ -171,7 +170,6 @@ Describe 'PSDocs.Dsc' {
         document 'WithMissingData' {
 
             Section 'Windows features' {
-            
                 # Reference a resource type that is not included in the configuration
                 $InputObject.ResourceType.WindowsFeature | Table -Property Name,Ensure;
             }
