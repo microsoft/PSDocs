@@ -16,7 +16,7 @@ $rootPath = (Resolve-Path $PSScriptRoot\..\..).Path;
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path;
 $temp = "$here\..\..\build";
 
-Import-Module (Join-Path -Path $rootPath -ChildPath "out/modules/PSDocs") -Force;
+Import-Module (Join-Path -Path $rootPath -ChildPath 'out/modules/PSDocs') -Force;
 
 $outputPath = "$temp\PSDocs.Tests\Common";
 Remove-Item -Path $outputPath -Force -Recurse -Confirm:$False -ErrorAction SilentlyContinue;
@@ -193,6 +193,11 @@ Describe 'New-PSDocumentOption' -Tag 'Option' {
 
     Context 'Read Markdown.Encoding' {
 
+        It 'from default' {
+            $option = New-PSDocumentOption;
+            $option.Markdown.Encoding | Should -Be Default;
+        }
+
         It 'from Hashtable' {
             $option = New-PSDocumentOption -Option @{ 'Markdown.Encoding' = 'UTF8' };
             $option.Markdown.Encoding | Should -Be 'UTF8';
@@ -205,6 +210,11 @@ Describe 'New-PSDocumentOption' -Tag 'Option' {
     }
 
     Context 'Read Markdown.WrapSeparator' {
+
+        It 'from default' {
+            $option = New-PSDocumentOption;
+            $option.Markdown.WrapSeparator | Should -Be ' ';
+        }
 
         It 'from Hashtable' {
             $option = New-PSDocumentOption -Option @{ 'Markdown.WrapSeparator' = 'ZZZ' };
@@ -219,6 +229,11 @@ Describe 'New-PSDocumentOption' -Tag 'Option' {
 
     Context 'Read Markdown.SkipEmptySections' {
 
+        It 'from default' {
+            $option = New-PSDocumentOption;
+            $option.Markdown.SkipEmptySections | Should -Be $True;
+        }
+
         It 'from Hashtable' {
             $option = New-PSDocumentOption -Option @{ 'Markdown.SkipEmptySections' = $False };
             $option.Markdown.SkipEmptySections | Should -Be $False;
@@ -227,6 +242,24 @@ Describe 'New-PSDocumentOption' -Tag 'Option' {
         It 'from YAML' {
             $option = New-PSDocumentOption -Option (Join-Path -Path $here -ChildPath 'PSDocs.Tests.yml');
             $option.Markdown.SkipEmptySections | Should -Be $False;
+        }
+    }
+
+    Context 'Read Execution.LanguageMode' {
+
+        It 'from default' {
+            $option = New-PSDocumentOption;
+            $option.Execution.LanguageMode | Should -Be FullLanguage;
+        }
+
+        It 'from Hashtable' {
+            $option = New-PSDocumentOption -Option @{ 'Execution.LanguageMode' = 'ConstrainedLanguage' };
+            $option.Execution.LanguageMode | Should -Be ConstrainedLanguage;
+        }
+
+        It 'from YAML' {
+            $option = New-PSDocumentOption -Option (Join-Path -Path $here -ChildPath 'PSDocs.Tests.yml');
+            $option.Execution.LanguageMode | Should -Be ConstrainedLanguage
         }
     }
 }
