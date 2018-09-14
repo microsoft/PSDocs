@@ -126,7 +126,6 @@ The following commands exist in the `PSDocs` module:
 
 - [Invoke-PSDocument](/docs/commands/PSDocs/en-US/Invoke-PSDocument.md)
 - [Get-PSDocumentHeader](/docs/commands/PSDocs/en-US/Get-PSDocumentHeader.md)
-- [Import-PSDocumentTemplate](/docs/commands/PSDocs/en-US/Import-PSDocumentTemplate.md)
 - [New-PSDocumentOption](/docs/commands/PSDocs/en-US/New-PSDocumentOption.md)
 
 The following commands exist in the `PSDocs.Dsc` module:
