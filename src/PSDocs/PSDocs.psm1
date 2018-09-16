@@ -1172,7 +1172,12 @@ function InvokeTemplate {
 
             # Replay verbose messages
             $ps.Streams.Verbose | ForEach-Object -Process {
-                Write-Verbose -Message $_.Message
+                Write-Verbose -Message $_.Message;
+            }
+
+            # Replay warning messages
+            $ps.Streams.Warning | ForEach-Object -Proces {
+                Write-Warning -Message $_.Message;
             }
         }
         finally {
