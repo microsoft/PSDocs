@@ -80,12 +80,17 @@ Describe 'PSDocs -- Section keyword' -Tag Section {
 
         # Define a test document with a section block
         document 'SectionWhen' {
-            Section 'Section 1' -When { $False } {
+            Section 'Section 1' -If { $False } {
                 'Content 1'
             }
 
-            Section 'Section 2' -When { $True } {
+            Section 'Section 2' -If { $True } {
                 'Content 2'
+            }
+
+            # Support for When alias of If
+            Section 'Section 3' -When { $True } {
+                'Content 3'
             }
         }
 
@@ -98,6 +103,7 @@ Describe 'PSDocs -- Section keyword' -Tag Section {
 
         It 'Should contain Section 2' {
             $outputDoc | Should -FileContentMatchMultiline '## Section 2\r\n\r\nContent 2';
+            $outputDoc | Should -FileContentMatchMultiline '## Section 3\r\n\r\nContent 3';
         }
 
         It 'Should not contain Section 1' {
