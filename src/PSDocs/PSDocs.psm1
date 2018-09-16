@@ -11,9 +11,9 @@ $PSModuleRoot = $PSModule.ModuleBase;
 # Import the appropriate nested binary module based on the current PowerShell version
 $binModulePath = Join-Path -Path $PSModuleRoot -ChildPath '/desktop/PSDocs.dll';
 
-# if (($PSVersionTable.Keys -contains 'PSEdition') -and ($PSVersionTable.PSEdition -ne 'Desktop')) {
+if (($PSVersionTable.Keys -contains 'PSEdition') -and ($PSVersionTable.PSEdition -ne 'Desktop')) {
     $binModulePath = Join-Path -Path $PSModuleRoot -ChildPath '/core/PSDocs.dll';
-# }
+}
 
 $binaryModule = Import-Module -Name $binModulePath -PassThru;
 
