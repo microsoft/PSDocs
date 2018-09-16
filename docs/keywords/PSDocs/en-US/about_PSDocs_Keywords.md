@@ -57,7 +57,7 @@ Section [-Name] <String> [-If <ScriptBlock>] [-Force] [-Body] <ScriptBlock>
 
 - `Name` - The name or header of the section.
 - `If` - A condition to determine if the section block should be included in the markdown document.
-- `Force` - Force the creation of the section even if the section has not content.
+- `Force` - Force the creation of the section even if the section has no content.
 
 Examples:
 

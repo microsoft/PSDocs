@@ -17,7 +17,6 @@ $here = Split-Path -Parent $MyInvocation.MyCommand.Path;
 $temp = "$here\..\..\build";
 
 Import-Module (Join-Path -Path $rootPath -ChildPath "out/modules/PSDocs") -Force;
-Import-Module (Join-Path -Path $rootPath -ChildPath "out/modules/PSDocs/PSDocsProcessor/Markdown") -Force;
 
 $outputPath = "$temp\PSDocs.Tests\Table";
 Remove-Item -Path $outputPath -Force -Recurse -Confirm:$False -ErrorAction SilentlyContinue;

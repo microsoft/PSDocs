@@ -137,28 +137,34 @@ Describe 'PSDocs instance names' -Tag Common {
 Describe 'Invoke-PSDocument' -Tag 'FromPath' {
     Context 'With -Path' {
 
-        # Only generate documents for the named document
-        Invoke-PSDocument -Path $here -OutputPath $outputPath -Name 'FromFileTest2';
-
-        It 'Should generate named documents' {
+        It 'Should match name' {
+            # Only generate documents for the named document
+            Invoke-PSDocument -Path $here -OutputPath $outputPath -Name FromFileTest2;
             Test-Path -Path "$outputPath\FromFileTest1.md" | Should be $False;
             Test-Path -Path "$outputPath\FromFileTest2.md" | Should be $True;
             Test-Path -Path "$outputPath\FromFileTest3.md" | Should be $False;
         }
 
-        Invoke-PSDocument -Path $here -OutputPath $outputPath -Tag 'Test3';
-
-        It 'Should generate tagged documents' {
+        It 'Should match single tag' {
+            # Only generate for documents with matching tag
+            Invoke-PSDocument -Path $here -OutputPath $outputPath -Tag Test3;
             Test-Path -Path "$outputPath\FromFileTest1.md" | Should be $False;
             Test-Path -Path "$outputPath\FromFileTest3.md" | Should be $True;
         }
 
-        Invoke-PSDocument -Path $here -OutputPath $outputPath -Tag 'Test4','Test5';
-
-        It 'Should generate tagged documents' {
+        It 'Should match all tags' {
+            # Only generate for documents with all matching tags
+            Invoke-PSDocument -Path $here -OutputPath $outputPath -Tag Test4,Test5;
             Test-Path -Path "$outputPath\FromFileTest1.md" | Should -Be $False;
             Test-Path -Path "$outputPath\FromFileTest4.md" | Should -Be $False;
             Test-Path -Path "$outputPath\FromFileTest5.md" | Should -Be $True;
+        }
+
+        It 'Should generate exception' {
+            { Invoke-PSDocument -Path $here -OutputPath $outputPath -Name InvalidCommand -ErrorAction Stop } | Should -Throw -ExceptionType PSDocs.Execution.InvokeDocumentException;
+            $Error[0].Exception.Message | Should -Match '^(The term ''New-PSDocsInvalidCommand'' is not recognized as the name of a cmdlet)';
+            { Invoke-PSDocument -Path $here -OutputPath $outputPath -Name InvalidCommandWithSection -ErrorAction Stop } | Should -Throw -ExceptionType PSDocs.Execution.InvokeDocumentException;
+            $Error[0].Exception.Message | Should -Match '^(The term ''New-PSDocsInvalidCommand'' is not recognized as the name of a cmdlet)';
         }
     }
 

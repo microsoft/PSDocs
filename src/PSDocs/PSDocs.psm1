@@ -335,22 +335,13 @@ function Write-PSDocumentSection {
             # Store as section to be referenced in nested calls
             $Section = $result;
 
-            try {
-                # Invoke the Section body and collect the results
-                $innerResult = $Body.InvokeReturnAsIs($Null) | ConvertToNode;
+            # Invoke the Section body and collect the results
+            $innerResult = $Body.Invoke() | ConvertToNode;
 
-                foreach ($r in $innerResult) {
-                    if ($Null -ne $r) {
-                        $result.Node.Add($r);
-                    }
+            foreach ($r in $innerResult) {
+                if ($Null -ne $r) {
+                    $result.Node.Add($r);
                 }
-            }
-            catch {
-
-                # Report non-terminating error
-                Write-Error -Message ($LocalizedData.SectionProcessFailure -f $_.Exception.Message) -Exception $_.Exception -ErrorId 'PSDocs.Section.ProcessFailure';
-
-                return;
             }
 
             if ($result.Node.Count -gt 0 -or $Force -or $PSDocs.Option.Markdown.SkipEmptySections -eq $False) {
@@ -1178,7 +1169,6 @@ function InvokeTemplate {
                     $errorRecord.InvocationInfo.PositionMessage
                 ));
             }
-            
 
             # Replay verbose messages
             $ps.Streams.Verbose | ForEach-Object -Process {
