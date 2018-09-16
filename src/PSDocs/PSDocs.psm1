@@ -42,6 +42,8 @@ Import-LocalizedData -BindingVariable LocalizedData -FileName 'PSDocs.Resources.
 # Public functions
 #
 
+#region Cmdlets
+
 # .ExternalHelp PSDocs-Help.xml
 function Document {
     [CmdletBinding()]
@@ -173,7 +175,17 @@ function Invoke-PSDocument {
         $invokeParams = $PSBoundParameters;
 
         try {
-            GenerateDocumentPath @invokeParams;
+            if ($PSCmdlet.ParameterSetName -eq 'Inline') {
+                foreach ($n in $Name) {
+                    Write-Verbose -Message "[Invoke-PSDocument] -- Calling by name: $n";
+
+                    $invokeParams['Name'] = $n;
+                    GenerateDocumentInline @invokeParams;
+                }
+            }
+            else {
+                GenerateDocumentPath @invokeParams;
+            }
         }
         catch {
             # Handle exceptions to provide meaningful errors
@@ -270,12 +282,16 @@ function New-PSDocumentOption {
     }
 }
 
+#endregion Cmdlets
+
 #
 # Internal language keywords
 #
 
+#region Keywords
+
 # Implement the Section keyword
-function Write-PSDocumentSection {
+function Section {
 
     [CmdletBinding()]
     [OutputType([PSObject])]
@@ -635,6 +651,8 @@ function FormatList {
         Write-Verbose -Message "[Doc][FormatList] END::";
     }
 }
+
+#endregion Keywords
 
 #
 # Helper functions
@@ -1211,7 +1229,7 @@ function GetRunspace {
         )));
         $iss.Commands.Add((New-Object -TypeName System.Management.Automation.Runspaces.SessionStateFunctionEntry -ArgumentList @(
             'Section',
-            ${function:Write-PSDocumentSection}
+            ${function:Section}
         )));
         $iss.Commands.Add((New-Object -TypeName System.Management.Automation.Runspaces.SessionStateFunctionEntry -ArgumentList @(
             'Title',

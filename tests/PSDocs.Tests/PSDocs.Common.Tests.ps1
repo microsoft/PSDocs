@@ -34,8 +34,6 @@ $dummyObject = New-Object -TypeName PSObject -Property @{
     }
 }
 
-$Global:TestVars = @{ };
-
 Describe 'PSDocs instance names' -Tag Common {
     Context 'Generate a document without an instance name' {
 
@@ -135,6 +133,20 @@ Describe 'PSDocs instance names' -Tag Common {
 }
 
 Describe 'Invoke-PSDocument' -Tag 'FromPath' {
+    # Check that -Name syntax still works until it is not supported
+    Context 'With -Name (depricated)' {
+
+        Document 'InvokeWithName' {
+            'Invoke with name'
+        }
+
+        It 'Should generate document' {
+            Invoke-PSDocument -Name InvokeWithName -OutputPath $outputPath -WarningVariable warnings -WarningAction SilentlyContinue;
+            Test-Path -Path (Join-Path -Path $outputPath -ChildPath 'InvokeWithName.md') | Should -Be $True;
+            $warnings | Should -Be 'Invoke-PSDocument with inline document block is depricated.';
+        }
+    }
+
     Context 'With -Path' {
 
         It 'Should match name' {

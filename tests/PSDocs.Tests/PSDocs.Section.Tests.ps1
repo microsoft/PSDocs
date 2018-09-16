@@ -18,8 +18,8 @@ $temp = "$here\..\..\build";
 
 Import-Module (Join-Path -Path $rootPath -ChildPath "out/modules/PSDocs") -Force;
 
-$outputPath = "$temp\PSDocs.Tests\Section";
-Remove-Item -Path $outputPath -Force -Recurse -Confirm:$False -ErrorAction SilentlyContinue;
+$outputPath = (Join-Path -Path $temp -ChildPath "PSDocs.Tests/Section");
+Remove-Item -Path $outputPath -Force -Recurse -Confirm:$False -ErrorAction Ignore;
 $Null = New-Item -Path $outputPath -ItemType Directory -Force;
 
 $dummyObject = New-Object -TypeName PSObject;
