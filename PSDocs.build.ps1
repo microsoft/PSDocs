@@ -97,6 +97,9 @@ task BuildDotNet {
 task CopyModule {
     CopyModuleFiles -Path src/PSDocs -DestinationPath out/modules/PSDocs;
     CopyModuleFiles -Path src/PSDocs.Dsc -DestinationPath out/modules/PSDocs.Dsc;
+
+    # Copy third party notices
+    Copy-Item -Path ThirdPartyNotices.txt -Destination out/modules/PSDocs;
 }
 
 # Synopsis: Build modules only
