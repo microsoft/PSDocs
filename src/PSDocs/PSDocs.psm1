@@ -86,6 +86,7 @@ function Document {
 
                     Write-Verbose -Message "[Doc] -- Processing instance: $instance";
 
+                    # Define scope variables
                     $document = [PSDocs.Models.ModelHelper]::NewDocument();
                     Set-Variable -Name Section -Value $document;
                     Set-Variable -Name InstanceName -Value $instance;
@@ -1349,7 +1350,15 @@ function InitEditorServices {
 
     process {
 
-        New-Alias -Name 'Section' -Value Write-PSDocumentSection -Option AllScope -Force -Scope Global;
+        Export-ModuleMember -Function @(
+            'Section'
+            'Table'
+            'Metadata'
+            'Title'
+            'Code'
+            'Note'
+            'Warning'
+        );
     }
 }
 
@@ -1370,9 +1379,6 @@ Export-ModuleMember -Function @(
     'Invoke-PSDocument'
     'Get-PSDocumentHeader'
     'New-PSDocumentOption'
-    'Write-PSDocumentSection'
 );
-
-Export-ModuleMember -Alias *;
 
 # EOM
