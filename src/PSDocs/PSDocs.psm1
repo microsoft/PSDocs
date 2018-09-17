@@ -1200,8 +1200,8 @@ function InvokeTemplate {
             }
         }
         finally {
-            # if ($Null -ne $ps) { $ps.Dispose() }
-            # if ($Null -ne $runspace) { $runspace.Dispose() }
+            if ($Null -ne $ps) { $ps.Dispose() }
+            if ($Null -ne $runspace) { $runspace.Dispose() }
         }
     }
 }
