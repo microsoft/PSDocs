@@ -12,7 +12,7 @@ $ErrorActionPreference = 'Stop';
 Set-StrictMode -Version latest;
 
 # Setup tests paths
-$rootPath = Join-Path -Path $PSScriptRoot -ChildPath ../.. -Resolve;
+$rootPath = $PWD;
 
 Import-Module (Join-Path -Path $rootPath -ChildPath "out/modules/PSDocs") -Force;
 
