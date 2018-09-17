@@ -42,7 +42,9 @@ Describe 'PSDocs -- Table keyword' -Tag Table {
         }
 
         It 'Should match expected format' {
-            $outputDoc | Should -FileContentMatchMultiline '\|LICENSE\|False\|\r\n\|README.md\|False\|\r\n\r\nEOF';
+            $content = Get-Content -Path $outputDoc;
+            $content | Should -Contain '|LICENSE|False|';
+            $content | Should -Contain '|README.md|False|';
         }
     }
 
