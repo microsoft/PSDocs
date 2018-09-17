@@ -29,13 +29,13 @@ Describe 'PSDocs -- Table keyword' -Tag Table {
         # Define a test document with a table
         document 'TableTests' {
 
-            Get-ChildItem -Path $rootPath | Where-Object -FilterScript { 'README.md','LICENSE' -contains $_.Name } | Format-Table -Property 'Name','PSIsContainer'
+            Get-ChildItem -Path $InputObject -File | Where-Object -FilterScript { 'README.md','LICENSE' -contains $_.Name } | Format-Table -Property 'Name','PSIsContainer'
 
             'EOF'
         }
 
         $outputDoc = "$outputPath\Table.md";
-        TableTests -InstanceName 'Table' -InputObject $dummyObject -OutputPath $outputPath;
+        TableTests -InstanceName 'Table' -InputObject $rootPath -OutputPath $outputPath;
 
         It 'Should have generated output' {
             Test-Path -Path $outputDoc | Should be $True;
