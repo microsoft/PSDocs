@@ -12,19 +12,15 @@ $ErrorActionPreference = 'Stop';
 Set-StrictMode -Version latest;
 
 # Setup tests paths
-$rootPath = (Resolve-Path $PSScriptRoot\..\..).Path;
-$here = Split-Path -Parent $MyInvocation.MyCommand.Path;
-$temp = "$here\..\..\build";
+$rootPath = Join-Path -Path $PSScriptRoot -ChildPath ../.. -Resolve;
 
 Import-Module (Join-Path -Path $rootPath -ChildPath "out/modules/PSDocs") -Force;
 
-$outputPath = "$temp\PSDocs.Tests\Table";
+$outputPath = Join-Path -Path $rootPath -ChildPath out/tests/PSDocs.Tests/Table;
 Remove-Item -Path $outputPath -Force -Recurse -Confirm:$False -ErrorAction SilentlyContinue;
 $Null = New-Item -Path $outputPath -ItemType Directory -Force;
 
 $dummyObject = New-Object -TypeName PSObject;
-
-$Global:TestVars = @{ };
 
 Describe 'PSDocs -- Table keyword' -Tag Table {
 
