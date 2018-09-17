@@ -16,12 +16,11 @@ $rootPath = (Resolve-Path $PSScriptRoot\..\..).Path;
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path;
 $temp = "$here\..\..\build";
 
-Import-Module (Join-Path -Path $rootPath -ChildPath "out/modules/PSDocs") -Force;
-Import-Module (Join-Path -Path $rootPath -ChildPath "out/modules/PSDocs/PSDocsProcessor/Markdown") -Force;
+Import-Module (Join-Path -Path $rootPath -ChildPath 'out/modules/PSDocs') -Force;
 
 $outputPath = "$temp\PSDocs.Tests\Common";
 Remove-Item -Path $outputPath -Force -Recurse -Confirm:$False -ErrorAction SilentlyContinue;
-New-Item -Path $outputPath -ItemType Directory -Force | Out-Null;
+$Null = New-Item -Path $outputPath -ItemType Directory -Force;
 
 $dummyObject = New-Object -TypeName PSObject -Property @{
     Object = [PSObject]@{
@@ -35,9 +34,7 @@ $dummyObject = New-Object -TypeName PSObject -Property @{
     }
 }
 
-$Global:TestVars = @{ };
-
-Describe 'PSDocs instance names' {
+Describe 'PSDocs instance names' -Tag Common {
     Context 'Generate a document without an instance name' {
 
         # Define a test document with a table
@@ -57,12 +54,12 @@ Describe 'PSDocs instance names' {
         }
 
         It 'Should contain document name' {
-            Get-Content -Path $outputDoc -Raw | Should -Match 'WithoutInstanceName';
+            $outputDoc | Should -FileContentMatch 'WithoutInstanceName';
         }
 
         It 'Should contain object properties' {
-            Get-Content -Path $outputDoc -Raw | Should -Match 'ObjectName';
-            Get-Content -Path $outputDoc -Raw | Should -Match 'HashName';
+            $outputDoc | Should -FileContentMatch 'ObjectName';
+            $outputDoc | Should -FileContentMatch 'HashName';
         }
     }
 
@@ -89,13 +86,13 @@ Describe 'PSDocs instance names' {
     }
 
     Context 'Generate a document with multiple instance names' {
-        
+
         # Define a test document with a table
         document 'WithMultiInstanceName' {
             $InstanceName;
         }
 
-        WithMultiInstanceName -InstanceName 'Instance2','Instance3' -InputObject $dummyObject -OutputPath $outputPath;
+        WithMultiInstanceName -InstanceName 'Instance2','Instance3' -InputObject @{} -OutputPath $outputPath;
 
         It 'Should not create a output with the document name' {
             Test-Path -Path "$outputPath\WithMultiInstanceName.md" | Should be $False;
@@ -128,7 +125,7 @@ Describe 'PSDocs instance names' {
         foreach ($encoding in @('UTF8', 'UTF7', 'Unicode', 'ASCII', 'UTF32')) {
 
             It "Should generate $encoding encoded content" {
-                WithEncoding -InstanceName "With$encoding" -InputObject $dummyObject -OutputPath $outputPath -Encoding $encoding;
+                WithEncoding -InstanceName "With$encoding" -InputObject @{} -OutputPath $outputPath -Encoding $encoding;
                 Get-Content -Path (Join-Path -Path $outputPath -ChildPath "With$encoding.md") -Raw -Encoding $encoding | Should -BeExactly "With$encoding`r`n";
             }
         }
@@ -136,30 +133,68 @@ Describe 'PSDocs instance names' {
 }
 
 Describe 'Invoke-PSDocument' -Tag 'FromPath' {
+    # Check that -Name syntax still works until it is not supported
+    Context 'With -Name (depricated)' {
+
+        Document 'InvokeWithName' {
+            'Invoke with name'
+        }
+
+        It 'Should generate document' {
+            Invoke-PSDocument -Name InvokeWithName -OutputPath $outputPath -WarningVariable warnings -WarningAction SilentlyContinue;
+            Test-Path -Path (Join-Path -Path $outputPath -ChildPath 'InvokeWithName.md') | Should -Be $True;
+            $warnings | Should -Be 'Invoke-PSDocument with inline document block is depricated.';
+        }
+    }
+
     Context 'With -Path' {
 
-        # Only generate documents for the named document
-        Invoke-PSDocument -Path $here -OutputPath $outputPath -Name 'FromFileTest2' -Verbose;
-
-        It 'Should generate named documents' {
+        It 'Should match name' {
+            # Only generate documents for the named document
+            Invoke-PSDocument -Path $here -OutputPath $outputPath -Name FromFileTest2;
             Test-Path -Path "$outputPath\FromFileTest1.md" | Should be $False;
             Test-Path -Path "$outputPath\FromFileTest2.md" | Should be $True;
             Test-Path -Path "$outputPath\FromFileTest3.md" | Should be $False;
         }
 
-        Invoke-PSDocument -Path $here -OutputPath $outputPath -Tag 'Test3' -Verbose;
-
-        It 'Should generate tagged documents' {
+        It 'Should match single tag' {
+            # Only generate for documents with matching tag
+            Invoke-PSDocument -Path $here -OutputPath $outputPath -Tag Test3;
             Test-Path -Path "$outputPath\FromFileTest1.md" | Should be $False;
             Test-Path -Path "$outputPath\FromFileTest3.md" | Should be $True;
         }
 
-        Invoke-PSDocument -Path $here -OutputPath $outputPath -Tag 'Test4','Test5' -Verbose;
+        It 'Should match all tags' {
+            # Only generate for documents with all matching tags
+            Invoke-PSDocument -Path $here -OutputPath $outputPath -Tag Test4,Test5;
+            Test-Path -Path "$outputPath\FromFileTest1.md" | Should -Be $False;
+            Test-Path -Path "$outputPath\FromFileTest4.md" | Should -Be $False;
+            Test-Path -Path "$outputPath\FromFileTest5.md" | Should -Be $True;
+        }
 
-        It 'Should generate tagged documents' {
-            Test-Path -Path "$outputPath\FromFileTest1.md" | Should be $False;
-            Test-Path -Path "$outputPath\FromFileTest4.md" | Should be $False;
-            Test-Path -Path "$outputPath\FromFileTest5.md" | Should be $True;
+        It 'Should generate exception' {
+            { Invoke-PSDocument -Path $here -OutputPath $outputPath -Name InvalidCommand -ErrorAction Stop } | Should -Throw -ExceptionType PSDocs.Execution.InvokeDocumentException;
+            $Error[0].Exception.Message | Should -Match '^(The term ''New-PSDocsInvalidCommand'' is not recognized as the name of a cmdlet)';
+            { Invoke-PSDocument -Path $here -OutputPath $outputPath -Name InvalidCommandWithSection -ErrorAction Stop } | Should -Throw -ExceptionType PSDocs.Execution.InvokeDocumentException;
+            $Error[0].Exception.Message | Should -Match '^(The term ''New-PSDocsInvalidCommand'' is not recognized as the name of a cmdlet)';
+        }
+    }
+
+    Context 'With constrained language' {
+
+        It 'Checks if DeviceGuard is enabled' {
+            Mock -CommandName IsDeviceGuardEnabled -ModuleName PSDocs -Verifiable -MockWith {
+                return $True;
+            }
+
+            Invoke-PSDocument -Path $here -OutputPath $outputPath -Name 'ConstrainedTest1';
+            Assert-MockCalled -CommandName IsDeviceGuardEnabled -ModuleName PSDocs -Times 1;
+        }
+
+        # Check that '[Console]::WriteLine('Should fail')' is not executed
+        It 'Should fail to execute blocked code' {
+            { Invoke-PSDocument -Path $here -OutputPath $outputPath -Name 'ConstrainedTest2' -Option @{ 'execution.mode' = 'ConstrainedLanguage' } -ErrorAction Stop } | Should -Throw 'Cannot invoke method. Method invocation is supported only on core types in this language mode.';
+            Test-Path -Path "$outputPath\ConstrainedTest2.md" | Should -Be $False;
         }
     }
 }
@@ -176,6 +211,11 @@ Describe 'New-PSDocumentOption' -Tag 'Option' {
 
     Context 'Read Markdown.Encoding' {
 
+        It 'from default' {
+            $option = New-PSDocumentOption;
+            $option.Markdown.Encoding | Should -Be Default;
+        }
+
         It 'from Hashtable' {
             $option = New-PSDocumentOption -Option @{ 'Markdown.Encoding' = 'UTF8' };
             $option.Markdown.Encoding | Should -Be 'UTF8';
@@ -188,6 +228,11 @@ Describe 'New-PSDocumentOption' -Tag 'Option' {
     }
 
     Context 'Read Markdown.WrapSeparator' {
+
+        It 'from default' {
+            $option = New-PSDocumentOption;
+            $option.Markdown.WrapSeparator | Should -Be ' ';
+        }
 
         It 'from Hashtable' {
             $option = New-PSDocumentOption -Option @{ 'Markdown.WrapSeparator' = 'ZZZ' };
@@ -202,6 +247,11 @@ Describe 'New-PSDocumentOption' -Tag 'Option' {
 
     Context 'Read Markdown.SkipEmptySections' {
 
+        It 'from default' {
+            $option = New-PSDocumentOption;
+            $option.Markdown.SkipEmptySections | Should -Be $True;
+        }
+
         It 'from Hashtable' {
             $option = New-PSDocumentOption -Option @{ 'Markdown.SkipEmptySections' = $False };
             $option.Markdown.SkipEmptySections | Should -Be $False;
@@ -210,6 +260,24 @@ Describe 'New-PSDocumentOption' -Tag 'Option' {
         It 'from YAML' {
             $option = New-PSDocumentOption -Option (Join-Path -Path $here -ChildPath 'PSDocs.Tests.yml');
             $option.Markdown.SkipEmptySections | Should -Be $False;
+        }
+    }
+
+    Context 'Read Execution.LanguageMode' {
+
+        It 'from default' {
+            $option = New-PSDocumentOption;
+            $option.Execution.LanguageMode | Should -Be FullLanguage;
+        }
+
+        It 'from Hashtable' {
+            $option = New-PSDocumentOption -Option @{ 'Execution.LanguageMode' = 'ConstrainedLanguage' };
+            $option.Execution.LanguageMode | Should -Be ConstrainedLanguage;
+        }
+
+        It 'from YAML' {
+            $option = New-PSDocumentOption -Option (Join-Path -Path $here -ChildPath 'PSDocs.Tests.yml');
+            $option.Execution.LanguageMode | Should -Be ConstrainedLanguage
         }
     }
 }

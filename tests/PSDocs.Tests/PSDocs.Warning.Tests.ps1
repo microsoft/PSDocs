@@ -17,48 +17,16 @@ $here = Split-Path -Parent $MyInvocation.MyCommand.Path;
 $temp = "$here\..\..\build";
 
 Import-Module (Join-Path -Path $rootPath -ChildPath "out/modules/PSDocs") -Force;
-Import-Module (Join-Path -Path $rootPath -ChildPath "out/modules/PSDocs/PSDocsProcessor/Markdown") -Force;
 
 $outputPath = "$temp\PSDocs.Tests\Warning";
-New-Item $outputPath -ItemType Directory -Force | Out-Null;
+Remove-Item -Path $outputPath -Force -Recurse -Confirm:$False -ErrorAction SilentlyContinue;
+$Null = New-Item -Path $outputPath -ItemType Directory -Force;
 
 $dummyObject = New-Object -TypeName PSObject;
 
 $Global:TestVars = @{ };
 
 Describe 'PSDocs -- Warning keyword' {
-    Context 'Warning' {
-
-        # Define a test document with a note
-        document 'WarningVisitor' {
-            
-            Warning {
-                'This is a warning'
-            }
-        }
-
-        Mock -CommandName 'VisitWarning' -ModuleName 'Markdown' -Verifiable -MockWith {
-            param (
-                $InputObject
-            )
-
-            $Global:TestVars['VisitWarning'] = $InputObject;
-        }
-
-        WarningVisitor -InputObject $dummyObject -OutputPath $outputPath;
-
-        It 'Should process keyword' {
-            Assert-MockCalled -CommandName 'VisitWarning' -ModuleName 'Markdown' -Times 1;
-        }
-
-        It 'Should be expected type' {
-            $Global:TestVars['VisitWarning'].Type | Should be 'Warning';
-        }
-
-        It 'Should have expected content' {
-            $Global:TestVars['VisitWarning'].Content | Should be 'This is a warning';
-        }
-    }
 
     Context 'Warning single line markdown' {
         

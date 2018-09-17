@@ -9,6 +9,7 @@ param (
 
 # Setup error handling
 $ErrorActionPreference = 'Stop';
+Set-StrictMode -Version latest;
 
 # Setup tests paths
 $rootPath = (Resolve-Path $PSScriptRoot\..\..).Path;
@@ -70,12 +71,11 @@ configuration TestConfiguration2 {
     }
 }
 
-Describe 'PSDocs.Dsc' {
+Describe 'PSDocs.Dsc' -Tag 'Dsc' {
     Context 'Generate a document without an instance name' {
 
         # Define a test document with a table
         document 'WithoutInstanceName' {
-            
             $InputObject.ResourceType.File | Table -Property Contents,DestinationPath;
         }
 
@@ -85,11 +85,11 @@ Describe 'PSDocs.Dsc' {
         Invoke-DscNodeDocument -DocumentName 'WithoutInstanceName' -Path $outputPath -OutputPath $outputPath;
 
         It 'Should generate an output named WithoutInstanceName.md' {
-            Test-Path -Path $outputDoc | Should be $True;
+            Test-Path -Path $outputDoc | Should -Be $True;
         }
 
         It 'Should contain document name' {
-            Get-Content -Path $outputDoc -Raw | Should match '\|Node\=WithoutInstanceName\|';
+            $outputDoc | Should -FileContentMatch '\|Node\=WithoutInstanceName\|';
         }
     }
 
@@ -97,7 +97,6 @@ Describe 'PSDocs.Dsc' {
         
         # Define a test document with a table
         document 'WithInstanceName' {
-            
             $InputObject.ResourceType.File | Table -Property Contents,DestinationPath;
         }
 
@@ -106,15 +105,15 @@ Describe 'PSDocs.Dsc' {
         Invoke-DscNodeDocument -DocumentName 'WithInstanceName' -InstanceName 'Instance1' -Path $outputPath -OutputPath $outputPath;
 
         It 'Should not create a output with the document name' {
-            Test-Path -Path "$outputPath\WithInstanceName.md" | Should be $False;
+            Test-Path -Path "$outputPath\WithInstanceName.md" | Should -Be $False;
         }
 
         It 'Should generate an output named Instance1.md' {
-            Test-Path -Path "$outputPath\Instance1.md" | Should be $True;
+            Test-Path -Path "$outputPath\Instance1.md" | Should -Be $True;
         }
 
         It 'Should contain instance name' {
-            Get-Content -Path "$outputPath\Instance1.md" -Raw | Should match '|Content=Instance1|';
+            "$outputPath\Instance1.md" | Should -FileContentMatch '|Content=Instance1|';
         }
     }
 
@@ -130,23 +129,23 @@ Describe 'PSDocs.Dsc' {
         Invoke-DscNodeDocument -DocumentName 'WithMultiInstanceName' -InstanceName 'Instance2','Instance3' -Path $outputPath -OutputPath $outputPath;
 
         It 'Should not create a output with the document name' {
-            Test-Path -Path "$outputPath\WithMultiInstanceName.md" | Should be $False;
+            Test-Path -Path "$outputPath\WithMultiInstanceName.md" | Should -Be $False;
         }
 
         It 'Should generate an output named Instance2.md' {
-            Test-Path -Path "$outputPath\Instance2.md" | Should be $True;
+            Test-Path -Path "$outputPath\Instance2.md" | Should -Be $True;
         }
 
         It 'Should contain instance name Instance2' {
-            Get-Content -Path "$outputPath\Instance2.md" -Raw | Should match '\|Node\=Instance2\|';
+            "$outputPath\Instance2.md" | Should -FileContentMatch '\|Node\=Instance2\|';
         }
 
         It 'Should generate an output named Instance3.md' {
-            Test-Path -Path "$outputPath\Instance3.md" | Should be $True;
+            Test-Path -Path "$outputPath\Instance3.md" | Should -Be $True;
         }
 
         It 'Should contain instance name Instance3' {
-            Get-Content -Path "$outputPath\Instance3.md" -Raw | Should match '\|Node\=Instance3\|';
+            "$outputPath\Instance3.md" | Should -FileContentMatch '\|Node\=Instance3\|';
         }
     }
 
@@ -157,11 +156,11 @@ Describe 'PSDocs.Dsc' {
         Invoke-DscNodeDocument -Script "$here\Templates\WithExternalScript.ps1" -DocumentName 'WithExternalScript' -InstanceName 'WithExternalScript' -Path $outputPath -OutputPath $outputPath;
 
         It 'Should generate an output named WithExternalScript.md' {
-            Test-Path -Path "$outputPath\WithExternalScript.md" | Should be $True;
+            Test-Path -Path "$outputPath\WithExternalScript.md" | Should -Be $True;
         }
 
         It 'Should contain instance name' {
-            Get-Content -Path "$outputPath\WithExternalScript.md" -Raw | Should match '\|FS\-SMB1\|';
+            "$outputPath\WithExternalScript.md" | Should -FileContentMatch '\|FS\-SMB1\|';
         }
     }
 
@@ -171,7 +170,6 @@ Describe 'PSDocs.Dsc' {
         document 'WithMissingData' {
 
             Section 'Windows features' {
-            
                 # Reference a resource type that is not included in the configuration
                 $InputObject.ResourceType.WindowsFeature | Table -Property Name,Ensure;
             }
@@ -182,7 +180,7 @@ Describe 'PSDocs.Dsc' {
         Invoke-DscNodeDocument -DocumentName 'WithMissingData' -InstanceName 'WithMissingData' -Path $outputPath -OutputPath $outputPath;
 
         It 'Should output' {
-            Test-Path -Path "$outputPath\WithMissingData.md" | Should be $True;
+            Test-Path -Path "$outputPath\WithMissingData.md" | Should -Be $True;
         }
     }
 
@@ -197,7 +195,7 @@ Describe 'PSDocs.Dsc' {
         Invoke-DscNodeDocument -DocumentName 'EncodingTest' -InstanceName 'EncodingTest' -Encoding 'UTF8' -Path $outputPath -OutputPath $outputPath;
 
         It 'Called Invoke-PSDocument with Encoding' {
-            Get-Content -Path (Join-Path -Path $outputPath -ChildPath 'EncodingTest.md') -Raw | Should -Match 'UTF8';
+            (Join-Path -Path $outputPath -ChildPath 'EncodingTest.md') | Should -FileContentMatch 'UTF8';
         }
     }
 }

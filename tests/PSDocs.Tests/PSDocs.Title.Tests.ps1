@@ -17,49 +17,19 @@ $here = Split-Path -Parent $MyInvocation.MyCommand.Path;
 $temp = "$here\..\..\build";
 
 Import-Module (Join-Path -Path $rootPath -ChildPath "out/modules/PSDocs") -Force;
-Import-Module (Join-Path -Path $rootPath -ChildPath "out/modules/PSDocs/PSDocsProcessor/Markdown") -Force;
 
 $outputPath = "$temp\PSDocs.Tests\Title";
-New-Item $outputPath -ItemType Directory -Force | Out-Null;
+Remove-Item -Path $outputPath -Force -Recurse -Confirm:$False -ErrorAction SilentlyContinue;
+$Null = New-Item -Path $outputPath -ItemType Directory -Force;
 
 $dummyObject = New-Object -TypeName PSObject;
 
 $Global:TestVars = @{ };
 
 Describe 'PSDocs -- Title keyword' {
-    Context 'Title' {
-
-        # Define a test document with a title
-        document 'VisitTitle' {
-            
-            Title 'Test title'
-        }
-
-        Mock -CommandName 'VisitTitle' -ModuleName 'Markdown' -Verifiable -MockWith {
-            param (
-                $InputObject
-            )
-
-            $Global:TestVars['VisitTitle'] = $InputObject;
-        }
-
-        VisitTitle -InstanceName 'VisitTitle' -InputObject $dummyObject -OutputPath $outputPath;
-
-        It 'Should process Title keyword' {
-            Assert-MockCalled -CommandName 'VisitTitle' -ModuleName 'Markdown' -Times 1;
-        }
-
-        It 'Should be Title object' {
-            $Global:TestVars['VisitTitle'].Type | Should be 'Document';
-        }
-
-        It 'Should have expected content' {
-            $Global:TestVars['VisitTitle'].Title | Should match 'Test title';
-        }
-    }
 
     Context 'Single title markdown' {
-        
+
         # Define a test document with a title
         document 'SingleTitle' {
             

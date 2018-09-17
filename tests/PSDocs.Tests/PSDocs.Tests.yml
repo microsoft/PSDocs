@@ -3,3 +3,5 @@ markdown:
   encoding: UTF8
   wrapSeparator: 'ZZZ'
   skipEmptySections: false
+execution:
+  languageMode: ConstrainedLanguage

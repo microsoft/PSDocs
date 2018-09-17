@@ -126,7 +126,6 @@ The following commands exist in the `PSDocs` module:
 
 - [Invoke-PSDocument](/docs/commands/PSDocs/en-US/Invoke-PSDocument.md)
 - [Get-PSDocumentHeader](/docs/commands/PSDocs/en-US/Get-PSDocumentHeader.md)
-- [Import-PSDocumentTemplate](/docs/commands/PSDocs/en-US/Import-PSDocumentTemplate.md)
 - [New-PSDocumentOption](/docs/commands/PSDocs/en-US/New-PSDocumentOption.md)
 
 The following commands exist in the `PSDocs.Dsc` module:
@@ -142,6 +141,7 @@ The following conceptual topics exist in the `PSDocs` module:
   - [Markdown.WrapSeparator](/docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#wrap-separator)
   - [Markdown.Encoding](/docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#encoding)
   - [Markdown.SkipEmptySections](/docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#skip-empty-sections)
+  - [Execution.LanguageMode](/docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#language-mode)
 
 ## Changes and versioning
 

@@ -17,48 +17,16 @@ $here = Split-Path -Parent $MyInvocation.MyCommand.Path;
 $temp = "$here\..\..\build";
 
 Import-Module (Join-Path -Path $rootPath -ChildPath "out/modules/PSDocs") -Force;
-Import-Module (Join-Path -Path $rootPath -ChildPath "out/modules/PSDocs/PSDocsProcessor/Markdown") -Force;
 
 $outputPath = "$temp\PSDocs.Tests\Metadata";
-New-Item $outputPath -ItemType Directory -Force | Out-Null;
+Remove-Item -Path $outputPath -Force -Recurse -Confirm:$False -ErrorAction SilentlyContinue;
+$Null = New-Item -Path $outputPath -ItemType Directory -Force;
 
 $dummyObject = New-Object -TypeName PSObject;
 
 $Global:TestVars = @{ };
 
 Describe 'PSDocs -- Metadata keyword' {
-    Context 'Metadata' {
-
-        # Define a test document with a note
-        document 'MetadataVisitor' {
-            
-            Metadata @{
-                title = 'Test'
-            }
-        }
-
-        Mock -CommandName 'VisitMetadata' -ModuleName 'Markdown' -Verifiable -MockWith {
-            param (
-                $InputObject
-            )
-
-            $Global:TestVars['VisitMetadata'] = $InputObject;
-        }
-
-        MetadataVisitor -InputObject $dummyObject -OutputPath $outputPath;
-
-        It 'Should process keyword' {
-            Assert-MockCalled -CommandName 'VisitMetadata' -ModuleName 'Markdown' -Times 1;
-        }
-
-        It 'Should be expected type' {
-            $Global:TestVars['VisitMetadata'].Type | Should be 'Document';
-        }
-
-        It 'Should have expected content' {
-            $Global:TestVars['VisitMetadata'].Metadata['title'] | Should be 'Test';
-        }
-    }
 
     Context 'Metadata single entry' {
         

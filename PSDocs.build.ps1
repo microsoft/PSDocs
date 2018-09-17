@@ -4,6 +4,9 @@ param (
     [String]$ModuleVersion,
 
     [Parameter(Mandatory = $False)]
+    [String]$Configuration = 'Debug',
+
+    [Parameter(Mandatory = $False)]
     [String]$NuGetApiKey,
 
     [Parameter(Mandatory = $False)]
@@ -86,13 +89,17 @@ function SendAppveyorTestResult {
 task BuildDotNet {
     exec {
         # Build library
-        dotnet publish src/PSDocs -c Release -f net451 -o $(Join-Path -Path $PWD -ChildPath out/modules/PSDocs/bin/net451)
+        dotnet publish src/PSDocs -c $Configuration -f net452 -o $(Join-Path -Path $PWD -ChildPath out/modules/PSDocs/desktop)
+        dotnet publish src/PSDocs -c $Configuration -f netstandard2.0 -o $(Join-Path -Path $PWD -ChildPath out/modules/PSDocs/core)
     }
 }
 
 task CopyModule {
     CopyModuleFiles -Path src/PSDocs -DestinationPath out/modules/PSDocs;
     CopyModuleFiles -Path src/PSDocs.Dsc -DestinationPath out/modules/PSDocs.Dsc;
+
+    # Copy third party notices
+    Copy-Item -Path ThirdPartyNotices.txt -Destination out/modules/PSDocs;
 }
 
 # Synopsis: Build modules only

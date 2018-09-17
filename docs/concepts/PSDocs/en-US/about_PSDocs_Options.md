@@ -115,6 +115,30 @@ markdown:
   skipEmptySections: false
 ```
 
+### Language mode
+
+By default unless PowerShell has been constrained, full language features of PowerShell are available to use within document definitions. In locked down environments, a reduced set of language features may be desired.
+
+When PSDocs is executed in an environment configured for Device Guard, only constrained language features are available.
+
+The following language modes are available for use in PSDocs:
+
+- FullLanguage
+- ConstrainedLanguage
+
+This option can be specified using:
+
+```powershell
+# PowerShell: Using the Execution.LanguageMode hash table key
+$option = New-PSDocumentOption -Option @{ 'Execution.LanguageMode' = 'ConstrainedLanguage' }
+```
+
+```yaml
+# psdocs.yml: Using the execution/languageMode YAML property
+execution:
+  languageMode: ConstrainedLanguage
+```
+
 ## EXAMPLES
 
 ### Example PSDocs.yml
@@ -126,6 +150,8 @@ markdown:
   encoding: UTF8
   skipEmptySections: false
   wrapSeparator: '\'
+execution:
+  languageMode: ConstrainedLanguage
 ```
 
 ### Default PSDocs.yml
@@ -137,6 +163,8 @@ markdown:
   encoding: Default
   skipEmptySections: true
   wrapSeparator: ' '
+execution:
+  languageMode: FullLanguage
 ```
 
 ## NOTE

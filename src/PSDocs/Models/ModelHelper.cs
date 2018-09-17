@@ -14,7 +14,7 @@
         {
             return new Section
             {
-                Content = name,
+                Title = name,
                 Level = level
             };
         }
@@ -48,6 +48,14 @@
             return new Warning
             {
 
+            };
+        }
+
+        public static Text Text(string value)
+        {
+            return new Text
+            {
+                Content = value
             };
         }
     }

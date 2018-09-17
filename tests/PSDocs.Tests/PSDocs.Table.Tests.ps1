@@ -9,69 +9,42 @@ param (
 
 # Setup error handling
 $ErrorActionPreference = 'Stop';
+Set-StrictMode -Version latest;
 
 # Setup tests paths
-$rootPath = (Resolve-Path $PSScriptRoot\..\..).Path;
-$here = Split-Path -Parent $MyInvocation.MyCommand.Path;
-$temp = "$here\..\..\build";
+$rootPath = $PWD;
 
 Import-Module (Join-Path -Path $rootPath -ChildPath "out/modules/PSDocs") -Force;
-Import-Module (Join-Path -Path $rootPath -ChildPath "out/modules/PSDocs/PSDocsProcessor/Markdown") -Force;
 
-$outputPath = "$temp\PSDocs.Tests\Table";
-New-Item $outputPath -ItemType Directory -Force | Out-Null;
+$outputPath = Join-Path -Path $rootPath -ChildPath out/tests/PSDocs.Tests/Table;
+Remove-Item -Path $outputPath -Force -Recurse -Confirm:$False -ErrorAction SilentlyContinue;
+$Null = New-Item -Path $outputPath -ItemType Directory -Force;
 
 $dummyObject = New-Object -TypeName PSObject;
 
-$Global:TestVars = @{ };
-
-Describe 'PSDocs -- Table keyword' {
-    Context 'Table with a single named property' {
-
-        # Define a test document with a table
-        document 'WithSingleNamedProperty' {
-            
-            Get-ChildItem -Path '.\' | Table -Property 'Name'
-        }
-
-        Mock -CommandName 'VisitTable' -ModuleName 'Markdown' -Verifiable -MockWith {
-            param (
-                $InputObject
-            )
-
-            $Global:TestVars['VisitTable'] = $InputObject;
-        }
-
-        WithSingleNamedProperty -InputObject $dummyObject -OutputPath $outputPath;
-
-        It 'Should process Table keyword' {
-            Assert-MockCalled -CommandName 'VisitTable' -ModuleName 'Markdown' -Times 1;
-        }
-
-        It 'Should be Table object' {
-            $Global:TestVars['VisitTable'].Type | Should be 'Table';
-        }
-    }
+Describe 'PSDocs -- Table keyword' -Tag Table {
 
     Context 'Table markdown' {
-        
+
         # Define a test document with a table
         document 'TableTests' {
-            
-            Get-ChildItem -Path $rootPath | Where-Object -FilterScript { 'README.md','LICENSE' -contains $_.Name } | Format-Table -Property 'Name','PSIsContainer'
+
+            Get-ChildItem -Path $InputObject -File | Where-Object -FilterScript { 'README.md','LICENSE' -contains $_.Name } | Format-Table -Property 'Name','PSIsContainer'
 
             'EOF'
         }
 
         $outputDoc = "$outputPath\Table.md";
-        TableTests -InstanceName 'Table' -InputObject $dummyObject -OutputPath $outputPath;
+        TableTests -InstanceName 'Table' -InputObject $rootPath -OutputPath $outputPath;
 
         It 'Should have generated output' {
             Test-Path -Path $outputDoc | Should be $True;
         }
 
         It 'Should match expected format' {
-            Get-Content -Path $outputDoc -Raw | Should -Match '\|LICENSE\|False\|(\n|\r){1,2}\|README.md\|False\|\r\n\r\nEOF';
+            $content = Get-Content -Path $outputDoc;
+            $content | Should -Contain '|LICENSE|False|';
+            $content | Should -Contain '|README.md|False|';
         }
     }
 
@@ -101,7 +74,7 @@ Describe 'PSDocs -- Table keyword' {
         }
 
         It 'Should match expected format' {
-            Get-Content -Path $outputDoc -Raw | Should -Match '\|Dummy\|1\|2\|\r\n\r\nEOF';
+            $outputDoc | Should -FileContentMatchMultiline '\|Dummy\|1\|2\|\r\n\r\nEOF';
         }
     }
 
@@ -121,7 +94,7 @@ Describe 'PSDocs -- Table keyword' {
         }
 
         It 'Should match expected format' {
-            Get-Content -Path $outputDoc -Raw | Should match '\|Name\|\r\n\| --- \|\r\n\|Single\|';
+            $outputDoc | Should -FileContentMatchMultiline '\|Name\|\r\n\| --- \|\r\n\|Single\|';
         }
     }
     
@@ -129,22 +102,20 @@ Describe 'PSDocs -- Table keyword' {
         
         # Define a test document with section and table
         document 'TableWithNull' {
-
-            Section 'Windows features' {
-            
+            Section 'Windows features' -Force {
                 $InputObject.ResourceType.WindowsFeature | Table -Property Name,Ensure;
             }
         }
 
         $outputDoc = "$outputPath\TableWithNull.md";
-        TableWithNull -InputObject @{ ResourceType = @{  } } -OutputPath $outputPath;
+        TableWithNull -InputObject @{ ResourceType = @{ WindowsFeature = @() } } -OutputPath $outputPath;
 
         It 'Should have generated output' {
             Test-Path -Path $outputDoc | Should -Be $True;
         }
 
         It 'Should match expected format' {
-            Get-Content -Path $outputDoc -Raw | Should -Match '(## Windows features\r\n)$';
+            $outputDoc | Should -FileContentMatchMultiline '(## Windows features\r\n)$';
         }
     }
 
@@ -157,18 +128,18 @@ Describe 'PSDocs -- Table keyword' {
 
         # Define a test document with a multiple column in a table
         document 'TableWithMultilineColumn' {
-            $testObject | Table;
+            $InputObject | Table;
         }
 
         $outputDoc = "$outputPath\TableWithMultilineColumn.md";
-        TableWithMultilineColumn -OutputPath $outputPath;
+        TableWithMultilineColumn -InputObject $testObject -OutputPath $outputPath;
 
         It 'Should have generated output' {
             Test-Path -Path $outputDoc | Should -Be $True;
         }
 
         It 'Should match expected format' {
-            Get-Content -Path $outputDoc -Raw | Should -Match 'This is a description split over multiple lines\.';
+            $outputDoc | Should -FileContentMatch 'This is a description split over multiple lines\.';
         }
 
         $option = New-PSDocumentOption @{
@@ -176,10 +147,10 @@ Describe 'PSDocs -- Table keyword' {
         }
 
         $outputDoc = "$outputPath\TableWithMultilineColumnCustom.md";
-        TableWithMultilineColumn -InstanceName 'TableWithMultilineColumnCustom' -OutputPath $outputPath -Option $option;
+        TableWithMultilineColumn -InputObject $testObject -InstanceName 'TableWithMultilineColumnCustom' -OutputPath $outputPath -Option $option;
 
         It 'Should use wrap separator' {
-            Get-Content -Path $outputDoc -Raw | Should -Match 'This is a\<br /\>description\<br /\>split\<br /\>over\<br /\>multiple\<br /\>lines\.';
+            $outputDoc | Should -FileContentMatch 'This is a\<br /\>description\<br /\>split\<br /\>over\<br /\>multiple\<br /\>lines\.';
         }
     }
 }
