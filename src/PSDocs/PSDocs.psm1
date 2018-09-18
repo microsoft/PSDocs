@@ -196,8 +196,11 @@ function Invoke-PSDocument {
 
                 $errorParams = @{
                     Exception = $ex.Exception
-                    ErrorId = $ex.Exception.InnerException.ErrorRecord.FullyQualifiedErrorId
                     Category = [System.Management.Automation.ErrorCategory]::OperationStopped
+                }
+
+                if ($ex.Exception.InnerException -is [System.Management.Automation.IContainsErrorRecord]) {
+                    $errorParams['ErrorId'] = $ex.Exception.InnerException.ErrorRecord.FullyQualifiedErrorId
                 }
 
                 if ($ex.Exception -is [PSDocs.Execution.InvokeDocumentException]) {
@@ -538,11 +541,23 @@ function Table {
         Write-Verbose -Message "[Doc][Table] BEGIN::";
 
         # Create a table
-        $table = [PSDocs.Models.ModelHelper]::NewTable();
+        $builder = [PSDocs.Models.ModelHelper]::Table();
 
         $recordIndex = 0;
 
         $rowData = New-Object -TypeName Collections.Generic.List[Object];
+
+        # Prepare header if specified
+        if ($Null -ne $Property -and $Property.Length -gt 0) {
+            foreach ($p in $Property) {
+                if ($p -is [String]) {
+                    $builder.Header([String]$p);
+                }
+                elseif ($p -is [Hashtable]) {
+                   $builder.Header([Hashtable]$p);
+                }
+            }
+        }
     }
 
     process {
@@ -563,21 +578,25 @@ function Table {
     }
 
     end {
-        # Extract out the column names based on the resulting objects
-        $Null = $rowData | ForEach-Object -Process {
-            $_.PSObject.Properties
-        } | Where-Object -FilterScript {
-            $_.IsGettable -and $_.IsInstance
-        } | Select-Object -Unique -ExpandProperty Name | ForEach-Object -Process {
-            $table.Header.Add([String]$_);
+        # Extract out the header column names based on the resulting objects
+        if ($Null -eq $Property) {
+            $rowData | ForEach-Object -Process {
+                $_.PSObject.Properties
+            } | Where-Object -FilterScript {
+                $_.IsGettable -and $_.IsInstance
+            } | Select-Object -Unique -ExpandProperty Name | ForEach-Object -Process {
+                $builder.Header([String]$_);
+            }
         }
+
+        $table = $builder.Build();
 
         foreach ($r in $rowData) {
 
-            [String[]]$row = New-Object -TypeName 'String[]' -ArgumentList $table.Header.Count;
+            [String[]]$row = New-Object -TypeName 'String[]' -ArgumentList $table.Headers.Count;
 
             for ($i = 0; $i -lt $row.Length; $i++) {
-                $field = GetObjectField -InputObject $r -Field $table.Header[$i] -Verbose:$VerbosePreference;
+                $field = GetObjectField -InputObject $r -Field $table.Headers[$i].Label -Verbose:$VerbosePreference;
 
                 if ($Null -ne $field -and $Null -ne $field.Value) {
                     $row[$i] = $field.Value.ToString();
@@ -712,8 +731,11 @@ function GenerateDocumentFn {
 
                 $errorParams = @{
                     Exception = $ex.Exception
-                    ErrorId = $ex.Exception.InnerException.ErrorRecord.FullyQualifiedErrorId
                     Category = [System.Management.Automation.ErrorCategory]::OperationStopped
+                }
+
+                if ($ex.Exception.InnerException -is [System.Management.Automation.IContainsErrorRecord]) {
+                    $errorParams['ErrorId'] = $ex.Exception.InnerException.ErrorRecord.FullyQualifiedErrorId
                 }
 
                 if ($ex.Exception -is [PSDocs.Execution.InvokeDocumentException]) {
@@ -1180,12 +1202,17 @@ function InvokeTemplate {
             }
             catch {
                 $baseException = $_.Exception.GetBaseException();
-                $errorRecord = $baseException.ErrorRecord;
+                $positionMessage = $Null;
+
+                if ($baseException -is [System.Management.Automation.IContainsErrorRecord]) {
+                    $positionMessage = $baseException.ErrorRecord.InvocationInfo.PositionMessage
+                }
+
                 throw (New-Object -TypeName PSDocs.Execution.InvokeDocumentException -ArgumentList @(
                     $baseException.Message
                     $baseException
                     $Path
-                    $errorRecord.InvocationInfo.PositionMessage
+                    $positionMessage
                 ));
             }
 

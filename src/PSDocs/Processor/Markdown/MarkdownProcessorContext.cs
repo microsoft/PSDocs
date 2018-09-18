@@ -46,5 +46,10 @@ namespace PSDocs.Processor.Markdown
         {
             Builder.Append(text);
         }
+
+        public void Write(char c, int count)
+        {
+            Builder.Append(new string(c, count));
+        }
     }
 }

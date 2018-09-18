@@ -12,17 +12,15 @@ $ErrorActionPreference = 'Stop';
 Set-StrictMode -Version latest;
 
 # Setup tests paths
-$rootPath = (Resolve-Path $PSScriptRoot\..\..).Path;
+$rootPath = $PWD;
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path;
-$temp = "$here\..\..\build";
-# $sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path) -replace '\.Tests\.', '.';
 
 Import-Module (Join-Path -Path $rootPath -ChildPath "out/modules/PSDocs") -Force;
 Import-Module (Join-Path -Path $rootPath -ChildPath "out/modules/PSDocs.Dsc") -Force;
 
-$outputPath = "$temp\PSDocs.Dsc.Tests\Common";
-Remove-Item -Path $outputPath -Force -Recurse -Confirm:$False -ErrorAction SilentlyContinue;
-New-Item -Path $outputPath -ItemType Directory -Force | Out-Null;
+$outputPath = Join-Path -Path $rootPath -ChildPath out/tests/PSDocs.Dsc.Tests/Common;
+Remove-Item -Path $outputPath -Force -Recurse -Confirm:$False -ErrorAction Ignore;
+$Null = New-Item -Path $outputPath -ItemType Directory -Force;
 
 $Global:TestVars = @{ };
 
@@ -89,7 +87,7 @@ Describe 'PSDocs.Dsc' -Tag 'Dsc' {
         }
 
         It 'Should contain document name' {
-            $outputDoc | Should -FileContentMatch '\|Node\=WithoutInstanceName\|';
+            $outputDoc | Should -FileContentMatch '\| Node\=WithoutInstanceName\ |';
         }
     }
 
@@ -113,7 +111,7 @@ Describe 'PSDocs.Dsc' -Tag 'Dsc' {
         }
 
         It 'Should contain instance name' {
-            "$outputPath\Instance1.md" | Should -FileContentMatch '|Content=Instance1|';
+            "$outputPath\Instance1.md" | Should -FileContentMatch '\| Node=Instance1 \|';
         }
     }
 
@@ -137,7 +135,7 @@ Describe 'PSDocs.Dsc' -Tag 'Dsc' {
         }
 
         It 'Should contain instance name Instance2' {
-            "$outputPath\Instance2.md" | Should -FileContentMatch '\|Node\=Instance2\|';
+            "$outputPath\Instance2.md" | Should -FileContentMatch '\| Node\=Instance2\ |';
         }
 
         It 'Should generate an output named Instance3.md' {
@@ -145,7 +143,7 @@ Describe 'PSDocs.Dsc' -Tag 'Dsc' {
         }
 
         It 'Should contain instance name Instance3' {
-            "$outputPath\Instance3.md" | Should -FileContentMatch '\|Node\=Instance3\|';
+            "$outputPath\Instance3.md" | Should -FileContentMatch '\| Node\=Instance3\ |';
         }
     }
 
@@ -160,7 +158,7 @@ Describe 'PSDocs.Dsc' -Tag 'Dsc' {
         }
 
         It 'Should contain instance name' {
-            "$outputPath\WithExternalScript.md" | Should -FileContentMatch '\|FS\-SMB1\|';
+            "$outputPath\WithExternalScript.md" | Should -FileContentMatch '\| FS\-SMB1\ |';
         }
     }
 

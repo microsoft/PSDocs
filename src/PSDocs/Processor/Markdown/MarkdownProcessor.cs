@@ -179,44 +179,100 @@ namespace PSDocs.Processor.Markdown
 
         private void Table(MarkdownProcessorContext context, Table table)
         {
-            if (table.Header == null || table.Header.Count == 0)
+            if (table.Headers == null || table.Headers.Count == 0)
             {
                 return;
             }
 
             context.WriteLine("");
 
-            var headerCount = table.Header.Count;
+            var headerCount = table.Headers.Count;
 
-            context.WriteLine(string.Concat("|", string.Join("|", table.Header), "|"));
-            context.WriteLine(string.Concat(string.Empty.PadLeft(headerCount, 'X').Replace("X", "| --- "), "|"));
+            // Write table headers
+            for (var i = 0; i < table.Headers.Count; i++)
+            {
+                context.Write("| ");
+                context.Write(table.Headers[i].Label);
 
+                if (i < table.Headers.Count - 1)
+                {
+                    var padding = 0;
+
+                    // Pad column
+                    if (table.Headers[i].Width > 0 && (table.Headers[i].Width - table.Headers[i].Label.Length) > 0)
+                    {
+                        padding = table.Headers[i].Width - table.Headers[i].Label.Length;
+                    }
+
+                    context.Write(' ', padding + 1);
+                }
+            }
+
+            context.WriteLine(" |");
+
+            // Write table header separator
+            for (var i = 0; i < table.Headers.Count; i++)
+            {
+                context.Write("| ");
+                context.Write('-', table.Headers[i].Label.Length);
+
+                if (i < table.Headers.Count - 1)
+                {
+                    var padding = 0;
+
+                    // Pad column
+                    if (table.Headers[i].Width > 0 && (table.Headers[i].Width - table.Headers[i].Label.Length) > 0)
+                    {
+                        padding = table.Headers[i].Width - table.Headers[i].Label.Length;
+                    }
+
+                    context.Write(' ', padding + 1);
+                }
+            }
+
+            context.WriteLine(" |");
+
+            // Write table rows
             for (var r = 0; r < table.Rows.Count; r++)
             {
-                context.WriteLine(string.Concat('|', string.Join("|", WrapText(context, table.Rows[r])), "|"));
-            }
-
-            context.WriteLine("");
-        }
-
-        private string[] WrapText(MarkdownProcessorContext context, string[] text)
-        {
-            var separator = context.Option.Markdown.WrapSeparator;
-            var result = new string[text.Length];
-
-            for (var i = 0; i < text.Length; i++)
-            {
-                if (text[i].Contains("\n") || text[i].Contains("\r"))
+                for (var c = 0; c < table.Rows[r].Length; c++)
                 {
-                    result[i] = text[i].Replace("\r\n", separator).Replace("\n", separator).Replace("\r", separator);
+                    context.Write("| ");
 
-                    continue;
+                    var text = WrapText(context, table.Rows[r][c]);
+
+                    context.Write(text);
+
+                    if (c < table.Headers.Count - 1)
+                    {
+                        var padding = 0;
+
+                        // Pad column
+                        if (table.Headers[c].Width > 0 && (table.Headers[c].Width - table.Rows[r][c].Length) > 0)
+                        {
+                            padding = table.Headers[c].Width - table.Rows[r][c].Length;
+                        }
+
+                        context.Write(' ', padding + 1);
+                    }
                 }
 
-                result[i] = text[i];
+                context.WriteLine(" |");
+                context.WriteLine(string.Empty);
+            }
+        }
+
+        private string WrapText(MarkdownProcessorContext context, string text)
+        {
+            var separator = context.Option.Markdown.WrapSeparator;
+            var formatted = text;
+
+            if (text.Contains("\n") || text.Contains("\r"))
+            {
+                formatted = text.Replace("\r\n", separator).Replace("\n", separator).Replace("\r", separator);
             }
 
-            return result;
+            return formatted;
         }
     }
 }

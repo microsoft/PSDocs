@@ -17,7 +17,7 @@ $rootPath = $PWD;
 Import-Module (Join-Path -Path $rootPath -ChildPath "out/modules/PSDocs") -Force;
 
 $outputPath = Join-Path -Path $rootPath -ChildPath out/tests/PSDocs.Tests/Table;
-Remove-Item -Path $outputPath -Force -Recurse -Confirm:$False -ErrorAction SilentlyContinue;
+Remove-Item -Path $outputPath -Force -Recurse -Confirm:$False -ErrorAction Ignore;
 $Null = New-Item -Path $outputPath -ItemType Directory -Force;
 
 $dummyObject = New-Object -TypeName PSObject;
@@ -43,8 +43,8 @@ Describe 'PSDocs -- Table keyword' -Tag Table {
 
         It 'Should match expected format' {
             $content = Get-Content -Path $outputDoc;
-            $content | Should -Contain '|LICENSE|False|';
-            $content | Should -Contain '|README.md|False|';
+            $content | Should -Contain '| LICENSE | False |';
+            $content | Should -Contain '| README.md | False |';
         }
     }
 
@@ -74,7 +74,7 @@ Describe 'PSDocs -- Table keyword' -Tag Table {
         }
 
         It 'Should match expected format' {
-            $outputDoc | Should -FileContentMatchMultiline '\|Dummy\|1\|2\|\r\n\r\nEOF';
+            $outputDoc | Should -FileContentMatchMultiline '\| Dummy \| 1 \| 2 \|\r\n\r\nEOF';
         }
     }
 
@@ -94,7 +94,7 @@ Describe 'PSDocs -- Table keyword' -Tag Table {
         }
 
         It 'Should match expected format' {
-            $outputDoc | Should -FileContentMatchMultiline '\|Name\|\r\n\| --- \|\r\n\|Single\|';
+            $outputDoc | Should -FileContentMatchMultiline '\| Name \|\r\n\| -{1,} \|\r\n\| Single \|';
         }
     }
     
