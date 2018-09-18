@@ -34,12 +34,7 @@ namespace PSDocs.Models
             var header = new TableColumnHeader();
 
             // Build index to allow mapping
-            var index = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-
-            foreach (DictionaryEntry entry in hashtable)
-            {
-                index.Add(entry.Key.ToString(), entry.Value);
-            }
+            var index = GetIndex(hashtable);
 
             // Start loading matching values
 
@@ -73,6 +68,42 @@ namespace PSDocs.Models
             }
 
             _Headers.Add(header);
+        }
+
+        public IDictionary<string, object> GetIndex(Hashtable hashtable)
+        {
+            // Build index to allow mapping
+            var index = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (DictionaryEntry entry in hashtable)
+            {
+                index.Add(entry.Key.ToString(), entry.Value);
+            }
+
+            return index;
+        }
+
+        public IDictionary<string, object> GetPropertyFilter(Hashtable hashtable)
+        {
+            var index = GetIndex(hashtable);
+
+            if (index.ContainsKey("alignment"))
+            {
+                index.Remove("alignment");
+            }
+
+            if (index.ContainsKey("width"))
+            {
+                index.Remove("width");
+            }
+
+            if (index.ContainsKey("name"))
+            {
+                index["label"] = index["name"];
+                index.Remove("name");
+            }
+
+            return index;
         }
     }
 }

@@ -214,7 +214,33 @@ namespace PSDocs.Processor.Markdown
             for (var i = 0; i < table.Headers.Count; i++)
             {
                 context.Write("| ");
-                context.Write('-', table.Headers[i].Label.Length);
+
+                switch (table.Headers[i].Alignment)
+                {
+                    case Alignment.Left:
+                        context.Write(":");
+                        context.Write('-', table.Headers[i].Label.Length - 1);
+
+                        break;
+
+                    case Alignment.Right:
+                        context.Write('-', table.Headers[i].Label.Length - 1);
+                        context.Write(":");
+
+                        break;
+
+                    case Alignment.Center:
+                        context.Write(":");
+                        context.Write('-', table.Headers[i].Label.Length - 2);
+                        context.Write(":");
+
+                        break;
+
+                    default:
+                        context.Write('-', table.Headers[i].Label.Length);
+
+                        break;
+                }
 
                 if (i < table.Headers.Count - 1)
                 {

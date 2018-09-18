@@ -59,9 +59,10 @@ Describe 'PSDocs -- Table keyword' -Tag Table {
                     Value1 = 1
                     Value2 = 2
                 }
+                Value3 = 3
             }
 
-            $object | Table -Property Name,@{ Name = 'Value1'; Expression = { $_.Property.Value1 }},@{ Name = 'Value2'; Expression = { $_.Property.Value2 }};
+            $object | Table -Property Name,@{ Label = 'Value1'; Alignment = 'Left'; Expression = { $_.Property.Value1 }},@{ Name = 'Value2'; Alignment = 'Center'; Expression = { $_.Property.Value2 }},@{ Label = 'Value3'; Expression = { $_.Value3 }; Alignment = 'Right'; };
 
             'EOF'
         }
@@ -74,7 +75,8 @@ Describe 'PSDocs -- Table keyword' -Tag Table {
         }
 
         It 'Should match expected format' {
-            $outputDoc | Should -FileContentMatchMultiline '\| Dummy \| 1 \| 2 \|\r\n\r\nEOF';
+            $outputDoc | Should -FileContentMatch '\| ---- \| :----- \| :----: \| -----: \|'
+            $outputDoc | Should -FileContentMatchMultiline '\| Dummy \| 1 \| 2 \| 3 \|\r\n\r\nEOF';
         }
     }
 

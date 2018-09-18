@@ -547,14 +547,18 @@ function Table {
 
         $rowData = New-Object -TypeName Collections.Generic.List[Object];
 
+        $propertyExpression = @();
+
         # Prepare header if specified
         if ($Null -ne $Property -and $Property.Length -gt 0) {
             foreach ($p in $Property) {
                 if ($p -is [String]) {
                     $builder.Header([String]$p);
+                    $propertyExpression += $p;
                 }
                 elseif ($p -is [Hashtable]) {
-                   $builder.Header([Hashtable]$p);
+                    $builder.Header([Hashtable]$p);
+                    $propertyExpression += $builder.GetPropertyFilter($p);
                 }
             }
         }
@@ -567,7 +571,7 @@ function Table {
         Write-Verbose -Message "[Doc][Table][$recordIndex] -- Adding '$($InputObject)'";
 
         if ($Null -ne $InputObject) {
-            $selectedObject = Select-Object -InputObject $InputObject -Property $Property;
+            $selectedObject = Select-Object -InputObject $InputObject -Property $propertyExpression;
 
             $rowData.Add($selectedObject);
         }
