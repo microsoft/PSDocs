@@ -8,3 +8,8 @@ document 'InvalidCommandWithSection' {
         New-PSDocsInvalidCommand;
     }
 }
+
+document 'WithWriteError' {
+
+    Write-Error -Message 'Verify Write-Error is raised as an exception';
+}
