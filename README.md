@@ -137,11 +137,13 @@ The following commands exist in the `PSDocs.Dsc` module:
 
 The following conceptual topics exist in the `PSDocs` module:
 
-- [Options](/docs/concepts/PSDocs/en-US/about_PSDocs_Options.md)
-  - [Markdown.WrapSeparator](/docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#wrap-separator)
-  - [Markdown.Encoding](/docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#encoding)
-  - [Markdown.SkipEmptySections](/docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#skip-empty-sections)
-  - [Execution.LanguageMode](/docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#language-mode)
+- [Options](docs/concepts/PSDocs/en-US/about_PSDocs_Options.md)
+  - [Markdown.WrapSeparator](docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#wrap-separator)
+  - [Markdown.Encoding](docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#encoding)
+  - [Markdown.SkipEmptySections](docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#skip-empty-sections)
+  - [Markdown.ColumnPadding](docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#column-padding)
+  - [Markdown.UseEdgePipes](docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#use-edge-pipes)
+  - [Execution.LanguageMode](docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#language-mode)
 
 ## Changes and versioning
 

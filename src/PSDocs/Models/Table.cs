@@ -6,7 +6,7 @@ namespace PSDocs.Models
     {
         public Table()
         {
-            Header = new List<string>();
+            Headers = new List<TableColumnHeader>();
             Rows = new List<string[]>();
         }
 
@@ -14,6 +14,6 @@ namespace PSDocs.Models
 
         public List<string[]> Rows { get; set; }
 
-        public List<string> Header { get; set; }
+        public List<TableColumnHeader> Headers { get; set; }
     }
 }

@@ -295,7 +295,11 @@ Syntax:
 Table [-Property <Object[]>]
 ```
 
-- `-Property` - Filter the table to only the named columns. Either a named column or expression can be used.
+- `-Property` - Filter the table to only the named columns. Either a named column or hash table can be used. Valid keys include:
+  - Name (or Label) `[String]` - the name of the column
+  - Expression `[String]` or `[ScriptBlock]` - an expression to get a calculated column value
+  - Width `[Int32]` - the column width use in markdown output, this don't change how the the table is rendered
+  - Alignment (value can be "Left", "Center" or "Right") - alignment to align column values in during rendering
 
 Examples:
 
@@ -306,7 +310,7 @@ Document 'Table' {
     Section 'Directory list' {
 
         # Create a row for each child item of C:\
-        Get-ChildItem -Path 'C:\' | Table -Property Name,@{ Name = 'IsContainer'; Expression = { $_.PSIsContainer }};
+        Get-ChildItem -Path 'C:\' | Table -Property Name,PSIsContainer;
     }
 }
 
@@ -317,15 +321,41 @@ Invoke-PSDocument -Name 'Table';
 ```markdown
 ## Directory list
 
-|Name|IsContainer|
-| --- | --- |
-|Program Files|True|
-|Program Files (x86)|True|
-|Users|True|
-|Windows|True|
+Name | PSIsContainer
+---- | -------------
+Program Files | True
+Program Files (x86) | True
+Users | True
+Windows | True
 ```
 
-Generates a new `Table.md` document containing a table populated with a row for each item. Only the properties Name and IsContainer are added as columns. A property expression is used on the `PSIsContainer` property to render the column as `IsContainer`.
+```powershell
+# A document definition named Table
+Document 'Table' {
+
+    Section 'Directory list' {
+
+        # Create a row for each child item of C:\
+        Get-ChildItem -Path 'C:\' | Table -Property @{ Name = 'Name'; Expression = { $_.Name }; Width = 19; },@{ Name = 'Is Container'; Expression = { $_.PSIsContainer }; Alignment = 'Center'; Width = 11; };
+    }
+}
+
+# Generate markdown from the document definition
+Invoke-PSDocument -Name 'Table';
+```
+
+```markdown
+## Directory list
+
+Name                | Is Container
+----                | :----------:
+Program Files       | True
+Program Files (x86) | True
+Users               | True
+Windows             | True
+```
+
+Generates a new `Table.md` document containing a table populated with a row for each item. Only the properties Name and Is Container are added as columns. A property expression is used on the `PSIsContainer` property to render the column as `Is Container`.
 
 ### Metadata
 
@@ -401,4 +431,5 @@ An online version of this document is available at https://github.com/BernieWhit
 - Note
 - Warning
 - Table
+- Metadata
 - Yaml

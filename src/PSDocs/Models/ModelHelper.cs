@@ -19,12 +19,9 @@
             };
         }
 
-        public static Table NewTable()
+        public static TableBuilder Table()
         {
-            return new Table
-            {
-
-            };
+            return new TableBuilder();
         }
 
         public static Code NewCode()

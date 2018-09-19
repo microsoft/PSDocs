@@ -6,7 +6,6 @@ namespace PSDocs.Processor.Markdown
 {
     public sealed class MarkdownProcessor
     {
-
         public string Process(PSDocumentOption option, Document document)
         {
             if (document == null)
@@ -179,44 +178,173 @@ namespace PSDocs.Processor.Markdown
 
         private void Table(MarkdownProcessorContext context, Table table)
         {
-            if (table.Header == null || table.Header.Count == 0)
+            if (table.Headers == null || table.Headers.Count == 0)
             {
                 return;
             }
 
-            context.WriteLine("");
+            context.WriteLine(string.Empty);
 
-            var headerCount = table.Header.Count;
+            var lastHeader = table.Headers.Count - 1;
+            var useEdgePipe = context.Option.Markdown.UseEdgePipes == EdgePipeOption.Always
+                || table.Headers.Count == 1;
+            var padColumn = context.Option.Markdown.ColumnPadding == ColumnPadding.Single
+                || context.Option.Markdown.ColumnPadding == ColumnPadding.MatchHeader;
 
-            context.WriteLine(string.Concat("|", string.Join("|", table.Header), "|"));
-            context.WriteLine(string.Concat(string.Empty.PadLeft(headerCount, 'X').Replace("X", "| --- "), "|"));
-
-            for (var r = 0; r < table.Rows.Count; r++)
+            // Write table headers
+            for (var i = 0; i < table.Headers.Count; i++)
             {
-                context.WriteLine(string.Concat('|', string.Join("|", WrapText(context, table.Rows[r])), "|"));
+                StartColumn(context, i, lastHeader, useEdgePipe, padColumn);
+                
+                context.Write(table.Headers[i].Label);
+
+                if (i < lastHeader)
+                {
+                    var padding = 0;
+
+                    // Pad column
+                    if (table.Headers[i].Width > 0 && (table.Headers[i].Width - table.Headers[i].Label.Length) > 0)
+                    {
+                        padding = table.Headers[i].Width - table.Headers[i].Label.Length;
+                    }
+
+                    context.WriteSpace(padding);
+                }
             }
 
-            context.WriteLine("");
-        }
-
-        private string[] WrapText(MarkdownProcessorContext context, string[] text)
-        {
-            var separator = context.Option.Markdown.WrapSeparator;
-            var result = new string[text.Length];
-
-            for (var i = 0; i < text.Length; i++)
+            if (padColumn && useEdgePipe)
             {
-                if (text[i].Contains("\n") || text[i].Contains("\r"))
-                {
-                    result[i] = text[i].Replace("\r\n", separator).Replace("\n", separator).Replace("\r", separator);
+                context.WriteSpace();
+            }
 
-                    continue;
+            context.WriteLine(useEdgePipe ? "|" : string.Empty);
+
+            // Write table header separator
+            for (var i = 0; i < table.Headers.Count; i++)
+            {
+                StartColumn(context, i, lastHeader, useEdgePipe, padColumn);
+
+                switch (table.Headers[i].Alignment)
+                {
+                    case Alignment.Left:
+                        context.Write(":");
+                        context.Write('-', table.Headers[i].Label.Length - 1);
+
+                        break;
+
+                    case Alignment.Right:
+                        context.Write('-', table.Headers[i].Label.Length - 1);
+                        context.Write(":");
+
+                        break;
+
+                    case Alignment.Center:
+                        context.Write(":");
+                        context.Write('-', table.Headers[i].Label.Length - 2);
+                        context.Write(":");
+
+                        break;
+
+                    default:
+                        context.Write('-', table.Headers[i].Label.Length);
+
+                        break;
                 }
 
-                result[i] = text[i];
+                if (i < lastHeader)
+                {
+                    var padding = 0;
+
+                    // Pad column
+                    if (table.Headers[i].Width > 0 && (table.Headers[i].Width - table.Headers[i].Label.Length) > 0)
+                    {
+                        padding = table.Headers[i].Width - table.Headers[i].Label.Length;
+                    }
+
+                    context.WriteSpace(padding);
+                }
             }
 
-            return result;
+            if (padColumn && useEdgePipe)
+            {
+                context.WriteSpace();
+            }
+
+            context.WriteLine(useEdgePipe ? "|" : string.Empty);
+
+            // Write table rows
+            for (var r = 0; r < table.Rows.Count; r++)
+            {
+                for (var c = 0; c < table.Rows[r].Length; c++)
+                {
+                    StartColumn(context, c, lastHeader, useEdgePipe, padColumn);
+
+                    var text = WrapText(context, table.Rows[r][c]);
+
+                    context.Write(text);
+
+                    if (c < lastHeader)
+                    {
+                        var padding = 0;
+
+                        // Pad column using column width
+                        if (table.Headers[c].Width > 0 && (table.Headers[c].Width - table.Rows[r][c].Length) > 0)
+                        {
+                            padding = table.Headers[c].Width - table.Rows[r][c].Length;
+                        }
+                        // Pad column matching header
+                        else if (context.Option.Markdown.ColumnPadding == ColumnPadding.MatchHeader)
+                        {
+                            if ((table.Headers[c].Label.Length - table.Rows[r][c].Length) > 0)
+                            {
+                                padding = table.Headers[c].Label.Length - table.Rows[r][c].Length;
+                            }
+                        }
+
+                        context.WriteSpace(padding);
+                    }
+                }
+
+                if (padColumn && useEdgePipe)
+                {
+                    context.WriteSpace();
+                }
+
+                context.WriteLine(useEdgePipe ? "|" : string.Empty);
+            }
+
+            context.WriteLine(string.Empty);
+        }
+
+        private void StartColumn(MarkdownProcessorContext context, int index, int last, bool useEdgePipe, bool padColumn)
+        {
+            if (index > 0 && padColumn)
+            {
+                context.WriteSpace();
+            }
+
+            if (index > 0 || useEdgePipe)
+            {
+                context.WritePipe();
+            }
+
+            if (padColumn && useEdgePipe || index > 0 && padColumn)
+            {
+                context.WriteSpace();
+            }
+        }
+
+        private string WrapText(MarkdownProcessorContext context, string text)
+        {
+            var separator = context.Option.Markdown.WrapSeparator;
+            var formatted = text;
+
+            if (text.Contains("\n") || text.Contains("\r"))
+            {
+                formatted = text.Replace("\r\n", separator).Replace("\n", separator).Replace("\r", separator);
+            }
+
+            return formatted;
         }
     }
 }

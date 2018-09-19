@@ -17,7 +17,7 @@ $rootPath = $PWD;
 Import-Module (Join-Path -Path $rootPath -ChildPath "out/modules/PSDocs") -Force;
 
 $outputPath = Join-Path -Path $rootPath -ChildPath out/tests/PSDocs.Tests/Table;
-Remove-Item -Path $outputPath -Force -Recurse -Confirm:$False -ErrorAction SilentlyContinue;
+Remove-Item -Path $outputPath -Force -Recurse -Confirm:$False -ErrorAction Ignore;
 $Null = New-Item -Path $outputPath -ItemType Directory -Force;
 
 $dummyObject = New-Object -TypeName PSObject;
@@ -35,13 +35,13 @@ Describe 'PSDocs -- Table keyword' -Tag Table {
         }
 
         $outputDoc = "$outputPath\Table.md";
-        TableTests -InstanceName 'Table' -InputObject $rootPath -OutputPath $outputPath;
-
-        It 'Should have generated output' {
-            Test-Path -Path $outputDoc | Should be $True;
-        }
+        TableTests -InstanceName 'Table' -InputObject $rootPath -OutputPath $outputPath -Option @{
+            'Markdown.ColumnPadding' = 'None'
+            'Markdown.UseEdgePipes' = 'Always'
+        };
 
         It 'Should match expected format' {
+            Test-Path -Path $outputDoc | Should be $True;
             $content = Get-Content -Path $outputDoc;
             $content | Should -Contain '|LICENSE|False|';
             $content | Should -Contain '|README.md|False|';
@@ -59,9 +59,10 @@ Describe 'PSDocs -- Table keyword' -Tag Table {
                     Value1 = 1
                     Value2 = 2
                 }
+                Value3 = 3
             }
 
-            $object | Table -Property Name,@{ Name = 'Value1'; Expression = { $_.Property.Value1 }},@{ Name = 'Value2'; Expression = { $_.Property.Value2 }};
+            $object | Table -Property Name,@{ Label = 'Value1'; Alignment = 'Left'; Width = 10; Expression = { $_.Property.Value1 }},@{ Name = 'Value2'; Alignment = 'Center'; Expression = { $_.Property.Value2 }},@{ Label = 'Value3'; Expression = { $_.Value3 }; Alignment = 'Right'; };
 
             'EOF'
         }
@@ -69,12 +70,10 @@ Describe 'PSDocs -- Table keyword' -Tag Table {
         $outputDoc = "$outputPath\TableWithExpression.md";
         TableWithExpression -OutputPath $outputPath;
 
-        It 'Should have generated output' {
-            Test-Path -Path $outputDoc | Should be $True;
-        }
-
         It 'Should match expected format' {
-            $outputDoc | Should -FileContentMatchMultiline '\|Dummy\|1\|2\|\r\n\r\nEOF';
+            Test-Path -Path $outputDoc | Should be $True;
+            $outputDoc | Should -FileContentMatch '---- \| :-----     \| :----: \| -----:'
+            $outputDoc | Should -FileContentMatchMultiline 'Dummy \| 1          \| 2      \| 3\r\n\r\nEOF';
         }
     }
 
@@ -89,12 +88,9 @@ Describe 'PSDocs -- Table keyword' -Tag Table {
         $outputDoc = "$outputPath\TableSingleEntryMarkdown.md";
         TableSingleEntryMarkdown -InputObject $dummyObject -OutputPath $outputPath;
 
-        It 'Should have generated output' {
-            Test-Path -Path $outputDoc | Should be $True;
-        }
-
         It 'Should match expected format' {
-            $outputDoc | Should -FileContentMatchMultiline '\|Name\|\r\n\| --- \|\r\n\|Single\|';
+            Test-Path -Path $outputDoc | Should be $True;
+            $outputDoc | Should -FileContentMatchMultiline '\| Name \|\r\n\| -{1,} \|\r\n\| Single \|';
         }
     }
     
@@ -110,11 +106,8 @@ Describe 'PSDocs -- Table keyword' -Tag Table {
         $outputDoc = "$outputPath\TableWithNull.md";
         TableWithNull -InputObject @{ ResourceType = @{ WindowsFeature = @() } } -OutputPath $outputPath;
 
-        It 'Should have generated output' {
-            Test-Path -Path $outputDoc | Should -Be $True;
-        }
-
         It 'Should match expected format' {
+            Test-Path -Path $outputDoc | Should -Be $True;
             $outputDoc | Should -FileContentMatchMultiline '(## Windows features\r\n)$';
         }
     }
@@ -134,11 +127,8 @@ Describe 'PSDocs -- Table keyword' -Tag Table {
         $outputDoc = "$outputPath\TableWithMultilineColumn.md";
         TableWithMultilineColumn -InputObject $testObject -OutputPath $outputPath;
 
-        It 'Should have generated output' {
-            Test-Path -Path $outputDoc | Should -Be $True;
-        }
-
         It 'Should match expected format' {
+            Test-Path -Path $outputDoc | Should -Be $True;
             $outputDoc | Should -FileContentMatch 'This is a description split over multiple lines\.';
         }
 

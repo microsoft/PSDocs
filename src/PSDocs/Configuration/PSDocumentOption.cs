@@ -28,7 +28,9 @@ namespace PSDocs.Configuration
             {
                 WrapSeparator = option.Markdown.WrapSeparator,
                 Encoding = option.Markdown.Encoding,
-                SkipEmptySections = option.Markdown.SkipEmptySections
+                SkipEmptySections = option.Markdown.SkipEmptySections,
+                ColumnPadding = option.Markdown.ColumnPadding,
+                UseEdgePipes = option.Markdown.UseEdgePipes
             };
 
             Execution = new ExecutionOption
@@ -136,6 +138,16 @@ namespace PSDocs.Configuration
             if (index.TryGetValue("markdown.skipemptysections", out value))
             {
                 option.Markdown.SkipEmptySections = (bool)value;
+            }
+
+            if (index.TryGetValue("markdown.columnpadding", out value))
+            {
+                option.Markdown.ColumnPadding = (ColumnPadding)Enum.Parse(typeof(ColumnPadding), (string)value);
+            }
+
+            if (index.TryGetValue("markdown.useedgepipes", out value))
+            {
+                option.Markdown.UseEdgePipes = (EdgePipeOption)Enum.Parse(typeof(EdgePipeOption), (string)value);
             }
 
             if (index.TryGetValue("execution.languagemode", out value))

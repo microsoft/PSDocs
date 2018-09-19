@@ -7,6 +7,9 @@ namespace PSDocs.Processor.Markdown
 {
     internal sealed class MarkdownProcessorContext
     {
+        private const char Space = ' ';
+        private const char Pipe = '|';
+
         public readonly PSDocumentOption Option;
         public readonly Document Document;
 
@@ -45,6 +48,36 @@ namespace PSDocs.Processor.Markdown
         public void Write(string text)
         {
             Builder.Append(text);
+        }
+
+        public void Write(char c)
+        {
+            Builder.Append(c);
+        }
+
+        internal void WriteSpace(int count = 1)
+        {
+            if (count == 0)
+            {
+                return;
+            }
+
+            Builder.Append(new string(Space, count));
+        }
+
+        internal void WritePipe()
+        {
+            Builder.Append(Pipe);
+        }
+
+        public void Write(char c, int count)
+        {
+            if (count == 0)
+            {
+                return;
+            }
+
+            Builder.Append(new string(c, count));
         }
     }
 }
