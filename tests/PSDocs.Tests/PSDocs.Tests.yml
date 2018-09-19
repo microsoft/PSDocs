@@ -3,5 +3,7 @@ markdown:
   encoding: UTF8
   wrapSeparator: 'ZZZ'
   skipEmptySections: false
+  columnPadding: Single
+  useEdgePipes: Always
 execution:
   languageMode: ConstrainedLanguage

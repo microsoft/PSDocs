@@ -115,6 +115,103 @@ markdown:
   skipEmptySections: false
 ```
 
+### Column padding
+
+Sets how table column padding should be handled in markdown. This doesn't affect how tables are rendered but can greatly assist readability of markdown source files.
+
+The following padding options are available:
+
+- None - No padding will be used and column values will directly follow pipe `|`
+- Single - A single space will be used to pad the column value
+- MatchHeader - Will pad the header with a single space, then pad the column value, to the same width as the header
+
+When a column is set to a specific width with a property expression, `MatchHeader` will be ignored. Columns without a width set will apply `MatchHeader` as normal.
+
+Example markdown using `None`:
+
+```markdown
+|Name|Value|
+|----|-----|
+|Mon|Key|
+```
+
+Example markdown using `Single`:
+
+```markdown
+| Name | Value |
+| ---- | ----- |
+| Mon | Key |
+```
+
+Example markdown using `MatchHeader`:
+
+```markdown
+| Name | Value |
+| ---- | ----- |
+| Mon  | Key   |
+```
+
+This option can be specified using:
+
+```powershell
+# PowerShell: Using the Markdown.ColumnPadding hash table key
+$option = New-PSDocumentOption -Option @{ 'Markdown.ColumnPadding' = 'MatchHeader' }
+```
+
+```yaml
+# psdocs.yml: Using the markdown/columnPadding YAML property
+markdown:
+  columnPadding: MatchHeader
+```
+
+### Use edge pipes
+
+This option determined when pipes on the edge of a table should be used. This option can improve readability of markdown source files, but may not be supported by all markdown renderers.
+
+Edge pipes are always required if the table has a single column, so this option only applies when tables with more then one column are used.
+
+The following options for edge pipes are:
+
+- WhenRequired - Will not use edge pipes for tables with more when one column
+- Always - Will always use edge pipes
+
+Example markdown using `WhenRequired`:
+
+```markdown
+Name|Value
+----|-----
+Mon|Key
+```
+
+Example markdown using `Always`:
+
+```markdown
+|Name|Value|
+|----|-----|
+|Mon|Key|
+```
+
+Example markdown using `WhenRequired` and column padding of `MatchHeader`:
+
+```markdown
+Name | Value
+---- | -----
+Mon  | Key
+```
+
+This option can be specified using:
+
+```powershell
+# PowerShell: Using the Markdown.UseEdgePipes hash table key
+$option = New-PSDocumentOption -Option @{ 'Markdown.UseEdgePipes' = 'WhenRequired' }
+```
+
+```yaml
+# psdocs.yml: Using the markdown/useEdgePipes YAML property
+markdown:
+  useEdgePipes: WhenRequired
+```
+
 ### Language mode
 
 By default unless PowerShell has been constrained, full language features of PowerShell are available to use within document definitions. In locked down environments, a reduced set of language features may be desired.

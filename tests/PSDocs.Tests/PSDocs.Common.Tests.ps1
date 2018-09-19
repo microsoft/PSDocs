@@ -265,6 +265,42 @@ Describe 'New-PSDocumentOption' -Tag 'Option' {
         }
     }
 
+    Context 'Read Markdown.ColumnPadding' {
+
+        It 'from default' {
+            $option = New-PSDocumentOption;
+            $option.Markdown.ColumnPadding | Should -Be 'MatchHeader';
+        }
+
+        It 'from Hashtable' {
+            $option = New-PSDocumentOption -Option @{ 'Markdown.ColumnPadding' = 'Single' };
+            $option.Markdown.ColumnPadding | Should -Be 'Single';
+        }
+
+        It 'from YAML' {
+            $option = New-PSDocumentOption -Option (Join-Path -Path $here -ChildPath 'PSDocs.Tests.yml');
+            $option.Markdown.ColumnPadding | Should -Be 'Single';
+        }
+    }
+
+    Context 'Read Markdown.UseEdgePipes' {
+
+        It 'from default' {
+            $option = New-PSDocumentOption;
+            $option.Markdown.UseEdgePipes | Should -Be 'WhenRequired';
+        }
+
+        It 'from Hashtable' {
+            $option = New-PSDocumentOption -Option @{ 'Markdown.UseEdgePipes' = 'Always' };
+            $option.Markdown.UseEdgePipes | Should -Be 'Always';
+        }
+
+        It 'from YAML' {
+            $option = New-PSDocumentOption -Option (Join-Path -Path $here -ChildPath 'PSDocs.Tests.yml');
+            $option.Markdown.UseEdgePipes | Should -Be 'Always';
+        }
+    }
+
     Context 'Read Execution.LanguageMode' {
 
         It 'from default' {

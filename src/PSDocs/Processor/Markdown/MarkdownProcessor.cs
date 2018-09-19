@@ -6,7 +6,6 @@ namespace PSDocs.Processor.Markdown
 {
     public sealed class MarkdownProcessor
     {
-
         public string Process(PSDocumentOption option, Document document)
         {
             if (document == null)
@@ -184,17 +183,22 @@ namespace PSDocs.Processor.Markdown
                 return;
             }
 
-            context.WriteLine("");
+            context.WriteLine(string.Empty);
 
-            var headerCount = table.Headers.Count;
+            var lastHeader = table.Headers.Count - 1;
+            var useEdgePipe = context.Option.Markdown.UseEdgePipes == EdgePipeOption.Always
+                || table.Headers.Count == 1;
+            var padColumn = context.Option.Markdown.ColumnPadding == ColumnPadding.Single
+                || context.Option.Markdown.ColumnPadding == ColumnPadding.MatchHeader;
 
             // Write table headers
             for (var i = 0; i < table.Headers.Count; i++)
             {
-                context.Write("| ");
+                StartColumn(context, i, lastHeader, useEdgePipe, padColumn);
+                
                 context.Write(table.Headers[i].Label);
 
-                if (i < table.Headers.Count - 1)
+                if (i < lastHeader)
                 {
                     var padding = 0;
 
@@ -204,16 +208,21 @@ namespace PSDocs.Processor.Markdown
                         padding = table.Headers[i].Width - table.Headers[i].Label.Length;
                     }
 
-                    context.Write(' ', padding + 1);
+                    context.WriteSpace(padding);
                 }
             }
 
-            context.WriteLine(" |");
+            if (padColumn && useEdgePipe)
+            {
+                context.WriteSpace();
+            }
+
+            context.WriteLine(useEdgePipe ? "|" : string.Empty);
 
             // Write table header separator
             for (var i = 0; i < table.Headers.Count; i++)
             {
-                context.Write("| ");
+                StartColumn(context, i, lastHeader, useEdgePipe, padColumn);
 
                 switch (table.Headers[i].Alignment)
                 {
@@ -242,7 +251,7 @@ namespace PSDocs.Processor.Markdown
                         break;
                 }
 
-                if (i < table.Headers.Count - 1)
+                if (i < lastHeader)
                 {
                     var padding = 0;
 
@@ -252,39 +261,76 @@ namespace PSDocs.Processor.Markdown
                         padding = table.Headers[i].Width - table.Headers[i].Label.Length;
                     }
 
-                    context.Write(' ', padding + 1);
+                    context.WriteSpace(padding);
                 }
             }
 
-            context.WriteLine(" |");
+            if (padColumn && useEdgePipe)
+            {
+                context.WriteSpace();
+            }
+
+            context.WriteLine(useEdgePipe ? "|" : string.Empty);
 
             // Write table rows
             for (var r = 0; r < table.Rows.Count; r++)
             {
                 for (var c = 0; c < table.Rows[r].Length; c++)
                 {
-                    context.Write("| ");
+                    StartColumn(context, c, lastHeader, useEdgePipe, padColumn);
 
                     var text = WrapText(context, table.Rows[r][c]);
 
                     context.Write(text);
 
-                    if (c < table.Headers.Count - 1)
+                    if (c < lastHeader)
                     {
                         var padding = 0;
 
-                        // Pad column
+                        // Pad column using column width
                         if (table.Headers[c].Width > 0 && (table.Headers[c].Width - table.Rows[r][c].Length) > 0)
                         {
                             padding = table.Headers[c].Width - table.Rows[r][c].Length;
                         }
+                        // Pad column matching header
+                        else if (context.Option.Markdown.ColumnPadding == ColumnPadding.MatchHeader)
+                        {
+                            if ((table.Headers[c].Label.Length - table.Rows[r][c].Length) > 0)
+                            {
+                                padding = table.Headers[c].Label.Length - table.Rows[r][c].Length;
+                            }
+                        }
 
-                        context.Write(' ', padding + 1);
+                        context.WriteSpace(padding);
                     }
                 }
 
-                context.WriteLine(" |");
-                context.WriteLine(string.Empty);
+                if (padColumn && useEdgePipe)
+                {
+                    context.WriteSpace();
+                }
+
+                context.WriteLine(useEdgePipe ? "|" : string.Empty);
+            }
+
+            context.WriteLine(string.Empty);
+        }
+
+        private void StartColumn(MarkdownProcessorContext context, int index, int last, bool useEdgePipe, bool padColumn)
+        {
+            if (index > 0 && padColumn)
+            {
+                context.WriteSpace();
+            }
+
+            if (index > 0 || useEdgePipe)
+            {
+                context.WritePipe();
+            }
+
+            if (padColumn && useEdgePipe || index > 0 && padColumn)
+            {
+                context.WriteSpace();
             }
         }
 

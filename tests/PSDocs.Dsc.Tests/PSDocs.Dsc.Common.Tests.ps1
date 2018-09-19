@@ -111,7 +111,7 @@ Describe 'PSDocs.Dsc' -Tag 'Dsc' {
         }
 
         It 'Should contain instance name' {
-            "$outputPath\Instance1.md" | Should -FileContentMatch '\| Node=Instance1 \|';
+            "$outputPath\Instance1.md" | Should -FileContentMatch 'Node=Instance1 \|';
         }
     }
 
