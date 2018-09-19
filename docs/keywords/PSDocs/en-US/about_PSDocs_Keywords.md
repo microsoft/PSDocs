@@ -310,6 +310,32 @@ Document 'Table' {
     Section 'Directory list' {
 
         # Create a row for each child item of C:\
+        Get-ChildItem -Path 'C:\' | Table -Property Name,PSIsContainer;
+    }
+}
+
+# Generate markdown from the document definition
+Invoke-PSDocument -Name 'Table';
+```
+
+```markdown
+## Directory list
+
+Name | PSIsContainer
+---- | -------------
+Program Files | True
+Program Files (x86) | True
+Users | True
+Windows | True
+```
+
+```powershell
+# A document definition named Table
+Document 'Table' {
+
+    Section 'Directory list' {
+
+        # Create a row for each child item of C:\
         Get-ChildItem -Path 'C:\' | Table -Property @{ Name = 'Name'; Expression = { $_.Name }; Width = 19; },@{ Name = 'Is Container'; Expression = { $_.PSIsContainer }; Alignment = 'Center'; Width = 11; };
     }
 }
@@ -321,12 +347,12 @@ Invoke-PSDocument -Name 'Table';
 ```markdown
 ## Directory list
 
-| Name                | Is Container |
-| ----                | :----------: |
-| Program Files       | True         |
-| Program Files (x86) | True         |
-| Users               | True         |
-| Windows             | True         |
+Name                | Is Container
+----                | :----------:
+Program Files       | True
+Program Files (x86) | True
+Users               | True
+Windows             | True
 ```
 
 Generates a new `Table.md` document containing a table populated with a row for each item. Only the properties Name and Is Container are added as columns. A property expression is used on the `PSIsContainer` property to render the column as `Is Container`.
@@ -405,4 +431,5 @@ An online version of this document is available at https://github.com/BernieWhit
 - Note
 - Warning
 - Table
+- Metadata
 - Yaml
