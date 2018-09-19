@@ -298,14 +298,14 @@ Table [-Property <Object[]>]
 - `-Property` - Filter the table to only the named columns. Either a named column or hash table can be used. Valid keys include:
   - Name (or Label) `[String]` - the name of the column
   - Expression `[String]` or `[ScriptBlock]` - an expression to get a calculated column value
-  - Width `[Int32]` - the column width use in markdown output, this don't change how the the table is rendered
+  - Width `[Int32]` - columns will be padded with spaces in markdown to this width. This doesn't change how the the table is rendered
   - Alignment (value can be "Left", "Center" or "Right") - alignment to align column values in during rendering
 
 Examples:
 
 ```powershell
 # A document definition named Table
-Document 'Table' {
+Document 'SimpleTable' {
 
     Section 'Directory list' {
 
@@ -315,7 +315,7 @@ Document 'Table' {
 }
 
 # Generate markdown from the document definition
-Invoke-PSDocument -Name 'Table';
+SimpleTable;
 ```
 
 ```markdown
@@ -329,9 +329,11 @@ Users | True
 Windows | True
 ```
 
+Generates a new `SimpleTable.md` document containing a table populated with a row for each item. Only the properties Name and Is Container are added as columns. A property expression is used on the `PSIsContainer` property to render the column as `Is Container`.
+
 ```powershell
 # A document definition named Table
-Document 'Table' {
+Document 'CalculatedTable' {
 
     Section 'Directory list' {
 
@@ -341,7 +343,7 @@ Document 'Table' {
 }
 
 # Generate markdown from the document definition
-Invoke-PSDocument -Name 'Table';
+CalculatedTable;
 ```
 
 ```markdown
@@ -355,7 +357,7 @@ Users               | True
 Windows             | True
 ```
 
-Generates a new `Table.md` document containing a table populated with a row for each item. Only the properties Name and Is Container are added as columns. A property expression is used on the `PSIsContainer` property to render the column as `Is Container`.
+Generates a new `CalculatedTable.md` document containing a table populated with a row for each item. Only the properties Name and Is Container are added as columns. A property expression is used on the `PSIsContainer` property to render the column as `Is Container`.
 
 ### Metadata
 
@@ -388,7 +390,7 @@ Document 'MetadataBlock' {
 }
 
 # Generate markdown from the document definition
-Invoke-PSDocument -Name 'MetadataBlock';
+MetadataBlock;
 ```
 
 Generates a new MetadataBlock.md document containing a yaml front matter. An example of the output generated is available [here](/docs/examples/Yaml-header-output.md).

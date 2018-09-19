@@ -123,7 +123,7 @@ The following padding options are available:
 
 - None - No padding will be used and column values will directly follow pipe `|`
 - Single - A single space will be used to pad the column value
-- MatchHeader - Will pad the header with a single space, then pad the column value, to the same width as the header
+- MatchHeader - Will pad the header with a single space, then pad the column value, to the same width as the header (default)
 
 When a column is set to a specific width with a property expression, `MatchHeader` will be ignored. Columns without a width set will apply `MatchHeader` as normal.
 
@@ -172,7 +172,7 @@ Edge pipes are always required if the table has a single column, so this option 
 
 The following options for edge pipes are:
 
-- WhenRequired - Will not use edge pipes for tables with more when one column
+- WhenRequired - Will not use edge pipes for tables with more when one column (default)
 - Always - Will always use edge pipes
 
 Example markdown using `WhenRequired`:
@@ -260,6 +260,8 @@ markdown:
   encoding: Default
   skipEmptySections: true
   wrapSeparator: ' '
+  columnPadding: MatchHeader
+  useEdgePipes: WhenRequired
 execution:
   languageMode: FullLanguage
 ```
