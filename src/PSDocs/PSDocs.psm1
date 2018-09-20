@@ -150,10 +150,6 @@ function Invoke-PSDocument {
         [String]$OutputPath = $PWD,
 
         [Parameter(Mandatory = $False)]
-        [ValidateNotNull()]
-        [System.Collections.Generic.Dictionary[String, ScriptBlock]]$Function,
-
-        [Parameter(Mandatory = $False)]
         [Switch]$PassThru = $False,
 
         [Parameter(Mandatory = $False)]
@@ -780,9 +776,6 @@ function GenerateDocumentPath {
         [String]$OutputPath = $PWD,
 
         [Parameter(Mandatory = $False)]
-        [System.Collections.Generic.Dictionary[String, ScriptBlock]]$Function,
-
-        [Parameter(Mandatory = $False)]
         [Switch]$PassThru = $False,
 
         [Parameter(Mandatory = $False)]
@@ -871,9 +864,6 @@ function GenerateDocumentInline {
 
         [Parameter(Mandatory = $False)]
         [String]$OutputPath = $PWD,
-
-        [Parameter(Mandatory = $False)]
-        [System.Collections.Generic.Dictionary[String, ScriptBlock]]$Function,
 
         [Parameter(Mandatory = $False)]
         [Switch]$PassThru = $False,

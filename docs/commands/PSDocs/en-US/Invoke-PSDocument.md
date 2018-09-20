@@ -17,7 +17,6 @@ Create markdown from an input object.
 
 ```text
 Invoke-PSDocument -Name <String[]> [-InstanceName <String[]>] [-InputObject <PSObject>] [-OutputPath <String>]
- [-Function <System.Collections.Generic.Dictionary`2[System.String,System.Management.Automation.ScriptBlock]>]
  [-PassThru] [-Option <PSDocumentOption>] [-Encoding <MarkdownEncoding>] [<CommonParameters>]
 ```
 
@@ -26,13 +25,12 @@ Invoke-PSDocument -Name <String[]> [-InstanceName <String[]>] [-InputObject <PSO
 ```text
 Invoke-PSDocument [-Name <String[]>] [-Tag <String[]>] [-InstanceName <String[]>] [-InputObject <PSObject>]
  [-Path] <String> [-OutputPath <String>]
- [-Function <System.Collections.Generic.Dictionary`2[System.String,System.Management.Automation.ScriptBlock]>]
  [-PassThru] [-Option <PSDocumentOption>] [-Encoding <MarkdownEncoding>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
 
-Create markdown from an input object using a document definition. A document is defined using the Document keyword.
+Create markdown from an input object using a document definition. A document is defined using the `document` keyword.
 
 ## EXAMPLES
 
@@ -41,7 +39,7 @@ Create markdown from an input object using a document definition. A document is 
 ```powershell
 # Create a new document definition called Sample in sample.doc.ps1
 Set-Content -Path .\sample.doc.ps1 -Value @'
-Document Sample {
+document Sample {
 
     # Add an introduction section
     Section Introduction {
@@ -65,7 +63,7 @@ Create markdown using *.doc.ps1 files loaded from the current working directory.
 
 ```powershell
 # Define an inline document called Sample
-Document Sample {
+document Sample {
 
     # Add an introduction section
     Section Introduction {
@@ -89,25 +87,9 @@ Create markdown using the inline documentation definition called Sample using as
 
 ## PARAMETERS
 
-### -Function
-
-This option can be used to define documentation specific functions that can be used using markdown creation.
-
-```yaml
-Type: System.Collections.Generic.Dictionary`2[System.String,System.Management.Automation.ScriptBlock]
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
 ### -InputObject
 
-An input object that will be used to build markdown.
+An input object that will be passed to each document and can be referenced within document blocks as `$InputObject`.
 
 ```yaml
 Type: PSObject
@@ -123,7 +105,7 @@ Accept wildcard characters: False
 
 ### -InstanceName
 
-The name of the resulting markdown file. During execution of this command, the variable $InstanceName will be available within the document definition for use by expressions.
+The name of the resulting markdown file. During execution of this command, the variable `$InstanceName` will be available within the document definition for use by expressions.
 
 If InstanceName is not specified the name of the document definition will be used instead.
 
@@ -143,7 +125,9 @@ Accept wildcard characters: False
 
 ### -Name
 
-The name of a specific document template to use to generate markdown.
+The name of a specific document definition to use to generate markdown.
+
+When this option is used with `-Path`, script files will be executed in order, and document blocks that do not match name are skipped.
 
 ```yaml
 Type: String[]
