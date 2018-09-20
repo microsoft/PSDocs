@@ -100,7 +100,7 @@ Prior to PSDocs v0.4.0 the only encoding supported was ASCII.
 
 From PSDocs v0.5.0 onward, `Section` blocks that are empty are omitted from markdown output by default. i.e. `Markdown.SkipEmptySections` is `$True`.
 
-To include empty sections (PSDocs v0.4.0 or older) in markdown output either use the `-Force` parameter on a specific `Section` block or set `Markdown.SkipEmptySections = $False`.
+To include empty sections (the same as PSDocs v0.4.0 or older) in markdown output either use the `-Force` parameter on a specific `Section` block or set the option `Markdown.SkipEmptySections` to `$False`.
 
 This option can be specified using:
 
@@ -121,9 +121,9 @@ Sets how table column padding should be handled in markdown. This doesn't affect
 
 The following padding options are available:
 
-- None - No padding will be used and column values will directly follow pipe `|`
+- None - No padding will be used and column values will directly follow table pipe (`|`) column separators
 - Single - A single space will be used to pad the column value
-- MatchHeader - Will pad the header with a single space, then pad the column value, to the same width as the header
+- MatchHeader - Will pad the header with a single space, then pad the column value, to the same width as the header (default)
 
 When a column is set to a specific width with a property expression, `MatchHeader` will be ignored. Columns without a width set will apply `MatchHeader` as normal.
 
@@ -133,6 +133,7 @@ Example markdown using `None`:
 |Name|Value|
 |----|-----|
 |Mon|Key|
+|Really long name|Really long value|
 ```
 
 Example markdown using `Single`:
@@ -141,6 +142,7 @@ Example markdown using `Single`:
 | Name | Value |
 | ---- | ----- |
 | Mon | Key |
+| Really long name | Really long value |
 ```
 
 Example markdown using `MatchHeader`:
@@ -149,6 +151,7 @@ Example markdown using `MatchHeader`:
 | Name | Value |
 | ---- | ----- |
 | Mon  | Key   |
+| Really long name | Really long value |
 ```
 
 This option can be specified using:
@@ -166,13 +169,13 @@ markdown:
 
 ### Use edge pipes
 
-This option determined when pipes on the edge of a table should be used. This option can improve readability of markdown source files, but may not be supported by all markdown renderers.
+This option determines when pipes on the edge of a table should be used. This option can improve readability of markdown source files, but may not be supported by all markdown renderers.
 
-Edge pipes are always required if the table has a single column, so this option only applies when tables with more then one column are used.
+Edge pipes are always required if the table has a single column, so this option only applies for tables with more then one column.
 
 The following options for edge pipes are:
 
-- WhenRequired - Will not use edge pipes for tables with more when one column
+- WhenRequired - Will not use edge pipes for tables with more when one column (default)
 - Always - Will always use edge pipes
 
 Example markdown using `WhenRequired`:
@@ -214,7 +217,7 @@ markdown:
 
 ### Language mode
 
-By default unless PowerShell has been constrained, full language features of PowerShell are available to use within document definitions. In locked down environments, a reduced set of language features may be desired.
+Unless PowerShell has been constrained, full language features of PowerShell are available to use within document definitions. In locked down environments, a reduced set of language features may be desired.
 
 When PSDocs is executed in an environment configured for Device Guard, only constrained language features are available.
 
@@ -260,6 +263,8 @@ markdown:
   encoding: Default
   skipEmptySections: true
   wrapSeparator: ' '
+  columnPadding: MatchHeader
+  useEdgePipes: WhenRequired
 execution:
   languageMode: FullLanguage
 ```

@@ -22,10 +22,6 @@ Defines a named block that can be called to output documentation.
 
 Get the Yaml header from a PSDocs generated markdown file.
 
-### [Import-PSDocumentTemplate](Import-PSDocumentTemplate.md)
-
-{{Manually Enter Import-PSDocumentTemplate Description Here}}
-
 ### [Invoke-PSDocument](Invoke-PSDocument.md)
 
 Create markdown from an input object.

@@ -2,6 +2,7 @@
 ## Unreleased
 
 - **Breaking change**: Removed `Import-PSDocumentTemplate` cmdlet. Use `Invoke-PSDocument` instead or dot source
+- **Breaking change**: Removed support for `-Function` parameter of `Invoke-PSDocument`. External commands can be executed in document blocks. Re-evaluating if this is really needed.
 - **Important change**: Renamed `-When` parameter on Section block to `-If`. `-When` is still supported
 - Added support for locked down environments to ensure that documents are executed as constrained code when Device Guard is used
   - Use the `Execution.LanguageMode = 'ConstrainedLanguage'` option to force constrained language mode
