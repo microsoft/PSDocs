@@ -820,10 +820,10 @@ function GenerateDocumentPath {
         );
 
         $PSDocs.WriteDocumentHook = {
-                param ([PSDocs.Configuration.PSDocumentOption]$option, [PSDocs.Models.Document]$document)
+            param ([PSDocs.Configuration.PSDocumentOption]$option, [PSDocs.Models.Document]$document)
 
-                # Visit the document with the specified processor
-                (NewMarkdownProcessor).Process($option, $document) | WriteDocumentContent -Path $document.Path -PassThru:$PassThru -Encoding:$option.Markdown.Encoding;
+            # Visit the document with the specified processor
+            (NewMarkdownProcessor).Process($option, $document) | WriteDocumentContent -Path $document.Path -PassThru:$PassThru -Encoding:$option.Markdown.Encoding;
         }
 
         $PSDocs.OutputPath = [System.IO.Path]::GetFullPath($OutputPath);
@@ -1005,9 +1005,9 @@ function WriteDocumentContent {
 
     end {
         if ($PassThru) {
-            $stringBuilder.ToString();
+            Write-Verbose -Message "[Doc] -- Writing to pipeline";
+            $PSCmdlet.WriteObject($stringBuilder.ToString());
         } else {
-
             Write-Verbose -Message "[Doc] -- Writing to path: $Path";
             [System.IO.File]::WriteAllText($Path, $stringBuilder.ToString(), $contentEncoding);
         }
@@ -1192,7 +1192,7 @@ function InvokeTemplate {
             $Null = $ps.AddScript($template);
 
             try {
-                $Null = $ps.Invoke();
+                $ps.Invoke();
             }
             catch {
                 $baseException = $_.Exception.GetBaseException();

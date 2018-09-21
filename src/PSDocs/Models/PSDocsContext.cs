@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace PSDocs.Models
 {
-    public delegate void WriteDocumentDelegate(PSDocumentOption option, Document document);
+    public delegate object WriteDocumentDelegate(PSDocumentOption option, Document document);
 
     public sealed class PSDocsContext
     {
@@ -26,9 +26,9 @@ namespace PSDocs.Models
             };
         }
 
-        public void WriteDocument(Document document)
+        public object WriteDocument(Document document)
         {
-            WriteDocumentHook?.Invoke(Option, document);
+            return WriteDocumentHook?.Invoke(Option, document);
         }
     }
 }

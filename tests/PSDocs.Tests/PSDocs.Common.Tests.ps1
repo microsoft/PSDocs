@@ -182,6 +182,14 @@ Describe 'Invoke-PSDocument' -Tag 'FromPath' {
         }
     }
 
+    Context 'With -PassThru' {
+
+        It 'Should return results' {
+            $result = Invoke-PSDocument -Path $here -OutputPath $outputPath -Name FromFileTest1,FromFileTest2 -PassThru -Verbose;
+            $result | Should -Not -BeNullOrEmpty;
+        }
+    }
+
     Context 'With constrained language' {
 
         It 'Checks if DeviceGuard is enabled' {
