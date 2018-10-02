@@ -85,6 +85,12 @@ namespace PSDocs.Processor.Markdown
 
                         break;
 
+                    case DocumentNodeType.BlockQuote:
+
+                        BlockQuote(context, documentNode as BlockQuote);
+
+                        break;
+
                     case DocumentNodeType.Note:
 
                         Note(context, documentNode as Note);
@@ -130,6 +136,23 @@ namespace PSDocs.Processor.Markdown
                 {
                     Node(context, node);
                 }
+            }
+        }
+
+        private void BlockQuote(MarkdownProcessorContext context, BlockQuote blockQuote)
+        {
+            context.WriteLine(string.Empty);
+
+            if (!string.IsNullOrEmpty(blockQuote.Info))
+            {
+                context.Write("> ");
+                context.WriteLine(blockQuote.Info);
+            }
+
+            foreach (var line in blockQuote.Content)
+            {
+                context.Write("> ");
+                context.WriteLine(line);
             }
         }
 

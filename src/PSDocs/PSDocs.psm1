@@ -504,6 +504,30 @@ function Warning {
     }
 }
 
+function BlockQuote {
+
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $True, ValueFromPipeline = $True)]
+        [String]$Text,
+
+        [Parameter(Mandatory = $False)]
+        [String]$Info
+    )
+
+    begin {
+        $result = [PSDocs.Models.ModelHelper]::BlockQuote();
+    }
+
+    process {
+        $result.Content += $Text;
+    }
+
+    end {
+        $result;
+    }
+}
+
 function Metadata {
 
     [CmdletBinding()]
@@ -1269,6 +1293,10 @@ function GetRunspace {
             ${function:Code}
         )));
         $iss.Commands.Add((New-Object -TypeName System.Management.Automation.Runspaces.SessionStateFunctionEntry -ArgumentList @(
+            'BlockQuote',
+            ${function:BlockQuote}
+        )));
+        $iss.Commands.Add((New-Object -TypeName System.Management.Automation.Runspaces.SessionStateFunctionEntry -ArgumentList @(
             'Note',
             ${function:Note}
         )));
@@ -1395,6 +1423,7 @@ function InitEditorServices {
             'Metadata'
             'Title'
             'Code'
+            'BlockQuote'
             'Note'
             'Warning'
         );

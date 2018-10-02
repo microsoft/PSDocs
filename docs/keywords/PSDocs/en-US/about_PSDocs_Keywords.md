@@ -18,6 +18,7 @@ The following PSDocs keywords are available:
 - Section - A named section
 - Title - Sets the document title
 - Code - Inserts a block of code
+- BlockQuote - Inserts a block quote
 - Note - Inserts a note using DocFx formatted markdown (DFM)
 - Warning - Inserts a warning using DocFx formatted markdown (DFM)
 - Table - Inserts a table from pipeline objects
@@ -262,6 +263,33 @@ Document 'CodeBlockFromPipeline' {
 }
 ```
 
+### BlockQuote
+
+Creates a block quote formatted section.
+
+Syntax:
+
+```text
+BlockQuote [-Text] <String>
+```
+
+Examples:
+
+```powershell
+# A document definition named BlockQuote
+Document 'BlockQuote' {
+
+    # Block quote some text
+    'This is a block quote.' | BlockQuote
+}
+```
+
+```markdown
+> This is a block quote.
+```
+
+Generates a new `BlockQuote.md` document containing a block quote.
+
 ### Note
 
 Creates a block quote formatted as a DocFx Formatted Markdown note.
@@ -457,6 +485,7 @@ An online version of this document is available at https://github.com/BernieWhit
 - Section
 - Title
 - Code
+- BlockQuote
 - Note
 - Warning
 - Table

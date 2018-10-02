@@ -48,6 +48,14 @@
             };
         }
 
+        public static BlockQuote BlockQuote(string info = null)
+        {
+            return new BlockQuote
+            {
+                Info = info
+            };
+        }
+
         public static Text Text(string value)
         {
             return new Text
