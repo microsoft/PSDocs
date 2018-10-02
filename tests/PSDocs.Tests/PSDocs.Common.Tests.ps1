@@ -130,6 +130,18 @@ Describe 'PSDocs instance names' -Tag Common {
             }
         }
     }
+
+    Context 'With -PassThru' {
+
+        document 'WithPassThru' {
+            $InstanceName
+        }
+
+        It 'Should return results' {
+            $result = WithPassThru -PassThru;
+            $result | Should -Match 'WithPassThru';
+        }
+    }
 }
 
 Describe 'Invoke-PSDocument' -Tag 'FromPath' {
@@ -179,6 +191,14 @@ Describe 'Invoke-PSDocument' -Tag 'FromPath' {
             $Error[0].Exception.Message | Should -Match '^(The term ''New-PSDocsInvalidCommand'' is not recognized as the name of a cmdlet)';
             { Invoke-PSDocument -Path $here -OutputPath $outputPath -Name WithWriteError -ErrorAction Stop } | Should -Throw -ExceptionType PSDocs.Execution.InvokeDocumentException;
             $Error[0].Exception.Message | Should -Match 'Verify Write-Error is raised as an exception';
+        }
+    }
+
+    Context 'With -PassThru' {
+
+        It 'Should return results' {
+            $result = Invoke-PSDocument -Path $here -OutputPath $outputPath -Name FromFileTest1,FromFileTest2 -PassThru;
+            $result | Should -Not -BeNullOrEmpty;
         }
     }
 
