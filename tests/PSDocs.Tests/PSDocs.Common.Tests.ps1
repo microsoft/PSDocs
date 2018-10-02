@@ -130,6 +130,18 @@ Describe 'PSDocs instance names' -Tag Common {
             }
         }
     }
+
+    Context 'With -PassThru' {
+
+        document 'WithPassThru' {
+            $InstanceName
+        }
+
+        It 'Should return results' {
+            $result = WithPassThru -PassThru;
+            $result | Should -Match 'WithPassThru';
+        }
+    }
 }
 
 Describe 'Invoke-PSDocument' -Tag 'FromPath' {
@@ -185,7 +197,7 @@ Describe 'Invoke-PSDocument' -Tag 'FromPath' {
     Context 'With -PassThru' {
 
         It 'Should return results' {
-            $result = Invoke-PSDocument -Path $here -OutputPath $outputPath -Name FromFileTest1,FromFileTest2 -PassThru -Verbose;
+            $result = Invoke-PSDocument -Path $here -OutputPath $outputPath -Name FromFileTest1,FromFileTest2 -PassThru;
             $result | Should -Not -BeNullOrEmpty;
         }
     }
