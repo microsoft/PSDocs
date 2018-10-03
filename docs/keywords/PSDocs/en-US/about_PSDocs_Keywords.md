@@ -130,7 +130,7 @@ Document 'Sample' {
 }
 ```
 
-```markdown
+```text
 ## Introduction
 This is a sample document that uses PSDocs keywords to construct a dynamic document.
 ```
@@ -152,7 +152,7 @@ Document 'Sample' {
 }
 ```
 
-```markdown
+```text
 ## Level2
 ### Level3
 ```
@@ -176,7 +176,7 @@ Document 'Sample' {
 }
 ```
 
-```markdown
+```text
 ## Included in output
 ```
 
@@ -207,7 +207,7 @@ Document 'Sample' {
 }
 ```
 
-```markdown
+```text
 # Level 1
 ## Level 2
 ```
@@ -241,6 +241,10 @@ Document 'CodeBlock' {
 
 Generates a new `CodeBlock.md` document containing the `powershell.exe -Help` command line.
 
+    ```
+    powershell.exe -Help
+    ```
+
 ```powershell
 # A document definition named CodeBlockWithInfo
 Document 'CodeBlockWithInfo' {
@@ -253,6 +257,10 @@ Document 'CodeBlockWithInfo' {
 ```
 
 Generates a new document containing script code formatted with the powershell info string.
+
+    ```powershell
+    Get-Item -Path .\;
+    ```
 
 ```powershell
 # A document definition named CodeBlockFromPipeline
@@ -270,8 +278,12 @@ Creates a block quote formatted section.
 Syntax:
 
 ```text
-BlockQuote [-Text] <String>
+BlockQuote [-Text] <String> [-Title <String>] [-Info <String>]
 ```
+
+- `Text` - The text of the block quote. This parameter can be specified directly or accept input from the pipeline.
+- `Title` - An additional title to add to the top of the text provided by the `-Text` parameter.
+- `Info` - The type of block quote. By default PSDocs will format using a DocFX Formatted Markdown (DFM) syntax.
 
 Examples:
 
@@ -284,15 +296,43 @@ Document 'BlockQuote' {
 }
 ```
 
-```markdown
+Generates a new `BlockQuote.md` document containing a block quote.
+
+```text
 > This is a block quote.
 ```
 
-Generates a new `BlockQuote.md` document containing a block quote.
+```powershell
+# A document definition named BlockQuote
+Document 'BlockQuote' {
+
+    # Block quote some text
+    'This is a block quote.' | BlockQuote -Title 'NB:'
+}
+```
+
+```text
+> NB:
+> This is a block quote.
+```
+
+```powershell
+# A document definition named BlockQuote
+Document 'BlockQuote' {
+
+    # Block quote some text
+    'This is a block quote.' | BlockQuote -Info 'Note'
+}
+```
+
+```text
+> [!NOTE]
+> This is a block quote.
+```
 
 ### Note
 
-Creates a block quote formatted as a DocFx Formatted Markdown note.
+Creates a block quote formatted as a DocFx Formatted Markdown (DFM) note. This is an alternative to using the `BlockQuote` keyword.
 
 Syntax:
 
@@ -313,7 +353,7 @@ Document 'NoteBlock' {
 }
 ```
 
-```markdown
+```text
 > [!NOTE]
 > This is a note.
 ```
@@ -322,7 +362,7 @@ Generates a new `NoteBlock.md` document containing a block quote formatted as a 
 
 ### Warning
 
-Creates a block quote formatted as a DocFx Formatted Markdown warning.
+Creates a block quote formatted as a DocFx Formatted Markdown (DFM) warning. This is an alternative to using the `BlockQuote` keyword.
 
 Syntax:
 
@@ -342,7 +382,7 @@ Document 'WarningBlock' {
 }
 ```
 
-```markdown
+```text
 > [!WARNING]
 > This is a warning.
 ```
@@ -379,7 +419,7 @@ Document 'SimpleTable' {
 }
 ```
 
-```markdown
+```text
 ## Directory list
 
 Name | PSIsContainer
@@ -404,7 +444,7 @@ Document 'CalculatedTable' {
 }
 ```
 
-```markdown
+```text
 ## Directory list
 
 Name                | Is Container
@@ -452,6 +492,15 @@ MetadataBlock;
 ```
 
 Generates a new MetadataBlock.md document containing a yaml front matter. An example of the output generated is available [here](/docs/examples/Yaml-header-output.md).
+
+```text
+---
+title: An example title
+author: bewhite
+last-updated: 2018-05-17
+---
+Yaml header may not be rendered by some markdown viewers. See source to view yaml.
+```
 
 ## EXAMPLES
 

@@ -48,11 +48,12 @@
             };
         }
 
-        public static BlockQuote BlockQuote(string info = null)
+        public static BlockQuote BlockQuote(string info, string title)
         {
             return new BlockQuote
             {
-                Info = info
+                Info = info,
+                Title = title
             };
         }
 

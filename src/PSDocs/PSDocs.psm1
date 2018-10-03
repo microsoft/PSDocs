@@ -512,11 +512,14 @@ function BlockQuote {
         [String]$Text,
 
         [Parameter(Mandatory = $False)]
-        [String]$Info
+        [String]$Info,
+
+        [Parameter(Mandatory = $False)]
+        [String]$Title
     )
 
     begin {
-        $result = [PSDocs.Models.ModelHelper]::BlockQuote();
+        $result = [PSDocs.Models.ModelHelper]::BlockQuote($Info, $Title);
     }
 
     process {
