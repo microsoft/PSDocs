@@ -25,14 +25,14 @@ Describe 'PSDocs -- BlockQuote keyword' -Tag BlockQuote {
 
         It 'Should handle single line input' {
             document 'BlockQuoteSingleMarkdown' {
-                'This is a single block quote' | BlockQuote
+                'This is a single line' | BlockQuote
             }
 
             $outputDoc = "$outputPath\BlockQuoteSingleMarkdown.md";
             BlockQuoteSingleMarkdown -OutputPath $outputPath;
 
             Test-Path -Path $outputDoc | Should be $True;
-            $outputDoc | Should -FileContentMatchMultiline '\> This is a single block quote';
+            $outputDoc | Should -FileContentMatchMultiline '\> This is a single line';
         }
 
         It 'Should handle multiline input' {

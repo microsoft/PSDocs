@@ -12,64 +12,54 @@ $ErrorActionPreference = 'Stop';
 Set-StrictMode -Version latest;
 
 # Setup tests paths
-$rootPath = (Resolve-Path $PSScriptRoot\..\..).Path;
-$here = Split-Path -Parent $MyInvocation.MyCommand.Path;
-$temp = "$here\..\..\build";
+$rootPath = $PWD;
 
-Import-Module (Join-Path -Path $rootPath -ChildPath "out/modules/PSDocs") -Force;
+Import-Module (Join-Path -Path $rootPath -ChildPath out/modules/PSDocs) -Force;
 
-$outputPath = "$temp\PSDocs.Tests\Warning";
-Remove-Item -Path $outputPath -Force -Recurse -Confirm:$False -ErrorAction SilentlyContinue;
+$outputPath = Join-Path -Path $rootPath -ChildPath out/tests/PSDocs.Tests/Warning;
+Remove-Item -Path $outputPath -Force -Recurse -Confirm:$False -ErrorAction Ignore;
 $Null = New-Item -Path $outputPath -ItemType Directory -Force;
 
-$dummyObject = New-Object -TypeName PSObject;
+Describe 'PSDocs -- Warning keyword' -Tag Warning {
+    Context 'Markdown' {
 
-$Global:TestVars = @{ };
-
-Describe 'PSDocs -- Warning keyword' {
-
-    Context 'Warning single line markdown' {
-        
-        # Define a test document with a warning
-        document 'WarningSingleMarkdown' {
-            
-            Warning {
-                'This is a single line warning'
+        It 'Should handle single line input' {
+            document 'WarningSingleMarkdown' {
+                'This is a single line' | Warning
             }
-        }
 
-        $outputDoc = "$outputPath\WarningSingleMarkdown.md";
-        WarningSingleMarkdown -InputObject $dummyObject -OutputPath $outputPath;
+            $outputDoc = "$outputPath\WarningSingleMarkdown.md";
+            WarningSingleMarkdown -OutputPath $outputPath;
 
-        It 'Should have generated output' {
             Test-Path -Path $outputDoc | Should be $True;
+            $outputDoc | Should -FileContentMatchMultiline '\> \[\!WARNING\]\r\n\> This is a single line';
         }
 
-        It 'Should match expected format' {
-            Get-Content -Path $outputDoc -Raw | Should match '\> \[\!WARNING\]\r\n\> This is a single line warning';
-        }
-    }
-
-    Context 'Warning multi-line markdown' {
-        
-        # Define a test document with a warning
-        document 'WarningMultiMarkdown' {
-            
-            Warning {
-                'This is the first line of the warning.'
-                'This is the second line of the warning.'
+        It 'Should handle multiline input' {
+            document 'WarningMultiMarkdown' {
+                @('This is the first line.'
+                'This is the second line.') | Warning
             }
+
+            $outputDoc = "$outputPath\WarningMultiMarkdown.md";
+            WarningMultiMarkdown -OutputPath $outputPath;
+
+            Test-Path -Path $outputDoc | Should -Be $True;
+            $outputDoc | Should -FileContentMatchMultiline '\> \[\!WARNING\]\r\n\> This is the first line.\r\n\> This is the second line.';
         }
 
-        $outputDoc = "$outputPath\WarningMultiMarkdown.md";
-        WarningMultiMarkdown -InputObject $dummyObject -OutputPath $outputPath;
+        It 'Should handle script block input' {
+            document 'WarningScriptBlockMarkdown' {
+                Warning {
+                    'This is a single line'
+                }
+            }
 
-        It 'Should have generated output' {
+            $outputDoc = "$outputPath\WarningScriptBlockMarkdown.md";
+            WarningScriptBlockMarkdown -OutputPath $outputPath;
+
             Test-Path -Path $outputDoc | Should be $True;
-        }
-
-        It 'Should match expected format' {
-            Get-Content -Path $outputDoc -Raw | Should match '\> \[\!WARNING\]\r\n\> This is the first line of the warning.\r\n\> This is the second line of the warning.';
+            $outputDoc | Should -FileContentMatchMultiline '\> \[\!WARNING\]\r\n\> This is a single line';
         }
     }
 }

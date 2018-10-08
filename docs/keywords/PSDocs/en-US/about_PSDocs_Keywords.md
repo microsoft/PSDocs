@@ -337,8 +337,10 @@ Creates a block quote formatted as a DocFx Formatted Markdown (DFM) note. This i
 Syntax:
 
 ```text
-Note [-Body] <ScriptBlock>
+Note -Text <String>
 ```
+
+- `Text` - The text of the note. This parameter can be specified directly or accept input from the pipeline.
 
 Examples:
 
@@ -347,9 +349,7 @@ Examples:
 Document 'NoteBlock' {
 
     # Define a note block
-    Note {
-        'This is a note.'
-    }
+    'This is a note.' | Note
 }
 ```
 
@@ -367,8 +367,10 @@ Creates a block quote formatted as a DocFx Formatted Markdown (DFM) warning. Thi
 Syntax:
 
 ```text
-Warning [-Body] <ScriptBlock>
+Warning -Text <String>
 ```
+
+- `Text` - The text of the warning. This parameter can be specified directly or accept input from the pipeline.
 
 Examples:
 
@@ -376,9 +378,7 @@ Examples:
 # A document definition named WarningBlock
 Document 'WarningBlock' {
 
-    Warning {
-        'This is a warning.'
-    }
+    'This is a warning.' | Warning
 }
 ```
 

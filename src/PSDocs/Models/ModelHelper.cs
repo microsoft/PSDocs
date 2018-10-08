@@ -32,22 +32,6 @@
             };
         }
 
-        public static Note NewNote()
-        {
-            return new Note
-            {
-
-            };
-        }
-
-        public static Warning NewWarning()
-        {
-            return new Warning
-            {
-
-            };
-        }
-
         public static BlockQuote BlockQuote(string info, string title)
         {
             return new BlockQuote
