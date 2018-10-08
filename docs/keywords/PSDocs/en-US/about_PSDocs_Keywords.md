@@ -23,6 +23,7 @@ The following PSDocs keywords are available:
 - Warning - Inserts a warning using DocFx formatted markdown (DFM)
 - Table - Inserts a table from pipeline objects
 - Metadata - Inserts a YAML header
+- Include - Insert content from an external file
 
 ### Document
 
@@ -502,6 +503,43 @@ last-updated: 2018-05-17
 Yaml header may not be rendered by some markdown viewers. See source to view yaml.
 ```
 
+### Include
+
+Insert content from an external file into this document.
+
+Syntax:
+
+```text
+Include [-FileName] <String> [-BaseDirectory <String>]
+```
+
+- `FileName` - The path to a markdown file to include. An absolute or relative path is accepted.
+- `BaseDirectory` - The base path to work from for relative paths specified with the `FileName` parameter. By default this is the current working path.
+
+Examples:
+
+```powershell
+# A document definition
+Document 'Sample' {
+    Include IncludeFile.md
+}
+```
+
+```text
+This is included from an external file.
+```
+
+```powershell
+# A document definition
+Document 'Sample' {
+    Include IncludeFile.md -BaseDirectory docs
+}
+```
+
+```text
+This is included from an external file.
+```
+
 ## EXAMPLES
 
 ```powershell
@@ -540,3 +578,4 @@ An online version of this document is available at https://github.com/BernieWhit
 - Table
 - Metadata
 - Yaml
+- Include

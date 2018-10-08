@@ -555,6 +555,30 @@ function BlockQuote {
     }
 }
 
+function Include {
+
+    [CmdletBinding()]
+    param (
+        [Parameter(Position = 0, Mandatory = $True)]
+        [String]$FileName,
+
+        [Parameter(Mandatory = $False)]
+        [String]$BaseDirectory = $PWD,
+
+        [Parameter(Mandatory = $False)]
+        [String]$Culture,
+
+        [Parameter(Mandatory = $False)]
+        [Switch]$Localized = $False
+    )
+
+    process {
+        $result = [PSDocs.Models.ModelHelper]::Include($BaseDirectory, $Culture, $FileName);
+
+        $result;
+    }
+}
+
 function Metadata {
 
     [CmdletBinding()]
@@ -1340,6 +1364,10 @@ function GetRunspace {
             ${function:Metadata}
         )));
         $iss.Commands.Add((New-Object -TypeName System.Management.Automation.Runspaces.SessionStateFunctionEntry -ArgumentList @(
+            'Include',
+            ${function:Include}
+        )));
+        $iss.Commands.Add((New-Object -TypeName System.Management.Automation.Runspaces.SessionStateFunctionEntry -ArgumentList @(
             'GetObjectField',
             ${function:GetObjectField}
         )));
@@ -1453,6 +1481,7 @@ function InitEditorServices {
             'BlockQuote'
             'Note'
             'Warning'
+            'Include'
         );
     }
 }

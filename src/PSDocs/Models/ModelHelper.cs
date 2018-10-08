@@ -1,4 +1,7 @@
-﻿namespace PSDocs.Models
+﻿using PSDocs.Configuration;
+using System.IO;
+
+namespace PSDocs.Models
 {
     public static class ModelHelper
     {
@@ -46,6 +49,26 @@
             return new Text
             {
                 Content = value
+            };
+        }
+
+        public static Include Include(string baseDirectory, string culture, string fileName)
+        {
+            var absolutePath = Path.IsPathRooted(fileName) ? fileName : Path.Combine(baseDirectory, fileName);
+
+            if (!Path.IsPathRooted(absolutePath))
+            {
+                absolutePath = Path.Combine(PSDocumentOption.GetWorkingPath(), absolutePath);
+            }
+
+            if (!File.Exists(absolutePath))
+            {
+                throw new FileNotFoundException("The included file was not found.", absolutePath);
+            }
+
+            return new Include
+            {
+                Path = absolutePath
             };
         }
     }
