@@ -462,44 +462,95 @@ function List {
 
 function Note {
 
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'ScriptBlock')]
     param (
-        [Parameter(Position = 0, Mandatory = $True)]
-        [ScriptBlock]$Body
+        [Parameter(Position = 0, Mandatory = $True, ParameterSetName = 'ScriptBlock')]
+        [ScriptBlock]$Body,
+
+        [Parameter(Mandatory = $True, ValueFromPipeline = $True, ParameterSetName = 'Text')]
+        [String]$Text
     )
+
+    begin {
+        $result = [PSDocs.Models.ModelHelper]::BlockQuote('NOTE', $Null);
+    }
 
     process {
 
-        $result = [PSDocs.Models.ModelHelper]::NewNote();
+        if ($PSCmdlet.ParameterSetName -eq 'ScriptBlock') {
+            $innerResult = $Body.InvokeWithContext($Null, $Null);
 
-        $innerResult = $Body.InvokeWithContext($Null, $Null);
-
-        foreach ($r in $innerResult) {
-            $result.Content += $r;
+            foreach ($r in $innerResult) {
+                $result.Content += $r;
+            }
         }
+        else {
+            $result.Content += $Text;
+        }
+    }
 
+    end {
         $result;
     }
 }
 
 function Warning {
 
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'ScriptBlock')]
     param (
-        [Parameter(Position = 0, Mandatory = $True)]
-        [ScriptBlock]$Body
+        [Parameter(Position = 0, Mandatory = $True, ParameterSetName = 'ScriptBlock')]
+        [ScriptBlock]$Body,
+
+        [Parameter(Mandatory = $True, ValueFromPipeline = $True, ParameterSetName = 'Text')]
+        [String]$Text
     )
+
+    begin {
+        $result = [PSDocs.Models.ModelHelper]::BlockQuote('WARNING', $Null);
+    }
 
     process {
 
-        $result = [PSDocs.Models.ModelHelper]::NewWarning();
+        if ($PSCmdlet.ParameterSetName -eq 'ScriptBlock') {
+            $innerResult = $Body.InvokeWithContext($Null, $Null);
 
-        $innerResult = $Body.InvokeWithContext($Null, $Null);
-
-        foreach ($r in $innerResult) {
-            $result.Content += $r;
+            foreach ($r in $innerResult) {
+                $result.Content += $r;
+            }
         }
+        else {
+            $result.Content += $Text;
+        }
+    }
 
+    end {
+        $result;
+    }
+}
+
+function BlockQuote {
+
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $True, ValueFromPipeline = $True)]
+        [String]$Text,
+
+        [Parameter(Mandatory = $False)]
+        [String]$Info,
+
+        [Parameter(Mandatory = $False)]
+        [String]$Title
+    )
+
+    begin {
+        $result = [PSDocs.Models.ModelHelper]::BlockQuote($Info, $Title);
+    }
+
+    process {
+        $result.Content += $Text;
+    }
+
+    end {
         $result;
     }
 }
@@ -1269,6 +1320,10 @@ function GetRunspace {
             ${function:Code}
         )));
         $iss.Commands.Add((New-Object -TypeName System.Management.Automation.Runspaces.SessionStateFunctionEntry -ArgumentList @(
+            'BlockQuote',
+            ${function:BlockQuote}
+        )));
+        $iss.Commands.Add((New-Object -TypeName System.Management.Automation.Runspaces.SessionStateFunctionEntry -ArgumentList @(
             'Note',
             ${function:Note}
         )));
@@ -1395,6 +1450,7 @@ function InitEditorServices {
             'Metadata'
             'Title'
             'Code'
+            'BlockQuote'
             'Note'
             'Warning'
         );

@@ -10,6 +10,5 @@ document 'InvalidCommandWithSection' {
 }
 
 document 'WithWriteError' {
-
     Write-Error -Message 'Verify Write-Error is raised as an exception';
 }

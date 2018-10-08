@@ -14,6 +14,8 @@
 
         Warning,
 
+        BlockQuote,
+
         Text
     }
 }

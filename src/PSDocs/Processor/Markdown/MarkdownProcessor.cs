@@ -6,6 +6,8 @@ namespace PSDocs.Processor.Markdown
 {
     public sealed class MarkdownProcessor
     {
+        private const string MARKDOWN_BLOCKQUOTE = "> ";
+
         public string Process(PSDocumentOption option, Document document)
         {
             if (document == null)
@@ -85,6 +87,12 @@ namespace PSDocs.Processor.Markdown
 
                         break;
 
+                    case DocumentNodeType.BlockQuote:
+
+                        BlockQuote(context, documentNode as BlockQuote);
+
+                        break;
+
                     case DocumentNodeType.Note:
 
                         Note(context, documentNode as Note);
@@ -130,6 +138,31 @@ namespace PSDocs.Processor.Markdown
                 {
                     Node(context, node);
                 }
+            }
+        }
+
+        private void BlockQuote(MarkdownProcessorContext context, BlockQuote node)
+        {
+            context.WriteLine(string.Empty);
+
+            if (!string.IsNullOrEmpty(node.Info))
+            {
+                context.Write(MARKDOWN_BLOCKQUOTE);
+                context.Write("[!");
+                context.Write(node.Info.ToUpper());
+                context.WriteLine("]");
+            }
+
+            if (!string.IsNullOrEmpty(node.Title))
+            {
+                context.Write(MARKDOWN_BLOCKQUOTE);
+                context.WriteLine(node.Title);
+            }
+
+            foreach (var line in node.Content)
+            {
+                context.Write(MARKDOWN_BLOCKQUOTE);
+                context.WriteLine(line);
             }
         }
 

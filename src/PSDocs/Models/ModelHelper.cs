@@ -32,19 +32,12 @@
             };
         }
 
-        public static Note NewNote()
+        public static BlockQuote BlockQuote(string info, string title)
         {
-            return new Note
+            return new BlockQuote
             {
-
-            };
-        }
-
-        public static Warning NewWarning()
-        {
-            return new Warning
-            {
-
+                Info = info,
+                Title = title
             };
         }
 

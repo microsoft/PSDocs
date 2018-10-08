@@ -77,6 +77,7 @@ FunctionsToExport = @(
     'Metadata'
     'Title'
     'Code'
+    'BlockQuote'
     'Note'
     'Warning'
 )

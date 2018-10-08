@@ -1,15 +1,19 @@
 
 ## Unreleased
 
+- Added `BlockQuote` keyword to generate block quotes in addition to existing `Note` and `Warning` keywords which are specific to DocFX
 - **Breaking change**: Removed `Import-PSDocumentTemplate` cmdlet. Use `Invoke-PSDocument` instead or dot source
 - **Breaking change**: Removed support for `-Function` parameter of `Invoke-PSDocument`. External commands can be executed in document blocks. Re-evaluating if this is really needed.
-- **Important change**: Renamed `-When` parameter on Section block to `-If`. `-When` is still supported
+- **Important change**: Renamed `-When` parameter on Section block to `-If`. `-When` is still works but is deprecated.
 - Added support for locked down environments to ensure that documents are executed as constrained code when Device Guard is used
   - Use the `Execution.LanguageMode = 'ConstrainedLanguage'` option to force constrained language mode
 - **Important change**: Improved markdown formatting for tables [#31](https://github.com/BernieWhite/PSDocs/issues/31)
   - Table columns are now padded by default to match header width. Set `Markdown.ColumnPadding` option to `None` to match format style from PSDocs <= 0.5.0
   - Pipe characters on the start and end of a table row are not added by default. Set `Markdown.UseEdgePipes` option to `Always` to match format style from PSDocs <= 0.5.0
   - Property expressions now support Label, Expression, Alignment and Width keys
+- **Important change**: Added support for `Note` and `Warning` keywords to accept text from the pipeline
+  - Using the pipeline is now the preferred way to use `Note` and `Warning` keywords
+  - `Note` and `Warning` script blocks are still work, but are deprecated.
 - **Experimental**: Publishing of keywords for syntax completion with editors
 
 ## v0.5.0
