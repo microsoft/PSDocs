@@ -10,12 +10,10 @@
 
         Code,
 
-        Note,
-
-        Warning,
-
         BlockQuote,
 
-        Text
+        Text,
+
+        Include
     }
 }

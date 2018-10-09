@@ -17,15 +17,16 @@ Create markdown from an input object.
 
 ```text
 Invoke-PSDocument -Name <String[]> [-InstanceName <String[]>] [-InputObject <PSObject>] [-OutputPath <String>]
- [-PassThru] [-Option <PSDocumentOption>] [-Encoding <MarkdownEncoding>] [<CommonParameters>]
+ [-PassThru] [-Option <PSDocumentOption>] [-Encoding <MarkdownEncoding>] [-Culture <String[]>]
+ [<CommonParameters>]
 ```
 
 ### Path
 
 ```text
 Invoke-PSDocument [-Name <String[]>] [-Tag <String[]>] [-InstanceName <String[]>] [-InputObject <PSObject>]
- [-Path] <String> [-OutputPath <String>]
- [-PassThru] [-Option <PSDocumentOption>] [-Encoding <MarkdownEncoding>] [<CommonParameters>]
+ [-Path] <String> [-OutputPath <String>] [-PassThru] [-Option <PSDocumentOption>]
+ [-Encoding <MarkdownEncoding>] [-Culture <String[]>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -250,6 +251,24 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -Culture
+
+One or more culture names when building documents that are localized. i.e. en-AU, en-US
+
+When culture names are specified, the generated document will be written to a culture specific subdirectory.
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### CommonParameters
 
 This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
@@ -265,3 +284,5 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 ## NOTES
 
 ## RELATED LINKS
+
+[New-PSDocumentOption](New-PSDocumentOption.md)

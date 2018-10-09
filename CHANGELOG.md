@@ -2,11 +2,17 @@
 ## Unreleased
 
 - Added `BlockQuote` keyword to generate block quotes in addition to existing `Note` and `Warning` keywords which are specific to DocFX
+  - See [about_PSDocs_Keywords](docs/keywords/PSDocs/en-US/about_PSDocs_Keywords.md#blockquote) help topic for details
+- Added `-Culture` parameter to `Invoke-PSDocument`, which allows generation of multiple localized output files
+- Added `Include` keyword to insert content from an external file
+  - Use the `-UseCulture` switch of `Include` to insert content from a culture specific external file
+  - See [about_PSDocs_Keywords](docs/keywords/PSDocs/en-US/about_PSDocs_Keywords.md#include) help topic for details
+- Added support for locked down environments to ensure that documents are executed as constrained code when Device Guard is used
+  - Use the `Execution.LanguageMode = 'ConstrainedLanguage'` option to force constrained language mode
+- Added new contextual help topic to provide details on automatic variables exposed for PSDocs for use within document definitions
 - **Breaking change**: Removed `Import-PSDocumentTemplate` cmdlet. Use `Invoke-PSDocument` instead or dot source
 - **Breaking change**: Removed support for `-Function` parameter of `Invoke-PSDocument`. External commands can be executed in document blocks. Re-evaluating if this is really needed.
 - **Important change**: Renamed `-When` parameter on Section block to `-If`. `-When` is still works but is deprecated.
-- Added support for locked down environments to ensure that documents are executed as constrained code when Device Guard is used
-  - Use the `Execution.LanguageMode = 'ConstrainedLanguage'` option to force constrained language mode
 - **Important change**: Improved markdown formatting for tables [#31](https://github.com/BernieWhite/PSDocs/issues/31)
   - Table columns are now padded by default to match header width. Set `Markdown.ColumnPadding` option to `None` to match format style from PSDocs <= 0.5.0
   - Pipe characters on the start and end of a table row are not added by default. Set `Markdown.UseEdgePipes` option to `Always` to match format style from PSDocs <= 0.5.0

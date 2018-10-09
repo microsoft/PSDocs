@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using PSDocs.Configuration;
 using PSDocs.Models;
 
@@ -93,21 +94,15 @@ namespace PSDocs.Processor.Markdown
 
                         break;
 
-                    case DocumentNodeType.Note:
-
-                        Note(context, documentNode as Note);
-
-                        break;
-
-                    case DocumentNodeType.Warning:
-
-                        Warning(context, documentNode as Warning);
-
-                        break;
-
                     case DocumentNodeType.Text:
 
                         Text(context, documentNode as Text);
+
+                        break;
+
+                    case DocumentNodeType.Include:
+
+                        Include(context, documentNode as Include);
 
                         break;
                 }
@@ -166,28 +161,6 @@ namespace PSDocs.Processor.Markdown
             }
         }
 
-        private void Warning(MarkdownProcessorContext context, Warning warning)
-        {
-            context.WriteLine(string.Empty);
-            context.WriteLine("> [!WARNING]");
-
-            foreach (var line in warning.Content)
-            {
-                context.WriteLine("> ", line);
-            }
-        }
-
-        private void Note(MarkdownProcessorContext context, Note note)
-        {
-            context.WriteLine(string.Empty);
-            context.WriteLine("> [!NOTE]");
-
-            foreach (var line in note.Content)
-            {
-                context.WriteLine("> ", line);
-            }
-        }
-
         private void Code(MarkdownProcessorContext context, Code code)
         {
             if (string.IsNullOrEmpty(code.Info))
@@ -207,6 +180,12 @@ namespace PSDocs.Processor.Markdown
         private void Text(MarkdownProcessorContext context, Text text)
         {
             context.WriteLine(text.Content);
+        }
+
+        private void Include(MarkdownProcessorContext context, Include include)
+        {
+            var text = File.ReadAllText(include.Path);
+            context.WriteLine(text);
         }
 
         private void Table(MarkdownProcessorContext context, Table table)

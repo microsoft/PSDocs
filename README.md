@@ -120,6 +120,7 @@ The following language keywords are used by the `PSDocs` module:
 - [Warning](docs/keywords/PSDocs/en-US/about_PSDocs_Keywords.md#warning) - Inserts a warning using DocFx formatted markdown (DFM)
 - [Metadata](docs/keywords/PSDocs/en-US/about_PSDocs_Keywords.md#metadata) - Inserts a yaml header
 - [Table](docs/keywords/PSDocs/en-US/about_PSDocs_Keywords.md#table) - Inserts a table from pipeline objects
+- [Include](docs/keywords/PSDocs/en-US/about_PSDocs_Keywords.md#include) - Insert content from an external file
 
 ### Commands
 
@@ -145,6 +146,12 @@ The following conceptual topics exist in the `PSDocs` module:
   - [Markdown.ColumnPadding](docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#column-padding)
   - [Markdown.UseEdgePipes](docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#use-edge-pipes)
   - [Execution.LanguageMode](docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#language-mode)
+- [Variables](docs/concepts/PSDocs/en-US/about_PSDocs_Variables.md)
+  - [$Culture](docs/concepts/PSDocs/en-US/about_PSDocs_Variables.md#culture)
+  - [$Document](docs/concepts/PSDocs/en-US/about_PSDocs_Variables.md#document)
+  - [$InstanceName](docs/concepts/PSDocs/en-US/about_PSDocs_Variables.md#instancename)
+  - [$InputObject](docs/concepts/PSDocs/en-US/about_PSDocs_Variables.md#inputobject)
+  - [$Section](docs/concepts/PSDocs/en-US/about_PSDocs_Variables.md#section)
 
 ## Changes and versioning
 
