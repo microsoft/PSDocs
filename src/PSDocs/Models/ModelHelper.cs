@@ -52,9 +52,9 @@ namespace PSDocs.Models
             };
         }
 
-        public static Include Include(string baseDirectory, string culture, string fileName)
+        public static Include Include(string baseDirectory, string culture, string fileName, bool useCulture)
         {
-            var absolutePath = Path.IsPathRooted(fileName) ? fileName : Path.Combine(baseDirectory, fileName);
+            var absolutePath = Path.IsPathRooted(fileName) ? fileName : Path.Combine(baseDirectory, (useCulture ? culture : string.Empty), fileName);
 
             if (!Path.IsPathRooted(absolutePath))
             {

@@ -146,6 +146,9 @@ The following conceptual topics exist in the `PSDocs` module:
   - [Markdown.ColumnPadding](docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#column-padding)
   - [Markdown.UseEdgePipes](docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#use-edge-pipes)
   - [Execution.LanguageMode](docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#language-mode)
+- [Variables](docs/concepts/PSDocs/en-US/about_PSDocs_Variables.md)
+  - [Culture](docs/concepts/PSDocs/en-US/about_PSDocs_Variables.md#culture)
+  - [InstanceName](docs/concepts/PSDocs/en-US/about_PSDocs_Variables.md#instancename)
 
 ## Changes and versioning
 

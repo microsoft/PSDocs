@@ -32,7 +32,7 @@ Describe 'PSDocs -- Include keyword' -Tag Include {
             $outputDoc = "$outputPath\IncludeRelative.md";
             IncludeRelative -OutputPath $outputPath;
 
-            Test-Path -Path $outputDoc | Should be $True;
+            Test-Path -Path $outputDoc | Should -Be $True;
             $outputDoc | Should -FileContentMatch 'This is included from an external file.';
             $outputDoc | Should -FileContentMatch 'This is a second file to include.';
         }
@@ -45,8 +45,24 @@ Describe 'PSDocs -- Include keyword' -Tag Include {
             $outputDoc = "$outputPath\IncludeAbsolute.md";
             IncludeAbsolute -OutputPath $outputPath;
 
-            Test-Path -Path $outputDoc | Should be $True;
+            Test-Path -Path $outputDoc | Should -Be $True;
             $outputDoc | Should -FileContentMatch 'This is included from an external file.';
+        }
+
+        It 'Should include from culture' {
+            document 'IncludeCulture' {
+                Include IncludeFile3.md -UseCulture -BaseDirectory tests/PSDocs.Tests/
+            }
+
+            IncludeCulture -OutputPath $outputPath -Culture 'en-AU','en-US' -Verbose;
+
+            $outputDoc = "$outputPath\en-AU\IncludeCulture.md";
+            Test-Path -Path $outputDoc | Should -Be $True;
+            $outputDoc | Should -FileContentMatch 'This is en-AU.';
+
+            $outputDoc = "$outputPath\en-US\IncludeCulture.md";
+            Test-Path -Path $outputDoc | Should -Be $True;
+            $outputDoc | Should -FileContentMatch 'This is en-US.';
         }
     }
 }

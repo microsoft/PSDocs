@@ -2,7 +2,9 @@
 ## Unreleased
 
 - Added `BlockQuote` keyword to generate block quotes in addition to existing `Note` and `Warning` keywords which are specific to DocFX
+- Added `-Culture` parameter to `Invoke-PSDocument`, which allows generation of multiple localized output files
 - Added `Include` keyword to insert content from an external file
+  - Use the `-UseCulture` switch to include a culture specific external file
 - **Breaking change**: Removed `Import-PSDocumentTemplate` cmdlet. Use `Invoke-PSDocument` instead or dot source
 - **Breaking change**: Removed support for `-Function` parameter of `Invoke-PSDocument`. External commands can be executed in document blocks. Re-evaluating if this is really needed.
 - **Important change**: Renamed `-When` parameter on Section block to `-If`. `-When` is still works but is deprecated.

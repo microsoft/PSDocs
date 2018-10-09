@@ -76,10 +76,15 @@ function Document {
                 Write-Verbose -Message "[Doc] -- Calling document block: $Name";
 
                 [String[]]$instances = @($PSDocs.InstanceName);
+                [String[]]$cultures = @($PSDocs.Culture);
 
                 # If an instance name is not specified, default to the document name
                 if ($Null -eq $PSDocs.InstanceName) {
                     $instances = @($Name);
+                }
+
+                if ($Null -eq $PSDocs.Culture) {
+                    $cultures = @([System.Threading.Thread]::CurrentThread.CurrentCulture.Name);
                 }
 
                 Write-Verbose -Message "[Doc] -- Will process instances: $($instances.Length)";
@@ -88,33 +93,45 @@ function Document {
 
                     Write-Verbose -Message "[Doc] -- Processing instance: $instance";
 
-                    # Define scope variables
-                    $document = [PSDocs.Models.ModelHelper]::NewDocument();
-                    Set-Variable -Name Section -Value $document;
-                    Set-Variable -Name InstanceName -Value $instance;
+                    foreach ($cultureName in $cultures) {
 
-                    # Build a path for the document
-                    $document.Path = Join-Path -Path $PSDocs.OutputPath -ChildPath "$instance.md";
+                        Write-Verbose -Message "[Doc] -- Using culture: $cultureName";
 
-                    $innerResult = $Body.Invoke() | ConvertToNode;
+                        # Define scope variables
+                        $document = [PSDocs.Models.ModelHelper]::NewDocument();
+                        Set-Variable -Name Section -Value $document;
+                        Set-Variable -Name InstanceName -Value $instance;
+                        Set-Variable -Name Culture -Value $cultureName;
 
-                    foreach ($r in $innerResult) {
-                        $document.Node.Add($r);
+                        # Build a path for the document
+                        if ($Null -eq $PSDocs.Culture) {
+                            $document.Path = Join-Path -Path $PSDocs.OutputPath -ChildPath "$instance.md";
+                        }
+                        else {
+                            $culturePath = Join-Path -Path $PSDocs.OutputPath -ChildPath $cultureName;
+                            $document.Path = Join-Path -Path $culturePath -ChildPath "$instance.md";
+                        }
+
+                        $innerResult = $Body.Invoke() | ConvertToNode;
+
+                        foreach ($r in $innerResult) {
+                            $document.Node.Add($r);
+                        }
+
+                        Write-Verbose -Message "[Doc] -- Document results [$($document.Node.Count)]";
+
+                        # Create parent path if it doesn't exist
+                        $documentParent = Split-Path -Path $document.Path -Parent;
+
+                        if (!(Test-Path -Path $documentParent)) {
+                            $Null = New-Item -Path $documentParent -ItemType Directory -Force;
+                        }
+
+                        Write-Verbose -Message "[Doc] -- Document output path: $($document.Path)";
+
+                        # Parse the model
+                        $PSDocs.WriteDocument($document);
                     }
-
-                    Write-Verbose -Message "[Doc] -- Document results [$($document.Node.Count)]";
-
-                    # Create parent path if it doesn't exist
-                    $documentParent = Split-Path -Path $document.Path -Parent;
-
-                    if (!(Test-Path -Path $documentParent)) {
-                        $Null = New-Item -Path $documentParent -ItemType Directory -Force;
-                    }
-
-                    Write-Verbose -Message "[Doc] -- Document output path: $($document.Path)";
-
-                    # Parse the model
-                    $PSDocs.WriteDocument($document);
                 }
             }
         }
@@ -156,7 +173,10 @@ function Invoke-PSDocument {
         [PSDocs.Configuration.PSDocumentOption]$Option,
 
         [Parameter(Mandatory = $False)]
-        [PSDocs.Configuration.MarkdownEncoding]$Encoding = [PSDocs.Configuration.MarkdownEncoding]::Default
+        [PSDocs.Configuration.MarkdownEncoding]$Encoding = [PSDocs.Configuration.MarkdownEncoding]::Default,
+
+        [Parameter(Mandatory = $False)]
+        [String[]]$Culture
     )
 
     begin {
@@ -566,14 +586,14 @@ function Include {
         [String]$BaseDirectory = $PWD,
 
         [Parameter(Mandatory = $False)]
-        [String]$Culture,
+        [String]$Culture = $Culture,
 
         [Parameter(Mandatory = $False)]
-        [Switch]$Localized = $False
+        [Switch]$UseCulture = $False
     )
 
     process {
-        $result = [PSDocs.Models.ModelHelper]::Include($BaseDirectory, $Culture, $FileName);
+        $result = [PSDocs.Models.ModelHelper]::Include($BaseDirectory, $Culture, $FileName, $UseCulture);
 
         $result;
     }
@@ -786,7 +806,10 @@ function GenerateDocumentFn {
         [PSDocs.Configuration.PSDocumentOption]$Option,
 
         [Parameter(Mandatory = $False)]
-        [PSDocs.Configuration.MarkdownEncoding]$Encoding = [PSDocs.Configuration.MarkdownEncoding]::Default
+        [PSDocs.Configuration.MarkdownEncoding]$Encoding = [PSDocs.Configuration.MarkdownEncoding]::Default,
+
+        [Parameter(Mandatory = $False)]
+        [String[]]$Culture
     )
 
     process {
@@ -858,7 +881,10 @@ function GenerateDocumentPath {
         [PSDocs.Configuration.PSDocumentOption]$Option,
 
         [Parameter(Mandatory = $False)]
-        [PSDocs.Configuration.MarkdownEncoding]$Encoding = [PSDocs.Configuration.MarkdownEncoding]::Default
+        [PSDocs.Configuration.MarkdownEncoding]$Encoding = [PSDocs.Configuration.MarkdownEncoding]::Default,
+
+        [Parameter(Mandatory = $False)]
+        [String[]]$Culture
     )
 
     begin {
@@ -903,6 +929,7 @@ function GenerateDocumentPath {
 
         $PSDocs.OutputPath = [System.IO.Path]::GetFullPath($OutputPath);
         $PSDocs.InstanceName = $InstanceName;
+        $PSDocs.Culture = $Culture;
     }
 
     process {
@@ -948,7 +975,10 @@ function GenerateDocumentInline {
         [PSDocs.Configuration.PSDocumentOption]$Option,
 
         [Parameter(Mandatory = $False)]
-        [PSDocs.Configuration.MarkdownEncoding]$Encoding = [PSDocs.Configuration.MarkdownEncoding]::Default
+        [PSDocs.Configuration.MarkdownEncoding]$Encoding = [PSDocs.Configuration.MarkdownEncoding]::Default,
+
+        [Parameter(Mandatory = $False)]
+        [String[]]$Culture
     )
 
     begin {
@@ -1004,6 +1034,7 @@ function GenerateDocumentInline {
 
         $PSDocs.OutputPath = [System.IO.Path]::GetFullPath($OutputPath);
         $PSDocs.InstanceName = $InstanceName;
+        $PSDocs.Culture = $Culture;
     }
 
     process {
