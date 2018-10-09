@@ -147,8 +147,11 @@ The following conceptual topics exist in the `PSDocs` module:
   - [Markdown.UseEdgePipes](docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#use-edge-pipes)
   - [Execution.LanguageMode](docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#language-mode)
 - [Variables](docs/concepts/PSDocs/en-US/about_PSDocs_Variables.md)
-  - [Culture](docs/concepts/PSDocs/en-US/about_PSDocs_Variables.md#culture)
-  - [InstanceName](docs/concepts/PSDocs/en-US/about_PSDocs_Variables.md#instancename)
+  - [$Culture](docs/concepts/PSDocs/en-US/about_PSDocs_Variables.md#culture)
+  - [$Document](docs/concepts/PSDocs/en-US/about_PSDocs_Variables.md#document)
+  - [$InstanceName](docs/concepts/PSDocs/en-US/about_PSDocs_Variables.md#instancename)
+  - [$InputObject](docs/concepts/PSDocs/en-US/about_PSDocs_Variables.md#inputobject)
+  - [$Section](docs/concepts/PSDocs/en-US/about_PSDocs_Variables.md#section)
 
 ## Changes and versioning
 
