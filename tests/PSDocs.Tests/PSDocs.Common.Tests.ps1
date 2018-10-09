@@ -351,5 +351,24 @@ Describe 'PSDocs variables' -Tag 'Variables' {
             $result = PSAutomaticVariables -PassThru;
             $result.Split("`r`n") | Where-Object -FilterScript { $_ -like "PWD=*" } | Should -Be "PWD=$PWD";
         }
-    } 
+    }
+
+    Context 'PSDocs automatic variables' {
+
+        document 'PSDocsAutomaticVariables' {
+            Title '001'
+            Metadata @{
+                author = '002'
+            }
+
+            "Document.Title=$($document.Title)"
+            "Document.Metadata=$($document.Metadata['author'])"
+        }
+
+        It '$Document' {
+            $result = (PSDocsAutomaticVariables -PassThru).Split("`r`n");
+            $result | Where-Object -FilterScript { $_ -like "Document.Title=*" } | Should -Be "Document.Title=001";
+            $result | Where-Object -FilterScript { $_ -like "Document.Metadata=*" } | Should -Be "Document.Metadata=002";
+        }
+    }
 }

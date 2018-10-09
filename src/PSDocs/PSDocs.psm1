@@ -1406,7 +1406,7 @@ function GetRunspace {
             'PSDocs',
             $PSDocs,
             $Null,
-            [System.Management.Automation.ScopedItemOptions]::AllScope
+            [System.Management.Automation.ScopedItemOptions]::Constant
         )));
         $iss.Variables.Add((New-Object -TypeName System.Management.Automation.Runspaces.SessionStateVariableEntry -ArgumentList @(
             'VerbosePreference',
@@ -1417,6 +1417,12 @@ function GetRunspace {
             'ErrorActionPreference',
             [System.Management.Automation.ActionPreference]::Stop,
             $Null
+        )));
+        $iss.Variables.Add((New-Object -TypeName System.Management.Automation.Runspaces.SessionStateVariableEntry -ArgumentList @(
+            'PWD',
+            $PWD,
+            $Null,
+            [System.Management.Automation.ScopedItemOptions]::Constant
         )));
         $rs = [RunspaceFactory]::CreateRunspace($iss);
         $rs.Open();
