@@ -54,7 +54,7 @@ Describe 'PSDocs -- Include keyword' -Tag Include {
                 Include IncludeFile3.md -UseCulture -BaseDirectory tests/PSDocs.Tests/
             }
 
-            IncludeCulture -OutputPath $outputPath -Culture 'en-AU','en-US' -Verbose;
+            IncludeCulture -OutputPath $outputPath -Culture 'en-AU','en-US';
 
             $outputDoc = "$outputPath\en-AU\IncludeCulture.md";
             Test-Path -Path $outputDoc | Should -Be $True;
