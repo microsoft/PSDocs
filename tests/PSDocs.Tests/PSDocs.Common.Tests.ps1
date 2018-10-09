@@ -339,3 +339,17 @@ Describe 'New-PSDocumentOption' -Tag 'Option' {
         }
     }
 }
+
+Describe 'PSDocs variables' -Tag 'Variables' {
+    Context 'PowerShell automatic variables' {
+
+        document 'PSAutomaticVariables' {
+            "PWD=$PWD"
+        }
+
+        It '$PWD' {
+            $result = PSAutomaticVariables -PassThru;
+            $result.Split("`r`n") | Where-Object -FilterScript { $_ -like "PWD=*" } | Should -Be "PWD=$PWD";
+        }
+    } 
+}

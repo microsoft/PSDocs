@@ -25,12 +25,12 @@ Describe 'PSDocs -- Include keyword' -Tag Include {
 
         It 'Should include a relative path' {
             document 'IncludeRelative' {
-                Include tests/PSDocs.Tests/IncludeFile.md
-                Include IncludeFile2.md -BaseDirectory tests/PSDocs.Tests/
+                Include tests/PSDocs.Tests/IncludeFile.md -BaseDirectory $InputObject
+                Include IncludeFile2.md -BaseDirectory (Join-Path -Path $InputObject -ChildPath tests/PSDocs.Tests/)
             }
 
             $outputDoc = "$outputPath\IncludeRelative.md";
-            IncludeRelative -OutputPath $outputPath;
+            IncludeRelative -InputObject $rootPath -OutputPath $outputPath;
 
             Test-Path -Path $outputDoc | Should -Be $True;
             $outputDoc | Should -FileContentMatch 'This is included from an external file.';
@@ -39,11 +39,11 @@ Describe 'PSDocs -- Include keyword' -Tag Include {
 
         It 'Should include an absolute path' {
             document 'IncludeAbsolute' {
-                Include (Join-Path -Path $PWD -ChildPath tests/PSDocs.Tests/IncludeFile.md)
+                Include (Join-Path -Path $InputObject -ChildPath tests/PSDocs.Tests/IncludeFile.md)
             }
 
             $outputDoc = "$outputPath\IncludeAbsolute.md";
-            IncludeAbsolute -OutputPath $outputPath;
+            IncludeAbsolute -InputObject $rootPath -OutputPath $outputPath;
 
             Test-Path -Path $outputDoc | Should -Be $True;
             $outputDoc | Should -FileContentMatch 'This is included from an external file.';
