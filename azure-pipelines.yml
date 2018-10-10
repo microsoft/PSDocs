@@ -1,6 +1,9 @@
 # Azure DevOps
 # Build pipeline for PSDocs
 
+trigger:
+- master
+
 pool:
   vmImage: VS2017-Win2016
 
