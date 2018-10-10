@@ -2,12 +2,7 @@
 
 A PowerShell module with commands to generate markdown from objects using PowerShell syntax.
 
-[![av-image][]][av-site] [![cc-image][]][cc-site]
-
-[av-image]: https://ci.appveyor.com/api/projects/status/pl7tu7ktue388n7s/branch/master?svg=true
-[av-site]: https://ci.appveyor.com/project/BernieWhite/PSDocs
-[cc-image]: https://codecov.io/gh/BernieWhite/PSDocs/branch/master/graph/badge.svg
-[cc-site]: https://codecov.io/gh/BernieWhite/PSDocs
+![ci-badge]
 
 ## Disclaimer
 
@@ -165,6 +160,7 @@ Modules in this repository will use the [semantic versioning](http://semver.org/
 
 This project is [licensed under the MIT License](LICENSE).
 
+[ci-badge]: https://bewhite.visualstudio.com/PSDocs/_apis/build/status/PSDocs-CI?branchName=master
 [psg-psdocs]: https://www.powershellgallery.com/packages/PSDocs
 [psg-psdocs-version-badge]: https://img.shields.io/powershellgallery/v/PSDocs.svg
 [psg-psdocs-installs-badge]: https://img.shields.io/powershellgallery/dt/PSDocs.svg
