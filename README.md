@@ -2,11 +2,9 @@
 
 A PowerShell module with commands to generate markdown from objects using PowerShell syntax.
 
-| AppVeyor (Windows) | Codecov (Windows) |
-| --- | --- |
-| [![av-image][]][av-site] | [![cc-image][]][cc-site] |
+[![av-image][]][av-site] [![cc-image][]][cc-site]
 
-[av-image]: https://ci.appveyor.com/api/projects/status/pl7tu7ktue388n7s
+[av-image]: https://ci.appveyor.com/api/projects/status/pl7tu7ktue388n7s/branch/master?svg=true
 [av-site]: https://ci.appveyor.com/project/BernieWhite/PSDocs
 [cc-image]: https://codecov.io/gh/BernieWhite/PSDocs/branch/master/graph/badge.svg
 [cc-site]: https://codecov.io/gh/BernieWhite/PSDocs
