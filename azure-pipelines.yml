@@ -1,0 +1,35 @@
+# Azure DevOps
+# Build pipeline for PSDocs
+
+pool:
+  vmImage: VS2017-Win2016
+
+variables:
+  buildConfiguration: 'Release'
+
+steps:
+
+- powershell: ./scripts/vstsbuild.ps1
+  displayName: 'Install Invoke-Build'
+
+- powershell: Invoke-Build -Configuration $(buildConfiguration)
+  displayName: 'Build module'
+
+- task: PublishTestResults@2
+  displayName: 'Publish test results'
+  inputs:
+    testResultsFormat: NUnit
+    testResultsFiles: 'reports/*.xml'
+    mergeTestResults: true
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish PSDocs module'
+  inputs:
+    PathtoPublish: out/modules/PSDocs
+    ArtifactName: PSDocs
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish PSDocs.Dsc module'
+  inputs:
+    PathtoPublish: out/modules/PSDocs.Dsc
+    ArtifactName: PSDocs.Dsc
