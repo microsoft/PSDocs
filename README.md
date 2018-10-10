@@ -13,14 +13,16 @@ A PowerShell module with commands to generate markdown from objects using PowerS
 
 This project is to be considered a **proof-of-concept** and **not a supported product**.
 
-## Modules
+If you have any problems please check our GitHub [issues](https://github.com/BernieWhite/PSDocs/issues) page. If you do not see your problem captured, please file a new issue and follow the provided template.
 
-The following modules are included in this repository.
+## Getting the modules
 
-| Module     | Description | Latest version |
+You can download and install these PowerShell modules from the PowerShell Gallery.
+
+| Module     | Description | Downloads |
 | ------     | ----------- | -------------- |
-| PSDocs     | Generate markdown from PowerShell | [![psg-psdocs-version-badge][]][psg-psdocs] [![psg-psdocs-installs-badge][]][psg-psdocs] |
-| PSDocs.Dsc | Extension for PSDocs to generate markdown from Desired State Configuration | [![psg-psdocsdsc-version-badge][]][psg-psdocsdsc] [![psg-psdocsdsc-installs-badge][]][psg-psdocsdsc] |
+| PSDocs     | Generate markdown from PowerShell | [latest][psg-psdocs] |
+| PSDocs.Dsc | Extension for PSDocs to generate markdown from Desired State Configuration | [latest][psg-psdocsdsc] |
 
 ## Getting started
 
