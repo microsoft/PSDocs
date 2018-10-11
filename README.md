@@ -14,41 +14,12 @@ If you have any problems please check our GitHub [issues](https://github.com/Ber
 
 You can download and install these PowerShell modules from the PowerShell Gallery.
 
-| Module     | Description | Downloads |
-| ------     | ----------- | -------------- |
-| PSDocs     | Generate markdown from PowerShell | [latest][psg-psdocs] |
-| PSDocs.Dsc | Extension for PSDocs to generate markdown from Desired State Configuration | [latest][psg-psdocsdsc] |
+| Module     | Description | Downloads / instructions |
+| ------     | ----------- | ------------------------ |
+| PSDocs     | Generate markdown from PowerShell | [latest][psg-psdocs] / [instructions][install] |
+| PSDocs.Dsc | Extension for PSDocs to generate markdown from Desired State Configuration | [latest][psg-psdocsdsc] / [instructions][install] |
 
 ## Getting started
-
-### Prerequisites
-
-- Windows Management Framework (WMF) 5.0 or greater
-- .NET Framework 4.6 or greater
-
-### Getting the modules
-
-- Install from [PowerShell Gallery][psg-psdocs]
-
-```powershell
-# Install base PSDocs module
-Install-Module -Name 'PSDocs';
-```
-
-```powershell
-# Optionally install DSC extensions module, which will install PSDocs if not already installed
-Install-Module -Name 'PSDocs.Dsc';
-```
-
-- Save for offline use from PowerShell Gallery
-
-```powershell
-# Save PSDocs module, in the .\modules directory
-Save-Module -Name 'PSDocs' -Path '.\modules';
-
-# Save PSDocs.Dsc module, in the .\modules directory
-Save-Module -Name 'PSDocs.Dsc' -Path '.\modules';
-```
 
 ### Generate a document from a directory listing
 
@@ -160,6 +131,7 @@ Modules in this repository will use the [semantic versioning](http://semver.org/
 
 This project is [licensed under the MIT License](LICENSE).
 
+[install]: docs/scenarios/install-instructions.md
 [ci-badge]: https://bewhite.visualstudio.com/PSDocs/_apis/build/status/PSDocs-CI?branchName=master
 [psg-psdocs]: https://www.powershellgallery.com/packages/PSDocs
 [psg-psdocs-version-badge]: https://img.shields.io/powershellgallery/v/PSDocs.svg
