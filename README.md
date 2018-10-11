@@ -69,6 +69,11 @@ Document 'Sample' {
 Invoke-DscNodeDocument -DocumentName 'Sample' -Path '.\nodes' -OutputPath '.\docs';
 ```
 
+### Scenarios
+
+- [Azure Resource Manager template example](docs/scenarios/arm-template.md)
+- [Integration with DocFX](docs/scenarios/integration-with-docfx.md)
+
 ## Language reference
 
 PSDocs extends PowerShell with domain specific language (DSL) keywords and cmdlets.
@@ -131,7 +136,7 @@ Modules in this repository will use the [semantic versioning](http://semver.org/
 
 This project is [licensed under the MIT License](LICENSE).
 
-[install]: docs/walkthroughs/install-instructions.md
+[install]: docs/scenarios/install-instructions.md
 [ci-badge]: https://bewhite.visualstudio.com/PSDocs/_apis/build/status/PSDocs-CI?branchName=master
 [psg-psdocs]: https://www.powershellgallery.com/packages/PSDocs
 [psg-psdocs-version-badge]: https://img.shields.io/powershellgallery/v/PSDocs.svg
