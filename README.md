@@ -71,7 +71,7 @@ Invoke-DscNodeDocument -DocumentName 'Sample' -Path '.\nodes' -OutputPath '.\doc
 
 ### Scenarios
 
-- [Azure Resource Manager template example](docs/scenarios/arm-template.md)
+- [Azure Resource Manager template example](docs/scenarios/arm-template/arm-template.md)
 - [Integration with DocFX](docs/scenarios/integration-with-docfx.md)
 
 ## Language reference

@@ -133,6 +133,6 @@ document 'arm-template' {
 }
 ```
 
-## Examples
+## More information
 
-- [Full script](docs/examples/arm-template/arm-template.doc.ps1)
+- [Get the full script](arm-template.doc.ps1)
