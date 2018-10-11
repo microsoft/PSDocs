@@ -131,7 +131,7 @@ Modules in this repository will use the [semantic versioning](http://semver.org/
 
 This project is [licensed under the MIT License](LICENSE).
 
-[install]: docs/scenarios/install-instructions.md
+[install]: docs/walkthroughs/install-instructions.md
 [ci-badge]: https://bewhite.visualstudio.com/PSDocs/_apis/build/status/PSDocs-CI?branchName=master
 [psg-psdocs]: https://www.powershellgallery.com/packages/PSDocs
 [psg-psdocs-version-badge]: https://img.shields.io/powershellgallery/v/PSDocs.svg

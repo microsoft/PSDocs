@@ -5,11 +5,11 @@ This is an example of how PSDocs can be used to generate documentation for an AR
 In this scenario we will use two JSON files:
 
 - `template.json` - A valid ARM template
-- `metadata.json` - Contain information about the template that isn't part of the ARM template specification
+- `metadata.json` - Contains information about the template that isn't part of the ARM template specification
 
 > Our `metadata.json` uses the same schema used in the Azure Quick Start Templates GitHub repository.
 
-When deploying an ARM template, using knowing what parameters are available and how they can use is important, so this will be a key part of our documentation.
+When deploying an ARM template, knowing what parameters are available and how they can be used is important, so this will be a key part of our documentation.
 
 Fortunately, the ARM template specification allows for metadata per parameter, and a common use for this is to define a parameter description.
 
@@ -28,7 +28,7 @@ An example parameter might look like this:
 
 We will need to import our two JSON files and convert them to objects so that we can easily read the name of each parameter, but also the description.
 
-While this could be done inline, we will create separate functions that can be called as required. Using separate functions in this instance will improve the readability of our code.
+While this could be done inline, we will create separate functions that can be called as required. Using separate functions in this case will improve the readability of our code.
 
 ```powershell
 # A function to break out parameters from an ARM template
@@ -67,7 +67,7 @@ function GetTemplateMetadata {
 
 PSDocs uses the `document` keyword to describe a document definition. A document definition is designed to be reusable.
 
-With our two helper functions, we are ready to define our document.
+With our two helper functions already implemented, we are ready to define our document.
 
 ```powershell
 document 'arm-template' {
@@ -78,7 +78,7 @@ document 'arm-template' {
 }
 ```
 
-We want to set a title and an opening description for our document based on our metadata file.
+We want to set a title and an opening description for our document based on the metadata file.
 
 ```powershell
 document 'arm-template' {
@@ -95,7 +95,7 @@ document 'arm-template' {
 }
 ```
 
-Next we need to output our parameters into a table with metadata descriptions. To format our parameters in a table we use the `Table` keyword.
+Next we need to output the template parameters into a table with metadata descriptions. To format our parameters in a table we use the `Table` keyword.
 
 ```powershell
 document 'arm-template' {
@@ -113,7 +113,7 @@ document 'arm-template' {
 }
 ```
 
-We can also provide example command line syntax that can be used to deploy our ARM template. To insert code sample used the `Code` keyword.
+We can also provide an example command line that can be used to deploy our ARM template. To insert a code sample use the `Code` keyword.
 
 ```powershell
 document 'arm-template' {
