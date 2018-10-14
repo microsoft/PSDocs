@@ -73,8 +73,8 @@ With our two helper functions already implemented, we are ready to define our do
 document 'arm-template' {
 
     # Read JSON files
-    $metadata = GetTemplateMetadata -Path $InputObject/metadata.json;
-    $parameters = GetTemplateParameter -Path $InputObject/template.json;
+    $metadata = GetTemplateMetadata -Path docs/scenarios/arm-template/metadata.json;
+    $parameters = GetTemplateParameter -Path docs/scenarios/arm-template/template.json;
 }
 ```
 
@@ -84,8 +84,8 @@ We want to set a title and an opening description for our document based on the 
 document 'arm-template' {
 
     # Read JSON files
-    $metadata = GetTemplateMetadata -Path $InputObject/metadata.json;
-    $parameters = GetTemplateParameter -Path $InputObject/template.json;
+    $metadata = GetTemplateMetadata -Path docs/scenarios/arm-template/metadata.json;
+    $parameters = GetTemplateParameter -Path docs/scenarios/arm-template/template.json;
 
     # Set document title
     Title $metadata.itemDisplayName
@@ -101,8 +101,8 @@ Next we need to output the template parameters into a table with metadata descri
 document 'arm-template' {
 
     # Read JSON files
-    $metadata = GetTemplateMetadata -Path $InputObject/metadata.json;
-    $parameters = GetTemplateParameter -Path $InputObject/template.json;
+    $metadata = GetTemplateMetadata -Path docs/scenarios/arm-template/metadata.json;
+    $parameters = GetTemplateParameter -Path docs/scenarios/arm-template/template.json;
 
     ...
 
@@ -133,6 +133,14 @@ document 'arm-template' {
 }
 ```
 
+## Call the defintion
+
+```powershell
+
+```
+
 ## More information
 
 - [Get the full script](arm-template.doc.ps1)
+- [Example ARM template file](template.json)
+- [Example ARM metadata file](metadata.json)
