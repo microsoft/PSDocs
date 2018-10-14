@@ -917,7 +917,8 @@ function GenerateDocumentPath {
         $PSDocs = [PSDocs.Models.PSDocsContext]::Create(
             $Option,
             $Name,
-            $Tag
+            $Tag,
+            $OutputPath
         );
 
         $PSDocs.WriteDocumentHook = {
@@ -927,7 +928,6 @@ function GenerateDocumentPath {
             (NewMarkdownProcessor).Process($option, $document) | WriteDocumentContent -Path $document.Path -PassThru:$PassThru -Encoding:$option.Markdown.Encoding;
         }
 
-        $PSDocs.OutputPath = [System.IO.Path]::GetFullPath($OutputPath);
         $PSDocs.InstanceName = $InstanceName;
         $PSDocs.Culture = $Culture;
     }
@@ -1022,7 +1022,8 @@ function GenerateDocumentInline {
         $PSDocs = [PSDocs.Models.PSDocsContext]::Create(
             $Option,
             $Null,
-            $Null
+            $Null,
+            $OutputPath
         );
 
         $PSDocs.WriteDocumentHook = {
@@ -1032,7 +1033,6 @@ function GenerateDocumentInline {
             (NewMarkdownProcessor).Process($option, $document) | WriteDocumentContent -Path $document.Path -PassThru:$PassThru -Encoding:$option.Markdown.Encoding;
         }
 
-        $PSDocs.OutputPath = [System.IO.Path]::GetFullPath($OutputPath);
         $PSDocs.InstanceName = $InstanceName;
         $PSDocs.Culture = $Culture;
     }
@@ -1295,6 +1295,9 @@ function InvokeTemplate {
             $ps = [PowerShell]::Create();
             $ps.Runspace = $runspace;
 
+            $Null = $ps.AddScript("Set-Location -Path '$PWD';");
+            $ps.Invoke();
+
             $Null = $ps.AddScript($template);
 
             try {
@@ -1421,8 +1424,7 @@ function GetRunspace {
         $iss.Variables.Add((New-Object -TypeName System.Management.Automation.Runspaces.SessionStateVariableEntry -ArgumentList @(
             'PWD',
             $PWD,
-            $Null,
-            [System.Management.Automation.ScopedItemOptions]::Constant
+            $Null
         )));
         $rs = [RunspaceFactory]::CreateRunspace($iss);
         $rs.Open();
