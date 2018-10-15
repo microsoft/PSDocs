@@ -146,9 +146,10 @@ Examples:
 Invoke-PSDocument -Path .;
 ```
 
-In this case, we are generating documentation that saved in this repository and updating the example output directly so we use the`-OutputPath` and `-InstanceName` parameters.
+In this case, we are generating documentation with the definition and output saved in this repository so we use the`-OutputPath` and `-InstanceName` parameters.
 
 ```powershell
+# Generate docs/scenarios/arm-template/output.md
 Invoke-PSDocument -Path '.\docs\scenarios\arm-template' -OutputPath '.\docs\scenarios\arm-template\' -InstanceName 'output';
 ```
 
