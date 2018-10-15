@@ -37,8 +37,8 @@ function GetTemplateMetadata {
 document 'arm-template' {
 
     # Read JSON files
-    $metadata = GetTemplateMetadata -Path $PSSCRIPTROOT/metadata.json;
-    $parameters = GetTemplateParameter -Path $PSSCRIPTROOT/template.json;
+    $metadata = GetTemplateMetadata -Path $PSScriptRoot/metadata.json;
+    $parameters = GetTemplateParameter -Path $PSScriptRoot/template.json;
 
     # Set document title
     Title $metadata.itemDisplayName

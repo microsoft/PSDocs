@@ -67,14 +67,14 @@ function GetTemplateMetadata {
 
 PSDocs uses the `document` keyword to describe a document definition. A document definition is designed to be reusable.
 
-With our two helper functions already implemented, we are ready to define our document.
+With our two helper functions already implemented, we are ready to define our document. For our example, our JSON files are in the same directory as the documentation definition so we are using `$PSScriptRoot`.
 
 ```powershell
 document 'arm-template' {
 
     # Read JSON files
-    $metadata = GetTemplateMetadata -Path docs/scenarios/arm-template/metadata.json;
-    $parameters = GetTemplateParameter -Path docs/scenarios/arm-template/template.json;
+    $metadata = GetTemplateMetadata -Path $PSScriptRoot/metadata.json;
+    $parameters = GetTemplateParameter -Path $PSScriptRoot/template.json;
 }
 ```
 
@@ -84,8 +84,8 @@ We want to set a title and an opening description for our document based on the 
 document 'arm-template' {
 
     # Read JSON files
-    $metadata = GetTemplateMetadata -Path docs/scenarios/arm-template/metadata.json;
-    $parameters = GetTemplateParameter -Path docs/scenarios/arm-template/template.json;
+    $metadata = GetTemplateMetadata -Path $PSScriptRoot/metadata.json;
+    $parameters = GetTemplateParameter -Path $PSScriptRoot/template.json;
 
     # Set document title
     Title $metadata.itemDisplayName
@@ -101,8 +101,8 @@ Next we need to output the template parameters into a table with metadata descri
 document 'arm-template' {
 
     # Read JSON files
-    $metadata = GetTemplateMetadata -Path docs/scenarios/arm-template/metadata.json;
-    $parameters = GetTemplateParameter -Path docs/scenarios/arm-template/template.json;
+    $metadata = GetTemplateMetadata -Path $PSScriptRoot/metadata.json;
+    $parameters = GetTemplateParameter -Path $PSScriptRoot/template.json;
 
     ...
 
@@ -133,10 +133,23 @@ document 'arm-template' {
 }
 ```
 
-## Call the defintion
+## Generate markdown
+
+Document definitions can be called inline or from a path. In this example, we've saved our definition to a file.
+
+To generate markdown from a path, we used the `Invoke-PSDocument` cmdlet with the `-Path` parameter.
+
+Examples:
 
 ```powershell
+# Find and build any document definitions in the currently working path (and subdirectories)
+Invoke-PSDocument -Path .;
+```
 
+In this case, we are generating documentation that saved in this repository and updating the example output directly so we use the`-OutputPath` and `-InstanceName` parameters.
+
+```powershell
+Invoke-PSDocument -Path '.\docs\scenarios\arm-template' -OutputPath '.\docs\scenarios\arm-template\' -InstanceName 'output';
 ```
 
 ## More information
@@ -144,3 +157,4 @@ document 'arm-template' {
 - [Get the full script](arm-template.doc.ps1)
 - [Example ARM template file](template.json)
 - [Example ARM metadata file](metadata.json)
+- [Example output](output.md)
