@@ -23,6 +23,11 @@ namespace PSDocs.Processor.Markdown
             context.Builder.Remove(context.Builder.Length - 2, 2);
             var result = context.Builder.ToString();
 
+            if (string.IsNullOrEmpty(result))
+            {
+                result = null;
+            }
+
             return result;
         }
 

@@ -178,7 +178,7 @@ Describe 'PSDocs.Dsc' -Tag 'Dsc' {
         Invoke-DscNodeDocument -DocumentName 'WithMissingData' -InstanceName 'WithMissingData' -Path $outputPath -OutputPath $outputPath;
 
         It 'Should output' {
-            Test-Path -Path "$outputPath\WithMissingData.md" | Should -Be $True;
+            Test-Path -Path "$outputPath\WithMissingData.md" | Should -Be $False;
         }
     }
 
