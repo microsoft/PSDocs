@@ -1,6 +1,8 @@
 
 ## Unreleased
 
+## v0.6.0
+
 - Fix consistency of line break generation before and after document content.
 - Added `BlockQuote` keyword to generate block quotes in addition to existing `Note` and `Warning` keywords which are specific to DocFX
   - See [about_PSDocs_Keywords](docs/keywords/PSDocs/en-US/about_PSDocs_Keywords.md#blockquote) help topic for details
