@@ -2,58 +2,24 @@
 
 A PowerShell module with commands to generate markdown from objects using PowerShell syntax.
 
-| AppVeyor (Windows) | Codecov (Windows) |
-| --- | --- |
-| [![av-image][]][av-site] | [![cc-image][]][cc-site] |
-
-[av-image]: https://ci.appveyor.com/api/projects/status/pl7tu7ktue388n7s
-[av-site]: https://ci.appveyor.com/project/BernieWhite/PSDocs
-[cc-image]: https://codecov.io/gh/BernieWhite/PSDocs/branch/master/graph/badge.svg
-[cc-site]: https://codecov.io/gh/BernieWhite/PSDocs
+![ci-badge]
 
 ## Disclaimer
 
 This project is to be considered a **proof-of-concept** and **not a supported product**.
 
-## Modules
+If you have any problems please check our GitHub [issues](https://github.com/BernieWhite/PSDocs/issues) page. If you do not see your problem captured, please file a new issue and follow the provided template.
 
-The following modules are included in this repository.
+## Getting the modules
 
-| Module     | Description | Latest version |
-| ------     | ----------- | -------------- |
-| PSDocs     | Generate markdown from PowerShell | [![psg-psdocs-version-badge][]][psg-psdocs] [![psg-psdocs-installs-badge][]][psg-psdocs] |
-| PSDocs.Dsc | Extension for PSDocs to generate markdown from Desired State Configuration | [![psg-psdocsdsc-version-badge][]][psg-psdocsdsc] [![psg-psdocsdsc-installs-badge][]][psg-psdocsdsc] |
+You can download and install these PowerShell modules from the PowerShell Gallery.
+
+| Module     | Description | Downloads / instructions |
+| ------     | ----------- | ------------------------ |
+| PSDocs     | Generate markdown from PowerShell | [latest][psg-psdocs] / [instructions][install] |
+| PSDocs.Dsc | Extension for PSDocs to generate markdown from Desired State Configuration | [latest][psg-psdocsdsc] / [instructions][install] |
 
 ## Getting started
-
-### Prerequisites
-
-- Windows Management Framework (WMF) 5.0 or greater
-- .NET Framework 4.6 or greater
-
-### Getting the modules
-
-- Install from [PowerShell Gallery][psg-psdocs]
-
-```powershell
-# Install base PSDocs module
-Install-Module -Name 'PSDocs';
-```
-
-```powershell
-# Optionally install DSC extensions module, which will install PSDocs if not already installed
-Install-Module -Name 'PSDocs.Dsc';
-```
-
-- Save for offline use from PowerShell Gallery
-
-```powershell
-# Save PSDocs module, in the .\modules directory
-Save-Module -Name 'PSDocs' -Path '.\modules';
-
-# Save PSDocs.Dsc module, in the .\modules directory
-Save-Module -Name 'PSDocs.Dsc' -Path '.\modules';
-```
 
 ### Generate a document from a directory listing
 
@@ -102,6 +68,11 @@ Document 'Sample' {
 # Call the document definition and generate markdown for each .mof file in the .\nodes directory
 Invoke-DscNodeDocument -DocumentName 'Sample' -Path '.\nodes' -OutputPath '.\docs';
 ```
+
+### Scenarios
+
+- [Azure Resource Manager template example](docs/scenarios/arm-template/arm-template.md)
+- [Integration with DocFX](docs/scenarios/integration-with-docfx.md)
 
 ## Language reference
 
@@ -165,6 +136,8 @@ Modules in this repository will use the [semantic versioning](http://semver.org/
 
 This project is [licensed under the MIT License](LICENSE).
 
+[install]: docs/scenarios/install-instructions.md
+[ci-badge]: https://bewhite.visualstudio.com/PSDocs/_apis/build/status/PSDocs-CI?branchName=master
 [psg-psdocs]: https://www.powershellgallery.com/packages/PSDocs
 [psg-psdocs-version-badge]: https://img.shields.io/powershellgallery/v/PSDocs.svg
 [psg-psdocs-installs-badge]: https://img.shields.io/powershellgallery/dt/PSDocs.svg

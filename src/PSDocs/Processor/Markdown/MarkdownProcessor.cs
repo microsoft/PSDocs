@@ -20,7 +20,15 @@ namespace PSDocs.Processor.Markdown
 
             Document(context);
 
-            return context.Builder.ToString();
+            context.Builder.Remove(context.Builder.Length - 2, 2);
+            var result = context.Builder.ToString();
+
+            if (string.IsNullOrEmpty(result))
+            {
+                result = null;
+            }
+
+            return result;
         }
 
         private void Document(MarkdownProcessorContext context)
@@ -31,6 +39,7 @@ namespace PSDocs.Processor.Markdown
             if (!string.IsNullOrEmpty(context.Document.Title))
             {
                 context.WriteLine("# ", context.Document.Title);
+                context.WriteLine(string.Empty);
             }
 
             foreach (var node in context.Document.Node)
@@ -55,6 +64,7 @@ namespace PSDocs.Processor.Markdown
             }
 
             context.WriteLine("---");
+            context.WriteLine(string.Empty);
         }
 
         private void Node(MarkdownProcessorContext context, object node)
@@ -121,14 +131,12 @@ namespace PSDocs.Processor.Markdown
         private void Section(MarkdownProcessorContext context, Section section)
         {
             var sectionPadding = string.Empty.PadLeft(section.Level, '#');
-
-            context.WriteLine(string.Empty);
+            
             context.WriteLine(sectionPadding, " ", section.Title);
+            context.WriteLine(string.Empty);
 
             if (section.Node.Count > 0)
             {
-                context.WriteLine(string.Empty);
-
                 foreach (var node in section.Node)
                 {
                     Node(context, node);
@@ -175,11 +183,13 @@ namespace PSDocs.Processor.Markdown
             context.WriteLine(code.Content);
 
             context.WriteLine("```");
+            context.WriteLine(string.Empty);
         }
 
         private void Text(MarkdownProcessorContext context, Text text)
         {
             context.WriteLine(text.Content);
+            context.WriteLine(string.Empty);
         }
 
         private void Include(MarkdownProcessorContext context, Include include)
@@ -194,8 +204,6 @@ namespace PSDocs.Processor.Markdown
             {
                 return;
             }
-
-            context.WriteLine(string.Empty);
 
             var lastHeader = table.Headers.Count - 1;
             var useEdgePipe = context.Option.Markdown.UseEdgePipes == EdgePipeOption.Always

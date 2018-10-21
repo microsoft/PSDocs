@@ -1,5 +1,6 @@
 ﻿using PSDocs.Configuration;
 using System.Collections.Generic;
+using System.IO;
 
 namespace PSDocs.Models
 {
@@ -19,12 +20,20 @@ namespace PSDocs.Models
 
         public WriteDocumentDelegate WriteDocumentHook { get; set; }
 
-        public static PSDocsContext Create(PSDocumentOption option, string[] name, string[] tag)
+        public static PSDocsContext Create(PSDocumentOption option, string[] name, string[] tag, string outputPath)
         {
+            var actualPath = outputPath;
+
+            if (!Path.IsPathRooted(actualPath))
+            {
+                actualPath = Path.Combine(PSDocumentOption.GetWorkingPath(), outputPath);
+            }
+
             return new PSDocsContext
             {
                 Option = option,
-                Filter = DocumentFilter.Create(name, tag)
+                Filter = DocumentFilter.Create(name, tag),
+                OutputPath = actualPath
             };
         }
 
