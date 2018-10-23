@@ -24,9 +24,12 @@ steps:
 - task: PublishTestResults@2
   displayName: 'Publish test results'
   inputs:
+    testRunTitle: 'Pester unit tests'
     testResultsFormat: NUnit
     testResultsFiles: 'reports/*.xml'
     mergeTestResults: true
+    buildConfiguration: $(buildConfiguration)
+  condition: succeededOrFailed()
 
 # Generate artifacts
 - task: PublishBuildArtifacts@1
