@@ -12,12 +12,15 @@ variables:
 
 steps:
 
+# Install pipeline dependencies
 - powershell: ./scripts/vstsbuild.ps1
   displayName: 'Install Invoke-Build'
 
+# Invoke build
 - powershell: Invoke-Build -Configuration $(buildConfiguration)
   displayName: 'Build module'
 
+# Publish test results
 - task: PublishTestResults@2
   displayName: 'Publish test results'
   inputs:
@@ -25,6 +28,7 @@ steps:
     testResultsFiles: 'reports/*.xml'
     mergeTestResults: true
 
+# Generate artifacts
 - task: PublishBuildArtifacts@1
   displayName: 'Publish PSDocs module'
   inputs:
