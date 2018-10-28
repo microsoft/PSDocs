@@ -162,24 +162,6 @@ Describe 'PSDocs.Dsc' -Tag 'Dsc' {
         }
     }
 
-    Context 'Generate a document with missing data' {
-
-        # Define a test document with a table
-        document 'WithMissingData' {
-
-            Section 'Windows features' {
-                # Reference a resource type that is not included in the configuration
-                $InputObject.ResourceType.WindowsFeature | Table -Property Name,Ensure;
-            }
-        }
-
-        It 'Should output' {
-            TestConfiguration2 -OutputPath $outputPath -ComputerName 'WithMissingData';
-            Invoke-DscNodeDocument -DocumentName 'WithMissingData' -InstanceName 'WithMissingData' -Path $outputPath -OutputPath $outputPath;
-            Test-Path -Path "$outputPath\WithMissingData.md" | Should -Be $False;
-        }
-    }
-
     Context 'Generate a document with encoding' {
 
         document 'EncodingTest' {
