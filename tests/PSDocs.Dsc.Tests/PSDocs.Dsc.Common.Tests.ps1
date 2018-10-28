@@ -50,7 +50,7 @@ configuration TestConfiguration {
 }
 
 configuration TestConfiguration2 {
-    
+
     param (
         [Parameter(Mandatory = $True)]
         [String[]]$ComputerName
@@ -92,7 +92,7 @@ Describe 'PSDocs.Dsc' -Tag 'Dsc' {
     }
 
     Context 'Generate a document with an instance name' {
-        
+
         # Define a test document with a table
         document 'WithInstanceName' {
             $InputObject.ResourceType.File | Table -Property Contents,DestinationPath;
@@ -116,7 +116,7 @@ Describe 'PSDocs.Dsc' -Tag 'Dsc' {
     }
 
     Context 'Generate a document with multiple instance names' {
-        
+
         # Define a test document with a table
         document 'WithMultiInstanceName' {
             $InputObject.ResourceType.File | Table -Property Contents,DestinationPath;
@@ -135,7 +135,7 @@ Describe 'PSDocs.Dsc' -Tag 'Dsc' {
         }
 
         It 'Should contain instance name Instance2' {
-            "$outputPath\Instance2.md" | Should -FileContentMatch '\| Node\=Instance2\ |';
+            "$outputPath\Instance2.md" | Should -FileContentMatch 'Node\=Instance2 \|';
         }
 
         It 'Should generate an output named Instance3.md' {
@@ -143,7 +143,7 @@ Describe 'PSDocs.Dsc' -Tag 'Dsc' {
         }
 
         It 'Should contain instance name Instance3' {
-            "$outputPath\Instance3.md" | Should -FileContentMatch '\| Node\=Instance3\ |';
+            "$outputPath\Instance3.md" | Should -FileContentMatch 'Node\=Instance3 \|';
         }
     }
 
@@ -158,27 +158,7 @@ Describe 'PSDocs.Dsc' -Tag 'Dsc' {
         }
 
         It 'Should contain instance name' {
-            "$outputPath\WithExternalScript.md" | Should -FileContentMatch '\| FS\-SMB1\ |';
-        }
-    }
-
-    Context 'Generate a document with missing data' {
-        
-        # Define a test document with a table
-        document 'WithMissingData' {
-
-            Section 'Windows features' {
-                # Reference a resource type that is not included in the configuration
-                $InputObject.ResourceType.WindowsFeature | Table -Property Name,Ensure;
-            }
-        }
-
-        TestConfiguration2 -OutputPath $outputPath -ComputerName 'WithMissingData';
-
-        Invoke-DscNodeDocument -DocumentName 'WithMissingData' -InstanceName 'WithMissingData' -Path $outputPath -OutputPath $outputPath;
-
-        It 'Should output' {
-            Test-Path -Path "$outputPath\WithMissingData.md" | Should -Be $False;
+            "$outputPath\WithExternalScript.md" | Should -FileContentMatch '\| FS\-SMB1 \|';
         }
     }
 
@@ -188,11 +168,9 @@ Describe 'PSDocs.Dsc' -Tag 'Dsc' {
             $PSDocs.Option.Markdown.Encoding
         }
 
-        TestConfiguration2 -OutputPath $outputPath -ComputerName 'EncodingTest';
-
-        Invoke-DscNodeDocument -DocumentName 'EncodingTest' -InstanceName 'EncodingTest' -Encoding 'UTF8' -Path $outputPath -OutputPath $outputPath;
-
         It 'Called Invoke-PSDocument with Encoding' {
+            TestConfiguration2 -OutputPath $outputPath -ComputerName 'EncodingTest';
+            Invoke-DscNodeDocument -DocumentName 'EncodingTest' -InstanceName 'EncodingTest' -Encoding 'UTF8' -Path $outputPath -OutputPath $outputPath;
             (Join-Path -Path $outputPath -ChildPath 'EncodingTest.md') | Should -FileContentMatch 'UTF8';
         }
     }
