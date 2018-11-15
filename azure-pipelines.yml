@@ -9,6 +9,10 @@ pool:
 
 variables:
   buildConfiguration: 'Release'
+  versionNumber: '0.6.0'
+
+# Use build number format. i.e. 0.6.0-Build181001
+name: $(versionNumber)-Build$(date:yyMM)$(rev:rr)
 
 steps:
 

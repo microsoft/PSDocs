@@ -7,10 +7,13 @@ param (
     [String]$Configuration = 'Debug',
 
     [Parameter(Mandatory = $False)]
-    [String]$NuGetApiKey,
+    [String]$ApiKey,
 
     [Parameter(Mandatory = $False)]
-    [Switch]$CodeCoverage = $False
+    [Switch]$CodeCoverage = $False,
+
+    [Parameter(Mandatory = $False)]
+    [String]$OutputPath = (Join-Path -Path $PWD -ChildPath out/modules)
 )
 
 # Copy the PowerShell modules files to the destination path
@@ -102,8 +105,22 @@ task CopyModule {
     Copy-Item -Path ThirdPartyNotices.txt -Destination out/modules/PSDocs;
 }
 
-# Synopsis: Build modules only
-task BuildModule BuildDotNet, CopyModule
+task UpdateManifest {
+
+    # Update module version
+    if (![String]::IsNullOrEmpty($ModuleVersion)) {
+        Update-ModuleManifest -Path out/modules/PSDocs/PSDocs.psd1 -ModuleVersion $ModuleVersion;
+
+        Import-Module ./out/modules/PSDocs -Force;
+
+        Update-ModuleManifest -Path out/modules/PSDocs.Dsc/PSDocs.Dsc.psd1 -ModuleVersion $ModuleVersion -RequiredModules @(
+            [PSObject]@{ ModuleName = 'PSDocs'; ModuleVersion = "$ModuleVersion" }
+        );
+    }
+}
+
+# Synopsis: Build modules
+task BuildModule BuildDotNet, CopyModule, UpdateManifest
 
 # Synopsis: Build help
 task BuildHelp BuildModule, PlatyPS, {
@@ -133,26 +150,12 @@ task Clean {
     Remove-Item -Path out,reports -Recurse -Force -ErrorAction SilentlyContinue;
 }
 
-task PublishModule Build, {
+task PublishModule {
 
-    # Update module version
-    if ($Null -ne 'ModuleVersion') {
-        Update-ModuleManifest -Path out/modules/PSDocs/PSDocs.psd1 -ModuleVersion $ModuleVersion;
+    if (![String]::IsNullOrEmpty($ApiKey)) {
 
-        Import-Module ./out/modules/PSDocs -Force;
-
-        Update-ModuleManifest -Path out/modules/PSDocs.Dsc/PSDocs.Dsc.psd1 -ModuleVersion $ModuleVersion -RequiredModules @(
-            [PSObject]@{ ModuleName = 'PSDocs'; ModuleVersion = "$ModuleVersion" }
-        );
-    }
-}
-
-task ReleaseModule {
-
-    if ($Null -ne 'NuGetApiKey') {
-
-        Publish-Module -Path out/modules/PSDocs -NuGetApiKey $NuGetApiKey -Verbose
-        Publish-Module -Path out/modules/PSDocs.Dsc -NuGetApiKey $NuGetApiKey;
+        Publish-Module -Path out/modules/PSDocs -NuGetApiKey $ApiKey -Repository PSGallery;
+        Publish-Module -Path out/modules/PSDocs.Dsc -NuGetApiKey $ApiKey -Repository PSGallery;
     }
 }
 
@@ -217,6 +220,4 @@ task Build Clean, BuildModule, BuildHelp
 
 task Test Build, TestModule
 
-task Publish PublishModule
-
-task Release ReleaseModule
+task Publish UpdateManifest, PublishModule
