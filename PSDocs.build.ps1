@@ -4,6 +4,10 @@ param (
     [String]$ModuleVersion,
 
     [Parameter(Mandatory = $False)]
+    [AllowNull()]
+    [String]$ReleaseVersion,
+
+    [Parameter(Mandatory = $False)]
     [String]$Configuration = 'Debug',
 
     [Parameter(Mandatory = $False)]
@@ -12,8 +16,7 @@ param (
     [Parameter(Mandatory = $False)]
     [Switch]$CodeCoverage = $False,
 
-    [Parameter(Mandatory = $False)]
-    [String]$OutputPath = (Join-Path -Path $PWD -ChildPath out/modules)
+    [String]$ArtifactPath = (Join-Path -Path $PWD -ChildPath out/modules)
 )
 
 # Copy the PowerShell modules files to the destination path
@@ -105,6 +108,7 @@ task CopyModule {
     Copy-Item -Path ThirdPartyNotices.txt -Destination out/modules/PSDocs;
 }
 
+# TODO: Fix dependency linking
 task UpdateManifest {
 
     # Update module version
@@ -119,8 +123,8 @@ task UpdateManifest {
     }
 }
 
-# Synopsis: Build modules
-task BuildModule BuildDotNet, CopyModule, UpdateManifest
+# Synopsis: Build modules only
+task BuildModule BuildDotNet, CopyModule, VersionModule
 
 # Synopsis: Build help
 task BuildHelp BuildModule, PlatyPS, {
@@ -150,12 +154,51 @@ task Clean {
     Remove-Item -Path out,reports -Recurse -Force -ErrorAction SilentlyContinue;
 }
 
-task PublishModule {
+task VersionModule {
+
+    if (![String]::IsNullOrEmpty($ReleaseVersion)) {
+        Write-Verbose -Message "[VersionModule] -- ReleaseVersion: $ReleaseVersion";
+        $ModuleVersion = $ReleaseVersion;
+    }
+
+    if (![String]::IsNullOrEmpty($ModuleVersion)) {
+        Write-Verbose -Message "[VersionModule] -- ModuleVersion: $ModuleVersion";
+
+        $version = $ModuleVersion;
+        $revision = [String]::Empty;
+
+        Write-Verbose -Message "[VersionModule] -- Using Version: $version";
+        Write-Verbose -Message "[VersionModule] -- Using Revision: $revision";
+
+        if ($version -like '*-*') {
+            [String[]]$versionParts = $version.Split('-', [System.StringSplitOptions]::RemoveEmptyEntries);
+            $version = $versionParts[0];
+
+            if ($versionParts.Length -eq 2) {
+                $revision = $versionParts[1];
+            }
+        }
+
+        # Update module version
+        if (![String]::IsNullOrEmpty($version)) {
+            Write-Verbose -Message "[VersionModule] -- Updating module manifest ModuleVersion";
+            Update-ModuleManifest -Path (Join-Path -Path $ArtifactPath -ChildPath PSDocs/PSDocs.psd1) -ModuleVersion $version;
+        }
+
+        # Update pre-release version
+        if (![String]::IsNullOrEmpty($revision)) {
+            Write-Verbose -Message "[VersionModule] -- Updating module manifest Prerelease";
+            Update-ModuleManifest -Path (Join-Path -Path $ArtifactPath -ChildPath PSDocs/PSDocs.psd1) -Prerelease $revision;
+        }
+    }
+}
+
+task ReleaseModule VersionModule, {
 
     if (![String]::IsNullOrEmpty($ApiKey)) {
-
-        Publish-Module -Path out/modules/PSDocs -NuGetApiKey $ApiKey -Repository PSGallery;
-        Publish-Module -Path out/modules/PSDocs.Dsc -NuGetApiKey $ApiKey -Repository PSGallery;
+        # Publish to PowerShell Gallery
+        Publish-Module -Path (Join-Path -Path $ArtifactPath -ChildPath PSDocs) -NuGetApiKey $ApiKey -Repository PSGallery;
+        Publish-Module -Path (Join-Path -Path $ArtifactPath -ChildPath PSDocs.Dsc) -NuGetApiKey $ApiKey -Repository PSGallery;
     }
 }
 
@@ -183,7 +226,17 @@ task platyPS {
     Import-Module -Name PlatyPS -Verbose:$False;
 }
 
-task TestModule Pester, {
+task PSScriptAnalyzer {
+
+    # Install PSScriptAnalyzer if not currently installed
+    if ($Null -eq (Get-Module -Name PSScriptAnalyzer -ListAvailable)) {
+        Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser;
+    }
+
+    Import-Module -Name PSScriptAnalyzer -Verbose:$False;
+}
+
+task TestModule Pester, PSScriptAnalyzer, {
 
     # Run Pester tests
     $pesterParams = @{ Path = $PWD; OutputFile = 'reports/Pester.xml'; OutputFormat = 'NUnitXml'; PesterOption = @{ IncludeVSCodeMarker = $True }; PassThru = $True; };
@@ -212,12 +265,19 @@ task TestModule Pester, {
     }
 }
 
+# Synopsis: Run script analyzer
+task Analyze Build, PSScriptAnalyzer, {
+
+    Invoke-ScriptAnalyzer -Path out/modules/PSDocs;
+    Invoke-ScriptAnalyzer -Path out/modules/PSDocs.Dsc;
+}
+
 # Synopsis: Build and clean.
 task . Build, Test
 
 # Synopsis: Build the project
-task Build Clean, BuildModule, BuildHelp
+task Build Clean, BuildModule, BuildHelp, VersionModule
 
 task Test Build, TestModule
 
-task Publish UpdateManifest, PublishModule
+task Release ReleaseModule
