@@ -1,6 +1,8 @@
 
 ## Unreleased
 
+- Fix null reference for table columns with undefined properties [#53](https://github.com/BernieWhite/PSDocs/issues/53)
+
 ## v0.6.0
 
 - Fix consistency of line break generation before and after document content.
