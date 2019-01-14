@@ -23,7 +23,7 @@ pool:
 steps:
 
 # Install pipeline dependencies and build module
-- powershell: ./scripts/pipeline-build.ps1 -File ./PSDocs.build.ps1 -Configuration $(buildConfiguration) -ModuleVersion $(Build.BuildNumber) -ReleaseVersion "$(Release.Version)" -Verbose
+- powershell: ./scripts/pipeline-build.ps1 -File ./PSDocs.build.ps1 -Configuration $(buildConfiguration) -ModuleVersion $(Build.BuildNumber) -ReleaseVersion "$(Release.Version)"
   displayName: 'Build module'
 
 # Run module benchmark

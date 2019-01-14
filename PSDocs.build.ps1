@@ -117,7 +117,6 @@ task BuildModule BuildDotNet, CopyModule, VersionModule
 
 # Synopsis: Build help
 task BuildHelp BuildModule, PlatyPS, {
-
     # Generate MAML and about topics
     $Null = New-ExternalHelp -OutputPath out/docs/PSDocs -Path '.\docs\commands\PSDocs\en-US','.\docs\keywords\PSDocs\en-US','.\docs\concepts\PSDocs\en-US' -Force;
     $Null = New-ExternalHelp -OutputPath out/docs/PSDocs.Dsc -Path '.\docs\commands\PSDocs.Dsc\en-US' -Force;
@@ -130,7 +129,6 @@ task BuildHelp BuildModule, PlatyPS, {
 }
 
 task ScaffoldHelp BuildModule, {
-
     Import-Module (Join-Path -Path $PWD -ChildPath out/modules/PSDocs) -Force;
     Import-Module (Join-Path -Path $PWD -ChildPath out/modules/PSDocs.Dsc) -Force;
 
@@ -144,7 +142,6 @@ task Clean {
 }
 
 task VersionModule {
-
     if (![String]::IsNullOrEmpty($ReleaseVersion)) {
         Write-Verbose -Message "[VersionModule] -- ReleaseVersion: $ReleaseVersion";
         $ModuleVersion = $ReleaseVersion;
@@ -170,11 +167,13 @@ task VersionModule {
 
         # Update module version
         if (![String]::IsNullOrEmpty($version)) {
-            Write-Verbose -Message "[VersionModule] -- Updating module manifest ModuleVersion";
+            Write-Verbose -Message "[VersionModule] -- Updating module manifest ModuleVersion for PSDocs";
             Update-ModuleManifest -Path (Join-Path -Path $ArtifactPath -ChildPath PSDocs/PSDocs.psd1) -ModuleVersion $version;
 
+            # Updating PSModulePath is required for Update-ModuleManifest with -RequiredModules to work
             $Env:PSModulePath += ";$ArtifactPath";
 
+            Write-Verbose -Message "[VersionModule] -- Updating module manifest ModuleVersion for PSDocs.Dsc";
             Import-Module (Join-Path -Path $ArtifactPath -ChildPath PSDocs) -Force;
             $requiredVersion = @(New-Object -TypeName Microsoft.PowerShell.Commands.ModuleSpecification -ArgumentList @{ ModuleName = 'PSDocs'; ModuleVersion = "$version"; });
             Update-ModuleManifest -Path (Join-Path -Path $ArtifactPath -ChildPath PSDocs.Dsc/PSDocs.Dsc.psd1) -ModuleVersion $version -RequiredModules $requiredVersion -Verbose;
@@ -182,9 +181,10 @@ task VersionModule {
 
         # Update pre-release version
         if (![String]::IsNullOrEmpty($revision)) {
-            Write-Verbose -Message "[VersionModule] -- Updating module manifest Prerelease";
+            Write-Verbose -Message "[VersionModule] -- Updating module manifest Prerelease for PSDocs";
             Update-ModuleManifest -Path (Join-Path -Path $ArtifactPath -ChildPath PSDocs/PSDocs.psd1) -Prerelease $revision;
 
+            Write-Verbose -Message "[VersionModule] -- Updating module manifest Prerelease for PSDocs.Dsc";
             Import-Module (Join-Path -Path $ArtifactPath -ChildPath PSDocs) -Force;
             Update-ModuleManifest -Path (Join-Path -Path $ArtifactPath -ChildPath PSDocs.Dsc/PSDocs.Dsc.psd1) -Prerelease $revision;
         }
@@ -192,7 +192,6 @@ task VersionModule {
 }
 
 task ReleaseModule VersionModule, {
-
     if (![String]::IsNullOrEmpty($NuGetApiKey)) {
         # Publish to PowerShell Gallery
         Publish-Module -Path (Join-Path -Path $ArtifactPath -ChildPath PSDocs) -NuGetApiKey $NuGetApiKey;
@@ -204,39 +203,35 @@ task NuGet {
     $Null = Install-PackageProvider -Name NuGet -Force -Scope CurrentUser;
 }
 
+# Synopsis: Get Pester
 task Pester {
-
-    # Install pester if v4+ is not currently installed
+    # Install Pester if v4+ is not currently installed
     if ($Null -eq (Get-Module -Name Pester -ListAvailable | Where-Object -FilterScript { $_.Version -like '4.*' })) {
         Install-Module -Name Pester -MinimumVersion '4.0.0' -Force -Scope CurrentUser -SkipPublisherCheck;
     }
-
     Import-Module -Name Pester -Verbose:$False;
 }
 
+# Synopsis: Get PlatyPS
 task platyPS {
-
-    # Install pester if v4+ is not currently installed
+    # Install PlatyPS if not currently installed
     if ($Null -eq (Get-Module -Name PlatyPS -ListAvailable)) {
         Install-Module -Name PlatyPS -Force -Scope CurrentUser;
     }
-
     Import-Module -Name PlatyPS -Verbose:$False;
 }
 
+# Synopsis: Get PSScriptAnalyzer
 task PSScriptAnalyzer {
-
     # Install PSScriptAnalyzer if not currently installed
     if ($Null -eq (Get-Module -Name PSScriptAnalyzer -ListAvailable)) {
         Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser;
     }
-
     Import-Module -Name PSScriptAnalyzer -Verbose:$False;
 }
 
+# Synopsis: Run Pester tests
 task TestModule Pester, PSScriptAnalyzer, {
-
-    # Run Pester tests
     $pesterParams = @{ Path = $PWD; OutputFile = 'reports/Pester.xml'; OutputFormat = 'NUnitXml'; PesterOption = @{ IncludeVSCodeMarker = $True }; PassThru = $True; };
 
     if ($CodeCoverage) {
