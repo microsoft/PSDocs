@@ -143,4 +143,28 @@ Describe 'PSDocs -- Table keyword' -Tag Table {
             $outputDoc | Should -FileContentMatch 'This is a\<br /\>description\<br /\>split\<br /\>over\<br /\>multiple\<br /\>lines\.';
         }
     }
+
+    Context 'Table with null column' {
+
+        $testObject = [PSCustomObject]@{
+            Name = 'Test'
+            Value = 'Value'
+        }
+
+        # Define table with property expressions
+        document 'TableWithEmptyColumn' {
+            'Table1'
+            $InputObject | Table -Property Name,NotValue,Value
+            'Table2'
+            $InputObject | Table -Property Name,NotValue
+            'EOF'
+        }
+
+        It 'Should create empty columns' {
+            $outputDoc = "$outputPath\TableWithEmptyColumn.md";
+            TableWithEmptyColumn -InputObject $testObject -InstanceName 'TableWithEmptyColumn' -OutputPath $outputPath;
+            $outputDoc | Should -FileContentMatchMultiline 'Name \| NotValue \| Value\r\n---- \| -------- \| -----\r\nTest \|          \| Value';
+            $outputDoc | Should -FileContentMatchMultiline 'Name \| NotValue\r\n---- \| --------\r\nTest \|\r\n';
+        }
+    }
 }
