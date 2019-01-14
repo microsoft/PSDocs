@@ -23,6 +23,11 @@ param (
     [String]$ArtifactPath = (Join-Path -Path $PWD -ChildPath out/modules)
 )
 
+if ($ArtifactPath -notin $Env:PSModulePath.Split(';')) {
+    # Updating PSModulePath is required for Update-ModuleManifest with -RequiredModules to work
+    $Env:PSModulePath += ";$ArtifactPath";
+}
+
 # Copy the PowerShell modules files to the destination path
 function CopyModuleFiles {
 
@@ -127,9 +132,6 @@ task VersionModule {
             Write-Verbose -Message "[VersionModule] -- Updating module manifest ModuleVersion for PSDocs";
             Update-ModuleManifest -Path (Join-Path -Path $ArtifactPath -ChildPath PSDocs/PSDocs.psd1) -ModuleVersion $version;
 
-            # Updating PSModulePath is required for Update-ModuleManifest with -RequiredModules to work
-            $Env:PSModulePath += ";$ArtifactPath";
-
             Write-Verbose -Message "[VersionModule] -- Updating module manifest ModuleVersion for PSDocs.Dsc";
             Import-Module (Join-Path -Path $ArtifactPath -ChildPath PSDocs) -Force;
             $requiredVersion = @(New-Object -TypeName Microsoft.PowerShell.Commands.ModuleSpecification -ArgumentList @{ ModuleName = 'PSDocs'; ModuleVersion = "$version"; });
@@ -212,7 +214,6 @@ task TestModule Pester, PSScriptAnalyzer, {
 
 # Synopsis: Run script analyzer
 task Analyze Build, PSScriptAnalyzer, {
-
     Invoke-ScriptAnalyzer -Path out/modules/PSDocs;
     Invoke-ScriptAnalyzer -Path out/modules/PSDocs.Dsc;
 }
