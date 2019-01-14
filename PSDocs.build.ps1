@@ -156,9 +156,6 @@ task VersionModule {
         $version = $ModuleVersion;
         $revision = [String]::Empty;
 
-        Write-Verbose -Message "[VersionModule] -- Using Version: $version";
-        Write-Verbose -Message "[VersionModule] -- Using Revision: $revision";
-
         if ($version -like '*-*') {
             [String[]]$versionParts = $version.Split('-', [System.StringSplitOptions]::RemoveEmptyEntries);
             $version = $versionParts[0];
@@ -167,6 +164,9 @@ task VersionModule {
                 $revision = $versionParts[1];
             }
         }
+
+        Write-Verbose -Message "[VersionModule] -- Using Version: $version";
+        Write-Verbose -Message "[VersionModule] -- Using Revision: $revision";
 
         # Update module version
         if (![String]::IsNullOrEmpty($version)) {
