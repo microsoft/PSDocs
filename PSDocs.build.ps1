@@ -175,7 +175,8 @@ task VersionModule {
 
             Import-Module (Join-Path -Path $ArtifactPath -ChildPath PSDocs) -Force;
             Update-ModuleManifest -Path (Join-Path -Path $ArtifactPath -ChildPath PSDocs.Dsc/PSDocs.Dsc.psd1) -ModuleVersion $version;
-            $requiredVersion = @(@{ ModuleName = 'PSDocs'; ModuleVersion = [Version]"$version"; });
+            $requiredVersion = @(New-Object -TypeName Microsoft.PowerShell.Commands.ModuleSpecification -ArgumentList @{ ModuleName = 'PSDocs'; ModuleVersion = "$version"; });
+            Write-Verbose -Message "[VersionModule] -- Adding RequiredVersion: $($requiredVersion | ConvertTo-Json -Compress)";
             Update-ModuleManifest -Path (Join-Path -Path $ArtifactPath -ChildPath PSDocs.Dsc/PSDocs.Dsc.psd1) -RequiredModules $requiredVersion;
         }
 
