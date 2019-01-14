@@ -174,9 +174,9 @@ task VersionModule {
             Update-ModuleManifest -Path (Join-Path -Path $ArtifactPath -ChildPath PSDocs/PSDocs.psd1) -ModuleVersion $version;
 
             Import-Module (Join-Path -Path $ArtifactPath -ChildPath PSDocs) -Force;
-            Update-ModuleManifest -Path (Join-Path -Path $ArtifactPath -ChildPath PSDocs.Dsc/PSDocs.Dsc.psd1) -ModuleVersion $version -RequiredModules @(
-                @{ ModuleName = 'PSDocs'; ModuleVersion = "$version" }
-            );
+            Update-ModuleManifest -Path (Join-Path -Path $ArtifactPath -ChildPath PSDocs.Dsc/PSDocs.Dsc.psd1) -ModuleVersion $version;
+            $requiredVersion = @(@{ ModuleName = 'PSDocs'; ModuleVersion = "$version" });
+            Update-ModuleManifest -Path (Join-Path -Path $ArtifactPath -ChildPath PSDocs.Dsc/PSDocs.Dsc.psd1) -RequiredModules $requiredVersion;
         }
 
         # Update pre-release version
