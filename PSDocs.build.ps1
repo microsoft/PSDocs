@@ -173,6 +173,8 @@ task VersionModule {
             Write-Verbose -Message "[VersionModule] -- Updating module manifest ModuleVersion";
             Update-ModuleManifest -Path (Join-Path -Path $ArtifactPath -ChildPath PSDocs/PSDocs.psd1) -ModuleVersion $version;
 
+            $Env:PSModulePath += ";$ArtifactPath";
+
             Import-Module (Join-Path -Path $ArtifactPath -ChildPath PSDocs) -Force;
             $requiredVersion = @(New-Object -TypeName Microsoft.PowerShell.Commands.ModuleSpecification -ArgumentList @{ ModuleName = 'PSDocs'; ModuleVersion = "$version"; });
             Update-ModuleManifest -Path (Join-Path -Path $ArtifactPath -ChildPath PSDocs.Dsc/PSDocs.Dsc.psd1) -ModuleVersion $version -RequiredModules $requiredVersion -Verbose;
