@@ -172,9 +172,7 @@ task VersionModule {
         if (![String]::IsNullOrEmpty($version)) {
             Write-Verbose -Message "[VersionModule] -- Updating module manifest ModuleVersion";
             Update-ModuleManifest -Path (Join-Path -Path $ArtifactPath -ChildPath PSDocs/PSDocs.psd1) -ModuleVersion $version;
-            Update-ModuleManifest -Path (Join-Path -Path $ArtifactPath -ChildPath PSDocs/PSRule.Dsc.psd1) -ModuleVersion $version;
-
-            Update-ModuleManifest -Path (Join-Path -Path $ArtifactPath -ChildPath PSDocs/PSRule.Dsc.psd1) -ModuleVersion $version -RequiredModules @(
+            Update-ModuleManifest -Path (Join-Path -Path $ArtifactPath -ChildPath PSDocs.Dsc/PSDocs.Dsc.psd1) -ModuleVersion $version -RequiredModules @(
                 [PSObject]@{ ModuleName = 'PSDocs'; ModuleVersion = "$version" }
             );
         }
@@ -183,7 +181,7 @@ task VersionModule {
         if (![String]::IsNullOrEmpty($revision)) {
             Write-Verbose -Message "[VersionModule] -- Updating module manifest Prerelease";
             Update-ModuleManifest -Path (Join-Path -Path $ArtifactPath -ChildPath PSDocs/PSDocs.psd1) -Prerelease $revision;
-            Update-ModuleManifest -Path (Join-Path -Path $ArtifactPath -ChildPath PSDocs/PSDocs.Dsc.psd1) -Prerelease $revision;
+            Update-ModuleManifest -Path (Join-Path -Path $ArtifactPath -ChildPath PSDocs.Dsc/PSDocs.Dsc.psd1) -Prerelease $revision;
         }
     }
 }
