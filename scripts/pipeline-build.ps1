@@ -38,7 +38,7 @@ if ($Null -eq (Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue)) {
 }
 
 if ($Null -eq (Get-InstalledModule -Name PowerShellGet -MinimumVersion 2.0.3 -ErrorAction SilentlyContinue)) {
-    Install-Module PowerShellGet -MinimumVersion 2.0.3 -Scope CurrentUser -Force;
+    Install-Module PowerShellGet -MinimumVersion 2.0.3 -AllowClobber -Scope CurrentUser -Force;
     Remove-Module -Name PowerShellGet -ErrorAction SilentlyContinue;
     Import-Module -Name PowerShellGet -MinimumVersion 2.0.3;
 }
