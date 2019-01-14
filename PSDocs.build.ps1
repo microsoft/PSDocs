@@ -175,7 +175,7 @@ task VersionModule {
 
             Import-Module (Join-Path -Path $ArtifactPath -ChildPath PSDocs) -Force;
             $requiredVersion = @(New-Object -TypeName Microsoft.PowerShell.Commands.ModuleSpecification -ArgumentList @{ ModuleName = 'PSDocs'; ModuleVersion = "$version"; });
-            Update-ModuleManifest -Path (Join-Path -Path $ArtifactPath -ChildPath PSDocs.Dsc/PSDocs.Dsc.psd1) -ModuleVersion $version -RequiredModules $requiredVersion;
+            Update-ModuleManifest -Path (Join-Path -Path $ArtifactPath -ChildPath PSDocs.Dsc/PSDocs.Dsc.psd1) -ModuleVersion $version -RequiredModules $requiredVersion -Verbose;
         }
 
         # Update pre-release version
