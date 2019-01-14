@@ -11,7 +11,11 @@
                 "kind": "test",
                 "isDefault": true
             },
-            "problemMatcher": [ "$pester" ]
+            "problemMatcher": [ "$pester" ],
+            "presentation": {
+                "panel": "dedicated",
+                "clear": false
+            }
         },
         {
             "label": "coverage",
