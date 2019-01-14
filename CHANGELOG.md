@@ -1,6 +1,8 @@
 
 ## Unreleased
 
+## v0.6.1
+
 - Fix null reference for table columns with undefined properties [#53](https://github.com/BernieWhite/PSDocs/issues/53)
 
 ## v0.6.0
