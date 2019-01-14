@@ -1,38 +1,60 @@
 # Azure DevOps
 # Build pipeline for PSDocs
 
+strategy:
+  matrix:
+    Windows:
+      imageName: 'vs2017-win2016'
+      publishModule: 'true'
+
+variables:
+  buildConfiguration: 'Release'
+  version: '0.6.0'
+
+# Use build number format, i.e. 0.1.0-B181101
+name: $(version)-B$(date:yyMM)$(rev:rr)
+
 trigger:
 - master
 
 pool:
-  vmImage: VS2017-Win2016
-
-variables:
-  buildConfiguration: 'Release'
-  versionNumber: '0.6.0'
-
-# Use build number format. i.e. 0.6.0-Build181001
-name: $(versionNumber)-Build$(date:yyMM)$(rev:rr)
+  vmImage: $(imageName)
 
 steps:
 
-# Install pipeline dependencies
-- powershell: ./scripts/vstsbuild.ps1
-  displayName: 'Install Invoke-Build'
-
-# Invoke build
-- powershell: Invoke-Build -Configuration $(buildConfiguration)
+# Install pipeline dependencies and build module
+- powershell: ./scripts/pipeline-build.ps1 -File ./PSDocs.build.ps1 -Configuration $(buildConfiguration) -ModuleVersion $(Build.BuildNumber) -ReleaseVersion "$(Release.Version)"
   displayName: 'Build module'
 
-# Publish test results
+# Run module benchmark
+# - powershell: ./scripts/pipeline-build.ps1 -Task Benchmark -File ./PSDocs.build.ps1 -Configuration $(buildConfiguration) -ModuleVersion $(Build.BuildNumber) -ReleaseVersion "$(Release.Version)"
+#   displayName: 'Benchmark'
+#   condition: eq(variables['benchmark'], 'true')
+
+# DotNet test results
+# - task: PublishTestResults@2
+#   displayName: 'Publish unit test results'
+#   inputs:
+#     testRunTitle: 'DotNet on $(imageName)'
+#     testRunner: VSTest
+#     testResultsFiles: 'reports/*.trx'
+#     mergeTestResults: true
+#     platform: $(imageName)
+#     configuration: $(buildConfiguration)
+#     publishRunAttachments: true
+#   condition: succeededOrFailed()
+
+# Pester test results
 - task: PublishTestResults@2
-  displayName: 'Publish test results'
+  displayName: 'Publish Pester results'
   inputs:
-    testRunTitle: 'Pester unit tests'
-    testResultsFormat: NUnit
+    testRunTitle: 'Pester on $(imageName)'
+    testRunner: NUnit
     testResultsFiles: 'reports/*.xml'
     mergeTestResults: true
-    buildConfiguration: $(buildConfiguration)
+    platform: $(imageName)
+    configuration: $(buildConfiguration)
+    publishRunAttachments: true
   condition: succeededOrFailed()
 
 # Generate artifacts
@@ -41,9 +63,11 @@ steps:
   inputs:
     PathtoPublish: out/modules/PSDocs
     ArtifactName: PSDocs
+  condition: and(succeeded(), eq(variables['publishModule'], 'true'))
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish PSDocs.Dsc module'
   inputs:
     PathtoPublish: out/modules/PSDocs.Dsc
     ArtifactName: PSDocs.Dsc
+  condition: and(succeeded(), eq(variables['publishModule'], 'true'))

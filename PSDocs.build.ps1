@@ -11,11 +11,15 @@ param (
     [String]$Configuration = 'Debug',
 
     [Parameter(Mandatory = $False)]
-    [String]$ApiKey,
+    [String]$NuGetApiKey,
 
     [Parameter(Mandatory = $False)]
     [Switch]$CodeCoverage = $False,
 
+    [Parameter(Mandatory = $False)]
+    [Switch]$Benchmark = $False,
+
+    [Parameter(Mandatory = $False)]
     [String]$ArtifactPath = (Join-Path -Path $PWD -ChildPath out/modules)
 )
 
@@ -33,7 +37,7 @@ function CopyModuleFiles {
     process {
         $sourcePath = Resolve-Path -Path $Path;
 
-        Get-ChildItem -Path $sourcePath -Recurse -File -Include *.ps1,*.psm1,*.psd1 | Where-Object -FilterScript {
+        Get-ChildItem -Path $sourcePath -Recurse -File -Include *.ps1,*.psm1,*.psd1,*.ps1xml | Where-Object -FilterScript {
             ($_.FullName -notmatch '(\.(cs|csproj)|(\\|\/)(obj|bin))')
         } | ForEach-Object -Process {
             $filePath = $_.FullName.Replace($sourcePath, $destinationPath);
@@ -108,21 +112,6 @@ task CopyModule {
     Copy-Item -Path ThirdPartyNotices.txt -Destination out/modules/PSDocs;
 }
 
-# TODO: Fix dependency linking
-task UpdateManifest {
-
-    # Update module version
-    if (![String]::IsNullOrEmpty($ModuleVersion)) {
-        Update-ModuleManifest -Path out/modules/PSDocs/PSDocs.psd1 -ModuleVersion $ModuleVersion;
-
-        Import-Module ./out/modules/PSDocs -Force;
-
-        Update-ModuleManifest -Path out/modules/PSDocs.Dsc/PSDocs.Dsc.psd1 -ModuleVersion $ModuleVersion -RequiredModules @(
-            [PSObject]@{ ModuleName = 'PSDocs'; ModuleVersion = "$ModuleVersion" }
-        );
-    }
-}
-
 # Synopsis: Build modules only
 task BuildModule BuildDotNet, CopyModule, VersionModule
 
@@ -183,22 +172,28 @@ task VersionModule {
         if (![String]::IsNullOrEmpty($version)) {
             Write-Verbose -Message "[VersionModule] -- Updating module manifest ModuleVersion";
             Update-ModuleManifest -Path (Join-Path -Path $ArtifactPath -ChildPath PSDocs/PSDocs.psd1) -ModuleVersion $version;
+            Update-ModuleManifest -Path (Join-Path -Path $ArtifactPath -ChildPath PSDocs/PSRule.Dsc.psd1) -ModuleVersion $version;
+
+            Update-ModuleManifest -Path (Join-Path -Path $ArtifactPath -ChildPath PSDocs/PSRule.Dsc.psd1) -ModuleVersion $version -RequiredModules @(
+                [PSObject]@{ ModuleName = 'PSDocs'; ModuleVersion = "$version" }
+            );
         }
 
         # Update pre-release version
         if (![String]::IsNullOrEmpty($revision)) {
             Write-Verbose -Message "[VersionModule] -- Updating module manifest Prerelease";
             Update-ModuleManifest -Path (Join-Path -Path $ArtifactPath -ChildPath PSDocs/PSDocs.psd1) -Prerelease $revision;
+            Update-ModuleManifest -Path (Join-Path -Path $ArtifactPath -ChildPath PSDocs/PSDocs.Dsc.psd1) -Prerelease $revision;
         }
     }
 }
 
 task ReleaseModule VersionModule, {
 
-    if (![String]::IsNullOrEmpty($ApiKey)) {
+    if (![String]::IsNullOrEmpty($NuGetApiKey)) {
         # Publish to PowerShell Gallery
-        Publish-Module -Path (Join-Path -Path $ArtifactPath -ChildPath PSDocs) -NuGetApiKey $ApiKey -Repository PSGallery;
-        Publish-Module -Path (Join-Path -Path $ArtifactPath -ChildPath PSDocs.Dsc) -NuGetApiKey $ApiKey -Repository PSGallery;
+        Publish-Module -Path (Join-Path -Path $ArtifactPath -ChildPath PSDocs) -NuGetApiKey $NuGetApiKey;
+        Publish-Module -Path (Join-Path -Path $ArtifactPath -ChildPath PSDocs.Dsc) -NuGetApiKey $NuGetApiKey;
     }
 }
 
@@ -256,7 +251,6 @@ task TestModule Pester, PSScriptAnalyzer, {
     }
 
     # Throw an error if pester tests failed
-
     if ($Null -eq $results) {
         throw 'Failed to get Pester test results.';
     }
