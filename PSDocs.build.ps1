@@ -173,7 +173,7 @@ task VersionModule {
             Write-Verbose -Message "[VersionModule] -- Updating module manifest ModuleVersion";
             Update-ModuleManifest -Path (Join-Path -Path $ArtifactPath -ChildPath PSDocs/PSDocs.psd1) -ModuleVersion $version;
 
-            Import-Module (Join-Path -Path $ArtifactPath -ChildPath PSDocs);
+            Import-Module (Join-Path -Path $ArtifactPath -ChildPath PSDocs) -Force;
             Update-ModuleManifest -Path (Join-Path -Path $ArtifactPath -ChildPath PSDocs.Dsc/PSDocs.Dsc.psd1) -ModuleVersion $version -RequiredModules @(
                 [PSObject]@{ ModuleName = 'PSDocs'; ModuleVersion = "$version" }
             );
