@@ -175,7 +175,7 @@ task VersionModule {
 
             Import-Module (Join-Path -Path $ArtifactPath -ChildPath PSDocs) -Force;
             Update-ModuleManifest -Path (Join-Path -Path $ArtifactPath -ChildPath PSDocs.Dsc/PSDocs.Dsc.psd1) -ModuleVersion $version -RequiredModules @(
-                [PSObject]@{ ModuleName = 'PSDocs'; ModuleVersion = "$version" }
+                @{ ModuleName = 'PSDocs'; ModuleVersion = "$version" }
             );
         }
 
