@@ -54,11 +54,11 @@ document 'arm-template' {
     # Generate example command line
     Section 'Use the template' {
         Section 'PowerShell' {
-            'New-AzureRmResourceGroupDeployment -Name <deployment-name> -ResourceGroupName <resource-group-name> -TemplateFile <path-to-template>' | Code powershell
+            'New-AzResourceGroupDeployment -Name <deployment-name> -ResourceGroupName <resource-group-name> -TemplateFile <path-to-template>' | Code powershell
         }
 
         Section 'Azure CLI' {
-            'az group deployment create <resource-group-name> <deployment-name> --template-file <path-to-template>' | Code text
+            'az group deployment create --name <deployment-name> --resource-group <resource-group-name> --template-file <path-to-template>' | Code text
         }
     }
 }
