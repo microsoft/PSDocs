@@ -34,11 +34,11 @@ dockerBridgeCidr | A CIDR notation IP for Docker bridge.
 ### PowerShell
 
 ```powershell
-New-AzureRmResourceGroupDeployment -Name <deployment-name> -ResourceGroupName <resource-group-name> -TemplateFile <path-to-template>
+New-AzResourceGroupDeployment -Name <deployment-name> -ResourceGroupName <resource-group-name> -TemplateFile <path-to-template>
 ```
 
 ### Azure CLI
 
 ```text
-az group deployment create <resource-group-name> <deployment-name> --template-file <path-to-template>
+az group deployment create --name <deployment-name> --resource-group <resource-group-name> --template-file <path-to-template>
 ```
