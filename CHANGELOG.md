@@ -1,9 +1,12 @@
 
 ## Unreleased
 
+- Fix PositionMessage cannot be found on this object. [#63](https://github.com/BernieWhite/PSDocs/issues/63)
+- Fix handling of null metadata hashtable. [#60](https://github.com/BernieWhite/PSDocs/issues/60)
+
 ## v0.6.1
 
-- Fix null reference for table columns with undefined properties [#53](https://github.com/BernieWhite/PSDocs/issues/53)
+- Fix null reference for table columns with undefined properties. [#53](https://github.com/BernieWhite/PSDocs/issues/53)
 
 ## v0.6.0
 

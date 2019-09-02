@@ -600,16 +600,17 @@ function Include {
 }
 
 function Metadata {
-
     [CmdletBinding()]
     param (
         [Parameter(Position = 0, Mandatory = $True)]
+        [AllowNull()]
         [System.Collections.IDictionary]$Body
     )
-
     process {
-
-        # Process eaxch key value pair in the supplied dictionary/hashtable
+        if ($Null -eq $Body) {
+            return;
+        }
+        # Process each key value pair in the supplied dictionary/hashtable
         foreach ($kv in $Body.GetEnumerator()) {
             $Document.Metadata[$kv.Key] = $kv.Value;
         }
@@ -1307,8 +1308,10 @@ function InvokeTemplate {
                 $baseException = $_.Exception.GetBaseException();
                 $positionMessage = $Null;
 
-                if ($baseException -is [System.Management.Automation.IContainsErrorRecord]) {
-                    $positionMessage = $baseException.ErrorRecord.InvocationInfo.PositionMessage
+                if ($baseException -is [System.Management.Automation.IContainsErrorRecord] -and $Null -ne $baseException.ErrorRecord.InvocationInfo) {
+                    if (![String]::IsNullOrEmpty($baseException.ErrorRecord.InvocationInfo.PositionMessage)) {
+                        $positionMessage = $baseException.ErrorRecord.InvocationInfo.PositionMessage
+                    }
                 }
 
                 throw (New-Object -TypeName PSDocs.Execution.InvokeDocumentException -ArgumentList @(
