@@ -1,6 +1,8 @@
 
 ## Unreleased
 
+## v0.6.2
+
 - Fix PositionMessage cannot be found on this object. [#63](https://github.com/BernieWhite/PSDocs/issues/63)
 - Fix handling of null metadata hashtable. [#60](https://github.com/BernieWhite/PSDocs/issues/60)
 
