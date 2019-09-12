@@ -1,17 +1,26 @@
 
 document 'FromFileTest1' {
+    Metadata @{
+        test = 'Test1'
+    }
     Section 'Test' {
         'Test 1'
     }
 }
 
 document 'FromFileTest2' {
+    Metadata @{
+        test = 'Test2'
+    }
     Section 'Test' {
         'Test 2'
     }
 }
 
 document 'FromFileTest3' -Tag 'Test3' {
+    Metadata @{
+        test = 'Test3'
+    }
     Section 'Test' {
         'Test 3'
     }

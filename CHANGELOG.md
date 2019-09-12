@@ -1,6 +1,8 @@
 
 ## Unreleased
 
+- Add support for MacOS and Linux. [#59](https://github.com/BernieWhite/PSDocs/issues/59)
+
 ## v0.6.3
 
 - Fix concatenation of multiple lines in Code section. [#69](https://github.com/BernieWhite/PSDocs/issues/69)

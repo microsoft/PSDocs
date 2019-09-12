@@ -12,61 +12,28 @@ $ErrorActionPreference = 'Stop';
 Set-StrictMode -Version latest;
 
 # Setup tests paths
-$rootPath = (Resolve-Path $PSScriptRoot\..\..).Path;
-$here = Split-Path -Parent $MyInvocation.MyCommand.Path;
-$temp = "$here\..\..\build";
-
-Import-Module (Join-Path -Path $rootPath -ChildPath "out/modules/PSDocs") -Force;
-
-$outputPath = "$temp\PSDocs.Tests\Title";
-Remove-Item -Path $outputPath -Force -Recurse -Confirm:$False -ErrorAction SilentlyContinue;
-$Null = New-Item -Path $outputPath -ItemType Directory -Force;
+$rootPath = $PWD;
+Import-Module (Join-Path -Path $rootPath -ChildPath out/modules/PSDocs) -Force;
 
 $dummyObject = New-Object -TypeName PSObject;
 
-$Global:TestVars = @{ };
-
-Describe 'PSDocs -- Title keyword' {
-
-    Context 'Single title markdown' {
-
-        # Define a test document with a title
-        document 'SingleTitle' {
-            
-            Title 'Test title'
+Describe 'PSDocs -- Title keyword' -Tag Title {
+    Context 'Markdown' {
+        It 'With single title' {
+            document 'SingleTitle' {
+                Title 'Test title'
+            }
+            $result = SingleTitle -InputObject $dummyObject -PassThru;
+            $result | Should -Match "^(`# Test title(\r|\n|\r\n))";
         }
 
-        $outputDoc = "$outputPath\SingleTitle.md";
-        SingleTitle -InputObject $dummyObject -OutputPath $outputPath;
-
-        It 'Should have generated output' {
-            Test-Path -Path $outputDoc | Should be $True;
-        }
-
-        It 'Should match expected format' {
-            Get-Content -Path $outputDoc -Raw | Should match '^(\# Test title\r\n)';
-        }
-    }
-
-    Context 'Multiple title markdown' {
-        
-        # Define a test document with multiple titles
-        document 'MultipleTitle' {
-            
-            Title 'Title 1'
-
-            Title 'Title 2'
-        }
-
-        $outputDoc = "$outputPath\MultipleTitle.md";
-        MultipleTitle -InputObject $dummyObject -OutputPath $outputPath;
-
-        It 'Should have generated output' {
-            Test-Path -Path $outputDoc | Should be $True;
-        }
-
-        It 'Should match expected format' {
-            Get-Content -Path $outputDoc -Raw | Should match '^(\# Title 2\r\n)';
+        It 'With multiple titles' {
+            document 'MultipleTitle' {
+                Title 'Title 1'
+                Title 'Title 2'
+            }
+            $result = MultipleTitle -InputObject $dummyObject -PassThru;
+            $result | Should -Match "^(`# Title 2(\r|\n|\r\n))";
         }
     }
 }

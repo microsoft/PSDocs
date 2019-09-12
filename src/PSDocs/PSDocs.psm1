@@ -9,18 +9,18 @@ $PSModule = $ExecutionContext.SessionState.Module;
 $PSModuleRoot = $PSModule.ModuleBase;
 
 # Import the appropriate nested binary module based on the current PowerShell version
-$binModulePath = Join-Path -Path $PSModuleRoot -ChildPath '/desktop/PSDocs.dll';
+# $binModulePath = Join-Path -Path $PSModuleRoot -ChildPath '/desktop/PSDocs.dll';
 
-if (($PSVersionTable.Keys -contains 'PSEdition') -and ($PSVersionTable.PSEdition -ne 'Desktop')) {
-    $binModulePath = Join-Path -Path $PSModuleRoot -ChildPath '/core/PSDocs.dll';
-}
+# if (($PSVersionTable.Keys -contains 'PSEdition') -and ($PSVersionTable.PSEdition -ne 'Desktop')) {
+#     $binModulePath = Join-Path -Path $PSModuleRoot -ChildPath '/core/PSDocs.dll';
+# }
 
-$binaryModule = Import-Module -Name $binModulePath -PassThru;
+# $binaryModule = Import-Module -Name $binModulePath -PassThru;
 
 # When the module is unloaded, remove the nested binary module that was loaded with it
-$PSModule.OnRemove = {
-    Remove-Module -ModuleInfo $binaryModule;
-}
+# $PSModule.OnRemove = {
+#     Remove-Module -ModuleInfo $binaryModule;
+# }
 
 [PSDocs.Configuration.PSDocumentOption]::GetWorkingPath = {
     return Get-Location;

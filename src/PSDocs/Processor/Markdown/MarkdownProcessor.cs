@@ -1,7 +1,6 @@
-﻿using System;
-using System.IO;
-using PSDocs.Configuration;
+﻿using PSDocs.Configuration;
 using PSDocs.Models;
+using System.IO;
 
 namespace PSDocs.Processor.Markdown
 {
@@ -12,9 +11,7 @@ namespace PSDocs.Processor.Markdown
         public string Process(PSDocumentOption option, Document document)
         {
             if (document == null)
-            {
                 return string.Empty;
-            }
 
             var context = new MarkdownProcessorContext(option, document);
 
@@ -24,9 +21,7 @@ namespace PSDocs.Processor.Markdown
             var result = context.Builder.ToString();
 
             if (string.IsNullOrEmpty(result))
-            {
                 result = null;
-            }
 
             return result;
         }
@@ -39,87 +34,67 @@ namespace PSDocs.Processor.Markdown
             if (!string.IsNullOrEmpty(context.Document.Title))
             {
                 context.WriteLine("# ", context.Document.Title);
-                context.WriteLine(string.Empty);
+                context.LineBreak();
             }
 
             foreach (var node in context.Document.Node)
             {
                 Node(context, node);
             }
+            context.EndDocument();
         }
 
         private void Metadata(MarkdownProcessorContext context)
         {
             // Only write metadata block if there is at least one metadata property set
             if (context.Document.Metadata == null || context.Document.Metadata.Count == 0)
-            {
                 return;
-            }
 
             context.WriteLine("---");
-
             foreach (var key in context.Document.Metadata.Keys)
             {
                 context.WriteLine(key.ToString(), ": ", context.Document.Metadata[key].ToString());
             }
-
             context.WriteLine("---");
-            context.WriteLine(string.Empty);
+            context.LineBreak();
         }
 
         private void Node(MarkdownProcessorContext context, object node)
         {
             if (node == null)
-            {
                 return;
-            }
 
             var documentNode = node as DocumentNode;
-
             if (documentNode != null)
             {
                 switch (documentNode.Type)
                 {
                     case DocumentNodeType.Section:
-
                         Section(context, documentNode as Section);
-
                         break;
 
                     case DocumentNodeType.Table:
-
                         Table(context, documentNode as Table);
-
                         break;
 
                     case DocumentNodeType.Code:
-
                         Code(context, documentNode as Code);
-
                         break;
 
                     case DocumentNodeType.BlockQuote:
-
                         BlockQuote(context, documentNode as BlockQuote);
-
                         break;
 
                     case DocumentNodeType.Text:
-
                         Text(context, documentNode as Text);
-
                         break;
 
                     case DocumentNodeType.Include:
-
                         Include(context, documentNode as Include);
-
                         break;
                 }
-
                 return;
             }
-
             String(context, node.ToString());
         }
 
@@ -130,10 +105,10 @@ namespace PSDocs.Processor.Markdown
 
         private void Section(MarkdownProcessorContext context, Section section)
         {
-            var sectionPadding = string.Empty.PadLeft(section.Level, '#');
-            
-            context.WriteLine(sectionPadding, " ", section.Title);
-            context.WriteLine(string.Empty);
+            context.Write('#', section.Level);
+            context.WriteSpace();
+            context.Write(section.Title);
+            context.LineBreak();
 
             if (section.Node.Count > 0)
             {
@@ -146,8 +121,7 @@ namespace PSDocs.Processor.Markdown
 
         private void BlockQuote(MarkdownProcessorContext context, BlockQuote node)
         {
-            context.WriteLine(string.Empty);
-
+            context.LineBreak();
             if (!string.IsNullOrEmpty(node.Info))
             {
                 context.Write(MARKDOWN_BLOCKQUOTE);
@@ -171,25 +145,20 @@ namespace PSDocs.Processor.Markdown
 
         private void Code(MarkdownProcessorContext context, Code code)
         {
-            if (string.IsNullOrEmpty(code.Info))
-            {
-                context.WriteLine("```");
-            }
-            else
-            {
-                context.WriteLine("```", code.Info);
-            }
+            context.Write("```");
+            if (!string.IsNullOrEmpty(code.Info))
+                context.Write(code.Info);
 
+            context.Ending();
             context.WriteLine(code.Content);
-
             context.WriteLine("```");
-            context.WriteLine(string.Empty);
+            context.LineBreak();
         }
 
         private void Text(MarkdownProcessorContext context, Text text)
         {
             context.WriteLine(text.Content);
-            context.WriteLine(string.Empty);
+            context.LineBreak();
         }
 
         private void Include(MarkdownProcessorContext context, Include include)
@@ -201,9 +170,7 @@ namespace PSDocs.Processor.Markdown
         private void Table(MarkdownProcessorContext context, Table table)
         {
             if (table.Headers == null || table.Headers.Count == 0)
-            {
                 return;
-            }
 
             var lastHeader = table.Headers.Count - 1;
             var useEdgePipe = context.Option.Markdown.UseEdgePipes == EdgePipeOption.Always
@@ -233,9 +200,7 @@ namespace PSDocs.Processor.Markdown
             }
 
             if (padColumn && useEdgePipe)
-            {
                 context.WriteSpace();
-            }
 
             context.WriteLine(useEdgePipe ? "|" : string.Empty);
 
@@ -332,8 +297,7 @@ namespace PSDocs.Processor.Markdown
 
                 context.WriteLine(useEdgePipe ? "|" : string.Empty);
             }
-
-            context.WriteLine(string.Empty);
+            context.LineBreak();
         }
 
         private void StartColumn(MarkdownProcessorContext context, int index, int last, bool useEdgePipe, bool padBeforePipe, bool padAfterPipe)

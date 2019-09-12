@@ -36,13 +36,9 @@ $dummyObject = New-Object -TypeName PSObject -Property @{
 
 Describe 'PSDocs instance names' -Tag Common {
     Context 'Generate a document without an instance name' {
-
-        # Define a test document with a table
         document 'WithoutInstanceName' {
             $InstanceName;
-
             $InputObject.Object.Name;
-
             $InputObject.Hashtable.Name;
         }
 
@@ -64,8 +60,6 @@ Describe 'PSDocs instance names' -Tag Common {
     }
 
     Context 'Generate a document with an instance name' {
-        
-        # Define a test document with a table
         document 'WithInstanceName' {
             $InstanceName;
         }
@@ -86,8 +80,6 @@ Describe 'PSDocs instance names' -Tag Common {
     }
 
     Context 'Generate a document with multiple instance names' {
-
-        # Define a test document with a table
         document 'WithMultiInstanceName' {
             $InstanceName;
         }
@@ -116,23 +108,20 @@ Describe 'PSDocs instance names' -Tag Common {
     }
 
     Context 'Generate a document with a specific encoding' {
-
         document 'WithEncoding' {
             $InstanceName;
         }
 
         # Check each encoding can be written then read
         foreach ($encoding in @('UTF8', 'UTF7', 'Unicode', 'ASCII', 'UTF32')) {
-
             It "Should generate $encoding encoded content" {
                 WithEncoding -InstanceName "With$encoding" -InputObject @{} -OutputPath $outputPath -Encoding $encoding;
-                Get-Content -Path (Join-Path -Path $outputPath -ChildPath "With$encoding.md") -Raw -Encoding $encoding | Should -BeExactly "With$encoding`r`n";
+                Get-Content -Path (Join-Path -Path $outputPath -ChildPath "With$encoding.md") -Raw -Encoding $encoding | Should -Match "^(With$encoding(\r|\n|\r\n))$";
             }
         }
     }
 
     Context 'With -PassThru' {
-
         document 'WithPassThru' {
             $InstanceName
         }
@@ -147,7 +136,6 @@ Describe 'PSDocs instance names' -Tag Common {
 Describe 'Invoke-PSDocument' -Tag 'FromPath' {
     # Check that -Name syntax still works until it is not supported
     Context 'With -Name (depricated)' {
-
         Document 'InvokeWithName' {
             'Invoke with name'
         }
@@ -160,7 +148,6 @@ Describe 'Invoke-PSDocument' -Tag 'FromPath' {
     }
 
     Context 'With -Path' {
-
         It 'Should match name' {
             # Only generate documents for the named document
             Invoke-PSDocument -Path $here -OutputPath $outputPath -Name FromFileTest2;
@@ -195,7 +182,6 @@ Describe 'Invoke-PSDocument' -Tag 'FromPath' {
     }
 
     Context 'With -PassThru' {
-
         It 'Should return results' {
             $result = Invoke-PSDocument -Path $here -OutputPath $outputPath -Name FromFileTest1,FromFileTest2 -PassThru;
             $result | Should -Not -BeNullOrEmpty;
@@ -203,12 +189,10 @@ Describe 'Invoke-PSDocument' -Tag 'FromPath' {
     }
 
     Context 'With constrained language' {
-
         It 'Checks if DeviceGuard is enabled' {
             Mock -CommandName IsDeviceGuardEnabled -ModuleName PSDocs -Verifiable -MockWith {
                 return $True;
             }
-
             Invoke-PSDocument -Path $here -OutputPath $outputPath -Name 'ConstrainedTest1';
             Assert-MockCalled -CommandName IsDeviceGuardEnabled -ModuleName PSDocs -Times 1;
         }
@@ -221,154 +205,11 @@ Describe 'Invoke-PSDocument' -Tag 'FromPath' {
     }
 }
 
-Describe 'New-PSDocumentOption' -Tag 'Option' {
-
-    Context 'Read PSDocs.yml' {
-
-        It 'can read default YAML' {
-            $option = New-PSDocumentOption;
-            $option.Generator | Should -Be 'PSDocs';
-        }
-    }
-
-    Context 'Read Markdown.Encoding' {
-
-        It 'from default' {
-            $option = New-PSDocumentOption;
-            $option.Markdown.Encoding | Should -Be Default;
-        }
-
-        It 'from Hashtable' {
-            $option = New-PSDocumentOption -Option @{ 'Markdown.Encoding' = 'UTF8' };
-            $option.Markdown.Encoding | Should -Be 'UTF8';
-        }
-
-        It 'from YAML' {
-            $option = New-PSDocumentOption -Option (Join-Path -Path $here -ChildPath 'PSDocs.Tests.yml');
-            $option.Markdown.Encoding | Should -Be 'UTF8';
-        }
-    }
-
-    Context 'Read Markdown.WrapSeparator' {
-
-        It 'from default' {
-            $option = New-PSDocumentOption;
-            $option.Markdown.WrapSeparator | Should -Be ' ';
-        }
-
-        It 'from Hashtable' {
-            $option = New-PSDocumentOption -Option @{ 'Markdown.WrapSeparator' = 'ZZZ' };
-            $option.Markdown.WrapSeparator | Should -Be 'ZZZ';
-        }
-
-        It 'from YAML' {
-            $option = New-PSDocumentOption -Option (Join-Path -Path $here -ChildPath 'PSDocs.Tests.yml');
-            $option.Markdown.WrapSeparator | Should -Be 'ZZZ';
-        }
-    }
-
-    Context 'Read Markdown.SkipEmptySections' {
-
-        It 'from default' {
-            $option = New-PSDocumentOption;
-            $option.Markdown.SkipEmptySections | Should -Be $True;
-        }
-
-        It 'from Hashtable' {
-            $option = New-PSDocumentOption -Option @{ 'Markdown.SkipEmptySections' = $False };
-            $option.Markdown.SkipEmptySections | Should -Be $False;
-        }
-
-        It 'from YAML' {
-            $option = New-PSDocumentOption -Option (Join-Path -Path $here -ChildPath 'PSDocs.Tests.yml');
-            $option.Markdown.SkipEmptySections | Should -Be $False;
-        }
-    }
-
-    Context 'Read Markdown.ColumnPadding' {
-
-        It 'from default' {
-            $option = New-PSDocumentOption;
-            $option.Markdown.ColumnPadding | Should -Be 'MatchHeader';
-        }
-
-        It 'from Hashtable' {
-            $option = New-PSDocumentOption -Option @{ 'Markdown.ColumnPadding' = 'Single' };
-            $option.Markdown.ColumnPadding | Should -Be 'Single';
-        }
-
-        It 'from YAML' {
-            $option = New-PSDocumentOption -Option (Join-Path -Path $here -ChildPath 'PSDocs.Tests.yml');
-            $option.Markdown.ColumnPadding | Should -Be 'Single';
-        }
-    }
-
-    Context 'Read Markdown.UseEdgePipes' {
-
-        It 'from default' {
-            $option = New-PSDocumentOption;
-            $option.Markdown.UseEdgePipes | Should -Be 'WhenRequired';
-        }
-
-        It 'from Hashtable' {
-            $option = New-PSDocumentOption -Option @{ 'Markdown.UseEdgePipes' = 'Always' };
-            $option.Markdown.UseEdgePipes | Should -Be 'Always';
-        }
-
-        It 'from YAML' {
-            $option = New-PSDocumentOption -Option (Join-Path -Path $here -ChildPath 'PSDocs.Tests.yml');
-            $option.Markdown.UseEdgePipes | Should -Be 'Always';
-        }
-    }
-
-    Context 'Read Execution.LanguageMode' {
-
-        It 'from default' {
-            $option = New-PSDocumentOption;
-            $option.Execution.LanguageMode | Should -Be FullLanguage;
-        }
-
-        It 'from Hashtable' {
-            $option = New-PSDocumentOption -Option @{ 'Execution.LanguageMode' = 'ConstrainedLanguage' };
-            $option.Execution.LanguageMode | Should -Be ConstrainedLanguage;
-        }
-
-        It 'from YAML' {
-            $option = New-PSDocumentOption -Option (Join-Path -Path $here -ChildPath 'PSDocs.Tests.yml');
-            $option.Execution.LanguageMode | Should -Be ConstrainedLanguage
-        }
-    }
-}
-
-Describe 'PSDocs variables' -Tag 'Variables' {
-    Context 'PowerShell automatic variables' {
-
-        document 'PSAutomaticVariables' {
-            "PWD=$PWD"
-        }
-
-        It '$PWD' {
-            $result = PSAutomaticVariables -PassThru;
-            $result.Split("`r`n") | Where-Object -FilterScript { $_ -like "PWD=*" } | Should -Be "PWD=$PWD";
-        }
-    }
-
-    Context 'PSDocs automatic variables' {
-
-        document 'PSDocsAutomaticVariables' {
-            Title '001'
-            Metadata @{
-                author = '002'
-            }
-
-            "Document.Title=$($document.Title)"
-            "Document.Metadata=$($document.Metadata['author'])"
-        }
-
-        It '$Document' {
-            $result = (PSDocsAutomaticVariables -PassThru).Split("`r`n");
-            $result | Where-Object -FilterScript { $_ -like "Document.Title=*" } | Should -Be "Document.Title=001";
-            $result | Where-Object -FilterScript { $_ -like "Document.Metadata=*" } | Should -Be "Document.Metadata=002";
+Describe 'Get-PSDocumentHeader' -Tag 'Common', 'Get-PSDocumentHeader' {
+    Context 'With -Path' {
+        It 'Get Metadata header' {
+            $result = Get-PSDocumentHeader -Path $outputPath;
+            $result | Should -Not -BeNullOrEmpty;
         }
     }
 }

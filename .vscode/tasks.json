@@ -14,7 +14,7 @@
             "problemMatcher": [ "$pester" ],
             "presentation": {
                 "panel": "dedicated",
-                "clear": false
+                "clear": true
             }
         },
         {
