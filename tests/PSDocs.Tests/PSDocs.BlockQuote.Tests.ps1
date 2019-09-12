@@ -32,7 +32,7 @@ Describe 'PSDocs -- BlockQuote keyword' -Tag BlockQuote {
                 'This is the second line.') | BlockQuote
             }
             $result = BlockQuoteMultiMarkdown -InputObject $dummyObject -PassThru;
-            $result | Should -Match '\> This is the first line.(\r|\n){1,2}\> This is the second line.';
+            $result | Should -Match '\> This is the first line.(\r|\n|\r\n)\> This is the second line.';
         }
 
         It 'Should add title' {
@@ -40,7 +40,7 @@ Describe 'PSDocs -- BlockQuote keyword' -Tag BlockQuote {
                 'This is a single block quote' | BlockQuote -Title 'Test'
             }
             $result = BlockQuoteTitleMarkdown -InputObject $dummyObject -PassThru;
-            $result | Should -Match '\> Test(\r|\n){1,2}\> This is a single block quote';
+            $result | Should -Match '\> Test(\r|\n|\r\n)\> This is a single block quote';
         }
 
         It 'Should add info' {
@@ -48,7 +48,7 @@ Describe 'PSDocs -- BlockQuote keyword' -Tag BlockQuote {
                 'This is a single block quote' | BlockQuote -Info 'Tip'
             }
             $result = BlockQuoteInfoMarkdown -InputObject $dummyObject -PassThru;
-            $result | Should -Match '\> \[!TIP\](\r|\n){1,2}> This is a single block quote';
+            $result | Should -Match '\> \[!TIP\](\r|\n|\r\n)> This is a single block quote';
         }
     }
 }

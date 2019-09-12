@@ -43,19 +43,14 @@ namespace PSDocs.Processor.Markdown
 
         public void Ending(bool shouldBreak = false)
         {
-            if (_Ending == LineEnding.LineBreak)
+            if (_Ending == LineEnding.LineBreak || (_Ending == LineEnding.Normal && !shouldBreak))
                 return;
 
-            if (_Ending == LineEnding.None)
+            if (shouldBreak && _Ending == LineEnding.None)
                 Builder.Append(Environment.NewLine);
 
-            if (shouldBreak)
-            {
-                _Ending = LineEnding.LineBreak;
-                Builder.Append(Environment.NewLine);
-            }
-            else
-                _Ending = LineEnding.Normal;
+            Builder.Append(Environment.NewLine);
+            _Ending = shouldBreak ? LineEnding.LineBreak : LineEnding.Normal;
         }
 
         public void WriteLine(params string[] line)
@@ -63,18 +58,10 @@ namespace PSDocs.Processor.Markdown
             if (line == null || line.Length == 0)
                 return;
 
-            if (line.Length == 1)
-            {
-                Write(line[0]);
-                Ending();
-                return;
-            }
-
-            for (var i = 0; i < line.Length - 1; i++)
+            for (var i = 0; i < line.Length; i++)
             {
                 Write(line[i]);
             }
-            Write(line[line.Length - 1]);
             Ending();
         }
 

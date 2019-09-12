@@ -92,18 +92,18 @@ task BuildDotNet {
 }
 
 task TestDotNet {
-    # if ($CodeCoverage) {
-    #     exec {
-    #         # Test library
-    #         dotnet test --collect:"Code Coverage" --logger trx -r (Join-Path $PWD -ChildPath reports/) tests/PSDocs.Tests
-    #     }
-    # }
-    # else {
-    #     exec {
-    #         # Test library
-    #         dotnet test --logger trx -r (Join-Path $PWD -ChildPath reports/) tests/PSDocs.Tests
-    #     }
-    # }
+    if ($CodeCoverage) {
+        exec {
+            # Test library
+            dotnet test --collect:"Code Coverage" --logger trx -r (Join-Path $PWD -ChildPath reports/) tests/PSDocs.Tests
+        }
+    }
+    else {
+        exec {
+            # Test library
+            dotnet test --logger trx -r (Join-Path $PWD -ChildPath reports/) tests/PSDocs.Tests
+        }
+    }
 }
 
 task CopyModule {

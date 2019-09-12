@@ -210,7 +210,7 @@ Describe 'Get-PSDocumentHeader' -Tag 'Common', 'Get-PSDocumentHeader' {
         It 'Get Metadata header' {
             document 'WithMetadata' {
                 Metadata @{
-                    key1 = value1
+                    key1 = 'value1'
                 }
             }
             WithMetadata -OutputPath $outputPath;
