@@ -5,7 +5,7 @@ variables:
   version: '0.7.0'
   buildConfiguration: 'Release'
 
- # Use build number format, i.e. 0.1.0-B181101
+ # Use build number format, i.e. 0.1.0-B1811001
 name: $(version)-B$(date:yyMM)$(rev:rrr)
 
 trigger:
@@ -31,16 +31,20 @@ stages:
     strategy:
       matrix:
         Linux:
+          displayName: 'Linux'
           imageName: 'ubuntu-16.04'
         MacOS:
+          displayName: 'MacOS'
           imageName: 'macos-10.13'
         Windows:
+          displayName: 'Windows'
           imageName: 'vs2017-win2016'
-          publishModule: 'true'
+          publish: 'true'
           analysis: 'true'
           coverage: 'true'
     pool:
       vmImage: $(imageName)
+    displayName: 'PowerShell'
     steps:
 
     # Install pipeline dependencies
@@ -50,6 +54,7 @@ stages:
     # Build module
     - powershell: Invoke-Build -Configuration $(buildConfiguration) -Build $(Build.BuildNumber)
       displayName: 'Build module'
+      timeoutInMinutes: 15
 
     # Pester test results
     - task: PublishTestResults@2
@@ -91,13 +96,7 @@ stages:
       inputs:
         artifactName: PSDocs
         targetPath: out/modules/PSDocs
-      condition: and(succeeded(), eq(variables['publishModule'], 'true'))
-    - task: PublishPipelineArtifact@0
-      displayName: 'Publish module'
-      inputs:
-        artifactName: PSDocs.Dsc
-        targetPath: out/modules/PSDocs.Dsc
-      condition: and(succeeded(), eq(variables['publishModule'], 'true'))
+      condition: and(succeeded(), eq(variables['publish'], 'true'))
 
 # Release pipeline
 - stage: Release
@@ -113,8 +112,8 @@ stages:
     - task: DownloadPipelineArtifact@1
       displayName: 'Download module'
       inputs:
-        artifactName: PSRule.Rules.Azure
-        downloadPath: $(Build.SourcesDirectory)/out/modules/PSRule.Rules.Azure
+        artifactName: PSDocs
+        downloadPath: $(Build.SourcesDirectory)/out/modules/PSDocs
     # Install pipeline dependencies
     - powershell: ./.azure-pipelines/pipeline-deps.ps1
       displayName: 'Install dependencies'

@@ -116,7 +116,7 @@ Describe 'PSDocs instance names' -Tag Common {
         foreach ($encoding in @('UTF8', 'UTF7', 'Unicode', 'ASCII', 'UTF32')) {
             It "Should generate $encoding encoded content" {
                 WithEncoding -InstanceName "With$encoding" -InputObject @{} -OutputPath $outputPath -Encoding $encoding;
-                Get-Content -Path (Join-Path -Path $outputPath -ChildPath "With$encoding.md") -Raw -Encoding $encoding | Should -Match "^(With$encoding(\r|\n|\r\n))$";
+                Get-Content -Path (Join-Path -Path $outputPath -ChildPath "With$encoding.md") -Encoding $encoding | Out-String | Should -Match "^(With$encoding(\r|\n|\r\n))$";
             }
         }
     }
@@ -208,6 +208,12 @@ Describe 'Invoke-PSDocument' -Tag 'FromPath' {
 Describe 'Get-PSDocumentHeader' -Tag 'Common', 'Get-PSDocumentHeader' {
     Context 'With -Path' {
         It 'Get Metadata header' {
+            document 'WithMetadata' {
+                Metadata @{
+                    key1 = value1
+                }
+            }
+            WithMetadata -OutputPath $outputPath;
             $result = Get-PSDocumentHeader -Path $outputPath;
             $result | Should -Not -BeNullOrEmpty;
         }
