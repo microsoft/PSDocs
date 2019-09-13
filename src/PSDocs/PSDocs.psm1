@@ -1448,9 +1448,7 @@ function ReadYamlHeader {
 function IsDeviceGuardEnabled {
     [CmdletBinding()]
     [OutputType([System.Boolean])]
-    param (
-    )
-
+    param ()
     process {
         if ((Get-Variable -Name IsMacOS -ErrorAction Ignore) -or (Get-Variable -Name IsLinux -ErrorAction Ignore)) {
             return $False;
