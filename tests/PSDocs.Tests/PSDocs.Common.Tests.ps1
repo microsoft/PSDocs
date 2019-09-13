@@ -212,8 +212,10 @@ Describe 'Get-PSDocumentHeader' -Tag 'Common', 'Get-PSDocumentHeader' {
                 Metadata @{
                     key1 = 'value1'
                 }
+                Section 'Test' -Force {
+                }
             }
-            WithMetadata -OutputPath $outputPath;
+            WithMetadata -InputObject $dummyObject -OutputPath $outputPath;
             $result = Get-PSDocumentHeader -Path $outputPath;
             $result | Should -Not -BeNullOrEmpty;
         }

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net472</TargetFrameworks>
@@ -23,7 +23,24 @@ This project is to be considered a proof-of-concept and not a supported product.
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="PowerShellStandard.Library" Version="5.1.0" PrivateAssets="All" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="YamlDotNet" Version="5.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Resources\PSDocsResources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>PSDocsResources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\PSDocsResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>PSDocsResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

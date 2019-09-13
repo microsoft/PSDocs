@@ -81,7 +81,7 @@ Describe 'PSDocs -- Table keyword' -Tag Table {
             $result | Should -Match 'This is a description split over multiple lines\.';
 
             # With separator
-            $option = New-PSDocumentOption @{
+            $option = @{
                 'Markdown.WrapSeparator' = '<br />'
             }
             $result = TableWithMultilineColumn -InputObject $testObject -InstanceName 'TableWithMultilineColumnCustom' -PassThru -Option $option;

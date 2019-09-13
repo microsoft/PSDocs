@@ -4,28 +4,7 @@
 
 Set-StrictMode -Version latest;
 
-# Set up some helper variables to make it easier to work with the module
-$PSModule = $ExecutionContext.SessionState.Module;
-$PSModuleRoot = $PSModule.ModuleBase;
-
-# Import the appropriate nested binary module based on the current PowerShell version
-# $binModulePath = Join-Path -Path $PSModuleRoot -ChildPath '/desktop/PSDocs.dll';
-
-# if (($PSVersionTable.Keys -contains 'PSEdition') -and ($PSVersionTable.PSEdition -ne 'Desktop')) {
-#     $binModulePath = Join-Path -Path $PSModuleRoot -ChildPath '/core/PSDocs.dll';
-# }
-
-# $binaryModule = Import-Module -Name $binModulePath -PassThru;
-
-# When the module is unloaded, remove the nested binary module that was loaded with it
-# $PSModule.OnRemove = {
-#     Remove-Module -ModuleInfo $binaryModule;
-# }
-
-[PSDocs.Configuration.PSDocumentOption]::GetWorkingPath = {
-    return Get-Location;
-}
-
+[PSDocs.Configuration.PSDocumentOption]::UseExecutionContext($ExecutionContext);
 $Script:UTF8_NO_BOM = New-Object -TypeName System.Text.UTF8Encoding -ArgumentList $False;
 
 #
@@ -140,7 +119,6 @@ function Document {
 
 # .ExternalHelp PSDocs-Help.xml
 function Invoke-PSDocument {
-
     [CmdletBinding(DefaultParameterSetName = 'Inline')]
     param (
         # The name of the document
@@ -236,7 +214,6 @@ function Invoke-PSDocument {
 
 # .ExternalHelp PSDocs-Help.xml
 function Get-PSDocumentHeader {
-
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $False, ValueFromPipelineByPropertyName = $True)]
@@ -258,15 +235,14 @@ function Get-PSDocumentHeader {
 
 # .ExternalHelp PSDocs-Help.xml
 function New-PSDocumentOption {
-
     [CmdletBinding()]
     [OutputType([PSDocs.Configuration.PSDocumentOption])]
     param (
-        [Parameter(Mandatory = $False)]
-        [PSDocs.Configuration.PSDocumentOption]$Option,
+        [Parameter(Position = 0, Mandatory = $False)]
+        [String]$Path = $PWD,
 
         [Parameter(Mandatory = $False)]
-        [String]$Path = '.\psdocs.yml',
+        [PSDocs.Configuration.PSDocumentOption]$Option,
 
         [Parameter(Mandatory = $False)]
         [PSDocs.Configuration.MarkdownEncoding]$Encoding
@@ -278,25 +254,17 @@ function New-PSDocumentOption {
             $Option = $Option.Clone();
         }
         elseif ($PSBoundParameters.ContainsKey('Path')) {
-
-            if (!(Test-Path -Path $Path)) {
-
-            }
-
-            $Path = Resolve-Path -Path $Path;
-
-            $Option = [PSDocs.Configuration.PSDocumentOption]::FromFile($Path);
+            Write-Verbose -Message "Attempting to read: $Path";
+            $Option = [PSDocs.Configuration.PSDocumentOption]::FromFile($Path, $False);
         }
         else {
             Write-Verbose -Message "Attempting to read: $Path";
-
             $Option = [PSDocs.Configuration.PSDocumentOption]::FromFile($Path, $True);
         }
 
         if ($PSBoundParameters.ContainsKey('Encoding')) {
             $Option.Markdown.Encoding = $Encoding;
         }
-
         return $Option;
     }
 }

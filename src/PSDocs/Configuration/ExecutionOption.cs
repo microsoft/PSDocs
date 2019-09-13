@@ -4,14 +4,24 @@ namespace PSDocs.Configuration
 {
     public sealed class ExecutionOption
     {
-        private const LanguageMode DEFAULT_LANGUAGEMODE = LanguageMode.FullLanguage;
+        private const LanguageMode DEFAULT_LANGUAGEMODE = Configuration.LanguageMode.FullLanguage;
+
+        public static readonly ExecutionOption Default = new ExecutionOption
+        {
+            LanguageMode = DEFAULT_LANGUAGEMODE
+        };
 
         public ExecutionOption()
         {
-            LanguageMode = DEFAULT_LANGUAGEMODE;
+            LanguageMode = null;
+        }
+
+        internal ExecutionOption(ExecutionOption option)
+        {
+            LanguageMode = option.LanguageMode;
         }
 
         [DefaultValue(DEFAULT_LANGUAGEMODE)]
-        public LanguageMode LanguageMode { get; set; }
+        public LanguageMode? LanguageMode { get; set; }
     }
 }
