@@ -918,7 +918,6 @@ function GenerateDocumentPath {
 }
 
 function GenerateDocumentInline {
-
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $False)]
@@ -1014,7 +1013,6 @@ function GenerateDocumentInline {
         else {
             Write-Verbose -Message "[Doc] -- InputObject is of type [$($InputObject.GetType().FullName)]";
         }
-
         InvokeTemplate -Name $Name -ScriptBlock $Script:DocumentBody[$Name] -Option $Option -InputObject $InputObject -Verbose:$VerbosePreference;
     }
 }
@@ -1240,8 +1238,8 @@ function InvokeTemplate {
     )
 
     process {
-
         $template = $Null;
+        Write-Verbose -Message "[Doc] -- Preparing to invoke template: $Name";
 
         if ($PSCmdlet.ParameterSetName -eq 'Path') {
             if (!(Test-Path -Path $Path)) {
@@ -1270,6 +1268,7 @@ function InvokeTemplate {
             $Null = $ps.AddScript($template);
 
             try {
+                Write-Verbose -Message "[Doc] -- Invoking template: $Name";
                 $ps.Invoke();
             }
             catch {
