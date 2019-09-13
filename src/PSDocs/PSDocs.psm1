@@ -1289,6 +1289,8 @@ function InvokeTemplate {
                 ));
             }
 
+            Write-Verbose -Message "[Doc] -- Processing output";
+
             # Replay verbose messages
             $ps.Streams.Verbose | ForEach-Object -Process {
                 Write-Verbose -Message $_.Message;
@@ -1298,6 +1300,8 @@ function InvokeTemplate {
             $ps.Streams.Warning | ForEach-Object -Proces {
                 Write-Warning -Message $_.Message;
             }
+
+            Write-Verbose -Message "[Doc] -- Completed template";
         }
         finally {
             if ($Null -ne $ps) { $ps.Dispose() }
