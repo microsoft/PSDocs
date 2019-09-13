@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PSDocs", "src\PSDocs\PSDocs
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PSDocs.Tests", "tests\PSDocs.Tests\PSDocs.Tests.csproj", "{684AD3CB-E431-4CC5-A8AE-2B2E8CEE6B6C}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PSDocs.Benchmark", "src\PSDocs.Benchmark\PSDocs.Benchmark.csproj", "{1A60D079-A9A5-4C24-85F5-5EF2A6E93EAB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,18 @@ Global
 		{684AD3CB-E431-4CC5-A8AE-2B2E8CEE6B6C}.Release|x64.Build.0 = Release|Any CPU
 		{684AD3CB-E431-4CC5-A8AE-2B2E8CEE6B6C}.Release|x86.ActiveCfg = Release|Any CPU
 		{684AD3CB-E431-4CC5-A8AE-2B2E8CEE6B6C}.Release|x86.Build.0 = Release|Any CPU
+		{1A60D079-A9A5-4C24-85F5-5EF2A6E93EAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A60D079-A9A5-4C24-85F5-5EF2A6E93EAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A60D079-A9A5-4C24-85F5-5EF2A6E93EAB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{1A60D079-A9A5-4C24-85F5-5EF2A6E93EAB}.Debug|x64.Build.0 = Debug|Any CPU
+		{1A60D079-A9A5-4C24-85F5-5EF2A6E93EAB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{1A60D079-A9A5-4C24-85F5-5EF2A6E93EAB}.Debug|x86.Build.0 = Debug|Any CPU
+		{1A60D079-A9A5-4C24-85F5-5EF2A6E93EAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A60D079-A9A5-4C24-85F5-5EF2A6E93EAB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A60D079-A9A5-4C24-85F5-5EF2A6E93EAB}.Release|x64.ActiveCfg = Release|Any CPU
+		{1A60D079-A9A5-4C24-85F5-5EF2A6E93EAB}.Release|x64.Build.0 = Release|Any CPU
+		{1A60D079-A9A5-4C24-85F5-5EF2A6E93EAB}.Release|x86.ActiveCfg = Release|Any CPU
+		{1A60D079-A9A5-4C24-85F5-5EF2A6E93EAB}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

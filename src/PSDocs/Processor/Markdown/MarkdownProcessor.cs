@@ -7,6 +7,7 @@ namespace PSDocs.Processor.Markdown
     public sealed class MarkdownProcessor
     {
         private const string MARKDOWN_BLOCKQUOTE = "> ";
+        private const string MARKDOWN_FRONTMATTER = "---";
 
         public string Process(PSDocumentOption option, Document document)
         {
@@ -14,16 +15,8 @@ namespace PSDocs.Processor.Markdown
                 return string.Empty;
 
             var context = new MarkdownProcessorContext(option, document);
-
             Document(context);
-
-            context.Builder.Remove(context.Builder.Length - 2, 2);
-            var result = context.Builder.ToString();
-
-            if (string.IsNullOrEmpty(result))
-                result = null;
-
-            return result;
+            return context.GetString();
         }
 
         private void Document(MarkdownProcessorContext context)
@@ -50,12 +43,12 @@ namespace PSDocs.Processor.Markdown
             if (context.Document.Metadata == null || context.Document.Metadata.Count == 0)
                 return;
 
-            context.WriteLine("---");
+            context.WriteLine(MARKDOWN_FRONTMATTER);
             foreach (var key in context.Document.Metadata.Keys)
             {
                 context.WriteLine(key.ToString(), ": ", context.Document.Metadata[key].ToString());
             }
-            context.WriteLine("---");
+            context.WriteLine(MARKDOWN_FRONTMATTER);
             context.LineBreak();
         }
 
@@ -64,8 +57,7 @@ namespace PSDocs.Processor.Markdown
             if (node == null)
                 return;
 
-            var documentNode = node as DocumentNode;
-            if (documentNode != null)
+            if (node is DocumentNode documentNode)
             {
                 switch (documentNode.Type)
                 {
@@ -109,7 +101,6 @@ namespace PSDocs.Processor.Markdown
             context.WriteSpace();
             context.Write(section.Title);
             context.LineBreak();
-
             if (section.Node.Count > 0)
             {
                 foreach (var node in section.Node)

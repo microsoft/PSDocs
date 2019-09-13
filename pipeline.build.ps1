@@ -223,6 +223,12 @@ task TestModule TestDotNet, Pester, PSScriptAnalyzer, {
     }
 }
 
+task Benchmark {
+    if ($Benchmark -or $BuildTask -eq 'Benchmark') {
+        dotnet run -p src/PSDocs.Benchmark -f netcoreapp2.2 -c Release -- benchmark --output $PWD;
+    }
+}
+
 # Synopsis: Add shipit build tag
 task TagBuild {
     if ($Null -ne $Env:BUILD_DEFINITIONNAME) {

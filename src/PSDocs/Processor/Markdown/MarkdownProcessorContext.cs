@@ -12,11 +12,11 @@ namespace PSDocs.Processor.Markdown
 
         public readonly PSDocumentOption Option;
         public readonly Document Document;
-        public readonly StringBuilder Builder;
+        private readonly StringBuilder Builder;
 
         private LineEnding _Ending;
 
-        public MarkdownProcessorContext(PSDocumentOption option, Document document)
+        internal MarkdownProcessorContext(PSDocumentOption option, Document document)
         {
             Option = option;
             Document = document;
@@ -24,7 +24,12 @@ namespace PSDocs.Processor.Markdown
             _Ending = LineEnding.None;
         }
 
-        internal enum LineEnding : byte
+        public string GetString()
+        {
+            return Builder.Length > 0 ? Builder.ToString() : null;
+        }
+
+        private enum LineEnding : byte
         {
             None = 0,
             Normal = 1,
@@ -33,7 +38,9 @@ namespace PSDocs.Processor.Markdown
 
         public void EndDocument()
         {
-            LineBreak();
+            Ending();
+            if (_Ending == LineEnding.LineBreak)
+                Builder.Remove(Builder.Length - Environment.NewLine.Length, Environment.NewLine.Length);
         }
 
         public void LineBreak()

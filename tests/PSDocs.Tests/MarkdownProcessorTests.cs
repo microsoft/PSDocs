@@ -1,7 +1,6 @@
 using PSDocs.Configuration;
 using PSDocs.Models;
 using PSDocs.Processor.Markdown;
-using System;
 using Xunit;
 
 namespace PSDocs
