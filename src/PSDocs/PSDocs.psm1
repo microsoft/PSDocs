@@ -222,14 +222,10 @@ function Get-PSDocumentHeader {
     )
 
     process {
-
-        $filteredItems = Get-ChildItem -Path "$Path\*" -File;
-
+        $filteredItems = Get-ChildItem -Path (Join-Path -Path $Path -ChildPath '*') -File;
         foreach ($item in $filteredItems) {
-
             ReadYamlHeader -Path $item.FullName -Verbose:$VerbosePreference;
         }
-
     }
 }
 
@@ -1414,7 +1410,6 @@ function GetRunspace {
 }
 
 function ReadYamlHeader {
-
     [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
     param (
@@ -1423,18 +1418,15 @@ function ReadYamlHeader {
     )
 
     process {
-
         # Read the file
         $content = Get-Content -Path $Path -Raw;
 
         # Detect Yaml header
-        if (![String]::IsNullOrEmpty($content) -and $content -match '^(---\r\n(?<yaml>([A-Z0-9]{1,}:[A-Z0-9 ]{1,}(\r\n){0,}){1,})\r\n---\r\n)') {
-
+        if (![String]::IsNullOrEmpty($content) -and $content -match '^(---(\r|\n|\r\n)(?<yaml>([A-Z0-9]{1,}:[A-Z0-9 ]{1,}(\r|\n|\r\n){0,}){1,})(\r|\n|\r\n)---(\r|\n|\r\n))') {
             Write-Verbose -Message "[Doc][Toc]`t-- Reading Yaml header: $Path";
 
             # Extract yaml header key value pair
             [String[]]$yamlHeader = $Matches.yaml -split "`n";
-
             $result = @{ };
 
             # Read key values into hashtable
@@ -1442,7 +1434,6 @@ function ReadYamlHeader {
                 $kv = $item.Split(':', 2, [System.StringSplitOptions]::RemoveEmptyEntries);
 
                 Write-Debug -Message "Found yaml keypair from: $item";
-
                 if ($kv.Length -eq 2) {
                     $result[$kv[0].Trim()] = $kv[1].Trim();
                 }
@@ -1455,15 +1446,12 @@ function ReadYamlHeader {
 }
 
 function IsDeviceGuardEnabled {
-
     [CmdletBinding()]
     [OutputType([System.Boolean])]
     param (
-
     )
 
     process {
-
         if ((Get-Variable -Name IsMacOS -ErrorAction Ignore) -or (Get-Variable -Name IsLinux -ErrorAction Ignore)) {
             return $False;
         }
@@ -1472,20 +1460,16 @@ function IsDeviceGuardEnabled {
         if ($PSVersionTable.PSVersion -ge '6.0' -and $PSVersionTable.PSVersion -lt '6.1') {
             return $False;
         }
-
         return [System.Management.Automation.Security.SystemPolicy]::GetSystemLockdownPolicy() -eq [System.Management.Automation.Security.SystemEnforcementMode]::Enforce;
     }
 }
 
 function InitEditorServices {
-
     [CmdletBinding()]
     param (
-
     )
 
     process {
-
         Export-ModuleMember -Function @(
             'Section'
             'Table'
