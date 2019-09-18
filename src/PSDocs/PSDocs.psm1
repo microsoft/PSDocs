@@ -445,13 +445,17 @@ function Code {
         }
 
         # Cleanup indent
-
         if ($result.Content -match '^\r\n(?<indent> {1,})') {
-            $result.Content = $result.Content -replace "\r\n {1,$($Matches.indent.length)}", '';
+            $result.Content = $result.Content -replace "\r\n {1,$($Matches.indent.length)}", "`r`n";
         }
         # Check for \n line endings
         elseif ($result.Content -match '^\n(?<indent> {1,})') {
-            $result.Content = $result.Content -replace "\n {1,$($Matches.indent.length)}", '';
+            $result.Content = $result.Content -replace "\n {1,$($Matches.indent.length)}", "`n";
+        }
+
+        # Remove leading and trailing line break
+        if ($result.Content -match "^(\r|\n|\r\n){1,}|(\r|\n|\r\n){1,}$") {
+            $result.Content = $result.Content -replace "^(\r|\n|\r\n){1,}|(\r|\n|\r\n){1,}$", '';
         }
 
         $result;
