@@ -1,6 +1,8 @@
 
 ## Unreleased
 
+- Fix concatenation of multiple lines in Code section. [#69](https://github.com/BernieWhite/PSDocs/issues/69)
+
 ## v0.6.2
 
 - Fix PositionMessage cannot be found on this object. [#63](https://github.com/BernieWhite/PSDocs/issues/63)

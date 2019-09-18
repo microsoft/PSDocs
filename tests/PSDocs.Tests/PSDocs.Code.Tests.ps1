@@ -32,19 +32,18 @@ Describe 'PSDocs -- Code keyword' {
         # Define a test document with a table
         document 'CodeMarkdown' {
             Code {
+                # This is a comment
                 This is code
+
+                # Another comment
+                And code
             }
         }
 
-        $outputDoc = "$outputPath\CodeMarkdown.md";
-        CodeMarkdown -InputObject $dummyObject -OutputPath $outputPath;
-
-        It 'Should have generated output' {
-            Test-Path -Path $outputDoc | Should -Be $True;
-        }
+        $result = CodeMarkdown -InputObject $dummyObject -PassThru;
 
         It 'Should match expected format' {
-            $outputDoc | Should -FileContentMatch 'This is code';
+            $result | Should -Match "`# This is a comment(\r|\n|\r\n)This is code(\r|\n|\r\n){2,}`# Another comment(\r|\n|\r\n)And code";
         }
     }
 
@@ -57,15 +56,10 @@ Describe 'PSDocs -- Code keyword' {
             }
         }
 
-        $outputDoc = "$outputPath\CodeMarkdownNamedFormat.md";
-        CodeMarkdownNamedFormat -InputObject $dummyObject -OutputPath $outputPath;
-
-        It 'Should have generated output' {
-            Test-Path -Path $outputDoc | Should -Be $True;
-        }
+        $result = CodeMarkdownNamedFormat -InputObject $dummyObject -PassThru;
 
         It 'Should match expected format' {
-            $outputDoc | Should -FileContentMatchMultiline '```powershell\r\nGet-Content\r\n```';
+            $result | Should -Match '```powershell\r\nGet-Content\r\n```';
         }
     }
 
