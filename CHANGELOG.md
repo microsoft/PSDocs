@@ -1,6 +1,8 @@
 
 ## Unreleased
 
+## v0.6.3
+
 - Fix concatenation of multiple lines in Code section. [#69](https://github.com/BernieWhite/PSDocs/issues/69)
 
 ## v0.6.2
