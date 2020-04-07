@@ -14,11 +14,11 @@ Set-StrictMode -Version latest;
 # Setup tests paths
 $rootPath = (Resolve-Path $PSScriptRoot\..\..).Path;
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path;
-$temp = "$here\..\..\build";
+$temp = Join-Path -Path $here -ChildPath '../../build';
 
 Import-Module (Join-Path -Path $rootPath -ChildPath 'out/modules/PSDocs') -Force;
 
-$outputPath = "$temp\PSDocs.Tests\Common";
+$outputPath = Join-Path -Path $temp -ChildPath 'PSDocs.Tests/Common';
 Remove-Item -Path $outputPath -Force -Recurse -Confirm:$False -ErrorAction SilentlyContinue;
 $Null = New-Item -Path $outputPath -ItemType Directory -Force;
 
