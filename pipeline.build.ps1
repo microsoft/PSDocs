@@ -20,11 +20,13 @@ param (
     [String]$ArtifactPath = (Join-Path -Path $PWD -ChildPath out/modules)
 )
 
+Write-Host -Object "[Pipeline] -- PowerShell v$($PSVersionTable.PSVersion.ToString())" -ForegroundColor Green;
 Write-Host -Object "[Pipeline] -- PWD: $PWD" -ForegroundColor Green;
 Write-Host -Object "[Pipeline] -- ArtifactPath: $ArtifactPath" -ForegroundColor Green;
 Write-Host -Object "[Pipeline] -- BuildNumber: $($Env:BUILD_BUILDNUMBER)" -ForegroundColor Green;
 Write-Host -Object "[Pipeline] -- SourceBranch: $($Env:BUILD_SOURCEBRANCH)" -ForegroundColor Green;
 Write-Host -Object "[Pipeline] -- SourceBranchName: $($Env:BUILD_SOURCEBRANCHNAME)" -ForegroundColor Green;
+Write-Host -Object "[Pipeline] -- Culture: $((Get-Culture).Name), $((Get-Culture).Parent)" -ForegroundColor Green;
 
 if ($Env:SYSTEM_DEBUG -eq 'true') {
     $VerbosePreference = 'Continue';
@@ -49,7 +51,7 @@ if ($version -like '*-*') {
 Write-Host -Object "[Pipeline] -- Using version: $version" -ForegroundColor Green;
 Write-Host -Object "[Pipeline] -- Using versionSuffix: $versionSuffix" -ForegroundColor Green;
 
-if ($Env:coverage -eq 'true') {
+if ($Env:COVERAGE -eq 'true') {
     $CodeCoverage = $True;
 }
 
@@ -83,11 +85,51 @@ function CopyModuleFiles {
     }
 }
 
+function Get-RepoRuleData {
+    [CmdletBinding()]
+    param (
+        [Parameter(Position = 0, Mandatory = $False)]
+        [String]$Path = $PWD
+    )
+    process {
+        GetPathInfo -Path $Path -Verbose:$VerbosePreference;
+    }
+}
+
+function GetPathInfo {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $True)]
+        [String]$Path
+    )
+    begin {
+        $items = New-Object -TypeName System.Collections.ArrayList;
+    }
+    process {
+        $Null = $items.Add((Get-Item -Path $Path));
+        $files = @(Get-ChildItem -Path $Path -File -Recurse -Include *.ps1,*.psm1,*.psd1,*.cs | Where-Object {
+            !($_.FullName -like "*.Designer.cs") -and
+            !($_.FullName -like "*/bin/*") -and
+            !($_.FullName -like "*/obj/*") -and
+            !($_.FullName -like "*\obj\*") -and
+            !($_.FullName -like "*\bin\*") -and
+            !($_.FullName -like "*\out\*") -and
+            !($_.FullName -like "*/out/*")
+        });
+        $Null = $items.AddRange($files);
+    }
+    end {
+        $items;
+    }
+}
+
 task BuildDotNet {
     exec {
+        dotnet restore
+    }
+    exec {
         # Build library
-        # Add build version -p:versionPrefix=$ModuleVersion
-        dotnet publish src/PSDocs -c $Configuration -f netstandard2.0 -o $(Join-Path -Path $PWD -ChildPath out/modules/PSDocs)
+        dotnet publish src/PSDocs -c $Configuration -f netstandard2.0 -o $(Join-Path -Path $PWD -ChildPath out/modules/PSDocs) -p:version=$Build
     }
 }
 
@@ -118,8 +160,19 @@ task BuildModule BuildDotNet, CopyModule, VersionModule
 
 # Synopsis: Build help
 task BuildHelp BuildModule, PlatyPS, {
-    # Generate MAML and about topics
-    $Null = New-ExternalHelp -OutputPath out/docs/PSDocs -Path '.\docs\commands\PSDocs\en-US','.\docs\keywords\PSDocs\en-US','.\docs\concepts\PSDocs\en-US' -Force;
+    # Avoid YamlDotNet issue in same app domain
+    exec {
+        $pwshPath = (Get-Process -Id $PID).Path;
+        &$pwshPath -Command {
+            # Generate MAML and about topics
+            Import-Module -Name PlatyPS -Verbose:$False;
+            $Null = New-ExternalHelp -OutputPath 'out/docs/PSDocs' -Path '.\docs\commands\PSDocs\en-US','.\docs\keywords\PSDocs\en-US', '.\docs\concepts\PSDocs\en-US' -Force;
+        }
+    }
+
+    if (!(Test-Path -Path 'out/docs/PSDocs/PSDocs-help.xml')) {
+        throw 'Failed find generated cmdlet help.';
+    }
 
     # Copy generated help into module out path
     $Null = Copy-Item -Path out/docs/PSDocs/* -Destination out/modules/PSDocs/en-US;

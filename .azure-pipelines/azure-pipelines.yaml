@@ -4,8 +4,10 @@
 variables:
   version: '0.7.0'
   buildConfiguration: 'Release'
+  disable.coverage.autogenerate: 'true'
+  imageName: 'ubuntu-18.04'
 
- # Use build number format, i.e. 0.1.0-B1811001
+ # Use build number format, i.e. 0.7.0-B2001001
 name: $(version)-B$(date:yyMM)$(rev:rrr)
 
 trigger:
@@ -26,25 +28,12 @@ stages:
 # Build pipeline
 - stage: Build
   displayName: Build
+  dependsOn: []
   jobs:
   - job:
-    strategy:
-      matrix:
-        Linux:
-          displayName: 'Linux'
-          imageName: 'ubuntu-18.04'
-        MacOS:
-          displayName: 'MacOS'
-          imageName: 'macOS-10.15'
-        Windows:
-          displayName: 'Windows'
-          imageName: 'vs2017-win2016'
-          publish: 'true'
-          analysis: 'true'
-          coverage: 'true'
     pool:
       vmImage: $(imageName)
-    displayName: 'PowerShell'
+    displayName: 'Module'
     steps:
 
     # Install pipeline dependencies
@@ -54,15 +43,14 @@ stages:
     # Build module
     - powershell: Invoke-Build -Configuration $(buildConfiguration) -Build $(Build.BuildNumber)
       displayName: 'Build module'
-      timeoutInMinutes: 15
 
-    # Pester test results
+    # DotNet test results
     - task: PublishTestResults@2
-      displayName: 'Publish Pester results'
+      displayName: 'Publish unit test results'
       inputs:
-        testRunTitle: 'Pester on $(imageName)'
-        testRunner: NUnit
-        testResultsFiles: 'reports/pester-unit.xml'
+        testRunTitle: 'DotNet on $(imageName)'
+        testRunner: VSTest
+        testResultsFiles: 'reports/*.trx'
         mergeTestResults: true
         platform: $(imageName)
         configuration: $(buildConfiguration)
@@ -70,53 +58,155 @@ stages:
       condition: succeededOrFailed()
 
     # PSRule results
-    # - task: PublishTestResults@2
-    #   displayName: 'Publish PSRule results'
-    #   inputs:
-    #     testRunTitle: 'PSRule on $(imageName)'
-    #     testRunner: NUnit
-    #     testResultsFiles: 'reports/rule.report.xml'
-    #     mergeTestResults: true
-    #     platform: $(imageName)
-    #     configuration: $(buildConfiguration)
-    #     publishRunAttachments: true
-    #   condition: succeededOrFailed()
-
-    # Publish Code Coverage Results
-    - task: PublishCodeCoverageResults@1
-      displayName: 'Publish Pester code coverage'
+    - task: PublishTestResults@2
+      displayName: 'Publish PSRule results'
       inputs:
-        codeCoverageTool: 'JaCoCo'
-        summaryFileLocation: 'reports/pester-coverage.xml'
-      condition: eq(variables['coverage'], 'true')
+        testRunTitle: 'PSRule on $(imageName)'
+        testRunner: NUnit
+        testResultsFiles: 'reports/ps-rule*.xml'
+        mergeTestResults: true
+        platform: $(imageName)
+        configuration: $(buildConfiguration)
+        publishRunAttachments: true
+      condition: succeededOrFailed()
 
     # Generate artifacts
-    - task: PublishPipelineArtifact@0
+    - publish: out/modules/PSDocs
       displayName: 'Publish module'
+      artifact: PSDocs
+
+# Analysis pipeline
+- stage: Analysis
+  displayName: Analysis
+  dependsOn: []
+  jobs:
+  - job:
+    pool:
+      vmImage: $(imageName)
+    displayName: 'SonarCloud'
+    condition: not(eq(variables['Build.Reason'], 'PullRequest'))
+    steps:
+
+    # Run SonarCloud analysis
+    - script: dotnet tool install --global dotnet-sonarscanner
+      displayName: 'Install Sonar scanner'
+
+    - script: $HOME/.dotnet/tools/dotnet-sonarscanner begin /k:"BernieWhite_PSDocs" /o:"berniewhite-github" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.login=$(sonarQubeToken) /v:"$(Build.BuildNumber)" /d:sonar.cs.vscoveragexml.reportsPaths="reports/" /d:sonar.cs.xunit.reportsPaths="reports/"
+      displayName: 'Prepare SonarCloud'
+
+    - script: dotnet build
+      displayName: 'Build solution for analysis'
+
+    - script: $HOME/.dotnet/tools/dotnet-sonarscanner end /d:sonar.login=$(sonarQubeToken)
+      displayName: 'Complete SonarCloud'
+
+  - job: Secret_Scan
+    pool: 'Hosted VS2017'
+    displayName: Secret scan
+
+    steps:
+    - task: securedevelopmentteam.vss-secure-development-tools.build-task-credscan.CredScan@2
+      displayName: 'Scan for secrets'
       inputs:
-        artifactName: PSDocs
-        targetPath: out/modules/PSDocs
-      condition: and(succeeded(), eq(variables['publish'], 'true'))
+        debugMode: false
+        toolMajorVersion: V2
+
+    - task: securedevelopmentteam.vss-secure-development-tools.build-task-publishsecurityanalysislogs.PublishSecurityAnalysisLogs@2
+      displayName: 'Publish scan logs'
+      continueOnError: true
+
+    - task: securedevelopmentteam.vss-secure-development-tools.build-task-postanalysis.PostAnalysis@1
+      displayName: 'Check for failures'
+      inputs:
+        CredScan: true
+        ToolLogsNotFoundAction: Error
+
+# Test pipeline
+- stage: Test
+  dependsOn: Build
+  jobs:
+
+  - template: jobs/test.yaml
+    parameters:
+      name: ubuntu_18_04_coverage
+      imageName: 'ubuntu-18.04'
+      displayName: 'PowerShell coverage'
+      coverage: 'true'
+      publishResults: 'false'
+
+  - template: jobs/test.yaml
+    parameters:
+      name: macOS_10_15
+      displayName: 'PowerShell 7.0 - macOS-10.15'
+      imageName: 'macOS-10.15'
+
+  - template: jobs/test.yaml
+    parameters:
+      name: windows
+      displayName: 'PowerShell 5.1 - win2016'
+      imageName: 'vs2017-win2016'
+
+  # Currently can't use alpine because addtional tools for Azure DevOps are required
+  # - template: jobs/testContainer.yaml
+  #   parameters:
+  #     name: alpine_3_10
+  #     displayName: 'PowerShell 7.0 - alpine-3.10'
+  #     imageName: mcr.microsoft.com/powershell
+  #     imageTag: 7.0.0-alpine-3.10
+
+  - template: jobs/testContainer.yaml
+    parameters:
+      name: ps_7_ubuntu_18_04
+      displayName: 'PowerShell 7.0 - ubuntu-18.04'
+      imageName: mcr.microsoft.com/powershell
+      imageTag: 7.0.0-ubuntu-18.04
+
+  - template: jobs/testContainer.yaml
+    parameters:
+      name: ps_6_ubuntu_18_04
+      displayName: 'PowerShell 6.2.4 - ubuntu-18.04'
+      imageName: mcr.microsoft.com/powershell
+      imageTag: 6.2.4-ubuntu-18.04
 
 # Release pipeline
 - stage: Release
   displayName: Release
-  dependsOn: Build
-  condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/v0.')
+  dependsOn: [ 'Test', 'Analysis' ]
+  condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v0.'))
   jobs:
   - job:
     displayName: Live
     pool:
-      vmImage: 'ubuntu-16.04'
+      vmImage: $(imageName)
+    variables:
+      isPreRelease: $[contains(variables['Build.SourceBranchName'], '-B')]
     steps:
-    - task: DownloadPipelineArtifact@1
+
+    # Download module from build
+    - task: DownloadPipelineArtifact@2
       displayName: 'Download module'
       inputs:
-        artifactName: PSDocs
-        downloadPath: $(Build.SourcesDirectory)/out/modules/PSDocs
+        artifact: PSDocs
+        path: $(Build.SourcesDirectory)/out/modules/PSDocs
+
     # Install pipeline dependencies
     - powershell: ./.azure-pipelines/pipeline-deps.ps1
       displayName: 'Install dependencies'
+
     # Install pipeline dependencies and build module
-    # - powershell: Invoke-Build Release -ApiKey $(apiKey)
-    #   displayName: 'Publish module'
+    - powershell: Invoke-Build Release -ApiKey $(apiKey)
+      displayName: 'Publish module'
+
+    # Update GitHub release
+    - task: GitHubRelease@1
+      displayName: 'GitHub release'
+      inputs:
+        gitHubConnection: 'AzureDevOps-PSDocs'
+        repositoryName: '$(Build.Repository.Name)'
+        action: edit
+        tag: '$(Build.SourceBranchName)'
+        releaseNotesSource: inline
+        releaseNotesInline: 'See [change log](https://github.com/BernieWhite/PSDocs/blob/master/CHANGELOG.md)'
+        assetUploadMode: replace
+        addChangeLog: false
+        isPreRelease: $(isPreRelease)

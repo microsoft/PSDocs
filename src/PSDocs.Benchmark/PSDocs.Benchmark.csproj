@@ -4,6 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFrameworks>netcoreapp3.0</TargetFrameworks>
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <ProjectGuid>{a9f68ba6-1381-4e35-a619-a948d47ec752}</ProjectGuid>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">

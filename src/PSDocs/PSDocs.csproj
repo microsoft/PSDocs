@@ -1,17 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net472</TargetFrameworks>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>7.3</LangVersion>
     <OutputType>Library</OutputType>
+    <ProjectGuid>{1f6df554-c081-40d8-9aca-32c1abe4a1b6}</ProjectGuid>
     <DebugType>portable</DebugType>
+    <NeutralLanguage>en-US</NeutralLanguage>
     <DebugSymbols>true</DebugSymbols>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <!-- <TreatWarningsAsErrors>true</TreatWarningsAsErrors> -->
     <Authors>Bernie White</Authors>
     <AssemblyTitle>PSDocs</AssemblyTitle>
     <RepositoryUrl>https://github.com/BernieWhite/PSDocs</RepositoryUrl>
     <PackageLicenseExpression>https://github.com/BernieWhite/PSDocs/blob/master/LICENSE</PackageLicenseExpression>
-    <!--<Version>0.0.1</Version>-->
+    <Version>0.0.1</Version>
     <Copyright>(c) Bernie White. All rights reserved.</Copyright>
     <Description>Generate markdown from objects using PowerShell syntax.
 
