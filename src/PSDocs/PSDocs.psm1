@@ -1128,27 +1128,27 @@ function InvokeTemplate {
 
             $Null = $ps.AddScript($template);
 
-            try {
+            # try {
                 Write-Verbose -Message "[Doc] -- Invoking template: $Name";
                 $ps.Invoke();
-            }
-            catch {
-                $baseException = $_.Exception.GetBaseException();
-                $positionMessage = $Null;
+            # }
+            # catch {
+            #     $baseException = $_.Exception.GetBaseException();
+            #     $positionMessage = $Null;
 
-                if ($baseException -is [System.Management.Automation.IContainsErrorRecord] -and $Null -ne $baseException.ErrorRecord.InvocationInfo) {
-                    if (![String]::IsNullOrEmpty($baseException.ErrorRecord.InvocationInfo.PositionMessage)) {
-                        $positionMessage = $baseException.ErrorRecord.InvocationInfo.PositionMessage
-                    }
-                }
+            #     if ($baseException -is [System.Management.Automation.IContainsErrorRecord] -and $Null -ne $baseException.ErrorRecord.InvocationInfo) {
+            #         if (![String]::IsNullOrEmpty($baseException.ErrorRecord.InvocationInfo.PositionMessage)) {
+            #             $positionMessage = $baseException.ErrorRecord.InvocationInfo.PositionMessage
+            #         }
+            #     }
 
-                throw (New-Object -TypeName PSDocs.Execution.InvokeDocumentException -ArgumentList @(
-                    $baseException.Message
-                    $baseException
-                    $Path
-                    $positionMessage
-                ));
-            }
+            #     throw (New-Object -TypeName PSDocs.Execution.InvokeDocumentException -ArgumentList @(
+            #         $baseException.Message
+            #         $baseException
+            #         $Path
+            #         $positionMessage
+            #     ));
+            # }
 
             Write-Verbose -Message "[Doc] -- Processing output";
 

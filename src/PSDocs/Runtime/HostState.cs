@@ -69,6 +69,7 @@ namespace PSDocs.Runtime
             new SessionStateCmdletEntry(LanguageCmdlets.FormatWarning, typeof(WarningCommand), null),
             new SessionStateCmdletEntry(LanguageCmdlets.SetMetadata, typeof(MetadataCommand), null),
             new SessionStateCmdletEntry(LanguageCmdlets.SetTitle, typeof(TitleCommand), null),
+            new SessionStateCmdletEntry(LanguageCmdlets.AddInclude, typeof(IncludeCommand), null),
         };
 
         /// <summary>
@@ -86,6 +87,7 @@ namespace PSDocs.Runtime
             new SessionStateAliasEntry(LanguageKeywords.Warning, LanguageCmdlets.FormatWarning, string.Empty, ScopedItemOptions.ReadOnly),
             new SessionStateAliasEntry(LanguageKeywords.Metadata, LanguageCmdlets.SetMetadata, string.Empty, ScopedItemOptions.ReadOnly),
             new SessionStateAliasEntry(LanguageKeywords.Title, LanguageCmdlets.SetTitle, string.Empty, ScopedItemOptions.ReadOnly),
+            new SessionStateAliasEntry(LanguageKeywords.Include, LanguageCmdlets.AddInclude, string.Empty, ScopedItemOptions.ReadOnly),
         };
 
         public static InitialSessionState CreateSessionState()

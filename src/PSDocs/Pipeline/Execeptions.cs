@@ -7,12 +7,12 @@ namespace PSDocs.Pipeline
     /// <summary>
     /// A base class for all pipeline exceptions.
     /// </summary>
-    public abstract class PipelineExeception : Exception
+    public abstract class PipelineException : Exception
     {
         /// <summary>
         /// Creates a pipeline exception.
         /// </summary>
-        protected PipelineExeception()
+        protected PipelineException()
         {
         }
 
@@ -20,7 +20,7 @@ namespace PSDocs.Pipeline
         /// Creates a pipeline exception.
         /// </summary>
         /// <param name="message">The detail of the exception.</param>
-        protected PipelineExeception(string message) : base(message)
+        protected PipelineException(string message) : base(message)
         {
         }
 
@@ -29,18 +29,18 @@ namespace PSDocs.Pipeline
         /// </summary>
         /// <param name="message">The detail of the exception.</param>
         /// <param name="innerException">A nested exception that caused the issue.</param>
-        protected PipelineExeception(string message, Exception innerException) : base(message, innerException)
+        protected PipelineException(string message, Exception innerException) : base(message, innerException)
         {
         }
 
-        protected PipelineExeception(SerializationInfo info, StreamingContext context)
+        protected PipelineException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
         }
     }
 
     [Serializable]
-    public sealed class RuntimeException : PipelineExeception
+    public sealed class RuntimeException : PipelineException
     {
         /// <summary>
         /// Creates a serialization exception.
@@ -71,7 +71,50 @@ namespace PSDocs.Pipeline
         [SecurityPermission(SecurityAction.Demand, SerializationFormatter = true)]
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            if (info == null) throw new ArgumentNullException("info");
+            if (info == null) throw new ArgumentNullException(nameof(info));
+            base.GetObjectData(info, context);
+        }
+    }
+
+    [Serializable]
+    public sealed class InvokeDocumentException : PipelineException
+    {
+        public InvokeDocumentException()
+        {
+
+        }
+
+        public InvokeDocumentException(string message)
+            : base(message)
+        {
+
+        }
+
+        public InvokeDocumentException(string message, Exception innerException)
+            : base(message, innerException)
+        {
+
+        }
+
+        public InvokeDocumentException(string message, Exception innerException, string path, string positionMessage)
+            : base(message, innerException)
+        {
+            Path = path;
+            PositionMessage = positionMessage;
+        }
+
+        private InvokeDocumentException(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+        }
+
+        public string Path { get; }
+
+        public string PositionMessage { get; }
+
+        [SecurityPermission(SecurityAction.Demand, SerializationFormatter = true)]
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            if (info == null) throw new ArgumentNullException(nameof(info));
             base.GetObjectData(info, context);
         }
     }

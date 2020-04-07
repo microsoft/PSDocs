@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿
+using System.Collections;
 using System.Management.Automation;
 
 namespace PSDocs.Commands
@@ -7,7 +8,7 @@ namespace PSDocs.Commands
     internal sealed class MetadataCommand : KeywordCmdlet
     {
         [Parameter(Position = 0)]
-        public Hashtable Body { get; set; }
+        public IDictionary Body { get; set; }
 
         protected override void BeginProcessing()
         {

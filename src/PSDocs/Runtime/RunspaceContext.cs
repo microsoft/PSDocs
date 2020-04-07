@@ -1,4 +1,5 @@
-﻿using PSDocs.Configuration;
+﻿
+using PSDocs.Configuration;
 using PSDocs.Data.Internal;
 using PSDocs.Pipeline;
 using System;
@@ -10,8 +11,9 @@ namespace PSDocs.Runtime
 {
     internal sealed class RunspaceContext : IDisposable
     {
-        public readonly PipelineContext Pipeline;
         private readonly Source[] _Source;
+
+        internal readonly PipelineContext Pipeline;
 
         [ThreadStatic]
         internal static RunspaceContext CurrentThread;

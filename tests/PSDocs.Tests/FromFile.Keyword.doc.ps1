@@ -49,6 +49,19 @@ document 'CodeMarkdownEval' {
 
 #region Include
 
+document 'IncludeRelative' {
+    Include tests/PSDocs.Tests/IncludeFile.md -BaseDirectory $InputObject
+    Include IncludeFile2.md -BaseDirectory (Join-Path -Path $InputObject -ChildPath tests/PSDocs.Tests/)
+}
+
+document 'IncludeAbsolute' {
+    Include (Join-Path -Path $InputObject -ChildPath tests/PSDocs.Tests/IncludeFile.md)
+}
+
+document 'IncludeCulture' {
+    Include IncludeFile3.md -UseCulture -BaseDirectory tests/PSDocs.Tests/
+}
+
 #endregion Include
 
 #region Metadata

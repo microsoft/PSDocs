@@ -1,4 +1,5 @@
-﻿using PSDocs.Models;
+﻿
+using PSDocs.Models;
 using PSDocs.Runtime;
 using System;
 using System.Collections;
@@ -7,7 +8,7 @@ using System.Management.Automation;
 
 namespace PSDocs.Data.Internal
 {
-    internal sealed class ScriptDocumentBuilder : IDocumentBuilder, IDisposable
+    internal sealed class ScriptDocumentBuilder : IDocumentBuilder
     {
         private readonly ScriptDocumentBlock _Block;
 

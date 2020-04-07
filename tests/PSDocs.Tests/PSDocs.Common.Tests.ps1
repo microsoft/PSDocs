@@ -144,11 +144,11 @@ Describe 'Invoke-PSDocument' -Tag 'FromPath' {
             Test-Path -Path "$outputPath\FromFileTest5.md" | Should -Be $True;
         }
         It 'Should generate exception' {
-            { Invoke-PSDocument -Path $here -OutputPath $outputPath -Name InvalidCommand -ErrorAction Stop } | Should -Throw -ExceptionType PSDocs.Execution.InvokeDocumentException;
+            { Invoke-PSDocument -Path $here -OutputPath $outputPath -Name InvalidCommand -ErrorAction Stop } | Should -Throw -ExceptionType PSDocs.Pipeline.RuntimeException;
             $Error[0].Exception.Message | Should -Match '^(The term ''New-PSDocsInvalidCommand'' is not recognized as the name of a cmdlet)';
-            { Invoke-PSDocument -Path $here -OutputPath $outputPath -Name InvalidCommandWithSection -ErrorAction Stop } | Should -Throw -ExceptionType PSDocs.Execution.InvokeDocumentException;
+            { Invoke-PSDocument -Path $here -OutputPath $outputPath -Name InvalidCommandWithSection -ErrorAction Stop } | Should -Throw -ExceptionType PSDocs.Pipeline.RuntimeException;
             $Error[0].Exception.Message | Should -Match '^(The term ''New-PSDocsInvalidCommand'' is not recognized as the name of a cmdlet)';
-            { Invoke-PSDocument -Path $here -OutputPath $outputPath -Name WithWriteError -ErrorAction Stop } | Should -Throw -ExceptionType PSDocs.Execution.InvokeDocumentException;
+            { Invoke-PSDocument -Path $here -OutputPath $outputPath -Name WithWriteError -ErrorAction Stop } | Should -Throw -ExceptionType PSDocs.Pipeline.RuntimeException;
             $Error[0].Exception.Message | Should -Match 'Verify Write-Error is raised as an exception';
         }
     }
@@ -166,7 +166,7 @@ Describe 'Invoke-PSDocument' -Tag 'FromPath' {
     Context 'With constrained language' {
         # Check that '[Console]::WriteLine('Should fail')' is not executed
         It 'Should fail to execute blocked code' {
-            { Invoke-PSDocument -Path $here -OutputPath $outputPath -Name 'ConstrainedTest2' -Option @{ 'execution.mode' = 'ConstrainedLanguage' } -ErrorAction Stop } | Should -Throw 'Cannot invoke method. Method invocation is supported only on core types in this language mode.';
+            { Invoke-PSDocument -Path $here -OutputPath $outputPath -Name 'ConstrainedTest2' -Option @{ 'Execution.LanguageMode' = 'ConstrainedLanguage' } -ErrorAction Stop } | Should -Throw 'Cannot invoke method. Method invocation is supported only on core types in this language mode.';
             Test-Path -Path "$outputPath\ConstrainedTest2.md" | Should -Be $False;
         }
         It 'Checks if DeviceGuard is enabled' {

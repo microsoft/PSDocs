@@ -7,7 +7,7 @@ variables:
   disable.coverage.autogenerate: 'true'
   imageName: 'ubuntu-18.04'
 
- # Use build number format, i.e. 0.7.0-B2001001
+ # Use build number format, i.e. 0.7.0-B2004001
 name: $(version)-B$(date:yyMM)$(rev:rrr)
 
 trigger:
@@ -103,7 +103,6 @@ stages:
   - job: Secret_Scan
     pool: 'Hosted VS2017'
     displayName: Secret scan
-
     steps:
     - task: securedevelopmentteam.vss-secure-development-tools.build-task-credscan.CredScan@2
       displayName: 'Scan for secrets'
@@ -145,14 +144,6 @@ stages:
       name: windows
       displayName: 'PowerShell 5.1 - win2016'
       imageName: 'vs2017-win2016'
-
-  # Currently can't use alpine because addtional tools for Azure DevOps are required
-  # - template: jobs/testContainer.yaml
-  #   parameters:
-  #     name: alpine_3_10
-  #     displayName: 'PowerShell 7.0 - alpine-3.10'
-  #     imageName: mcr.microsoft.com/powershell
-  #     imageTag: 7.0.0-alpine-3.10
 
   - template: jobs/testContainer.yaml
     parameters:

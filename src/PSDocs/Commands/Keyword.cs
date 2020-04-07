@@ -1,4 +1,5 @@
-﻿using PSDocs.Data.Internal;
+﻿
+using PSDocs.Data.Internal;
 using PSDocs.Runtime;
 using System.Management.Automation;
 
@@ -34,6 +35,7 @@ namespace PSDocs.Commands
         public const string FormatList = "Format-List";
         public const string SetMetadata = "Set-Metadata";
         public const string SetTitle = "Set-Title";
+        public const string AddInclude = "Add-Include";
     }
 
     internal abstract class KeywordCmdlet : PSCmdlet
@@ -50,7 +52,23 @@ namespace PSDocs.Commands
 
         protected static bool True(object o)
         {
-            return o != null && (o is bool bResult) && bResult;
+            return o != null && TryBool(o, out bool bResult) && bResult;
+        }
+
+        private static bool TryBool(object o, out bool value)
+        {
+            value = false;
+            if (GetBaseObject(o) is bool bresult)
+            {
+                value = bresult;
+                return true;
+            }
+            return false;
+        }
+
+        private static object GetBaseObject(object o)
+        {
+            return o is PSObject pso ? pso.BaseObject : o;
         }
     }
 }

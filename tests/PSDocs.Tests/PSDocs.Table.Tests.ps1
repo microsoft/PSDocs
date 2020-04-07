@@ -55,15 +55,15 @@ Describe 'PSDocs -- Table keyword' -Tag Table {
                 Name = 'Test'
                 Description = "This is a`r`ndescription`r`nsplit`r`nover`r`nmultiple`r`nlines."
             }
-            
-            $result = TableWithMultilineColumn -InputObject $testObject -PassThru;
+
+            $result = Invoke-PSDocument @invokeParams -Name 'TableWithMultilineColumn' -InputObject $testObject;
             $result | Should -Match 'This is a description split over multiple lines\.';
 
             # With separator
             $option = @{
                 'Markdown.WrapSeparator' = '<br />'
             }
-            $result = TableWithMultilineColumn -InputObject $testObject -InstanceName 'TableWithMultilineColumnCustom' -PassThru -Option $option;
+            $result = Invoke-PSDocument @invokeParams -Name 'TableWithMultilineColumn' -InputObject $testObject -InstanceName 'TableWithMultilineColumnCustom' -Option $option;
             $result | Should -Match 'This is a\<br /\>description\<br /\>split\<br /\>over\<br /\>multiple\<br /\>lines\.';
         }
 
@@ -72,8 +72,7 @@ Describe 'PSDocs -- Table keyword' -Tag Table {
                 Name = 'Test'
                 Value = 'Value'
             }
-            
-            $result = TableWithEmptyColumn -InputObject $testObject -InstanceName 'TableWithEmptyColumn' -PassThru;
+            $result = Invoke-PSDocument @invokeParams -Name 'TableWithEmptyColumn' -InputObject $testObject -InstanceName 'TableWithEmptyColumn';
             $result | Should -Match 'Name \| NotValue \| Value(\r|\n|\r\n)---- \| -------- \| -----(\r|\n|\r\n)Test \|          \| Value';
             $result | Should -Match 'Name \| NotValue(\r|\n|\r\n)---- \| --------(\r|\n|\r\n)Test \|(\r|\n|\r\n)';
         }

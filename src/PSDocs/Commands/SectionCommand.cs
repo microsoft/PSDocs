@@ -1,5 +1,5 @@
-﻿using PSDocs.Runtime;
-using System;
+﻿
+using PSDocs.Runtime;
 using System.Management.Automation;
 
 namespace PSDocs.Commands

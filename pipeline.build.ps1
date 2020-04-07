@@ -295,7 +295,7 @@ task Analyze Build, PSScriptAnalyzer, {
 }
 
 # Synopsis: Build and clean.
-task . Build, Test
+task . Build, TestDotNet
 
 # Synopsis: Build the project
 task Build Clean, BuildModule, BuildHelp, VersionModule
