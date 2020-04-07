@@ -85,8 +85,6 @@ namespace PSDocs.Pipeline
         {
             var instanceName = Context.InstanceNameBinder.GetInstanceName();
             _Runspace.InstanceName = instanceName;
-            _Runspace.EnterTargetObject(sourceObject);
-
             try
             {
                 var doc = BuildDocument(sourceObject);
@@ -110,6 +108,7 @@ namespace PSDocs.Pipeline
 
         internal Document[] BuildDocument(PSObject sourceObject)
         {
+            _Runspace.EnterTargetObject(sourceObject);
             var result = new List<Document>();
             for (var i = 0; i < _Builder.Length; i++)
             {

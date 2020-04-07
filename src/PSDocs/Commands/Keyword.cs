@@ -55,12 +55,23 @@ namespace PSDocs.Commands
             return o != null && TryBool(o, out bool bResult) && bResult;
         }
 
-        private static bool TryBool(object o, out bool value)
+        protected static bool TryBool(object o, out bool value)
         {
             value = false;
-            if (GetBaseObject(o) is bool bresult)
+            if (GetBaseObject(o) is bool result)
             {
-                value = bresult;
+                value = result;
+                return true;
+            }
+            return false;
+        }
+
+        protected static bool TryString(object o, out string value)
+        {
+            value = null;
+            if (GetBaseObject(o) is string result)
+            {
+                value = result;
                 return true;
             }
             return false;

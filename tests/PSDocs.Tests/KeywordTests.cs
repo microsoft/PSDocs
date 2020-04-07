@@ -2,7 +2,6 @@
 using PSDocs.Configuration;
 using PSDocs.Models;
 using PSDocs.Pipeline;
-using PSDocs.Runtime;
 using System;
 using System.IO;
 using System.Management.Automation;
@@ -10,26 +9,22 @@ using Xunit;
 
 namespace PSDocs
 {
-    public sealed class PipelineTests
+    public sealed class KeywordTests
     {
         [Fact]
-        public void GetDocumentBuilder()
+        public void TableTests()
         {
-            var actual = HostHelper.GetDocumentBuilder(new RunspaceContext(new PipelineContext(GetOption(), null, null, null), GetSource()), GetSource());
-            Assert.Equal(7, actual.Length);
-        }
-
-        [Fact]
-        public void InvokePipeline()
-        {
-            var builder = PipelineBuilder.Invoke(GetSource(), GetOption(new string[] { "FromFileTest1" }));
+            var builder = PipelineBuilder.Invoke(GetSource(), GetOption(new string[] { "TableWithExpression" }));
             var pipeline = builder.Build() as InvokePipeline;
             var targetObject = PSObject.AsPSObject(new TestModel());
 
             var actual = pipeline.BuildDocument(targetObject);
             Assert.Single(actual);
-            Assert.Equal("Test title", actual[0].Title);
-            Assert.Equal("Test1", actual[0].Metadata["test"]);
+            Assert.IsType<Table>(actual[0].Node[0]);
+
+            var table = actual[0].Node[0] as Table;
+            Assert.Equal("Dummy", table.Rows[0][0]);
+            Assert.Equal("3", table.Rows[0][3]);
         }
 
         private static PSDocumentOption GetOption(string[] name = null)
@@ -45,18 +40,13 @@ namespace PSDocs
         private static Source[] GetSource()
         {
             var builder = new SourceBuilder();
-            builder.Directory(GetSourcePath("FromFile.doc.ps1"));
+            builder.Directory(GetSourcePath("FromFile.Keyword.doc.ps1"));
             return builder.Build();
         }
 
         private static string GetSourcePath(string fileName)
         {
             return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
-        }
-
-        private static TestCommandRuntime GetCommandRuntime()
-        {
-            return new TestCommandRuntime();
         }
     }
 }

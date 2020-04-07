@@ -1,4 +1,5 @@
-﻿using PSDocs.Commands;
+﻿
+using PSDocs.Commands;
 using System;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
@@ -92,7 +93,7 @@ namespace PSDocs.Runtime
 
         public static InitialSessionState CreateSessionState()
         {
-            var state = InitialSessionState.CreateDefault2();
+            var state = InitialSessionState.CreateDefault();
             state.ThreadOptions = PSThreadOptions.UseCurrentThread;
             state.ThrowOnRunspaceOpenError = true;
             RemoveDefault(state);
@@ -108,11 +109,11 @@ namespace PSDocs.Runtime
 
         private static void RemoveDefault(InitialSessionState state)
         {
-            for (var i = 0; i < state.Commands.Count; i++)
-            {
-                if (IsReplacedCommand(state.Commands[i].Name))
-                    state.Commands.Remove(state.Commands[i].Name, state.Commands[i].CommandType);
-            }
+            if (state.Commands[LanguageCmdlets.FormatTable].Count > 0)
+                state.Commands.Remove(LanguageCmdlets.FormatTable, null);
+
+            if (state.Commands[LanguageCmdlets.FormatList].Count > 0)
+                state.Commands.Remove(LanguageCmdlets.FormatList, null);
         }
 
         private static bool IsReplacedCommand(string name)

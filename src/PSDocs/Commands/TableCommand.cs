@@ -2,6 +2,7 @@
 using PSDocs.Models;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Management.Automation;
 
 namespace PSDocs.Commands
@@ -77,8 +78,17 @@ namespace PSDocs.Commands
 
         private static string ReadPropertyByExpression(PSObject value, ScriptBlock expression)
         {
-            var output = expression.InvokeReturnAsIs(value);
-            return output is string outString ? outString : output.ToString();
+            var variables = new List<PSVariable>(new PSVariable[] { new PSVariable("_", value) });
+            var output = GetPSObject(expression.InvokeWithContext(null, variables, null));
+            return TryString(output, out string soutput) ? soutput : output.ToString();
+        }
+
+        private static PSObject GetPSObject(Collection<PSObject> collection)
+        {
+            if (collection == null || collection.Count == 0)
+                return null;
+
+            return collection[0];
         }
 
         private string[] ReadFields(PSObject row)
