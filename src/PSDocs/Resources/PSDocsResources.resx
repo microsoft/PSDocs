@@ -117,8 +117,24 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="FoundModules" xml:space="preserve">
+    <value>[PSDocs][D] -- Found {0} PSDocs module(s)</value>
+  </data>
   <data name="OptionsNotFound" xml:space="preserve">
     <value>Options file does not exist.</value>
     <comment>Occurs when explicit path to a YAML file is specified and doesn't exist.</comment>
+  </data>
+  <data name="ScanModule" xml:space="preserve">
+    <value>[PSDocs][D] -- Scanning for source files in module: {0}</value>
+  </data>
+  <data name="ScanSource" xml:space="preserve">
+    <value>[PSDocs][D] -- Scanning for source files: {0}</value>
+  </data>
+  <data name="ScriptNotFound" xml:space="preserve">
+    <value>The script was not found.</value>
+  </data>
+  <data name="SourceNotFound" xml:space="preserve">
+    <value>The source was not found.</value>
+    <comment>Occurs when the source file specified does not exist.</comment>
   </data>
 </root>

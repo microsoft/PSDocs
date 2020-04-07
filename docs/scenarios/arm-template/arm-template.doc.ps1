@@ -33,7 +33,7 @@ function GetTemplateMetadata {
     }
 }
 
-# Description: A definition to generate markdown for an ARM template
+# Synopsis: A definition to generate markdown for an ARM template
 document 'arm-template' {
 
     # Read JSON files

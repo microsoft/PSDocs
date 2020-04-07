@@ -38,9 +38,8 @@ namespace PSDocs.Models
 
             // Start loading matching values
 
-            object value;
 
-            if (index.TryGetValue("name", out value))
+            if (index.TryGetValue("name", out object value))
             {
                 header.Label = (string)value;
             }

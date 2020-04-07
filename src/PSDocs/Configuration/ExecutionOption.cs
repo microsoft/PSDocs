@@ -6,7 +6,7 @@ namespace PSDocs.Configuration
     {
         private const LanguageMode DEFAULT_LANGUAGEMODE = Configuration.LanguageMode.FullLanguage;
 
-        public static readonly ExecutionOption Default = new ExecutionOption
+        internal static readonly ExecutionOption Default = new ExecutionOption
         {
             LanguageMode = DEFAULT_LANGUAGEMODE
         };

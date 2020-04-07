@@ -212,7 +212,7 @@ task TestModule TestDotNet, Pester, PSScriptAnalyzer, {
         $Null = New-Item -Path reports -ItemType Directory -Force;
     }
 
-    $results = Invoke-Pester @pesterParams -Verbose;
+    $results = Invoke-Pester @pesterParams;
 
     # Throw an error if pester tests failed
     if ($Null -eq $results) {

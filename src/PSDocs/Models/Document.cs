@@ -1,14 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Collections.Specialized;
+﻿using System.Collections.Specialized;
 
 namespace PSDocs.Models
 {
     public sealed class Document : SectionNode
     {
-        public Document()
+        public readonly string Name;
+
+        public Document(string name)
         {
+            Name = name;
             Metadata = new OrderedDictionary();
-            Path = null;
         }
 
         public override DocumentNodeType Type
@@ -17,7 +18,5 @@ namespace PSDocs.Models
         }
 
         public OrderedDictionary Metadata { get; set; }
-
-        public string Path { get; set; }
     }
 }

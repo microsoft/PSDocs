@@ -27,22 +27,19 @@ namespace PSDocs.Configuration
         public PSDocumentOption()
         {
             // Set defaults
-            Markdown = new MarkdownOption();
+            Document = new DocumentOption();
             Execution = new ExecutionOption();
+            Markdown = new MarkdownOption();
+            Output = new OutputOption();
         }
 
         public PSDocumentOption(PSDocumentOption option)
         {
             // Set from existing option instance
-            Markdown = new MarkdownOption
-            {
-                WrapSeparator = option.Markdown.WrapSeparator,
-                Encoding = option.Markdown.Encoding,
-                SkipEmptySections = option.Markdown.SkipEmptySections,
-                ColumnPadding = option.Markdown.ColumnPadding,
-                UseEdgePipes = option.Markdown.UseEdgePipes
-            };
+            Document = new DocumentOption(option.Document);
             Execution = new ExecutionOption(option.Execution);
+            Markdown = new MarkdownOption(option.Markdown);
+            Output = new OutputOption(option.Output);
         }
 
         /// <summary>
@@ -55,15 +52,19 @@ namespace PSDocs.Configuration
         /// </summary>
         public string Generator { get; set; }
 
-        /// <summary>
-        /// Options that affect markdown formatting.
-        /// </summary>
-        public MarkdownOption Markdown { get; set; }
+        public DocumentOption Document { get; set; }
 
         /// <summary>
         /// Options that affect script execution.
         /// </summary>
         public ExecutionOption Execution { get; set; }
+
+        /// <summary>
+        /// Options that affect markdown formatting.
+        /// </summary>
+        public MarkdownOption Markdown { get; set; }
+
+        public OutputOption Output { get; set; }
 
         public string ToYaml()
         {
@@ -169,9 +170,8 @@ namespace PSDocs.Configuration
 
             // Start loading matching values
 
-            object value;
 
-            if (index.TryGetValue("markdown.wrapseparator", out value))
+            if (index.TryGetValue("markdown.wrapseparator", out object value))
             {
                 option.Markdown.WrapSeparator = (string)value;
             }

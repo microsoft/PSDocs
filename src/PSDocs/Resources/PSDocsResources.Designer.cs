@@ -61,11 +61,56 @@ namespace PSDocs.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to [PSDocs][D] -- Found {0} PSDocs module(s).
+        /// </summary>
+        internal static string FoundModules {
+            get {
+                return ResourceManager.GetString("FoundModules", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Options file does not exist..
         /// </summary>
         internal static string OptionsNotFound {
             get {
                 return ResourceManager.GetString("OptionsNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to [PSDocs][D] -- Scanning for source files in module: {0}.
+        /// </summary>
+        internal static string ScanModule {
+            get {
+                return ResourceManager.GetString("ScanModule", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to [PSDocs][D] -- Scanning for source files: {0}.
+        /// </summary>
+        internal static string ScanSource {
+            get {
+                return ResourceManager.GetString("ScanSource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The script was not found..
+        /// </summary>
+        internal static string ScriptNotFound {
+            get {
+                return ResourceManager.GetString("ScriptNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The source was not found..
+        /// </summary>
+        internal static string SourceNotFound {
+            get {
+                return ResourceManager.GetString("SourceNotFound", resourceCulture);
             }
         }
     }

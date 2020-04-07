@@ -1,5 +1,6 @@
 
 document 'FromFileTest1' {
+    Title 'Test title'
     Metadata @{
         test = 'Test1'
     }

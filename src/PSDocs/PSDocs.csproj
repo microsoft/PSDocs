@@ -6,7 +6,7 @@
     <DebugType>portable</DebugType>
     <DebugSymbols>true</DebugSymbols>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <Authors>Bernie White</Authors>
     <AssemblyTitle>PSDocs</AssemblyTitle>
     <RepositoryUrl>https://github.com/BernieWhite/PSDocs</RepositoryUrl>
@@ -22,9 +22,14 @@ This project is to be considered a proof-of-concept and not a supported product.
     <DefineConstants>Windows</DefineConstants>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
+    <WarningsAsErrors />
+  </PropertyGroup>
+
   <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8" PrivateAssets="All" />
     <PackageReference Include="PowerShellStandard.Library" Version="5.1.0" PrivateAssets="All" />
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="YamlDotNet" Version="5.0.1" />
   </ItemGroup>
 
@@ -41,6 +46,10 @@ This project is to be considered a proof-of-concept and not a supported product.
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>PSDocsResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Common\" />
   </ItemGroup>
 
 </Project>

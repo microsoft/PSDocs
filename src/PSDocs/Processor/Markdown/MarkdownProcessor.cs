@@ -7,16 +7,41 @@ namespace PSDocs.Processor.Markdown
     public sealed class MarkdownProcessor
     {
         private const string MARKDOWN_BLOCKQUOTE = "> ";
-        private const string MARKDOWN_FRONTMATTER = "---";
 
-        public string Process(PSDocumentOption option, Document document)
+        /// <summary>
+        /// A markdown document result.
+        /// </summary>
+        private sealed class DocumentResult : IDocumentResult
+        {
+            private readonly string _Name;
+            private readonly string _Markdown;
+
+            internal DocumentResult(string name, string markdown)
+            {
+                _Name = string.Concat(name, ".md");
+                _Markdown = markdown;
+            }
+
+            public override string ToString()
+            {
+                return _Markdown;
+            }
+
+            string IDocumentResult.Name
+            {
+                get { return _Name; }
+            }
+        }
+
+        public IDocumentResult Process(PSDocumentOption option, Document document, string instanceName)
         {
             if (document == null)
-                return string.Empty;
+                return null;
 
+            var name = instanceName ?? document.Name;
             var context = new MarkdownProcessorContext(option, document);
             Document(context);
-            return context.GetString();
+            return new DocumentResult(name: name, markdown: context.GetString());
         }
 
         private void Document(MarkdownProcessorContext context)
@@ -26,7 +51,8 @@ namespace PSDocs.Processor.Markdown
 
             if (!string.IsNullOrEmpty(context.Document.Title))
             {
-                context.WriteLine("# ", context.Document.Title);
+                context.WriteHeaderHash(1);
+                context.WriteLine(context.Document.Title);
                 context.LineBreak();
             }
 
@@ -43,12 +69,12 @@ namespace PSDocs.Processor.Markdown
             if (context.Document.Metadata == null || context.Document.Metadata.Count == 0)
                 return;
 
-            context.WriteLine(MARKDOWN_FRONTMATTER);
+            context.WriteFrontMatter();
             foreach (var key in context.Document.Metadata.Keys)
             {
                 context.WriteLine(key.ToString(), ": ", context.Document.Metadata[key].ToString());
             }
-            context.WriteLine(MARKDOWN_FRONTMATTER);
+            context.WriteFrontMatter();
             context.LineBreak();
         }
 
@@ -97,16 +123,13 @@ namespace PSDocs.Processor.Markdown
 
         private void Section(MarkdownProcessorContext context, Section section)
         {
-            context.Write('#', section.Level);
-            context.WriteSpace();
+            context.WriteHeaderHash(section.Level);
             context.Write(section.Title);
             context.LineBreak();
             if (section.Node.Count > 0)
             {
                 foreach (var node in section.Node)
-                {
                     Node(context, node);
-                }
             }
         }
 
@@ -120,13 +143,11 @@ namespace PSDocs.Processor.Markdown
                 context.Write(node.Info.ToUpper());
                 context.WriteLine("]");
             }
-
             if (!string.IsNullOrEmpty(node.Title))
             {
                 context.Write(MARKDOWN_BLOCKQUOTE);
                 context.WriteLine(node.Title);
             }
-
             foreach (var line in node.Content)
             {
                 context.Write(MARKDOWN_BLOCKQUOTE);
@@ -136,13 +157,13 @@ namespace PSDocs.Processor.Markdown
 
         private void Code(MarkdownProcessorContext context, Code code)
         {
-            context.Write("```");
+            context.WriteTripleBacktick();
             if (!string.IsNullOrEmpty(code.Info))
                 context.Write(code.Info);
 
             context.Ending();
             context.WriteLine(code.Content);
-            context.WriteLine("```");
+            context.WriteTripleBacktick();
             context.LineBreak();
         }
 
@@ -173,7 +194,7 @@ namespace PSDocs.Processor.Markdown
             for (var i = 0; i < table.Headers.Count; i++)
             {
                 StartColumn(context, i, lastHeader, useEdgePipe, padColumn, padColumn);
-                
+
                 context.Write(table.Headers[i].Label);
 
                 if (i < lastHeader)
@@ -185,7 +206,6 @@ namespace PSDocs.Processor.Markdown
                     {
                         padding = table.Headers[i].Width - table.Headers[i].Label.Length;
                     }
-
                     context.WriteSpace(padding);
                 }
             }
@@ -205,25 +225,21 @@ namespace PSDocs.Processor.Markdown
                     case Alignment.Left:
                         context.Write(":");
                         context.Write('-', table.Headers[i].Label.Length - 1);
-
                         break;
 
                     case Alignment.Right:
                         context.Write('-', table.Headers[i].Label.Length - 1);
                         context.Write(":");
-
                         break;
 
                     case Alignment.Center:
                         context.Write(":");
                         context.Write('-', table.Headers[i].Label.Length - 2);
                         context.Write(":");
-
                         break;
 
                     default:
                         context.Write('-', table.Headers[i].Label.Length);
-
                         break;
                 }
 
@@ -297,12 +313,10 @@ namespace PSDocs.Processor.Markdown
             {
                 context.WriteSpace();
             }
-
             if (index > 0 || useEdgePipe)
             {
                 context.WritePipe();
             }
-
             if (padAfterPipe && useEdgePipe || index > 0 && padAfterPipe)
             {
                 context.WriteSpace();
@@ -318,12 +332,10 @@ namespace PSDocs.Processor.Markdown
             {
                 return string.Empty;
             }
-
             if (text.Contains("\n") || text.Contains("\r"))
             {
                 formatted = text.Replace("\r\n", separator).Replace("\n", separator).Replace("\r", separator);
             }
-
             return formatted;
         }
     }

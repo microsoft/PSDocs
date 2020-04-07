@@ -10,6 +10,15 @@ namespace PSDocs.Configuration
         private const ColumnPadding DEFAULT_COLUMN_PADDING = ColumnPadding.MatchHeader;
         private const EdgePipeOption DEFAULT_USE_EDGE_PIPES = EdgePipeOption.WhenRequired;
 
+        internal static readonly MarkdownOption Default = new MarkdownOption
+        {
+            WrapSeparator = DEFAULT_WRAP_SEPARATOR,
+            Encoding = DEFAULT_ENCODING,
+            SkipEmptySections = DEFAULT_SKIP_EMPTY_SECTIONS,
+            ColumnPadding = DEFAULT_COLUMN_PADDING,
+            UseEdgePipes = DEFAULT_USE_EDGE_PIPES,
+        };
+
         public MarkdownOption()
         {
             WrapSeparator = DEFAULT_WRAP_SEPARATOR;
@@ -17,6 +26,15 @@ namespace PSDocs.Configuration
             SkipEmptySections = DEFAULT_SKIP_EMPTY_SECTIONS;
             ColumnPadding = DEFAULT_COLUMN_PADDING;
             UseEdgePipes = DEFAULT_USE_EDGE_PIPES;
+        }
+
+        internal MarkdownOption(MarkdownOption option)
+        {
+            WrapSeparator = option.WrapSeparator;
+            Encoding = option.Encoding;
+            SkipEmptySections = option.SkipEmptySections;
+            ColumnPadding = option.ColumnPadding;
+            UseEdgePipes = option.UseEdgePipes;
         }
 
         [DefaultValue(DEFAULT_WRAP_SEPARATOR)]

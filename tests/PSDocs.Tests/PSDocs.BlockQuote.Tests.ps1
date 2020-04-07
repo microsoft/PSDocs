@@ -14,40 +14,34 @@ Set-StrictMode -Version latest;
 # Setup tests paths
 $rootPath = $PWD;
 Import-Module (Join-Path -Path $rootPath -ChildPath out/modules/PSDocs) -Force;
-$dummyObject = New-Object -TypeName PSObject;
+$here = (Resolve-Path $PSScriptRoot).Path;
 
 Describe 'PSDocs -- BlockQuote keyword' -Tag BlockQuote {
+    $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Keyword.doc.ps1';
+    $testObject = [PSCustomObject]@{
+        Name = 'TestObject'
+    }
+
     Context 'Markdown' {
+        $invokeParams = @{
+            Path = $docFilePath
+            InputObject = $testObject
+            PassThru = $True
+        }
         It 'Should handle single line input' {
-            document 'BlockQuoteSingleMarkdown' {
-                'This is a single line' | BlockQuote
-            }
-            $result = BlockQuoteSingleMarkdown -InputObject $dummyObject -PassThru -Verbose;
+            $result = Invoke-PSDocument @invokeParams -Name 'BlockQuoteSingleMarkdown';
             $result | Should -Match '\> This is a single line';
         }
-
         It 'Should handle multiline input' {
-            document 'BlockQuoteMultiMarkdown' {
-                @('This is the first line.'
-                'This is the second line.') | BlockQuote
-            }
-            $result = BlockQuoteMultiMarkdown -InputObject $dummyObject -PassThru;
+            $result = Invoke-PSDocument @invokeParams -Name 'BlockQuoteMultiMarkdown';
             $result | Should -Match '\> This is the first line.(\r|\n|\r\n)\> This is the second line.';
         }
-
         It 'Should add title' {
-            document 'BlockQuoteTitleMarkdown' {
-                'This is a single block quote' | BlockQuote -Title 'Test'
-            }
-            $result = BlockQuoteTitleMarkdown -InputObject $dummyObject -PassThru;
+            $result = Invoke-PSDocument @invokeParams -Name 'BlockQuoteTitleMarkdown';
             $result | Should -Match '\> Test(\r|\n|\r\n)\> This is a single block quote';
         }
-
         It 'Should add info' {
-            document 'BlockQuoteInfoMarkdown' {
-                'This is a single block quote' | BlockQuote -Info 'Tip'
-            }
-            $result = BlockQuoteInfoMarkdown -InputObject $dummyObject -PassThru;
+            $result = Invoke-PSDocument @invokeParams -Name 'BlockQuoteInfoMarkdown';
             $result | Should -Match '\> \[!TIP\](\r|\n|\r\n)> This is a single block quote';
         }
     }

@@ -1,7 +1,7 @@
-﻿using System;
-using System.Text;
-using PSDocs.Configuration;
+﻿using PSDocs.Configuration;
 using PSDocs.Models;
+using System;
+using System.Text;
 
 namespace PSDocs.Processor.Markdown
 {
@@ -9,6 +9,9 @@ namespace PSDocs.Processor.Markdown
     {
         private const char Space = ' ';
         private const char Pipe = '|';
+        private const char Hash = '#';
+        private const string TripleBacktick = "```";
+        private const string MARKDOWN_FRONTMATTER = "---";
 
         public readonly PSDocumentOption Option;
         public readonly Document Document;
@@ -24,7 +27,7 @@ namespace PSDocs.Processor.Markdown
             _Ending = LineEnding.None;
         }
 
-        public string GetString()
+        internal string GetString()
         {
             return Builder.Length > 0 ? Builder.ToString() : null;
         }
@@ -36,19 +39,19 @@ namespace PSDocs.Processor.Markdown
             LineBreak = 2
         }
 
-        public void EndDocument()
+        internal void EndDocument()
         {
             Ending();
             if (_Ending == LineEnding.LineBreak)
                 Builder.Remove(Builder.Length - Environment.NewLine.Length, Environment.NewLine.Length);
         }
 
-        public void LineBreak()
+        internal void LineBreak()
         {
             Ending(shouldBreak: true);
         }
 
-        public void Ending(bool shouldBreak = false)
+        internal void Ending(bool shouldBreak = false)
         {
             if (_Ending == LineEnding.LineBreak || (_Ending == LineEnding.Normal && !shouldBreak))
                 return;
@@ -60,7 +63,7 @@ namespace PSDocs.Processor.Markdown
             _Ending = shouldBreak ? LineEnding.LineBreak : LineEnding.Normal;
         }
 
-        public void WriteLine(params string[] line)
+        internal void WriteLine(params string[] line)
         {
             if (line == null || line.Length == 0)
                 return;
@@ -72,37 +75,46 @@ namespace PSDocs.Processor.Markdown
             Ending();
         }
 
-        public void Write(string text)
+        internal void Write(string text)
         {
             _Ending = LineEnding.None;
             Builder.Append(text);
         }
 
-        private void Write(char c)
+        internal void Write(char c, int count)
         {
+            if (count == 0)
+                return;
+
             _Ending = LineEnding.None;
-            Builder.Append(c);
+            Builder.Append(c, count);
         }
 
         internal void WriteSpace(int count = 1)
         {
-            if (count == 0)
-                return;
-
-            Write(new string(Space, count));
+            Write(Space, count);
         }
 
         internal void WritePipe()
         {
-            Write(Pipe);
+            Write(Pipe, 1);
         }
 
-        public void Write(char c, int count)
+        internal void WriteTripleBacktick()
         {
-            if (count == 0)
-                return;
+            Write(TripleBacktick);
+        }
 
-            Write(new string(c, count));
+        internal void WriteHeaderHash(int count)
+        {
+            Write(Hash, count);
+            WriteSpace();
+        }
+
+        internal void WriteFrontMatter()
+        {
+            Write(MARKDOWN_FRONTMATTER);
+            Ending();
         }
     }
 }

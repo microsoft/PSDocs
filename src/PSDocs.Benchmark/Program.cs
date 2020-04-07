@@ -70,7 +70,7 @@ namespace PSDocs.Benchmark
 
             for (var i = 0; i < 1000; i++)
             {
-                profile.InvokeMarkdownProcessor(); ;
+                profile.InvokeMarkdownProcessor();
             }
         }
     }

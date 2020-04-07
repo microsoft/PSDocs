@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace PSDocs.Models
+﻿namespace PSDocs.Models
 {
     public sealed class Section : SectionNode
     {

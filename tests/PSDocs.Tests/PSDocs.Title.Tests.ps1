@@ -14,25 +14,26 @@ Set-StrictMode -Version latest;
 # Setup tests paths
 $rootPath = $PWD;
 Import-Module (Join-Path -Path $rootPath -ChildPath out/modules/PSDocs) -Force;
-
-$dummyObject = New-Object -TypeName PSObject;
+$here = (Resolve-Path $PSScriptRoot).Path;
 
 Describe 'PSDocs -- Title keyword' -Tag Title {
+    $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Keyword.doc.ps1';
+    $testObject = [PSCustomObject]@{
+        Name = 'TestObject'
+    }
+
     Context 'Markdown' {
+        $invokeParams = @{
+            Path = $docFilePath
+            InputObject = $testObject
+            PassThru = $True
+        }
         It 'With single title' {
-            document 'SingleTitle' {
-                Title 'Test title'
-            }
-            $result = SingleTitle -InputObject $dummyObject -PassThru;
+            $result = Invoke-PSDocument @invokeParams -Name 'SingleTitle';
             $result | Should -Match "^(`# Test title(\r|\n|\r\n))";
         }
-
         It 'With multiple titles' {
-            document 'MultipleTitle' {
-                Title 'Title 1'
-                Title 'Title 2'
-            }
-            $result = MultipleTitle -InputObject $dummyObject -PassThru;
+            $result = Invoke-PSDocument @invokeParams -Name 'MultipleTitle';
             $result | Should -Match "^(`# Title 2(\r|\n|\r\n))";
         }
     }

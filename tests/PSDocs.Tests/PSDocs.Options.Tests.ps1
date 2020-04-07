@@ -34,7 +34,7 @@ Describe 'New-PSDocumentOption' -Tag 'Option' {
     Context 'Read Markdown.Encoding' {
         It 'from default' {
             $option = New-PSDocumentOption;
-            $option.Markdown.Encoding | Should -Be Default;
+            $option.Markdown.Encoding | Should -Be 'Default';
         }
 
         It 'from Hashtable' {

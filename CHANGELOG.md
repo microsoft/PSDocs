@@ -2,6 +2,11 @@
 ## Unreleased
 
 - Add support for MacOS and Linux. [#59](https://github.com/BernieWhite/PSDocs/issues/59)
+- **Breaking change**: Removed support for inline block
+- **Breaking change**: Removed script block usage of `Note` and `Warning` previously deprecated.
+  - Use pipeline instead.
+- **Breaking change**: Removed support for `-When` section parameter previously deprecated.
+  - Use `-If` parameter instead.
 
 ## v0.6.3
 

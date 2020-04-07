@@ -14,39 +14,30 @@ Set-StrictMode -Version latest;
 # Setup tests paths
 $rootPath = $PWD;
 Import-Module (Join-Path -Path $rootPath -ChildPath out/modules/PSDocs) -Force;
-$dummyObject = New-Object -TypeName PSObject;
+$here = (Resolve-Path $PSScriptRoot).Path;
 
 Describe 'PSDocs -- Code keyword' -Tag Code {
-    Context 'Markdown' {
-        It 'Should have generated output' {
-            document 'CodeMarkdown' {
-                Code {
-                    # This is a comment
-                    This is code
+    $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Keyword.doc.ps1';
+    $testObject = [PSCustomObject]@{
+        Name = 'TestObject'
+    }
 
-                    # Another comment
-                    And code
-                }
-            }
-            $result = CodeMarkdown -InputObject $dummyObject -PassThru;
+    Context 'Markdown' {
+        $invokeParams = @{
+            Path = $docFilePath
+            InputObject = $testObject
+            PassThru = $True
+        }
+        It 'Should have generated output' {
+            $result = Invoke-PSDocument @invokeParams -Name 'CodeMarkdown';
             $result | Should -Match "`# This is a comment(\r|\n|\r\n)This is code(\r|\n|\r\n){2,}`# Another comment(\r|\n|\r\n)And code";
         }
-
         It 'Code markdown with named format' {
-            document 'CodeMarkdownNamedFormat' {
-                Code powershell {
-                    Get-Content
-                }
-            }
-            $result = CodeMarkdownNamedFormat -InputObject $dummyObject -PassThru;
+            $result = Invoke-PSDocument @invokeParams -Name 'CodeMarkdownNamedFormat';
             $result | Should -Match '```powershell(\r|\n|\r\n)Get-Content(\r|\n|\r\n)```';
         }
-
         It 'Code markdown with evaluation' {
-            document 'CodeMarkdownEval' {
-                $a = 1; $a += 1; $a | Code powershell;
-            }
-            $result = CodeMarkdownEval -InputObject $dummyObject -PassThru;
+            $result = Invoke-PSDocument @invokeParams -Name 'CodeMarkdownEval';
             $result | Should -Match '```powershell(\r|\n|\r\n)2(\r|\n|\r\n)```';
         }
     }

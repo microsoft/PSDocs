@@ -1,0 +1,17 @@
+#
+# PSDocs
+#
+
+info:
+  name: PSDocs
+
+repository:
+  type: git
+  url: https://github.com/BernieWhite/PSDocs.git
+
+tasks:
+  clear:
+    steps:
+      - gitPrune:
+          name: origin
+          removeGone: true
