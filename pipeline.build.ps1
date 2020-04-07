@@ -252,7 +252,8 @@ task platyPS {
     Import-Module -Name PlatyPS -Verbose:$False;
 }
 
-task TestModule TestDotNet, Pester, PSScriptAnalyzer, {
+# Synopsis: Test the module
+task TestModule Pester, PSScriptAnalyzer, {
     # Run Pester tests
     $pesterParams = @{ Path = $PWD; OutputFile = 'reports/pester-unit.xml'; OutputFormat = 'NUnitXml'; PesterOption = @{ IncludeVSCodeMarker = $True }; PassThru = $True; };
 
