@@ -110,11 +110,15 @@ namespace PSDocs.Pipeline
         {
             _Runspace.EnterTargetObject(sourceObject);
             var result = new List<Document>();
-            for (var i = 0; i < _Builder.Length; i++)
+            for (var c = 0; c < Context.Option.Output.Culture.Length; c++)
             {
-                // TODO: Add target name binding
-                var document = _Builder[i].Process(_Runspace, sourceObject);
-                result.Add(document);
+                _Runspace.EnterCulture(Context.Option.Output.Culture[c]);
+                for (var i = 0; i < _Builder.Length; i++)
+                {
+                    // TODO: Add target name binding
+                    var document = _Builder[i].Process(_Runspace, sourceObject);
+                    result.Add(document);
+                }
             }
             return result.ToArray();
         }

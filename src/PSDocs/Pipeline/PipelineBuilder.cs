@@ -76,6 +76,8 @@ namespace PSDocs.Pipeline
             {
                 OutputVisitor = (o, enumerate) => WriteToFile(o, enumerate, Option, Logger);
             }
+
+            ConfigureCulture();
             return this;
         }
 
@@ -119,6 +121,16 @@ namespace PSDocs.Pipeline
                     return Encoding.UTF32;
                 default:
                     return new UTF8Encoding(false);
+            }
+        }
+
+        private void ConfigureCulture()
+        {
+            if (Option.Output.Culture == null || Option.Output.Culture.Length == 0)
+            {
+                // Fallback to current culture
+                var current = PSDocumentOption.GetCurrentCulture();
+                Option.Output.Culture = new string[] { current.Name };
             }
         }
     }

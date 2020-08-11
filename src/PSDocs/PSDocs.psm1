@@ -5,6 +5,7 @@
 Set-StrictMode -Version latest;
 
 [PSDocs.Configuration.PSDocumentOption]::UseExecutionContext($ExecutionContext);
+[PSDocs.Configuration.PSDocumentOption]::UseCurrentCulture();
 $Script:UTF8_NO_BOM = New-Object -TypeName System.Text.UTF8Encoding -ArgumentList $False;
 
 #

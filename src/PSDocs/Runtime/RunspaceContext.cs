@@ -35,6 +35,8 @@ namespace PSDocs.Runtime
 
         public PSObject TargetObject { get; private set; }
 
+        public string Culture { get; private set; }
+
         public string InstanceName { get; internal set; }
 
         internal PowerShell NewPowerShell()
@@ -125,6 +127,15 @@ namespace PSDocs.Runtime
         }
 
         #endregion TargetObject
+
+        #region Culture
+
+        public void EnterCulture(string culture)
+        {
+            Culture = culture;
+        }
+
+        #endregion Culture
 
         #region Logging
 

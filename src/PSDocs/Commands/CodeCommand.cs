@@ -1,27 +1,33 @@
 ﻿
 using PSDocs.Models;
+using PSDocs.Runtime;
+using System;
 using System.Collections.Generic;
 using System.Management.Automation;
-using System.Text.RegularExpressions;
 
 namespace PSDocs.Commands
 {
     [Cmdlet(VerbsCommon.Format, LanguageKeywords.Code)]
     internal sealed class CodeCommand : KeywordCmdlet
     {
+        private const string ParameterSet_StringDefault = "StringDefault";
+        private const string ParameterSet_InfoString = "InfoString";
+        private const string ParameterSet_StringInfoString = "StringInfoString";
+        private const string ParameterSet_Default = "Default";
+
         private Code _Code;
         private List<string> _Content;
 
-        [Parameter(Position = 0, Mandatory = true, ParameterSetName = "InfoString")]
-        [Parameter(Position = 0, Mandatory = true, ParameterSetName = "StringInfoString")]
+        [Parameter(Position = 0, Mandatory = true, ParameterSetName = ParameterSet_InfoString)]
+        [Parameter(Position = 0, Mandatory = true, ParameterSetName = ParameterSet_StringInfoString)]
         public string Info { get; set; }
 
-        [Parameter(Position = 0, Mandatory = true, ParameterSetName = "Default", ValueFromPipeline = true)]
-        [Parameter(Position = 1, Mandatory = true, ParameterSetName = "InfoString", ValueFromPipeline = true)]
+        [Parameter(Position = 0, Mandatory = true, ParameterSetName = ParameterSet_Default, ValueFromPipeline = true)]
+        [Parameter(Position = 1, Mandatory = true, ParameterSetName = ParameterSet_InfoString, ValueFromPipeline = true)]
         public ScriptBlock Body { get; set; }
 
-        [Parameter(Mandatory = true, ParameterSetName = "StringDefault", ValueFromPipeline = true)]
-        [Parameter(Mandatory = true, ParameterSetName = "StringInfoString", ValueFromPipeline = true)]
+        [Parameter(Mandatory = true, ParameterSetName = ParameterSet_StringDefault, ValueFromPipeline = true)]
+        [Parameter(Mandatory = true, ParameterSetName = ParameterSet_StringInfoString, ValueFromPipeline = true)]
         public string BodyString { get; set; }
 
         protected override void BeginProcessing()
@@ -33,34 +39,25 @@ namespace PSDocs.Commands
 
         protected override void ProcessRecord()
         {
-            if (ParameterSetName == "StringDefault" || ParameterSetName == "StringInfoString")
-                _Content.Add(CleanIndent(BodyString));
+            if (ParameterSetName == ParameterSet_StringDefault || ParameterSetName == ParameterSet_StringInfoString)
+                AddContent(BodyString);
             else
-                _Content.Add(CleanIndent(Body.ToString()));
+                AddContent(Body.ToString());
         }
 
         protected override void EndProcessing()
         {
-            _Code.Content = string.Join(System.Environment.NewLine, _Content.ToArray());
+            _Code.Content = string.Join(Environment.NewLine, _Content.ToArray());
             WriteObject(_Code);
-            
         }
 
-        private string CleanIndent(string value)
+        private void AddContent(string input)
         {
-            var match = Regex.Match(value, "^\r\n(?<indent> {1,})");
-            if (match.Success)
-                value = Regex.Replace(value, "\r\n {1,}", "\r\n");
+            if (string.IsNullOrEmpty(input))
+                return;
 
-            match = Regex.Match(value, "^\n(?<indent> {1,})");
-            if (match.Success)
-                value = Regex.Replace(value, "^\n {1,}", "\n");
-
-            match = Regex.Match(value, "^(\r|\n|\r\n){1,}|(\r|\n|\r\n){1,}$");
-            if (match.Success)
-                value = Regex.Replace(value, "^(\r|\n|\r\n){1,}|(\r|\n|\r\n){1,}$", "");
-
-            return value;
+            var content = new StringContent(input);
+            _Content.AddRange(content.ReadLines());
         }
     }
 }

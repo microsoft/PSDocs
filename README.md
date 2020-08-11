@@ -57,6 +57,16 @@ Document Sample {
 }
 ```
 
+### Execute a document
+
+To execute the document use Invoke-PSDocument.
+
+For example:
+
+```powershell
+Invoke-PSDocument -InputObject 'C:\';
+```
+
 An example of the output generated is available [here](docs/examples/Get-child-item-output.md).
 
 ### Scenarios
