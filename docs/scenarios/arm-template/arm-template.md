@@ -65,12 +65,12 @@ function GetTemplateMetadata {
 
 ## Create a document definition
 
-PSDocs uses the `document` keyword to describe a document definition. A document definition is designed to be reusable.
+PSDocs uses the `Document` keyword to describe a document definition. A document definition is designed to be reusable.
 
 With our two helper functions already implemented, we are ready to define our document. For our example, our JSON files are in the same directory as the documentation definition so we are using `$PSScriptRoot`.
 
 ```powershell
-document 'arm-template' {
+Document 'arm-template' {
 
     # Read JSON files
     $metadata = GetTemplateMetadata -Path $PSScriptRoot/metadata.json;
@@ -81,7 +81,7 @@ document 'arm-template' {
 We want to set a title and an opening description for our document based on the metadata file.
 
 ```powershell
-document 'arm-template' {
+Document 'arm-template' {
 
     # Read JSON files
     $metadata = GetTemplateMetadata -Path $PSScriptRoot/metadata.json;
@@ -98,7 +98,7 @@ document 'arm-template' {
 Next we need to output the template parameters into a table with metadata descriptions. To format our parameters in a table we use the `Table` keyword.
 
 ```powershell
-document 'arm-template' {
+Document 'arm-template' {
 
     # Read JSON files
     $metadata = GetTemplateMetadata -Path $PSScriptRoot/metadata.json;
@@ -116,7 +116,7 @@ document 'arm-template' {
 We can also provide an example command line that can be used to deploy our ARM template. To insert a code sample use the `Code` keyword.
 
 ```powershell
-document 'arm-template' {
+Document 'arm-template' {
 
     ...
 
@@ -155,7 +155,7 @@ Invoke-PSDocument -Path '.\docs\scenarios\arm-template' -OutputPath '.\docs\scen
 
 ## More information
 
-- [Get the full script](arm-template.doc.ps1)
+- [Get the full script](arm-template.Doc.ps1)
 - [Example ARM template file](template.json)
 - [Example ARM metadata file](metadata.json)
 - [Example output](output.md)

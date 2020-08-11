@@ -38,9 +38,9 @@ Create markdown from an input object using a document definition. A document is 
 ### Example 1
 
 ```powershell
-# Create a new document definition called Sample in sample.doc.ps1
-Set-Content -Path .\sample.doc.ps1 -Value @'
-document Sample {
+# Create a new document definition called Sample in Sample.Doc.ps1
+Set-Content -Path .\Sample.Doc.ps1 -Value @'
+Document Sample {
 
     # Add an introduction section
     Section Introduction {
@@ -54,17 +54,17 @@ document Sample {
 }
 '@
 
-# Discover document definitions in the current working path (and subdirectories) within .doc.ps1 files
+# Discover document definitions in the current working path (and subdirectories) within .Doc.ps1 files
 Invoke-PSDocument -Path .;
 ```
 
-Create markdown using *.doc.ps1 files loaded from the current working directory.
+Create markdown using *.Doc.ps1 files loaded from the current working directory.
 
 ### Example 2
 
 ```powershell
 # Define an inline document called Sample
-document Sample {
+Document Sample {
 
     # Add an introduction section
     Section Introduction {
@@ -77,7 +77,7 @@ document Sample {
     }
 }
 
-# Calling an inline document definition by name using Invoke-PSDocument is depricated
+# Calling an inline document definition by name using Invoke-PSDocument is deprecated
 Invoke-PSDocument -Name 'Sample' -InputObject 'C:\';
 
 # This is recommended way to call Sample

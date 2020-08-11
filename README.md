@@ -27,7 +27,7 @@ The following example shows basic PSDocs usage. For specific use cases see [scen
 ### Define a document
 
 A document provides instructions on how PSDocs should render an object into documentation.
-To define a document, create the `Document` script block saved to a file with the `.doc.ps1` extension.
+To define a document, create the `Document` script block saved to a file with the `.Doc.ps1` extension.
 
 For example:
 
