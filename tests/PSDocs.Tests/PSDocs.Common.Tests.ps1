@@ -35,7 +35,7 @@ $dummyObject = New-Object -TypeName PSObject -Property @{
 }
 
 Describe 'PSDocs instance names' -Tag Common {
-    $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Cmdlets.doc.ps1';
+    $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Cmdlets.Doc.ps1';
 
     Context 'Generate a document without an instance name' {
         $invokeParams = @{
@@ -180,7 +180,7 @@ Describe 'Invoke-PSDocument' -Tag 'FromPath' {
 }
 
 Describe 'Get-PSDocumentHeader' -Tag 'Common', 'Get-PSDocumentHeader' {
-    $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Cmdlets.doc.ps1';
+    $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Cmdlets.Doc.ps1';
 
     Context 'With -Path' {
         $testObject = [PSCustomObject]@{

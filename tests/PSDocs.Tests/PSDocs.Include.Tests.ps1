@@ -23,7 +23,7 @@ $here = (Resolve-Path $PSScriptRoot).Path;
 $dummyObject = New-Object -TypeName PSObject;
 
 Describe 'PSDocs -- Include keyword' -Tag Include {
-    $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Keyword.doc.ps1';
+    $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Keyword.Doc.ps1';
 
     Context 'Markdown' {
         $invokeParams = @{

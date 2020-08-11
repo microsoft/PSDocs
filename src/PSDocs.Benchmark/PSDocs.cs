@@ -87,7 +87,7 @@ namespace PSDocs.Benchmark
         private static Source[] GetSource()
         {
             return new Source[] {
-                new Source(GetSourcePath(), new SourceFile[] { new SourceFile(GetSourcePath("Benchmark.doc.ps1"), null, SourceType.Script, null) })
+                new Source(GetSourcePath(), new SourceFile[] { new SourceFile(GetSourcePath("Benchmark.Doc.ps1"), null, SourceType.Script, null) })
             };
         }
 

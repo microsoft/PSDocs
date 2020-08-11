@@ -156,7 +156,8 @@ Accept wildcard characters: False
 
 ### -OutputPath
 
-The directory path to store markdown files created based on the specified document template. This path will be automatically created if it doesn't exist.
+The directory path to store markdown files created based on the specified document template.
+This path will be automatically created if it doesn't exist.
 
 ```yaml
 Type: String
@@ -188,7 +189,9 @@ Accept wildcard characters: False
 
 ### -Option
 
-Additional options that configure document generation. A `PSDocumentOption` can be created by using the `New-PSDocumentOption` cmdlet. Alternatively a hashtable or path to YAML file can be specified with options.
+Additional options that configure document generation.
+A `PSDocumentOption` can be created by using the `New-PSDocumentOption` cmdlet.
+Alternatively a hashtable or path to YAML file can be specified with options.
 
 ```yaml
 Type: PSDocumentOption
@@ -204,7 +207,9 @@ Accept wildcard characters: False
 
 ### -Encoding
 
-Specifies the file encoding for generated markdown files. By default, UTF-8 without byte order mark (BOM) will be used. To use UTF-8 with BOM specify `UTF8`.
+Specifies the file encoding for generated markdown files.
+By default, UTF-8 without byte order mark (BOM) will be used.
+To use UTF-8 with BOM specify `UTF8`.
 
 ```yaml
 Type: MarkdownEncoding
@@ -221,7 +226,8 @@ Accept wildcard characters: False
 
 ### -Path
 
-A directory path to read document definitions recursively from. Document definitions are discovered within files ending in `.doc.ps1`.
+A directory path to read document definitions recursively from.
+Document definitions are discovered within files ending in `.Doc.ps1`.
 
 ```yaml
 Type: String
@@ -237,7 +243,8 @@ Accept wildcard characters: False
 
 ### -Tag
 
-One or more tags that the document definition must contain. If more then one tag is specified, all tags be present on the document definition to be evaluated.
+One or more tags that the document definition must contain.
+If more then one tag is specified, all tags be present on the document definition to be evaluated.
 
 ```yaml
 Type: String[]

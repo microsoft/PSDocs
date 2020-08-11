@@ -18,7 +18,7 @@ $here = (Resolve-Path $PSScriptRoot).Path;
 $dummyObject = New-Object -TypeName PSObject;
 
 Describe 'PSDocs -- Metadata keyword' -Tag Metadata {
-    $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Keyword.doc.ps1';
+    $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Keyword.Doc.ps1';
 
     Context 'Markdown' {
         $invokeParams = @{

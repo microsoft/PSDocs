@@ -87,13 +87,13 @@ Sample;
 External example:
 
 ```powershell
-# Will call all document definitions in files with the .doc.ps1 extension within the current working path
+# Will call all document definitions in files with the .Doc.ps1 extension within the current working path
 Invoke-PSDocument;
 ```
 
 ```powershell
 # Call a specific document definition by name, from a specific file
-Invoke-PSDocument -Name 'Sample' -Path '.\sample.doc.ps1';
+Invoke-PSDocument -Name 'Sample' -Path '.\sample.Doc.ps1';
 ```
 
 ### Section

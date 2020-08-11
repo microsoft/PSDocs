@@ -895,7 +895,7 @@ function GetDocumentFile {
             Resolve-Path -Path $Path;
         }
         else {
-            foreach ($p in (Get-ChildItem -Path $Path -Include '*.doc.ps1' -Recurse -File)) {
+            foreach ($p in (Get-ChildItem -Path $Path -Include '*.Doc.ps1' -Recurse -File)) {
                 $p.FullName;
             }
         }

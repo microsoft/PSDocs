@@ -56,7 +56,7 @@ namespace PSDocs
         private static Source[] GetSource()
         {
             var builder = new SourceBuilder();
-            builder.Directory(GetSourcePath("FromFile.Keyword.doc.ps1"));
+            builder.Directory(GetSourcePath("FromFile.Keyword.Doc.ps1"));
             return builder.Build();
         }
 

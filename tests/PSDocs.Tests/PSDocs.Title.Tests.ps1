@@ -17,7 +17,7 @@ Import-Module (Join-Path -Path $rootPath -ChildPath out/modules/PSDocs) -Force;
 $here = (Resolve-Path $PSScriptRoot).Path;
 
 Describe 'PSDocs -- Title keyword' -Tag Title {
-    $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Keyword.doc.ps1';
+    $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Keyword.Doc.ps1';
     $testObject = [PSCustomObject]@{
         Name = 'TestObject'
     }
