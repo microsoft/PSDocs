@@ -143,7 +143,7 @@ namespace PSDocs.Runtime
             Pipeline.Logger.WriteError(record);
         }
 
-        internal void ThrowRuntimeException(string sourceFile, Exception inner)
+        internal static void ThrowRuntimeException(string sourceFile, Exception inner)
         {
             throw new PSDocs.Pipeline.RuntimeException(sourceFile: sourceFile, innerException: inner);
         }

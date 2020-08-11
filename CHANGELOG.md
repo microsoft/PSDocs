@@ -1,12 +1,15 @@
 
 ## Unreleased
 
-- Add support for MacOS and Linux. [#59](https://github.com/BernieWhite/PSDocs/issues/59)
-- **Breaking change**: Removed support for inline document blocks.
-- **Breaking change**: Removed script block usage of `Note` and `Warning` previously deprecated.
-  - Use pipeline instead.
-- **Breaking change**: Removed support for `-When` section parameter previously deprecated.
-  - Use `-If` parameter instead.
+- Engine features:
+  - Added support for MacOS and Linux. [#59](https://github.com/BernieWhite/PSDocs/issues/59)
+- Deprecations and removals:
+  - Added migration guide for v0.6.x to v0.7.0.
+  - **Breaking change**: Removed support for inline document blocks.
+  - **Breaking change**: Removed script block usage of `Note` and `Warning` previously deprecated.
+    - Use pipeline instead.
+  - **Breaking change**: Removed support for `-When` section parameter previously deprecated.
+    - Use `-If` parameter instead.
 
 ## v0.6.3
 
@@ -43,7 +46,7 @@
 - **Important change**: Added support for `Note` and `Warning` keywords to accept text from the pipeline
   - Using the pipeline is now the preferred way to use `Note` and `Warning` keywords
   - `Note` and `Warning` script blocks are still work, but are deprecated.
-- **Experimental**: Publishing of keywords for syntax completion with editors
+- **Experimental**: Publishing of keywords for syntax completion with editors.
 
 ## v0.5.0
 

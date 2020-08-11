@@ -279,8 +279,13 @@ task TestModule Pester, PSScriptAnalyzer, {
 
 task Benchmark {
     if ($Benchmark -or $BuildTask -eq 'Benchmark') {
-        dotnet run -p src/PSDocs.Benchmark -f netcoreapp2.2 -c Release -- benchmark --output $PWD;
+        dotnet run -p src/PSDocs.Benchmark -f netcoreapp3.1 -c Release -- benchmark --output $PWD;
     }
+}
+
+# Synopsis: Run script analyzer
+task Analyze Build, PSScriptAnalyzer, {
+    Invoke-ScriptAnalyzer -Path out/modules/PSDocs;
 }
 
 # Synopsis: Add shipit build tag
@@ -290,17 +295,16 @@ task TagBuild {
     }
 }
 
-# Synopsis: Run script analyzer
-task Analyze Build, PSScriptAnalyzer, {
-    Invoke-ScriptAnalyzer -Path out/modules/PSDocs;
+# Synopsis: Remove temp files.
+task Clean {
+    Remove-Item -Path out,reports -Recurse -Force -ErrorAction SilentlyContinue;
 }
 
-# Synopsis: Build and clean.
-task . Build, TestDotNet
+task Build Clean, BuildModule, VersionModule, BuildHelp
 
-# Synopsis: Build the project
-task Build Clean, BuildModule, BuildHelp, VersionModule
-
-task Test Build, TestModule
+task Test Build, TestDotNet, TestModule
 
 task Release ReleaseModule, TagBuild
+
+# Synopsis: Build and test. Entry point for CI Build stage
+task . Build, TestDotNet

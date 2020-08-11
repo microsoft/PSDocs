@@ -1,5 +1,6 @@
 ﻿
 using PSDocs.Models;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,9 +13,38 @@ namespace PSDocs.Commands
     {
         private TableBuilder _TableBuilder;
         private List<PSObject> _RowData;
-        private List<PropertyReader> _Reader;
+        private PropertyReader _Reader;
 
-        internal delegate string PropertyReader(PSObject value);
+        internal sealed class PropertyReader
+        {
+            private readonly Dictionary<string, GetProperty> _Map;
+            private readonly List<string> _Properties;
+
+            public PropertyReader()
+            {
+                _Map = new Dictionary<string, GetProperty>();
+                _Properties = new List<string>();
+            }
+
+            public void Add(string propertyName, GetProperty get)
+            {
+                if (string.IsNullOrEmpty(propertyName) || _Map.ContainsKey(propertyName))
+                    return;
+
+                _Map.Add(propertyName, get);
+                _Properties.Add(propertyName);
+            }
+
+            public IEnumerator<GetProperty> GetEnumerator()
+            {
+                for (var i = 0; i < _Properties.Count; i++)
+                {
+                    yield return _Map[_Properties[i]];
+                }
+            }
+        }
+
+        internal delegate string GetProperty(PSObject value);
 
         [Parameter(ValueFromPipeline = true)]
         public PSObject InputObject { get; set; }
@@ -26,35 +56,52 @@ namespace PSDocs.Commands
         {
             _TableBuilder = GetBuilder().Table();
             _RowData = new List<PSObject>();
+            BuildReader();
+        }
 
+        private void BuildReader()
+        {
+            _Reader = new PropertyReader();
             if (Property == null || Property.Length == 0)
                 return;
 
-            _Reader = new List<PropertyReader>();
             for (var i = 0; i < Property.Length; i++)
             {
                 if (Property[i] is Hashtable propertyExpression)
                 {
                     _TableBuilder.Header(propertyExpression);
                     if (propertyExpression["Expression"] is ScriptBlock expression)
-                        _Reader.Add((PSObject value) => ReadPropertyByExpression(value, expression));
+                    {
+                        var propertyName = GetPropertyName(propertyExpression);
+                        _Reader.Add(propertyName, (PSObject value) => ReadPropertyByExpression(value, expression));
+                    }
                     else
                     {
                         var propertyName = propertyExpression["Expression"].ToString();
-                        _Reader.Add((PSObject value) => ReadPropertyByName(value, propertyName));
+                        _Reader.Add(propertyName, (PSObject value) => ReadPropertyByName(value, propertyName));
                     }
                 }
                 else
                 {
                     var propertyName = Property[i].ToString();
                     _TableBuilder.Header(propertyName);
-                    _Reader.Add((PSObject value) => ReadPropertyByName(value, propertyName));
+                    _Reader.Add(propertyName, (PSObject value) => ReadPropertyByName(value, propertyName));
                 }
             }
         }
 
         protected override void ProcessRecord()
         {
+            if (Property == null || Property.Length == 0)
+            {
+                // Extract out the header column names based on the resulting objects
+                foreach (var property in InputObject.Properties)
+                {
+                    var propertyName = property.Name.ToString();
+                    _TableBuilder.Header(propertyName);
+                    _Reader.Add(propertyName, (PSObject value) => ReadPropertyByName(value, propertyName));
+                }
+            }
             _RowData.Add(InputObject);
         }
 
@@ -73,7 +120,7 @@ namespace PSDocs.Commands
 
         private static string ReadPropertyByName(PSObject value, string propertyName)
         {
-            return value.Properties[propertyName].Value?.ToString();
+            return value.Properties[propertyName]?.Value?.ToString();
         }
 
         private static string ReadPropertyByExpression(PSObject value, ScriptBlock expression)
@@ -91,11 +138,25 @@ namespace PSDocs.Commands
             return collection[0];
         }
 
+        private static string GetPropertyName(Hashtable propertyExpression)
+        {
+            if (propertyExpression.ContainsKey("label"))
+                return propertyExpression["label"].ToString();
+
+            if (propertyExpression.ContainsKey("name"))
+                return propertyExpression["name"].ToString();
+
+            return null;
+        }
+
         private string[] ReadFields(PSObject row)
         {
+            if (row == null)
+                return Array.Empty<string>();
+
             var fields = new List<string>();
-            for (var i = 0; i < _Reader.Count; i++)
-                fields.Add(_Reader[i].Invoke(row));
+            foreach (var getter in _Reader)
+                fields.Add(getter.Invoke(row));
 
             return fields.ToArray();
         }
