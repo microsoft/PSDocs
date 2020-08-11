@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Management.Automation;
+using System.Threading;
 
 namespace PSDocs.Pipeline
 {
@@ -106,7 +107,7 @@ namespace PSDocs.Pipeline
             {
                 return;
             }
-            _Logger.WriteVerbose(string.Format(PSDocsResources.ScanSource, path));
+            _Logger.WriteVerbose(string.Format(Thread.CurrentThread.CurrentCulture, PSDocsResources.ScanSource, path));
         }
 
         public void VerboseFoundModules(int count)
@@ -115,7 +116,7 @@ namespace PSDocs.Pipeline
             {
                 return;
             }
-            _Logger.WriteVerbose(string.Format(PSDocsResources.FoundModules, count));
+            _Logger.WriteVerbose(string.Format(Thread.CurrentThread.CurrentCulture, PSDocsResources.FoundModules, count));
         }
 
         public void VerboseScanModule(string moduleName)
@@ -124,7 +125,7 @@ namespace PSDocs.Pipeline
             {
                 return;
             }
-            _Logger.WriteVerbose(string.Format(PSDocsResources.ScanModule, moduleName));
+            _Logger.WriteVerbose(string.Format(Thread.CurrentThread.CurrentCulture, PSDocsResources.ScanModule, moduleName));
         }
 
         /// <summary>
@@ -223,13 +224,14 @@ namespace PSDocs.Pipeline
             return result.ToArray();
         }
 
-        private bool Include(string path)
+        private static bool Include(string path)
         {
-            return path.EndsWith(".doc.ps1", System.StringComparison.OrdinalIgnoreCase) ||
-                path.EndsWith(".doc.yaml", System.StringComparison.OrdinalIgnoreCase);
+            return path.EndsWith(".Doc.ps1", System.StringComparison.OrdinalIgnoreCase) ||
+                path.EndsWith(".Doc.yaml", System.StringComparison.OrdinalIgnoreCase) ||
+                path.EndsWith(".Doc.yml", System.StringComparison.OrdinalIgnoreCase);
         }
 
-        private SourceType GetSourceType(string path)
+        private static SourceType GetSourceType(string path)
         {
             var extension = Path.GetExtension(path);
             //return (extension == ".yaml" || extension == ".yml") ? SourceType.Yaml : SourceType.Script;
