@@ -8,25 +8,41 @@ A PowerShell module with commands to generate markdown from objects using PowerS
 
 This project is to be considered a **proof-of-concept** and **not a supported product**.
 
-If you have any problems please check our GitHub [issues](https://github.com/BernieWhite/PSDocs/issues) page. If you do not see your problem captured, please file a new issue and follow the provided template.
+If you have any problems please check our GitHub [issues] page. If you do not see your problem captured, please file a new issue and follow the provided template.
 
 ## Getting the modules
 
-You can download and install these PowerShell modules from the PowerShell Gallery.
+You can download and install the PSDocs module from the PowerShell Gallery.
 
-| Module     | Description | Downloads / instructions |
-| ------     | ----------- | ------------------------ |
-| PSDocs     | Generate markdown from PowerShell | [latest][psg-psdocs] / [instructions][install] |
-| PSDocs.Dsc | Extension for PSDocs to generate markdown from Desired State Configuration | [latest][psg-psdocsdsc] / [instructions][install] |
+Module     | Description | Downloads / instructions
+------     | ----------- | ------------------------
+PSDocs     | Generate markdown from PowerShell | [latest][psg-psdocs] / [instructions][install]
+
+For rule and integration modules see [related projects](#related-projects).
 
 ## Getting started
 
-### Generate a document from a directory listing
+The following example shows basic PSDocs usage. For specific use cases see [scenarios](#scenarios).
+
+### Define a document
+
+A document provides instructions on how PSDocs should render an object into documentation.
+To define a document, create the `Document` script block saved to a file with the `.doc.ps1` extension.
+
+For example:
 
 ```powershell
-# Import PSDocs module
-Import-Module -Name PSDocs;
+# Define a document called Sample
+Document Sample {
+    # Define content here
+}
+```
 
+Within the document body provide one or more instructions.
+
+For example:
+
+```powershell
 # Define a document called Sample
 Document Sample {
 
@@ -39,35 +55,9 @@ Document Sample {
         Get-ChildItem -Path $InputObject | Table -Property Name,PSIsContainer
     }
 }
-
-# Call the document definition as a function to generate markdown from an object
-Sample -InputObject 'C:\';
 ```
 
-An example of the output generated is available [here](/docs/examples/Get-child-item-output.md).
-
-### Generate documentation from Desired State Configuration
-
-```powershell
-# Import PSDocs.Dsc module
-Import-Module -Name PSDocs.Dsc;
-
-# Define a document called Sample
-Document 'Sample' {
-
-    # Add an 'Installed features' section in the document
-    Section 'Installed features' {
-        # Add a comment
-        'The following Windows features have been installed.'
-
-        # Generate a table of Windows Features
-        $InputObject.ResourceType.WindowsFeature | Table -Property Name,Ensure
-    }
-}
-
-# Call the document definition and generate markdown for each .mof file in the .\nodes directory
-Invoke-DscNodeDocument -DocumentName 'Sample' -Path '.\nodes' -OutputPath '.\docs';
-```
+An example of the output generated is available [here](docs/examples/Get-child-item-output.md).
 
 ### Scenarios
 
@@ -97,14 +87,14 @@ The following language keywords are used by the `PSDocs` module:
 
 The following commands exist in the `PSDocs` module:
 
-- [Invoke-PSDocument](/docs/commands/PSDocs/en-US/Invoke-PSDocument.md)
-- [Get-PSDocumentHeader](/docs/commands/PSDocs/en-US/Get-PSDocumentHeader.md)
-- [New-PSDocumentOption](/docs/commands/PSDocs/en-US/New-PSDocumentOption.md)
+- [Invoke-PSDocument](docs/commands/PSDocs/en-US/Invoke-PSDocument.md)
+- [Get-PSDocumentHeader](docs/commands/PSDocs/en-US/Get-PSDocumentHeader.md)
+- [New-PSDocumentOption](docs/commands/PSDocs/en-US/New-PSDocumentOption.md)
 
 The following commands exist in the `PSDocs.Dsc` module:
 
-- [Get-DscMofDocument](/docs/commands/PSDocs.Dsc/en-US/Get-DscMofDocument.md)
-- [Invoke-DscNodeDocument](/docs/commands/PSDocs.Dsc/en-US/Invoke-DscNodeDocument.md)
+- [Get-DscMofDocument](docs/commands/PSDocs.Dsc/en-US/Get-DscMofDocument.md)
+- [Invoke-DscNodeDocument](docs/commands/PSDocs.Dsc/en-US/Invoke-DscNodeDocument.md)
 
 ### Concepts
 
@@ -124,6 +114,14 @@ The following conceptual topics exist in the `PSDocs` module:
   - [$InputObject](docs/concepts/PSDocs/en-US/about_PSDocs_Variables.md#inputobject)
   - [$Section](docs/concepts/PSDocs/en-US/about_PSDocs_Variables.md#section)
 
+## Related projects
+
+The following projects use or integrate with PSDocs.
+
+Name          | Description
+----          | -----------
+[PSDocs.Dsc]  | Extension for PSDocs to generate markdown from Desired State Configuration.
+
 ## Changes and versioning
 
 Modules in this repository will use the [semantic versioning](http://semver.org/) model to declare breaking changes from v1.0.0. Prior to v1.0.0, breaking changes may be introduced in minor (0.x.0) version increments. For a list of module changes please see the [change log](CHANGELOG.md).
@@ -137,10 +135,9 @@ Modules in this repository will use the [semantic versioning](http://semver.org/
 This project is [licensed under the MIT License](LICENSE).
 
 [install]: docs/scenarios/install-instructions.md
+[issues]: https://github.com/BernieWhite/PSDocs/issues
 [ci-badge]: https://bewhite.visualstudio.com/PSDocs/_apis/build/status/PSDocs-CI?branchName=master
 [psg-psdocs]: https://www.powershellgallery.com/packages/PSDocs
 [psg-psdocs-version-badge]: https://img.shields.io/powershellgallery/v/PSDocs.svg
 [psg-psdocs-installs-badge]: https://img.shields.io/powershellgallery/dt/PSDocs.svg
-[psg-psdocsdsc]: https://www.powershellgallery.com/packages/PSDocs.Dsc
-[psg-psdocsdsc-version-badge]: https://img.shields.io/powershellgallery/v/PSDocs.Dsc.svg
-[psg-psdocsdsc-installs-badge]: https://img.shields.io/powershellgallery/dt/PSDocs.Dsc.svg
+[PSDocs.Dsc]: https://www.powershellgallery.com/packages/PSDocs.Dsc
