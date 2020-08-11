@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>netcoreapp3.0</TargetFrameworks>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ProjectGuid>{a9f68ba6-1381-4e35-a619-a948d47ec752}</ProjectGuid>
   </PropertyGroup>
@@ -14,7 +14,7 @@
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.12.1" />
     <PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.1.1" />
-    <PackageReference Include="Microsoft.PowerShell.SDK" Version="6.2.4" />
+    <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.0.3" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(OS)' == 'Windows_NT'">
