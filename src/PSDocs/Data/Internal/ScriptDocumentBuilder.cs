@@ -22,7 +22,7 @@ namespace PSDocs.Data.Internal
         private static Stack<SectionNode> _Parent;
 
         // Track whether Dispose has been called.
-        private bool _Disposed = false;
+        private bool _Disposed;
 
         internal ScriptDocumentBuilder(ScriptDocumentBlock block)
         {
@@ -38,7 +38,7 @@ namespace PSDocs.Data.Internal
             context.EnterBuilder(this);
             try
             {
-                _Current = _Document = new Document(_Block.Name);
+                _Current = _Document = new Document(_Block.Name, context.Culture);
                 _Parent = new Stack<SectionNode>();
                 _Document.AddNodes(_Block.Body.Invoke());
                 return _Document;

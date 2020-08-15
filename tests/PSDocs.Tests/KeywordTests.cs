@@ -37,7 +37,7 @@ namespace PSDocs
 
         private static Document[] BuildDocument(string documentName)
         {
-            var builder = PipelineBuilder.Invoke(GetSource(), GetOption(new string[] { documentName }));
+            var builder = PipelineBuilder.Invoke(GetSource(), GetOption(new string[] { documentName }), null, null);
             var pipeline = builder.Build() as InvokePipeline;
             var targetObject = PSObject.AsPSObject(new TestModel());
             return pipeline.BuildDocument(targetObject);
@@ -55,7 +55,7 @@ namespace PSDocs
 
         private static Source[] GetSource()
         {
-            var builder = new SourceBuilder();
+            var builder = new SourceBuilder(new HostContext(null, null));
             builder.Directory(GetSourcePath("FromFile.Keyword.Doc.ps1"));
             return builder.Build();
         }

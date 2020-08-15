@@ -29,7 +29,7 @@ Describe 'PSDocs -- Include keyword' -Tag Include {
         $invokeParams = @{
             Path = $docFilePath
             OutputPath = $outputPath
-            PassThru = $True
+            # PassThru = $True
         }
 
         It 'Should include a relative path' {
@@ -50,7 +50,7 @@ Describe 'PSDocs -- Include keyword' -Tag Include {
         }
 
         It 'Should include from culture' {
-            $result = Invoke-PSDocument @invokeParams -Culture 'en-AU','en-US' -Name 'IncludeAbsolute';
+            $result = Invoke-PSDocument @invokeParams -Culture 'en-AU','en-US' -Name 'IncludeCulture';
 
             $outputDoc = "$outputPath\en-AU\IncludeCulture.md";
             Test-Path -Path $outputDoc | Should -Be $True;

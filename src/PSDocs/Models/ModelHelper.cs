@@ -7,7 +7,7 @@ namespace PSDocs.Models
     {
         public static Document NewDocument()
         {
-            return new Document(null);
+            return new Document(null, null);
         }
 
         public static Section NewSection(string name, int level)

@@ -41,7 +41,7 @@ namespace PSDocs.Benchmark
         private void PrepareInvokePipeline()
         {
             var option = GetOption();
-            var builder = PipelineBuilder.Invoke(GetSource(), option);
+            var builder = PipelineBuilder.Invoke(GetSource(), option, null, null);
             var pipeline = builder.Build();
             _InvokePipeline = pipeline.Process;
         }
@@ -56,7 +56,7 @@ namespace PSDocs.Benchmark
 
         private static Document GetDocument()
         {
-            var result = new Document("test-benchmark")
+            var result = new Document("test-benchmark", null)
             {
                 Title = "Test document"
             };

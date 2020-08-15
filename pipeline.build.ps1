@@ -177,6 +177,7 @@ task BuildHelp BuildModule, PlatyPS, {
     # Copy generated help into module out path
     $Null = Copy-Item -Path out/docs/PSDocs/* -Destination out/modules/PSDocs/en-US;
     $Null = Copy-Item -Path out/docs/PSDocs/* -Destination out/modules/PSDocs/en-AU;
+    $Null = Copy-Item -Path out/docs/PSDocs/* -Destination out/modules/PSDocs/en-GB;
 }
 
 task ScaffoldHelp BuildModule, {

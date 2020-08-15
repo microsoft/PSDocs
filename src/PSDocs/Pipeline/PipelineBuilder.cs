@@ -1,5 +1,6 @@
 
 using PSDocs.Configuration;
+using PSDocs.Pipeline.Output;
 using PSDocs.Processor;
 using System;
 using System.IO;
@@ -10,31 +11,31 @@ namespace PSDocs.Pipeline
 {
     public static class PipelineBuilder
     {
-        public static IInvokePipelineBuilder Invoke(Source[] source, PSDocumentOption option)
+        public static IInvokePipelineBuilder Invoke(Source[] source, PSDocumentOption option, PSCmdlet commandRuntime, EngineIntrinsics executionContext)
         {
-            var builder = new InvokePipelineBuilder(source);
+            var hostContext = new HostContext(commandRuntime, executionContext);
+            var builder = new InvokePipelineBuilder(source, hostContext);
             builder.Configure(option);
             return builder;
         }
 
-        public static SourceBuilder Source()
+        public static SourceBuilder Source(PSDocumentOption option, PSCmdlet commandRuntime, EngineIntrinsics executionContext)
         {
-            return new SourceBuilder();
+            var hostContext = new HostContext(commandRuntime, executionContext);
+            var builder = new SourceBuilder(hostContext);
+            builder.Configure(option);
+            return builder;
         }
     }
 
     public interface IPipelineBuilder
     {
-        void UseCommandRuntime(ICommandRuntime2 commandRuntime);
-
-        void UseExecutionContext(EngineIntrinsics executionContext);
-
         IPipelineBuilder Configure(PSDocumentOption option);
 
         IPipeline Build();
     }
 
-    public interface IPipeline
+    public interface IPipeline : IPipelineDisposable
     {
         void Process(PSObject sourceObject);
     }
@@ -43,26 +44,17 @@ namespace PSDocs.Pipeline
     {
         protected readonly Source[] Source;
         protected readonly PSDocumentOption Option;
-        protected readonly PipelineLogger Logger;
+        protected readonly IPipelineWriter Writer;
 
         protected Action<IDocumentResult, bool> OutputVisitor;
 
-        internal PipelineBuilderBase(Source[] source)
+        internal PipelineBuilderBase(Source[] source, HostContext hostContext)
         {
             Option = new PSDocumentOption();
+            
             Source = source;
-            Logger = new PipelineLogger();
-            OutputVisitor = (o, enumerate) => WriteToString(o, enumerate, Logger);
-        }
-
-        public virtual void UseCommandRuntime(ICommandRuntime2 commandRuntime)
-        {
-            Logger.UseCommandRuntime(commandRuntime);
-        }
-
-        public void UseExecutionContext(EngineIntrinsics executionContext)
-        {
-            Logger.UseExecutionContext(executionContext);
+            Writer = new HostPipelineWriter(hostContext);
+            OutputVisitor = (o, enumerate) => WriteToString(o, enumerate, Writer);
         }
 
         public virtual IPipelineBuilder Configure(PSDocumentOption option)
@@ -74,7 +66,7 @@ namespace PSDocs.Pipeline
 
             if (!string.IsNullOrEmpty(Option.Output.Path))
             {
-                OutputVisitor = (o, enumerate) => WriteToFile(o, enumerate, Option, Logger);
+                OutputVisitor = (o, enumerate) => WriteToFile(o, enumerate, Option, Writer);
             }
 
             ConfigureCulture();
@@ -85,10 +77,10 @@ namespace PSDocs.Pipeline
 
         protected virtual PipelineContext PrepareContext()
         {
-            return new PipelineContext(Option, Logger, OutputVisitor, null);
+            return new PipelineContext(Option, Writer, OutputVisitor, null);
         }
 
-        private static void WriteToFile(IDocumentResult result, bool enumerate, PSDocumentOption option, PipelineLogger logger)
+        private static void WriteToFile(IDocumentResult result, bool enumerate, PSDocumentOption option, IPipelineWriter writer)
         {
             var outputPath = PSDocumentOption.GetRootedPath(option.Output.Path);
             var filePath = Path.Combine(outputPath, result.Name);
@@ -97,12 +89,12 @@ namespace PSDocs.Pipeline
 
             // Write file info instead
             var fileInfo = new FileInfo(filePath);
-            logger.WriteObject(fileInfo, false);
+            writer.WriteObject(fileInfo, false);
         }
 
-        private static void WriteToString(IDocumentResult result, bool enumerate, PipelineLogger logger)
+        private static void WriteToString(IDocumentResult result, bool enumerate, IPipelineWriter writer)
         {
-            logger.WriteObject(result.ToString(), enumerate);
+            writer.WriteObject(result.ToString(), enumerate);
         }
 
         private static Encoding GetEncoding(MarkdownEncoding encoding)
@@ -141,12 +133,27 @@ namespace PSDocs.Pipeline
         protected readonly Source[] Source;
 
         // Track whether Dispose has been called.
-        private bool _Disposed = false;
+        private bool _Disposed;
 
         protected PipelineBase(PipelineContext context, Source[] source)
         {
             Context = context;
             Source = source;
+        }
+
+        public virtual void Begin()
+        {
+            // Do nothing
+        }
+
+        public virtual void Process(PSObject sourceObject)
+        {
+            // Do nothing
+        }
+
+        public virtual void End()
+        {
+            // Do nothing
         }
 
         #region IDisposable

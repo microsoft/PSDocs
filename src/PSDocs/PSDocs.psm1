@@ -139,10 +139,8 @@ function Invoke-PSDocument {
         # $PSDocs.InstanceName = $InstanceName;
         # $PSDocs.Culture = $Culture;
 
-        $builder = [PSDocs.Pipeline.PipelineBuilder]::Invoke($sourceFiles, $Option);
+        $builder = [PSDocs.Pipeline.PipelineBuilder]::Invoke($sourceFiles, $Option, $PSCmdlet, $ExecutionContext);
         $builder.InstanceName($InstanceName);
-        $builder.UseCommandRuntime($PSCmdlet.CommandRuntime);
-        $builder.UseExecutionContext($ExecutionContext);
         $pipeline = $builder.Build();
         try {
             $pipeline.Begin();
@@ -840,9 +838,7 @@ function GetSource {
         [PSDocs.Configuration.PSDocumentOption]$Option
     )
     process {
-        $builder = [PSDocs.Pipeline.PipelineBuilder]::Source().Configure($Option);
-        $builder.UseCommandRuntime($PSCmdlet.CommandRuntime);
-        $builder.UseExecutionContext($ExecutionContext);
+        $builder = [PSDocs.Pipeline.PipelineBuilder]::Source($Option, $PSCmdlet, $ExecutionContext);
 
         if ($PSBoundParameters.ContainsKey('Path')) {
             try {

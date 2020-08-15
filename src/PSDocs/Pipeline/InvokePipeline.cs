@@ -1,5 +1,4 @@
-﻿
-using PSDocs.Data;
+﻿using PSDocs.Data;
 using PSDocs.Models;
 using PSDocs.Processor;
 using PSDocs.Processor.Markdown;
@@ -18,8 +17,8 @@ namespace PSDocs.Pipeline
     {
         private string[] _InstanceName;
 
-        internal InvokePipelineBuilder(Source[] source)
-            : base(source)
+        internal InvokePipelineBuilder(Source[] source, HostContext hostContext)
+            : base(source, hostContext)
         {
             // Do nothing
         }
@@ -40,7 +39,7 @@ namespace PSDocs.Pipeline
         protected override PipelineContext PrepareContext()
         {
             var instanceNameBinder = new InstanceNameBinder(_InstanceName);
-            var context = new PipelineContext(Option, Logger, OutputVisitor, instanceNameBinder);
+            var context = new PipelineContext(Option, Writer, OutputVisitor, instanceNameBinder);
             return context;
         }
     }
@@ -60,12 +59,7 @@ namespace PSDocs.Pipeline
             Prepare();
         }
 
-        public void Begin()
-        {
-
-        }
-
-        public void Process(PSObject sourceObject)
+        public override void Process(PSObject sourceObject)
         {
             //if (sourceObject != null)
             //{
@@ -74,11 +68,6 @@ namespace PSDocs.Pipeline
 
             while (!_Stream.IsEmpty && _Stream.TryDequeue(out PSObject nextObject))
                 ProcessObject(nextObject);
-        }
-
-        public void End()
-        {
-
         }
 
         private void ProcessObject(PSObject sourceObject)
@@ -130,6 +119,8 @@ namespace PSDocs.Pipeline
             _Processor = new MarkdownProcessor();
         }
 
+        #region IDisposable
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)
@@ -147,5 +138,7 @@ namespace PSDocs.Pipeline
             }
             base.Dispose(disposing);
         }
+
+        #endregion IDisposable
     }
 }

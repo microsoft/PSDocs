@@ -5,10 +5,12 @@ namespace PSDocs.Models
     public sealed class Document : SectionNode
     {
         public readonly string Name;
+        public readonly string Culture;
 
-        public Document(string name)
+        public Document(string name, string culture)
         {
             Name = name;
+            Culture = culture;
             Metadata = new OrderedDictionary();
         }
 

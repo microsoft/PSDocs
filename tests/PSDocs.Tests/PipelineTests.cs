@@ -22,7 +22,7 @@ namespace PSDocs
         [Fact]
         public void InvokePipeline()
         {
-            var builder = PipelineBuilder.Invoke(GetSource(), GetOption(new string[] { "FromFileTest1" }));
+            var builder = PipelineBuilder.Invoke(GetSource(), GetOption(new string[] { "FromFileTest1" }), null, null);
             var pipeline = builder.Build() as InvokePipeline;
             var targetObject = PSObject.AsPSObject(new TestModel());
 
@@ -44,7 +44,7 @@ namespace PSDocs
 
         private static Source[] GetSource()
         {
-            var builder = new SourceBuilder();
+            var builder = new SourceBuilder(new HostContext(null, null));
             builder.Directory(GetSourcePath("FromFile.Doc.ps1"));
             return builder.Build();
         }

@@ -20,7 +20,7 @@ namespace PSDocs.Runtime
         private Runspace _Runspace;
 
         // Track whether Dispose has been called.
-        private bool _Disposed = false;
+        private bool _Disposed;
 
         public RunspaceContext(PipelineContext pipeline, Source[] source)
         {
@@ -150,8 +150,11 @@ namespace PSDocs.Runtime
 
         internal void WriteRuntimeException(string sourceFile, Exception inner)
         {
+            if (Pipeline == null || Pipeline.Writer == null)
+                return;
+
             var record = new ErrorRecord(new PSDocs.Pipeline.RuntimeException(sourceFile: sourceFile, innerException: inner), "PSDocs.Pipeline.RuntimeException", ErrorCategory.InvalidOperation, null);
-            Pipeline.Logger.WriteError(record);
+            Pipeline.Writer.WriteError(record);
         }
 
         internal static void ThrowRuntimeException(string sourceFile, Exception inner)
@@ -161,8 +164,8 @@ namespace PSDocs.Runtime
 
         private static void Debug_DataAdded(object sender, DataAddedEventArgs e)
         {
-            //if (CurrentThread._Logger == null)
-            //    return;
+            if (CurrentThread.Pipeline == null || CurrentThread.Pipeline.Writer == null)
+                return;
 
             var collection = sender as PSDataCollection<DebugRecord>;
             var record = collection[e.Index];
@@ -171,8 +174,8 @@ namespace PSDocs.Runtime
 
         private static void Information_DataAdded(object sender, DataAddedEventArgs e)
         {
-            //if (CurrentThread._Logger == null)
-            //    return;
+            if (CurrentThread.Pipeline == null || CurrentThread.Pipeline.Writer == null)
+                return;
 
             var collection = sender as PSDataCollection<InformationRecord>;
             var record = collection[e.Index];
@@ -181,32 +184,32 @@ namespace PSDocs.Runtime
 
         private static void Verbose_DataAdded(object sender, DataAddedEventArgs e)
         {
-            //if (CurrentThread._Logger == null)
-            //    return;
+            if (CurrentThread.Pipeline == null || CurrentThread.Pipeline.Writer == null)
+                return;
 
             var collection = sender as PSDataCollection<VerboseRecord>;
             var record = collection[e.Index];
-            //CurrentThread._Logger.WriteVerbose(record.Message);
+            CurrentThread.Pipeline.Writer.WriteVerbose(record.Message);
         }
 
         private static void Warning_DataAdded(object sender, DataAddedEventArgs e)
         {
-            //if (CurrentThread._Logger == null)
-            //    return;
+            if (CurrentThread.Pipeline == null || CurrentThread.Pipeline.Writer == null)
+                return;
 
             var collection = sender as PSDataCollection<WarningRecord>;
             var record = collection[e.Index];
-            //CurrentThread._Logger.WriteWarning(message: record.Message);
+            CurrentThread.Pipeline.Writer.WriteWarning(record.Message);
         }
 
         private static void Error_DataAdded(object sender, DataAddedEventArgs e)
         {
-            //if (CurrentThread._Logger == null)
-            //    return;
+            if (CurrentThread.Pipeline == null || CurrentThread.Pipeline.Writer == null)
+                return;
 
             var collection = sender as PSDataCollection<ErrorRecord>;
             var record = collection[e.Index];
-            //CurrentThread._Logger.WriteError(errorRecord: record);
+            CurrentThread.Pipeline.Writer.WriteError(record);
         }
 
         #endregion Logging

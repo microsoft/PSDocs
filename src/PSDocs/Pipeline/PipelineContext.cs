@@ -14,20 +14,20 @@ namespace PSDocs.Pipeline
         internal readonly PSDocumentOption Option;
         internal readonly LanguageMode LanguageMode;
         internal readonly DocumentFilter Filter;
-        internal readonly PipelineLogger Logger;
+        internal readonly IPipelineWriter Writer;
         internal readonly InstanceNameBinder InstanceNameBinder;
 
         private readonly Action<IDocumentResult, bool> _OutputVisitor;
 
         // Track whether Dispose has been called.
-        private bool _Disposed = false;
+        private bool _Disposed;
 
-        public PipelineContext(PSDocumentOption option, PipelineLogger logger, Action<IDocumentResult, bool> _Output, InstanceNameBinder instanceNameBinder)
+        public PipelineContext(PSDocumentOption option, IPipelineWriter writer, Action<IDocumentResult, bool> _Output, InstanceNameBinder instanceNameBinder)
         {
             Option = option;
             LanguageMode = option.Execution.LanguageMode.GetValueOrDefault(ExecutionOption.Default.LanguageMode.Value);
             Filter = DocumentFilter.Create(Option.Document.Include, Option.Document.Tag);
-            Logger = logger;
+            Writer = writer;
             InstanceNameBinder = instanceNameBinder;
 
             _OutputVisitor = _Output;

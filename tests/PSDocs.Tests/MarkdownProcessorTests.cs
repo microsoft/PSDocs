@@ -21,7 +21,7 @@ namespace PSDocs
 
         private static Document GetDocument()
         {
-            var result = new Document(null)
+            var result = new Document(null, null)
             {
                 Title = "Test document"
             };

@@ -1,4 +1,5 @@
 ﻿using PSDocs.Configuration;
+using PSDocs.Pipeline.Output;
 using PSDocs.Resources;
 using System.Collections;
 using System.Collections.Generic;
@@ -76,56 +77,34 @@ namespace PSDocs.Pipeline
     public sealed class SourceBuilder
     {
         private readonly List<Source> _Source;
-        private readonly PipelineLogger _Logger;
+        private readonly IPipelineWriter _Writer;
 
-        internal SourceBuilder()
+        internal SourceBuilder(HostContext hostContext)
         {
             _Source = new List<Source>();
-            _Logger = new PipelineLogger();
+            _Writer = new HostPipelineWriter(hostContext);
         }
 
         public SourceBuilder Configure(PSDocumentOption option)
         {
-            _Logger.Configure(option);
-            _Logger.EnterScope("[Discovery.Source]");
+            //_Writer.Configure(option);
+            //_Writer.EnterScope("[Discovery.Source]");
             return this;
-        }
-
-        public void UseCommandRuntime(ICommandRuntime2 commandRuntime)
-        {
-            _Logger.UseCommandRuntime(commandRuntime);
-        }
-
-        public void UseExecutionContext(EngineIntrinsics executionContext)
-        {
-            _Logger.UseExecutionContext(executionContext);
         }
 
         public void VerboseScanSource(string path)
         {
-            if (!_Logger.ShouldWriteVerbose())
-            {
-                return;
-            }
-            _Logger.WriteVerbose(string.Format(Thread.CurrentThread.CurrentCulture, PSDocsResources.ScanSource, path));
+            _Writer.WriteVerbose(PSDocsResources.ScanSource, path);
         }
 
         public void VerboseFoundModules(int count)
         {
-            if (!_Logger.ShouldWriteVerbose())
-            {
-                return;
-            }
-            _Logger.WriteVerbose(string.Format(Thread.CurrentThread.CurrentCulture, PSDocsResources.FoundModules, count));
+            _Writer.WriteVerbose(PSDocsResources.FoundModules, count);
         }
 
         public void VerboseScanModule(string moduleName)
         {
-            if (!_Logger.ShouldWriteVerbose())
-            {
-                return;
-            }
-            _Logger.WriteVerbose(string.Format(Thread.CurrentThread.CurrentCulture, PSDocsResources.ScanModule, moduleName));
+            _Writer.WriteVerbose(PSDocsResources.ScanModule, moduleName);
         }
 
         /// <summary>

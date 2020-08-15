@@ -1,5 +1,6 @@
 ﻿using PSDocs.Configuration;
 using PSDocs.Models;
+using System.Diagnostics;
 using System.IO;
 
 namespace PSDocs.Processor.Markdown
@@ -14,14 +15,17 @@ namespace PSDocs.Processor.Markdown
         private sealed class DocumentResult : IDocumentResult
         {
             private readonly string _Name;
+            private readonly string _Culture;
             private readonly string _Markdown;
 
-            internal DocumentResult(string name, string markdown)
+            internal DocumentResult(string name, string culture, string markdown)
             {
                 _Name = string.Concat(name, ".md");
+                _Culture = culture;
                 _Markdown = markdown;
             }
 
+            [DebuggerStepThrough]
             public override string ToString()
             {
                 return _Markdown;
@@ -31,6 +35,11 @@ namespace PSDocs.Processor.Markdown
             {
                 get { return _Name; }
             }
+
+            string IDocumentResult.Culture
+            {
+                get { return _Culture; }
+            }
         }
 
         public IDocumentResult Process(PSDocumentOption option, Document document, string instanceName)
@@ -39,9 +48,10 @@ namespace PSDocs.Processor.Markdown
                 return null;
 
             var name = instanceName ?? document.Name;
+            var culture = document.Culture;
             var context = new MarkdownProcessorContext(option, document);
             Document(context);
-            return new DocumentResult(name: name, markdown: context.GetString());
+            return new DocumentResult(name, culture, markdown: context.GetString());
         }
 
         private void Document(MarkdownProcessorContext context)
