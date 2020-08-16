@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## v0.7.0-B2008022 (pre-release)
+
+What's changed since v0.6.3:
+
 - Engine features:
   - Added support for MacOS and Linux. [#59](https://github.com/BernieWhite/PSDocs/issues/59)
 - Deprecations and removals:
