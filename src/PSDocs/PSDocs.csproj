@@ -13,7 +13,7 @@
     <Authors>Bernie White</Authors>
     <AssemblyTitle>PSDocs</AssemblyTitle>
     <RepositoryUrl>https://github.com/BernieWhite/PSDocs</RepositoryUrl>
-    <PackageLicenseExpression>https://github.com/BernieWhite/PSDocs/blob/master/LICENSE</PackageLicenseExpression>
+    <PackageLicenseExpression>https://github.com/BernieWhite/PSDocs/blob/main/LICENSE</PackageLicenseExpression>
     <Version>0.0.1</Version>
     <Copyright>(c) Bernie White. All rights reserved.</Copyright>
     <Description>Generate markdown from objects using PowerShell syntax.

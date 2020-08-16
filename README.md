@@ -152,7 +152,7 @@ This project is [licensed under the MIT License](LICENSE).
 
 [install]: docs/install-instructions.md
 [issues]: https://github.com/BernieWhite/PSDocs/issues
-[ci-badge]: https://bewhite.visualstudio.com/PSDocs/_apis/build/status/PSDocs-CI?branchName=master
+[ci-badge]: https://bewhite.visualstudio.com/PSDocs/_apis/build/status/PSDocs-CI?branchName=main
 [psg-psdocs]: https://www.powershellgallery.com/packages/PSDocs
 [psg-psdocs-version-badge]: https://img.shields.io/powershellgallery/v/PSDocs.svg
 [psg-psdocs-installs-badge]: https://img.shields.io/powershellgallery/dt/PSDocs.svg
