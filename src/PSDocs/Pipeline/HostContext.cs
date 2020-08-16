@@ -59,5 +59,13 @@ namespace PSDocs.Pipeline
 
             return (ActionPreference)ExecutionContext.SessionState.PSVariable.GetValue(variableName);
         }
+
+        public bool ShouldProcess(string target, string action)
+        {
+            if (CommandRuntime == null)
+                return true;
+
+            return CommandRuntime.ShouldProcess(target, action);
+        }
     }
 }

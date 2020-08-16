@@ -2,6 +2,7 @@
 using PSDocs.Configuration;
 using PSDocs.Pipeline.Output;
 using PSDocs.Processor;
+using PSDocs.Resources;
 using System;
 using System.IO;
 using System.Management.Automation;
@@ -9,6 +10,8 @@ using System.Text;
 
 namespace PSDocs.Pipeline
 {
+    internal delegate bool ShouldProcess(string target, string action);
+
     public static class PipelineBuilder
     {
         public static IInvokePipelineBuilder Invoke(Source[] source, PSDocumentOption option, PSCmdlet commandRuntime, EngineIntrinsics executionContext)
@@ -45,15 +48,18 @@ namespace PSDocs.Pipeline
         protected readonly Source[] Source;
         protected readonly PSDocumentOption Option;
         protected readonly IPipelineWriter Writer;
+        protected readonly ShouldProcess ShouldProcess;
 
         protected Action<IDocumentResult, bool> OutputVisitor;
+
+        private static readonly ShouldProcess EmptyShouldProcess = (target, action) => true;
 
         internal PipelineBuilderBase(Source[] source, HostContext hostContext)
         {
             Option = new PSDocumentOption();
-            
             Source = source;
             Writer = new HostPipelineWriter(hostContext);
+            ShouldProcess = hostContext == null ? EmptyShouldProcess : hostContext.ShouldProcess;
             OutputVisitor = (o, enumerate) => WriteToString(o, enumerate, Writer);
         }
 
@@ -66,7 +72,7 @@ namespace PSDocs.Pipeline
 
             if (!string.IsNullOrEmpty(Option.Output.Path))
             {
-                OutputVisitor = (o, enumerate) => WriteToFile(o, enumerate, Option, Writer);
+                OutputVisitor = (o, enumerate) => WriteToFile(o, Option, Writer, ShouldProcess);
             }
 
             ConfigureCulture();
@@ -80,16 +86,26 @@ namespace PSDocs.Pipeline
             return new PipelineContext(Option, Writer, OutputVisitor, null);
         }
 
-        private static void WriteToFile(IDocumentResult result, bool enumerate, PSDocumentOption option, IPipelineWriter writer)
+        private static void WriteToFile(IDocumentResult result, PSDocumentOption option, IPipelineWriter writer, ShouldProcess shouldProcess)
         {
-            var outputPath = PSDocumentOption.GetRootedPath(option.Output.Path);
-            var filePath = Path.Combine(outputPath, result.Name);
-            var encoding = GetEncoding(option.Markdown.Encoding);
-            File.WriteAllText(filePath, result.ToString(), encoding);
+            var rootedPath = PSDocumentOption.GetRootedPath(option.Output.Path);
+            var filePath = !string.IsNullOrEmpty(result.Culture) && option.Output?.Culture?.Length > 1 ?
+                Path.Combine(rootedPath, result.Culture, result.Name) : Path.Combine(rootedPath, result.Name);
+            var parentPath = Directory.GetParent(filePath);
 
-            // Write file info instead
-            var fileInfo = new FileInfo(filePath);
-            writer.WriteObject(fileInfo, false);
+            if (!parentPath.Exists && shouldProcess(target: parentPath.FullName, action: PSDocsResources.ShouldCreatePath))
+            {
+                Directory.CreateDirectory(path: parentPath.FullName);
+            }
+            if (shouldProcess(target: rootedPath, action: PSDocsResources.ShouldWriteFile))
+            {
+                var encoding = GetEncoding(option.Markdown.Encoding);
+                File.WriteAllText(filePath, result.ToString(), encoding);
+
+                // Write file info instead
+                var fileInfo = new FileInfo(filePath);
+                writer.WriteObject(fileInfo, false);
+            }
         }
 
         private static void WriteToString(IDocumentResult result, bool enumerate, IPipelineWriter writer)

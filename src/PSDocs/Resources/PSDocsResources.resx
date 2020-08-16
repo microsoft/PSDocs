@@ -133,6 +133,12 @@
   <data name="ScriptNotFound" xml:space="preserve">
     <value>The script was not found.</value>
   </data>
+  <data name="ShouldCreatePath" xml:space="preserve">
+    <value>Create path</value>
+  </data>
+  <data name="ShouldWriteFile" xml:space="preserve">
+    <value>Write file</value>
+  </data>
   <data name="SourceNotFound" xml:space="preserve">
     <value>The source was not found.</value>
     <comment>Occurs when the source file specified does not exist.</comment>
