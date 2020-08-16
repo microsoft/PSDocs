@@ -54,7 +54,7 @@ namespace PSDocs.Processor.Markdown
             return new DocumentResult(name, culture, markdown: context.GetString());
         }
 
-        private void Document(MarkdownProcessorContext context)
+        private static void Document(MarkdownProcessorContext context)
         {
             // Process metadata
             Metadata(context);
@@ -73,7 +73,7 @@ namespace PSDocs.Processor.Markdown
             context.EndDocument();
         }
 
-        private void Metadata(MarkdownProcessorContext context)
+        private static void Metadata(MarkdownProcessorContext context)
         {
             // Only write metadata block if there is at least one metadata property set
             if (context.Document.Metadata == null || context.Document.Metadata.Count == 0)
@@ -88,7 +88,7 @@ namespace PSDocs.Processor.Markdown
             context.LineBreak();
         }
 
-        private void Node(MarkdownProcessorContext context, object node)
+        private static void Node(MarkdownProcessorContext context, object node)
         {
             if (node == null)
                 return;
@@ -126,12 +126,12 @@ namespace PSDocs.Processor.Markdown
             String(context, node.ToString());
         }
 
-        private void String(MarkdownProcessorContext context, string node)
+        private static void String(MarkdownProcessorContext context, string node)
         {
             context.WriteLine(node);
         }
 
-        private void Section(MarkdownProcessorContext context, Section section)
+        private static void Section(MarkdownProcessorContext context, Section section)
         {
             context.WriteHeaderHash(section.Level);
             context.Write(section.Title);
@@ -143,7 +143,7 @@ namespace PSDocs.Processor.Markdown
             }
         }
 
-        private void BlockQuote(MarkdownProcessorContext context, BlockQuote node)
+        private static void BlockQuote(MarkdownProcessorContext context, BlockQuote node)
         {
             context.LineBreak();
             if (!string.IsNullOrEmpty(node.Info))
@@ -165,7 +165,7 @@ namespace PSDocs.Processor.Markdown
             }
         }
 
-        private void Code(MarkdownProcessorContext context, Code code)
+        private static void Code(MarkdownProcessorContext context, Code code)
         {
             context.WriteTripleBacktick();
             if (!string.IsNullOrEmpty(code.Info))
@@ -177,19 +177,19 @@ namespace PSDocs.Processor.Markdown
             context.LineBreak();
         }
 
-        private void Text(MarkdownProcessorContext context, Text text)
+        private static void Text(MarkdownProcessorContext context, Text text)
         {
             context.WriteLine(text.Content);
             context.LineBreak();
         }
 
-        private void Include(MarkdownProcessorContext context, Include include)
+        private static void Include(MarkdownProcessorContext context, Include include)
         {
             var text = File.ReadAllText(include.Path);
             context.WriteLine(text);
         }
 
-        private void Table(MarkdownProcessorContext context, Table table)
+        private static void Table(MarkdownProcessorContext context, Table table)
         {
             if (table.Headers == null || table.Headers.Count == 0)
                 return;
@@ -317,7 +317,7 @@ namespace PSDocs.Processor.Markdown
             context.LineBreak();
         }
 
-        private void StartColumn(MarkdownProcessorContext context, int index, int last, bool useEdgePipe, bool padBeforePipe, bool padAfterPipe)
+        private static void StartColumn(MarkdownProcessorContext context, int index, int last, bool useEdgePipe, bool padBeforePipe, bool padAfterPipe)
         {
             if (index > 0 && padBeforePipe)
             {
@@ -333,7 +333,7 @@ namespace PSDocs.Processor.Markdown
             }
         }
 
-        private string WrapText(MarkdownProcessorContext context, string text)
+        private static string WrapText(MarkdownProcessorContext context, string text)
         {
             var separator = context.Option.Markdown.WrapSeparator;
             var formatted = text;

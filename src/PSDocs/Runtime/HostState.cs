@@ -8,11 +8,26 @@ namespace PSDocs.Runtime
 {
     internal static class HostState
     {
-        public sealed class InstanceName : PSVariable
+        public sealed class PSDocsVariable : PSVariable
+        {
+            internal const string VariableName = "PSDocs";
+
+            private readonly PSDocs _Value;
+
+            public PSDocsVariable()
+                : base(VariableName, null, ScopedItemOptions.ReadOnly)
+            {
+                _Value = new PSDocs();
+            }
+
+            public override object Value => _Value;
+        }
+
+        public sealed class InstanceNameVariable : PSVariable
         {
             internal const string VariableName = "InstanceName";
 
-            public InstanceName()
+            public InstanceNameVariable()
                 : base(VariableName, null, ScopedItemOptions.ReadOnly) { }
 
             public override object Value
@@ -24,31 +39,31 @@ namespace PSDocs.Runtime
             }
         }
 
-        public sealed class TargetObject : PSVariable
+        public sealed class TargetObjectVariable : PSVariable
         {
             internal const string VariableName = "TargetObject";
 
-            public TargetObject()
+            public TargetObjectVariable()
                 : base(VariableName, null, ScopedItemOptions.ReadOnly) { }
 
             public override object Value => RunspaceContext.CurrentThread.TargetObject;
         }
 
-        public sealed class InputObject : PSVariable
+        public sealed class InputObjectVariable : PSVariable
         {
             internal const string VariableName = "InputObject";
 
-            public InputObject()
+            public InputObjectVariable()
                 : base(VariableName, null, ScopedItemOptions.ReadOnly) { }
 
             public override object Value => RunspaceContext.CurrentThread.TargetObject;
         }
 
-        public sealed class Document : PSVariable
+        public sealed class DocumentVariable : PSVariable
         {
             internal const string VariableName = "Document";
 
-            public Document()
+            public DocumentVariable()
                 : base(VariableName, null, ScopedItemOptions.ReadOnly) { }
 
             public override object Value => RunspaceContext.CurrentThread.Builder.Document;
@@ -103,7 +118,7 @@ namespace PSDocs.Runtime
             state.Commands.Add(BuiltInAliases);
 
             // Set execution policy
-            SetExecutionPolicy(state: state, executionPolicy: Microsoft.PowerShell.ExecutionPolicy.RemoteSigned);
+            SetExecutionPolicy(state, executionPolicy: Microsoft.PowerShell.ExecutionPolicy.RemoteSigned);
             return state;
         }
 

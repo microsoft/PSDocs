@@ -65,7 +65,7 @@ Create markdown using *.Doc.ps1 files loaded from the current working directory.
 
 ### -InputObject
 
-An input object that will be passed to each document and can be referenced within document blocks as `$InputObject`.
+An input object that will be passed to each document and can be referenced within document blocks as `$TargetObject`.
 
 ```yaml
 Type: PSObject
@@ -209,7 +209,7 @@ Type: String
 Parameter Sets: Path
 Aliases:
 
-Required: True
+Required: False
 Position: 0
 Default value: None
 Accept pipeline input: False

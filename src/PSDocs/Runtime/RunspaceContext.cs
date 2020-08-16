@@ -63,10 +63,11 @@ namespace PSDocs.Runtime
                     Runspace.DefaultRunspace = _Runspace;
 
                 _Runspace.Open();
-                _Runspace.SessionStateProxy.PSVariable.Set(new HostState.InstanceName());
-                _Runspace.SessionStateProxy.PSVariable.Set(new HostState.TargetObject());
-                _Runspace.SessionStateProxy.PSVariable.Set(new HostState.InputObject());
-                _Runspace.SessionStateProxy.PSVariable.Set(new HostState.Document());
+                _Runspace.SessionStateProxy.PSVariable.Set(new HostState.PSDocsVariable());
+                _Runspace.SessionStateProxy.PSVariable.Set(new HostState.InstanceNameVariable());
+                _Runspace.SessionStateProxy.PSVariable.Set(new HostState.TargetObjectVariable());
+                _Runspace.SessionStateProxy.PSVariable.Set(new HostState.InputObjectVariable());
+                _Runspace.SessionStateProxy.PSVariable.Set(new HostState.DocumentVariable());
                 _Runspace.SessionStateProxy.PSVariable.Set("ErrorActionPreference", ActionPreference.Continue);
                 _Runspace.SessionStateProxy.PSVariable.Set("WarningPreference", ActionPreference.Continue);
                 _Runspace.SessionStateProxy.PSVariable.Set("VerbosePreference", ActionPreference.Continue);
@@ -153,13 +154,13 @@ namespace PSDocs.Runtime
             if (Pipeline == null || Pipeline.Writer == null)
                 return;
 
-            var record = new ErrorRecord(new PSDocs.Pipeline.RuntimeException(sourceFile: sourceFile, innerException: inner), "PSDocs.Pipeline.RuntimeException", ErrorCategory.InvalidOperation, null);
+            var record = new ErrorRecord(new Pipeline.RuntimeException(sourceFile: sourceFile, innerException: inner), "PSDocs.Pipeline.RuntimeException", ErrorCategory.InvalidOperation, null);
             Pipeline.Writer.WriteError(record);
         }
 
         internal static void ThrowRuntimeException(string sourceFile, Exception inner)
         {
-            throw new PSDocs.Pipeline.RuntimeException(sourceFile: sourceFile, innerException: inner);
+            throw new Pipeline.RuntimeException(sourceFile: sourceFile, innerException: inner);
         }
 
         private static void Debug_DataAdded(object sender, DataAddedEventArgs e)
