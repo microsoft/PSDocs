@@ -1,7 +1,7 @@
-﻿using System;
-using System.Text;
-using PSDocs.Configuration;
+﻿using PSDocs.Configuration;
 using PSDocs.Models;
+using System;
+using System.Text;
 
 namespace PSDocs.Processor.Markdown
 {
@@ -9,75 +9,112 @@ namespace PSDocs.Processor.Markdown
     {
         private const char Space = ' ';
         private const char Pipe = '|';
+        private const char Hash = '#';
+        private const string TripleBacktick = "```";
+        private const string MARKDOWN_FRONTMATTER = "---";
 
         public readonly PSDocumentOption Option;
         public readonly Document Document;
+        private readonly StringBuilder Builder;
 
-        public readonly StringBuilder Builder;
+        private LineEnding _Ending;
 
-        public MarkdownProcessorContext(PSDocumentOption option, Document document)
+        internal MarkdownProcessorContext(PSDocumentOption option, Document document)
         {
             Option = option;
             Document = document;
-
             Builder = new StringBuilder();
+            _Ending = LineEnding.None;
         }
 
-        public void WriteLine(params string[] line)
+        internal string GetString()
+        {
+            return Builder.Length > 0 ? Builder.ToString() : null;
+        }
+
+        private enum LineEnding : byte
+        {
+            None = 0,
+            Normal = 1,
+            LineBreak = 2
+        }
+
+        internal void EndDocument()
+        {
+            Ending();
+            if (_Ending == LineEnding.LineBreak)
+                Builder.Remove(Builder.Length - Environment.NewLine.Length, Environment.NewLine.Length);
+        }
+
+        internal void LineBreak()
+        {
+            Ending(shouldBreak: true);
+        }
+
+        internal void Ending(bool shouldBreak = false)
+        {
+            if (_Ending == LineEnding.LineBreak || (_Ending == LineEnding.Normal && !shouldBreak))
+                return;
+
+            if (shouldBreak && _Ending == LineEnding.None)
+                Builder.Append(Environment.NewLine);
+
+            Builder.Append(Environment.NewLine);
+            _Ending = shouldBreak ? LineEnding.LineBreak : LineEnding.Normal;
+        }
+
+        internal void WriteLine(params string[] line)
         {
             if (line == null || line.Length == 0)
-            {
                 return;
-            }
 
-            if (line.Length == 1)
+            for (var i = 0; i < line.Length; i++)
             {
-                Builder.AppendLine(line[0]);
-
-                return;
+                Write(line[i]);
             }
-
-            for (var i = 0; i < line.Length - 1; i++)
-            {
-                Builder.Append(line[i]);
-            }
-
-            Builder.AppendLine(line[line.Length - 1]);
+            Ending();
         }
 
-        public void Write(string text)
+        internal void Write(string text)
         {
+            _Ending = LineEnding.None;
             Builder.Append(text);
         }
 
-        public void Write(char c)
+        internal void Write(char c, int count)
         {
-            Builder.Append(c);
+            if (count == 0)
+                return;
+
+            _Ending = LineEnding.None;
+            Builder.Append(c, count);
         }
 
         internal void WriteSpace(int count = 1)
         {
-            if (count == 0)
-            {
-                return;
-            }
-
-            Builder.Append(new string(Space, count));
+            Write(Space, count);
         }
 
         internal void WritePipe()
         {
-            Builder.Append(Pipe);
+            Write(Pipe, 1);
         }
 
-        public void Write(char c, int count)
+        internal void WriteTripleBacktick()
         {
-            if (count == 0)
-            {
-                return;
-            }
+            Write(TripleBacktick);
+        }
 
-            Builder.Append(new string(c, count));
+        internal void WriteHeaderHash(int count)
+        {
+            Write(Hash, count);
+            WriteSpace();
+        }
+
+        internal void WriteFrontMatter()
+        {
+            Write(MARKDOWN_FRONTMATTER);
+            Ending();
         }
     }
 }

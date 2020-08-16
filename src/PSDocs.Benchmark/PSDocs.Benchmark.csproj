@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ProjectGuid>{a9f68ba6-1381-4e35-a619-a948d47ec752}</ProjectGuid>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <DefineConstants>TRACE;BENCHMARK</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" Version="0.12.1" />
+    <PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.1.1" />
+    <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.0.3" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(OS)' == 'Windows_NT'">
+    <PackageReference Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.12.1" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
+    <PackageReference Include="Microsoft.PowerShell.5.1.ReferenceAssemblies" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.2'">
+    <PackageReference Include="Microsoft.PowerShell.SDK" Version="6.2.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PSDocs\PSDocs.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Benchmark.Doc.ps1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

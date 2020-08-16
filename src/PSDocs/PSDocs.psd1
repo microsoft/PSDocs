@@ -11,7 +11,7 @@ RootModule = 'PSDocs.psm1'
 ModuleVersion = '0.0.1'
 
 # Supported PSEditions
-# CompatiblePSEditions = @()
+CompatiblePSEditions = 'Core', 'Desktop'
 
 # ID used to uniquely identify this module
 GUID = '1f6df554-c081-40d8-9aca-32c1abe4a1b6'
@@ -31,7 +31,7 @@ Description = 'Generate markdown from PowerShell.
 This project is to be considered a proof-of-concept and not a supported product.'
 
 # Minimum version of the Windows PowerShell engine required by this module
-# PowerShellVersion = ''
+PowerShellVersion = '5.1'
 
 # Name of the Windows PowerShell host required by this module
 # PowerShellHostName = ''
@@ -40,7 +40,7 @@ This project is to be considered a proof-of-concept and not a supported product.
 # PowerShellHostVersion = ''
 
 # Minimum version of Microsoft .NET Framework required by this module. This prerequisite is valid for the PowerShell Desktop edition only.
-# DotNetFrameworkVersion = ''
+DotNetFrameworkVersion = '4.7.2'
 
 # Minimum version of the common language runtime (CLR) required by this module. This prerequisite is valid for the PowerShell Desktop edition only.
 # CLRVersion = ''
@@ -52,7 +52,9 @@ This project is to be considered a proof-of-concept and not a supported product.
 # RequiredModules = @()
 
 # Assemblies that must be loaded prior to importing this module
-# RequiredAssemblies = @()
+RequiredAssemblies = @(
+    'PSDocs.dll'
+)
 
 # Script files (.ps1) that are run in the caller's environment prior to importing this module.
 # ScriptsToProcess = @()
@@ -103,11 +105,10 @@ AliasesToExport = @()
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
 PrivateData = @{
-
     PSData = @{
 
         # Tags applied to this module. These help with module discovery in online galleries.
-        Tags = @('Markdown')
+        Tags = @('Markdown', 'PSDocs', 'DevOps', 'CI')
 
         # A URL to the license for this module.
         LicenseUri = 'https://github.com/BernieWhite/PSDocs/blob/master/LICENSE'

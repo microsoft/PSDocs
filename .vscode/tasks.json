@@ -14,7 +14,7 @@
             "problemMatcher": [ "$pester" ],
             "presentation": {
                 "panel": "dedicated",
-                "clear": false
+                "clear": true
             }
         },
         {
@@ -50,6 +50,16 @@
             "type": "shell",
             "command": "Invoke-Build Clean",
             "problemMatcher": []
+        },
+        {
+            "label": "benchmark",
+            "type": "shell",
+            "command": "Invoke-Build Benchmark",
+            "problemMatcher": [],
+            "presentation": {
+                "clear": true,
+                "panel": "dedicated"
+            }
         }
     ]
 }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace PSDocs.Models
+﻿namespace PSDocs.Models
 {
     public sealed class Text : DocumentNode
     {

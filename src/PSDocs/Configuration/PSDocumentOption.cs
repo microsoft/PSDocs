@@ -1,7 +1,11 @@
-﻿using System;
+﻿using PSDocs.Resources;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.Management.Automation;
+using System.Threading;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -10,54 +14,64 @@ namespace PSDocs.Configuration
     /// <summary>
     /// A delgate to allow callback to PowerShell to get current working path.
     /// </summary>
-    public delegate string GetWorkingPathDelegate();
+    internal delegate string PathDelegate();
 
     public sealed class PSDocumentOption
     {
+        private const string DEFAULT_FILENAME = "psdocs.yml";
+
+        private static readonly PSDocumentOption Default = new PSDocumentOption
+        {
+            Execution = ExecutionOption.Default,
+            //Markdown = MarkdownOption.Default
+        };
+
         public PSDocumentOption()
         {
             // Set defaults
-            Markdown = new MarkdownOption();
+            Document = new DocumentOption();
             Execution = new ExecutionOption();
+            Markdown = new MarkdownOption();
+            Output = new OutputOption();
         }
 
         public PSDocumentOption(PSDocumentOption option)
         {
             // Set from existing option instance
-            Markdown = new MarkdownOption
-            {
-                WrapSeparator = option.Markdown.WrapSeparator,
-                Encoding = option.Markdown.Encoding,
-                SkipEmptySections = option.Markdown.SkipEmptySections,
-                ColumnPadding = option.Markdown.ColumnPadding,
-                UseEdgePipes = option.Markdown.UseEdgePipes
-            };
-
-            Execution = new ExecutionOption
-            {
-                LanguageMode = option.Execution.LanguageMode
-            };
+            Document = new DocumentOption(option.Document);
+            Execution = new ExecutionOption(option.Execution);
+            Markdown = new MarkdownOption(option.Markdown);
+            Output = new OutputOption(option.Output);
         }
 
         /// <summary>
         /// A callback that is overridden by PowerShell so that the current working path can be retrieved.
         /// </summary>
-        public static GetWorkingPathDelegate GetWorkingPath = () => Directory.GetCurrentDirectory();
+        private static PathDelegate _GetWorkingPath = () => Directory.GetCurrentDirectory();
+
+        /// <summary>
+        /// Sets the current culture to use when processing rules unless otherwise specified.
+        /// </summary>
+        private static CultureInfo _CurrentCulture = Thread.CurrentThread.CurrentCulture;
 
         /// <summary>
         /// Reserved for internal use.
         /// </summary>
         public string Generator { get; set; }
 
-        /// <summary>
-        /// Options that affect markdown formatting.
-        /// </summary>
-        public MarkdownOption Markdown { get; set; }
+        public DocumentOption Document { get; set; }
 
         /// <summary>
         /// Options that affect script execution.
         /// </summary>
         public ExecutionOption Execution { get; set; }
+
+        /// <summary>
+        /// Options that affect markdown formatting.
+        /// </summary>
+        public MarkdownOption Markdown { get; set; }
+
+        public OutputOption Output { get; set; }
 
         public string ToYaml()
         {
@@ -73,26 +87,31 @@ namespace PSDocs.Configuration
             return new PSDocumentOption(this);
         }
 
+        /// <summary>
+        /// Load a YAML formatted PDocumentOption object from disk.
+        /// </summary>
+        /// <param name="path">The file or directory path to load options from.</param>
+        /// <param name="silentlyContinue">When false, if the file does not exist, and exception will be raised.</param>
+        /// <returns></returns>
         public static PSDocumentOption FromFile(string path, bool silentlyContinue = false)
         {
-            // Ensure that a full path instead of a path relative to PowerShell is used for .NET methods
-            var rootedPath = GetRootedPath(path);
+            // Get a rooted file path instead of directory or relative path
+            var filePath = GetFilePath(path: path);
 
             // Fallback to defaults even if file does not exist when silentlyContinue is true
-            if (!File.Exists(rootedPath))
+            if (!File.Exists(filePath))
             {
                 if (!silentlyContinue)
                 {
-                    throw new FileNotFoundException("", rootedPath);
+                    throw new FileNotFoundException(PSDocsResources.OptionsNotFound, filePath);
                 }
                 else
                 {
                     // Use the default options
-                    return new PSDocumentOption();
+                    return Default.Clone();
                 }
             }
-
-            return FromYaml(File.ReadAllText(rootedPath));
+            return FromYaml(path: filePath, yaml: File.ReadAllText(filePath));
         }
 
         public static PSDocumentOption FromYaml(string yaml)
@@ -103,6 +122,61 @@ namespace PSDocs.Configuration
                 .Build();
 
             return d.Deserialize<PSDocumentOption>(yaml) ?? new PSDocumentOption();
+        }
+
+        public static PSDocumentOption FromYaml(string path, string yaml)
+        {
+            var d = new DeserializerBuilder()
+                .IgnoreUnmatchedProperties()
+                .WithNamingConvention(new CamelCaseNamingConvention())
+                .Build();
+            var option = d.Deserialize<PSDocumentOption>(yaml) ?? new PSDocumentOption();
+            //option.SourcePath = path;
+            return option;
+        }
+
+        /// <summary>
+        /// Set working path from PowerShell host environment.
+        /// </summary>
+        /// <param name="executionContext">An $ExecutionContext object.</param>
+        /// <remarks>
+        /// Called from PowerShell.
+        /// </remarks>
+        public static void UseExecutionContext(EngineIntrinsics executionContext)
+        {
+            if (executionContext == null)
+            {
+                _GetWorkingPath = () => Directory.GetCurrentDirectory();
+
+                return;
+            }
+
+            _GetWorkingPath = () => executionContext.SessionState.Path.CurrentFileSystemLocation.Path;
+        }
+
+        public static void UseCurrentCulture()
+        {
+            UseCurrentCulture(Thread.CurrentThread.CurrentCulture);
+        }
+
+        public static void UseCurrentCulture(string culture)
+        {
+            UseCurrentCulture(CultureInfo.CreateSpecificCulture(culture));
+        }
+
+        public static void UseCurrentCulture(CultureInfo culture)
+        {
+            _CurrentCulture = culture;
+        }
+
+        public static string GetWorkingPath()
+        {
+            return _GetWorkingPath();
+        }
+
+        public static CultureInfo GetCurrentCulture()
+        {
+            return _CurrentCulture;
         }
 
         /// <summary>
@@ -123,9 +197,8 @@ namespace PSDocs.Configuration
 
             // Start loading matching values
 
-            object value;
 
-            if (index.TryGetValue("markdown.wrapseparator", out value))
+            if (index.TryGetValue("markdown.wrapseparator", out object value))
             {
                 option.Markdown.WrapSeparator = (string)value;
             }
@@ -170,13 +243,50 @@ namespace PSDocs.Configuration
         }
 
         /// <summary>
+        /// Get a fully qualified file path.
+        /// </summary>
+        /// <param name="path">A file or directory path.</param>
+        /// <returns></returns>
+        public static string GetFilePath(string path)
+        {
+            var rootedPath = GetRootedPath(path);
+            if (Path.HasExtension(rootedPath))
+            {
+                var ext = Path.GetExtension(rootedPath);
+                if (string.Equals(ext, ".yaml", StringComparison.OrdinalIgnoreCase) || string.Equals(ext, ".yml", StringComparison.OrdinalIgnoreCase))
+                {
+                    return rootedPath;
+                }
+            }
+
+            // Check if default files exist and 
+            return UseFilePath(path: rootedPath, name: "ps-docs.yaml") ??
+                UseFilePath(path: rootedPath, name: "ps-docs.yml") ??
+                UseFilePath(path: rootedPath, name: "psdocs.yaml") ??
+                UseFilePath(path: rootedPath, name: "psdocs.yml") ??
+                Path.Combine(rootedPath, DEFAULT_FILENAME);
+        }
+
+        /// <summary>
         /// Get a full path instead of a relative path that may be passed from PowerShell.
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        private static string GetRootedPath(string path)
+        internal static string GetRootedPath(string path)
         {
-            return Path.IsPathRooted(path) ? path : Path.Combine(GetWorkingPath(), path);
+            return Path.IsPathRooted(path) ? path : Path.GetFullPath(Path.Combine(GetWorkingPath(), path));
+        }
+
+        /// <summary>
+        /// Determine if the combined file path is exists.
+        /// </summary>
+        /// <param name="path">A directory path where a options file may be stored.</param>
+        /// <param name="name">A file name of an options file.</param>
+        /// <returns>Returns a file path if the file exists or null if the file does not exist.</returns>
+        private static string UseFilePath(string path, string name)
+        {
+            var filePath = Path.Combine(path, name);
+            return File.Exists(filePath) ? filePath : null;
         }
     }
 }

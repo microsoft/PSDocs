@@ -5,5 +5,14 @@
         "reports/": true,
         "**/bin/": true,
         "**/obj/": true
-    }
+    },
+    "[yaml]": {
+        "editor.tabSize": 2
+    },
+    "[markdown]": {
+        "editor.tabSize": 2
+    },
+    "files.associations": {
+        "**/.azure-pipelines/**/*.yaml": "azure-pipelines"
+    },
 }

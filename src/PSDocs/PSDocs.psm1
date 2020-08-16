@@ -4,28 +4,8 @@
 
 Set-StrictMode -Version latest;
 
-# Set up some helper variables to make it easier to work with the module
-$PSModule = $ExecutionContext.SessionState.Module;
-$PSModuleRoot = $PSModule.ModuleBase;
-
-# Import the appropriate nested binary module based on the current PowerShell version
-$binModulePath = Join-Path -Path $PSModuleRoot -ChildPath '/desktop/PSDocs.dll';
-
-if (($PSVersionTable.Keys -contains 'PSEdition') -and ($PSVersionTable.PSEdition -ne 'Desktop')) {
-    $binModulePath = Join-Path -Path $PSModuleRoot -ChildPath '/core/PSDocs.dll';
-}
-
-$binaryModule = Import-Module -Name $binModulePath -PassThru;
-
-# When the module is unloaded, remove the nested binary module that was loaded with it
-$PSModule.OnRemove = {
-    Remove-Module -ModuleInfo $binaryModule;
-}
-
-[PSDocs.Configuration.PSDocumentOption]::GetWorkingPath = {
-    return Get-Location;
-}
-
+[PSDocs.Configuration.PSDocumentOption]::UseExecutionContext($ExecutionContext);
+[PSDocs.Configuration.PSDocumentOption]::UseCurrentCulture();
 $Script:UTF8_NO_BOM = New-Object -TypeName System.Text.UTF8Encoding -ArgumentList $False;
 
 #
@@ -35,14 +15,226 @@ $Script:UTF8_NO_BOM = New-Object -TypeName System.Text.UTF8Encoding -ArgumentLis
 $LocalizedData = data {
 
 }
+$LocalizedHelp = data {
+
+}
 
 Import-LocalizedData -BindingVariable LocalizedData -FileName 'PSDocs.Resources.psd1' -ErrorAction SilentlyContinue;
+Import-LocalizedData -BindingVariable LocalizedHelp -FileName 'PSDocs.Resources.psd1' -ErrorAction SilentlyContinue;
 
 #
 # Public functions
 #
 
 #region Cmdlets
+
+# .ExternalHelp PSDocs-Help.xml
+function Invoke-PSDocument {
+    [CmdletBinding(DefaultParameterSetName = 'Input')]
+    param (
+        # The name of the document
+        [Parameter(Mandatory = $False)]
+        [String[]]$Name,
+
+        [Parameter(Mandatory = $False)]
+        [String[]]$Tag,
+
+        [Parameter(Mandatory = $False)]
+        [String[]]$InstanceName,
+
+        [Parameter(Mandatory = $False, ValueFromPipeline = $True, ParameterSetName = 'Input')]
+        [PSObject]$InputObject,
+
+        # The path to look for document definitions in
+        [Parameter(Position = 0, Mandatory = $False)]
+        [PSDefaultValue(Help = '.')]
+        [String]$Path = $PWD,
+
+        # The output path to save generated documentation
+        [Parameter(Mandatory = $False)]
+        [String]$OutputPath = $PWD,
+
+        [Parameter(Mandatory = $False)]
+        [Switch]$PassThru,
+
+        [Parameter(Mandatory = $False)]
+        [PSDocs.Configuration.PSDocumentOption]$Option,
+
+        [Parameter(Mandatory = $False)]
+        [PSDocs.Configuration.MarkdownEncoding]$Encoding = [PSDocs.Configuration.MarkdownEncoding]::Default,
+
+        [Parameter(Mandatory = $False)]
+        [String[]]$Culture
+    )
+    begin {
+        Write-Verbose -Message "[Invoke-PSDocument]::BEGIN";
+
+        # Check if the path is a directory
+        if (!(Test-Path -Path $Path)) {
+            Write-Error -Message $LocalizedData.PathNotFound -ErrorAction Stop;
+
+            return;
+        }
+
+        # Get matching document scripts
+        # [String[]]$docScripts = GetDocumentFile -Path $Path -Verbose:$VerbosePreference;
+
+        # Get parameter options, which will override options from other sources
+        $optionParams = @{ };
+
+        if ($PSBoundParameters.ContainsKey('Option')) {
+            $optionParams['Option'] = $Option;
+        }
+
+        # Get an options object
+        $Option = New-PSDocumentOption @optionParams;
+
+        # Discover scripts in the specified paths
+        $sourceParams = @{ };
+
+        if ($PSBoundParameters.ContainsKey('Path')) {
+            $sourceParams['Path'] = $Path;
+        }
+        # if ($PSBoundParameters.ContainsKey('Module')) {
+        #     $sourceParams['Module'] = $Module;
+        # }
+        if ($sourceParams.Count -eq 0) {
+            $sourceParams['Path'] = $Path;
+        }
+        $sourceParams['Option'] = $Option;
+        $sourceFiles = GetSource @sourceParams -Verbose:$VerbosePreference;
+
+        # Check that some matching script files were found
+        if ($Null -eq $sourceFiles) {
+            Write-Warning -Message $LocalizedHelp.SourceNotFound;
+            return; # continue causes issues with Pester
+        }
+
+        $isDeviceGuard = IsDeviceGuardEnabled;
+
+        # If DeviceGuard is enabled, force a contrained execution environment
+        if ($isDeviceGuard) {
+            $Option.Execution.LanguageMode = [PSDocs.Configuration.LanguageMode]::ConstrainedLanguage;
+        }
+
+        # Get parameter options, which will override options from other sources
+        # $optionParams = @{ };
+
+        if ($PSBoundParameters.ContainsKey('Name')) {
+            $Option.Document.Include =  $Name;
+        }
+        if ($PSBoundParameters.ContainsKey('Tag')) {
+            $Option.Document.Tag = $Tag;
+        }
+        if ($PSBoundParameters.ContainsKey('OutputPath') -and !$PassThru) {
+            $Option.Output.Path = $OutputPath;
+        }
+        if ($PSBoundParameters.ContainsKey('Culture')) {
+            $Option.Output.Culture = $Culture;
+        }
+        if ($PSBoundParameters.ContainsKey('Encoding')) {
+            $Option.Markdown.Encoding = $Encoding;
+        }
+
+        # $PSDocs.InstanceName = $InstanceName;
+        # $PSDocs.Culture = $Culture;
+
+        $builder = [PSDocs.Pipeline.PipelineBuilder]::Invoke($sourceFiles, $Option, $PSCmdlet, $ExecutionContext);
+        $builder.InstanceName($InstanceName);
+        $pipeline = $builder.Build();
+        try {
+            $pipeline.Begin();
+        }
+        catch {
+            $pipeline.Dispose();
+            throw;
+        }
+    }
+    process {
+        if ($Null -ne (Get-Variable -Name pipeline -ErrorAction SilentlyContinue)) {
+            try {
+                # Process pipeline objects
+                $pipeline.Process($InputObject);
+            }
+            catch {
+                $pipeline.Dispose();
+                throw;
+            }
+        }
+    }
+    end {
+        if ($Null -ne (Get-Variable -Name pipeline -ErrorAction SilentlyContinue)) {
+            try {
+                $pipeline.End();
+            }
+            finally {
+                $pipeline.Dispose();
+            }
+        }
+        Write-Verbose -Message "[Invoke-PSDocument]::END";
+    }
+}
+
+# .ExternalHelp PSDocs-Help.xml
+function Get-PSDocumentHeader {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $False, ValueFromPipelineByPropertyName = $True)]
+        [Alias('FullName')]
+        [String]$Path = $PWD
+    )
+
+    process {
+        $filteredItems = Get-ChildItem -Path (Join-Path -Path $Path -ChildPath '*') -File;
+        foreach ($item in $filteredItems) {
+            ReadYamlHeader -Path $item.FullName -Verbose:$VerbosePreference;
+        }
+    }
+}
+
+# .ExternalHelp PSDocs-Help.xml
+function New-PSDocumentOption {
+    [CmdletBinding()]
+    [OutputType([PSDocs.Configuration.PSDocumentOption])]
+    param (
+        [Parameter(Position = 0, Mandatory = $False)]
+        [String]$Path = $PWD,
+
+        [Parameter(Mandatory = $False)]
+        [PSDocs.Configuration.PSDocumentOption]$Option,
+
+        [Parameter(Mandatory = $False)]
+        [PSDocs.Configuration.MarkdownEncoding]$Encoding
+    )
+
+    process {
+
+        if ($PSBoundParameters.ContainsKey('Option')) {
+            $Option = $Option.Clone();
+        }
+        elseif ($PSBoundParameters.ContainsKey('Path')) {
+            Write-Verbose -Message "Attempting to read: $Path";
+            $Option = [PSDocs.Configuration.PSDocumentOption]::FromFile($Path, $False);
+        }
+        else {
+            Write-Verbose -Message "Attempting to read: $Path";
+            $Option = [PSDocs.Configuration.PSDocumentOption]::FromFile($Path, $True);
+        }
+
+        if ($PSBoundParameters.ContainsKey('Encoding')) {
+            $Option.Markdown.Encoding = $Encoding;
+        }
+        return $Option;
+    }
+}
+
+#endregion Cmdlets
+
+#
+# Internal language keywords
+#
+
+#region Keywords
 
 # .ExternalHelp PSDocs-Help.xml
 function Document {
@@ -137,177 +329,6 @@ function Document {
         }
     }
 }
-
-# .ExternalHelp PSDocs-Help.xml
-function Invoke-PSDocument {
-
-    [CmdletBinding(DefaultParameterSetName = 'Inline')]
-    param (
-        # The name of the document
-        [Parameter(Mandatory = $False, ParameterSetName = 'Path')]
-        [Parameter(Position = 0, Mandatory = $True, ParameterSetName = 'Inline')]
-        [String[]]$Name,
-
-        [Parameter(Mandatory = $False, ParameterSetName = 'Path')]
-        [String[]]$Tag,
-
-        [Parameter(Mandatory = $False)]
-        [String[]]$InstanceName,
-
-        [Parameter(Mandatory = $False, ValueFromPipeline = $True)]
-        [PSObject]$InputObject,
-
-        # The path to look for document definitions in
-        [Parameter(Position = 0, Mandatory = $True, ParameterSetName = 'Path')]
-        [PSDefaultValue(Help = '.')]
-        [String]$Path = $PWD,
-
-        # The output path to save generated documentation
-        [Parameter(Mandatory = $False)]
-        [String]$OutputPath = $PWD,
-
-        [Parameter(Mandatory = $False)]
-        [Switch]$PassThru = $False,
-
-        [Parameter(Mandatory = $False)]
-        [PSDocs.Configuration.PSDocumentOption]$Option,
-
-        [Parameter(Mandatory = $False)]
-        [PSDocs.Configuration.MarkdownEncoding]$Encoding = [PSDocs.Configuration.MarkdownEncoding]::Default,
-
-        [Parameter(Mandatory = $False)]
-        [String[]]$Culture
-    )
-
-    begin {
-        if ($PSCmdlet.ParameterSetName -eq 'Inline') {
-            Write-Warning -Message "Invoke-PSDocument with inline document block is depricated."
-        }
-    }
-
-    process {
-        Write-Verbose -Message "[Invoke-PSDocument]::BEGIN";
-
-        $invokeParams = $PSBoundParameters;
-
-        try {
-            if ($PSCmdlet.ParameterSetName -eq 'Inline') {
-                foreach ($n in $Name) {
-                    Write-Verbose -Message "[Invoke-PSDocument] -- Calling by name: $n";
-
-                    $invokeParams['Name'] = $n;
-                    GenerateDocumentInline @invokeParams;
-                }
-            }
-            else {
-                GenerateDocumentPath @invokeParams;
-            }
-        }
-        catch {
-            # Handle exceptions to provide meaningful errors
-
-            $ex = $_;
-
-            if ($Null -ne $ex.Exception.InnerException) {
-
-                $errorParams = @{
-                    Exception = $ex.Exception
-                    Category = [System.Management.Automation.ErrorCategory]::OperationStopped
-                }
-
-                if ($ex.Exception.InnerException -is [System.Management.Automation.IContainsErrorRecord]) {
-                    $errorParams['ErrorId'] = $ex.Exception.InnerException.ErrorRecord.FullyQualifiedErrorId
-                }
-
-                if ($ex.Exception -is [PSDocs.Execution.InvokeDocumentException]) {
-                    $errorParams['Category'] = [System.Management.Automation.ErrorCategory]::InvalidOperation;
-                }
-
-                Write-Error @errorParams;
-            }
-            else {
-                throw $ex.Exception;
-            }
-        }
-
-        Write-Verbose -Message "[Invoke-PSDocument]::END";
-    }
-}
-
-# .ExternalHelp PSDocs-Help.xml
-function Get-PSDocumentHeader {
-
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory = $False, ValueFromPipelineByPropertyName = $True)]
-        [Alias('FullName')]
-        [String]$Path = $PWD
-    )
-
-    process {
-
-        $filteredItems = Get-ChildItem -Path "$Path\*" -File;
-
-        foreach ($item in $filteredItems) {
-
-            ReadYamlHeader -Path $item.FullName -Verbose:$VerbosePreference;
-        }
-
-    }
-}
-
-# .ExternalHelp PSDocs-Help.xml
-function New-PSDocumentOption {
-
-    [CmdletBinding()]
-    [OutputType([PSDocs.Configuration.PSDocumentOption])]
-    param (
-        [Parameter(Mandatory = $False)]
-        [PSDocs.Configuration.PSDocumentOption]$Option,
-
-        [Parameter(Mandatory = $False)]
-        [String]$Path = '.\psdocs.yml',
-
-        [Parameter(Mandatory = $False)]
-        [PSDocs.Configuration.MarkdownEncoding]$Encoding
-    )
-
-    process {
-
-        if ($PSBoundParameters.ContainsKey('Option')) {
-            $Option = $Option.Clone();
-        }
-        elseif ($PSBoundParameters.ContainsKey('Path')) {
-
-            if (!(Test-Path -Path $Path)) {
-
-            }
-
-            $Path = Resolve-Path -Path $Path;
-
-            $Option = [PSDocs.Configuration.PSDocumentOption]::FromFile($Path);
-        }
-        else {
-            Write-Verbose -Message "Attempting to read: $Path";
-
-            $Option = [PSDocs.Configuration.PSDocumentOption]::FromFile($Path, $True);
-        }
-
-        if ($PSBoundParameters.ContainsKey('Encoding')) {
-            $Option.Markdown.Encoding = $Encoding;
-        }
-
-        return $Option;
-    }
-}
-
-#endregion Cmdlets
-
-#
-# Internal language keywords
-#
-
-#region Keywords
 
 # Implement the Section keyword
 function Section {
@@ -791,267 +812,66 @@ function InitDocumentContext {
     }
 }
 
-# Proxy function is used when executing the Document keyword like a function
-function GenerateDocumentFn {
+function GetSource {
     [CmdletBinding()]
-    param (
-        [Parameter(Mandatory = $False, ValueFromPipeline = $True)]
-        [PSObject]$InputObject,
-
-        [Parameter(Mandatory = $False)]
-        [String]$OutputPath = $PWD,
-
-        [Parameter(Mandatory = $False)]
-        [String[]]$InstanceName,
-
-        [Parameter(Mandatory = $False)]
-        [Switch]$PassThru = $False,
-
-        [Parameter(Mandatory = $False)]
-        [PSDocs.Configuration.PSDocumentOption]$Option,
-
-        [Parameter(Mandatory = $False)]
-        [PSDocs.Configuration.MarkdownEncoding]$Encoding = [PSDocs.Configuration.MarkdownEncoding]::Default,
-
-        [Parameter(Mandatory = $False)]
-        [String[]]$Culture
-    )
-
-    process {
-        Write-Verbose -Message "[$($MyInvocation.InvocationName)]::BEGIN";
-
-        $fnParams = $PSBoundParameters;
-
-        try {
-            GenerateDocumentInline -Name $MyInvocation.InvocationName @fnParams;
-        }
-        catch {
-            # Handle exceptions to provide meaningful errors
-
-            $ex = $_;
-
-            if ($Null -ne $ex.Exception.InnerException) {
-
-                $errorParams = @{
-                    Exception = $ex.Exception
-                    Category = [System.Management.Automation.ErrorCategory]::OperationStopped
-                }
-
-                if ($ex.Exception.InnerException -is [System.Management.Automation.IContainsErrorRecord]) {
-                    $errorParams['ErrorId'] = $ex.Exception.InnerException.ErrorRecord.FullyQualifiedErrorId
-                }
-
-                if ($ex.Exception -is [PSDocs.Execution.InvokeDocumentException]) {
-                    $errorParams['Category'] = [System.Management.Automation.ErrorCategory]::InvalidOperation;
-                }
-
-                Write-Error @errorParams;
-            }
-            else {
-                throw $ex.Exception;
-            }
-        }
-
-        Write-Verbose -Message "[$($MyInvocation.InvocationName)]::END";
-    }
-}
-
-function GenerateDocumentPath {
-
-    [CmdletBinding()]
+    [OutputType([PSDocs.Pipeline.Source])]
     param (
         [Parameter(Mandatory = $False)]
-        [String[]]$Name,
+        [String[]]$Path,
 
         [Parameter(Mandatory = $False)]
-        [String[]]$Tag,
+        [String[]]$Module,
 
         [Parameter(Mandatory = $False)]
-        [String[]]$InstanceName,
+        [Switch]$ListAvailable,
 
         [Parameter(Mandatory = $False)]
-        [PSObject]$InputObject,
+        [String]$Culture,
 
         [Parameter(Mandatory = $False)]
-        [String]$Path = $PWD,
+        [Switch]$PreferPath = $False,
 
         [Parameter(Mandatory = $False)]
-        [String]$OutputPath = $PWD,
+        [Switch]$PreferModule = $False,
 
-        [Parameter(Mandatory = $False)]
-        [Switch]$PassThru = $False,
-
-        [Parameter(Mandatory = $False)]
-        [AllowNull()]
-        [PSDocs.Configuration.PSDocumentOption]$Option,
-
-        [Parameter(Mandatory = $False)]
-        [PSDocs.Configuration.MarkdownEncoding]$Encoding = [PSDocs.Configuration.MarkdownEncoding]::Default,
-
-        [Parameter(Mandatory = $False)]
-        [String[]]$Culture
+        [Parameter(Mandatory = $True)]
+        [PSDocs.Configuration.PSDocumentOption]$Option
     )
-
-    begin {
-
-        # Check if the path is a directory
-        if (!(Test-Path -Path $Path)) {
-            Write-Error -Message $LocalizedData.PathNotFound -ErrorAction Stop;
-
-            return;
-        }
-
-        # Get matching document scripts
-        [String[]]$docScripts = GetDocumentFile -Path $Path -Verbose:$VerbosePreference;
-
-        # Get parameter options, which will override options from other sources
-        $optionParams = @{ };
-
-        if ($PSBoundParameters.ContainsKey('Option')) {
-            $optionParams['Option'] =  $Option;
-        }
-
-        if ($PSBoundParameters.ContainsKey('Encoding')) {
-            $optionParams['Encoding'] = $Encoding;
-        }
-
-        # Get an options object
-        $Option = New-PSDocumentOption @optionParams;
-
-        # Create PSDocs variable
-        $PSDocs = [PSDocs.Models.PSDocsContext]::Create(
-            $Option,
-            $Name,
-            $Tag,
-            $OutputPath
-        );
-
-        $PSDocs.WriteDocumentHook = {
-            param ([PSDocs.Configuration.PSDocumentOption]$option, [PSDocs.Models.Document]$document)
-
-            # Visit the document with the specified processor
-            (NewMarkdownProcessor).Process($option, $document) | WriteDocumentContent -Path $document.Path -PassThru:$PassThru -Encoding:$option.Markdown.Encoding;
-        }
-
-        $PSDocs.InstanceName = $InstanceName;
-        $PSDocs.Culture = $Culture;
-    }
-
     process {
+        $builder = [PSDocs.Pipeline.PipelineBuilder]::Source($Option, $PSCmdlet, $ExecutionContext);
 
-        if ($Null -eq $InputObject) {
-            Write-Verbose -Message "[Doc] -- InputObject is null";
-        }
-        else {
-            Write-Verbose -Message "[Doc] -- InputObject is of type [$($InputObject.GetType().FullName)]";
-        }
-
-        foreach ($p in $docScripts) {
-            Write-Verbose -Message "[Doc] -- Processing: $p";
-            InvokeTemplate -Path $p -Option $Option -InputObject $InputObject -Verbose:$VerbosePreference;
-        }
-    }
-}
-
-function GenerateDocumentInline {
-
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory = $False)]
-        [String]$Name,
-
-        [Parameter(Mandatory = $False)]
-        [String[]]$InstanceName,
-
-        [Parameter(Mandatory = $False)]
-        [PSObject]$InputObject,
-
-        [Parameter(Mandatory = $False)]
-        [String]$Path = $PWD,
-
-        [Parameter(Mandatory = $False)]
-        [String]$OutputPath = $PWD,
-
-        [Parameter(Mandatory = $False)]
-        [Switch]$PassThru = $False,
-
-        [Parameter(Mandatory = $False)]
-        [AllowNull()]
-        [PSDocs.Configuration.PSDocumentOption]$Option,
-
-        [Parameter(Mandatory = $False)]
-        [PSDocs.Configuration.MarkdownEncoding]$Encoding = [PSDocs.Configuration.MarkdownEncoding]::Default,
-
-        [Parameter(Mandatory = $False)]
-        [String[]]$Culture
-    )
-
-    begin {
-
-        # Check if existing document is inline
-        if ($PSBoundParameters.ContainsKey('Name') -and !$PSBoundParameters.ContainsKey('Path')) {
-
-            if ($Null -eq $Script:DocumentBody -or !$Script:DocumentBody.ContainsKey($Name)) {
-
-                Write-Error -Message ($LocalizedData.DocumentNotFound -f $Name) -ErrorAction Stop;
-
-                return;
+        if ($PSBoundParameters.ContainsKey('Path')) {
+            try {
+                $builder.Directory($Path);
             }
-            else {
-                $useInline = $True;
+            catch {
+                throw $_.Exception.GetBaseException();
             }
         }
 
-        # Check if the path is a directory
-        if (!(Test-Path -Path $Path)) {
-            Write-Error -Message $LocalizedData.PathNotFound -ErrorAction Stop;
+        # $moduleParams = @{};
+        # if ($PSBoundParameters.ContainsKey('Module')) {
+        #     $moduleParams['Name'] = $Module;
 
-            return;
-        }
+        #     # Determine if module should be automatically loaded
+        #     if (GetAutoloadPreference) {
+        #         foreach ($m in $Module) {
+        #             if ($Null -eq (GetRuleModule -Name $m)) {
+        #                 LoadModule -Name $m -Verbose:$VerbosePreference;
+        #             }
+        #         }
+        #     }
+        # }
 
-        # Get parameter options, which will override options from other sources
-        $optionParams = @{ };
+        # if ($PSBoundParameters.ContainsKey('ListAvailable')) {
+        #     $moduleParams['ListAvailable'] = $ListAvailable.ToBool();
+        # }
 
-        if ($PSBoundParameters.ContainsKey('Option')) {
-            $optionParams['Option'] =  $Option;
-        }
-
-        if ($PSBoundParameters.ContainsKey('Encoding')) {
-            $optionParams['Encoding'] = $Encoding;
-        }
-
-        # Get an options object
-        $Option = New-PSDocumentOption @optionParams;
-
-        # Create PSDocs variable
-        $PSDocs = [PSDocs.Models.PSDocsContext]::Create(
-            $Option,
-            $Null,
-            $Null,
-            $OutputPath
-        );
-
-        $PSDocs.WriteDocumentHook = {
-            param ([PSDocs.Configuration.PSDocumentOption]$option, [PSDocs.Models.Document]$document)
-
-            # Visit the document with the specified processor
-            (NewMarkdownProcessor).Process($option, $document) | WriteDocumentContent -Path $document.Path -PassThru:$PassThru -Encoding:$option.Markdown.Encoding;
-        }
-
-        $PSDocs.InstanceName = $InstanceName;
-        $PSDocs.Culture = $Culture;
-    }
-
-    process {
-
-        if ($Null -eq $InputObject) {
-            Write-Verbose -Message "[Doc] -- InputObject is null";
-        }
-        else {
-            Write-Verbose -Message "[Doc] -- InputObject is of type [$($InputObject.GetType().FullName)]";
-        }
-
-        InvokeTemplate -Name $Name -ScriptBlock $Script:DocumentBody[$Name] -Option $Option -InputObject $InputObject -Verbose:$VerbosePreference;
+        # if ($moduleParams.Count -gt 0 -or $PreferModule) {
+        #     $modules = @(GetRuleModule @moduleParams);
+        #     $builder.Module($modules);
+        # }
+        $builder.Build();
     }
 }
 
@@ -1071,7 +891,7 @@ function GetDocumentFile {
             Resolve-Path -Path $Path;
         }
         else {
-            foreach ($p in (Get-ChildItem -Path $Path -Include '*.doc.ps1' -Recurse -File)) {
+            foreach ($p in (Get-ChildItem -Path $Path -Include '*.Doc.ps1' -Recurse -File)) {
                 $p.FullName;
             }
         }
@@ -1276,8 +1096,8 @@ function InvokeTemplate {
     )
 
     process {
-
         $template = $Null;
+        Write-Verbose -Message "[Doc] -- Preparing to invoke template: $Name";
 
         if ($PSCmdlet.ParameterSetName -eq 'Path') {
             if (!(Test-Path -Path $Path)) {
@@ -1305,26 +1125,29 @@ function InvokeTemplate {
 
             $Null = $ps.AddScript($template);
 
-            try {
+            # try {
+                Write-Verbose -Message "[Doc] -- Invoking template: $Name";
                 $ps.Invoke();
-            }
-            catch {
-                $baseException = $_.Exception.GetBaseException();
-                $positionMessage = $Null;
+            # }
+            # catch {
+            #     $baseException = $_.Exception.GetBaseException();
+            #     $positionMessage = $Null;
 
-                if ($baseException -is [System.Management.Automation.IContainsErrorRecord] -and $Null -ne $baseException.ErrorRecord.InvocationInfo) {
-                    if (![String]::IsNullOrEmpty($baseException.ErrorRecord.InvocationInfo.PositionMessage)) {
-                        $positionMessage = $baseException.ErrorRecord.InvocationInfo.PositionMessage
-                    }
-                }
+            #     if ($baseException -is [System.Management.Automation.IContainsErrorRecord] -and $Null -ne $baseException.ErrorRecord.InvocationInfo) {
+            #         if (![String]::IsNullOrEmpty($baseException.ErrorRecord.InvocationInfo.PositionMessage)) {
+            #             $positionMessage = $baseException.ErrorRecord.InvocationInfo.PositionMessage
+            #         }
+            #     }
 
-                throw (New-Object -TypeName PSDocs.Execution.InvokeDocumentException -ArgumentList @(
-                    $baseException.Message
-                    $baseException
-                    $Path
-                    $positionMessage
-                ));
-            }
+            #     throw (New-Object -TypeName PSDocs.Execution.InvokeDocumentException -ArgumentList @(
+            #         $baseException.Message
+            #         $baseException
+            #         $Path
+            #         $positionMessage
+            #     ));
+            # }
+
+            Write-Verbose -Message "[Doc] -- Processing output";
 
             # Replay verbose messages
             $ps.Streams.Verbose | ForEach-Object -Process {
@@ -1335,6 +1158,8 @@ function InvokeTemplate {
             $ps.Streams.Warning | ForEach-Object -Proces {
                 Write-Warning -Message $_.Message;
             }
+
+            Write-Verbose -Message "[Doc] -- Completed template";
         }
         finally {
             if ($Null -ne $ps) { $ps.Dispose() }
@@ -1446,7 +1271,6 @@ function GetRunspace {
 }
 
 function ReadYamlHeader {
-
     [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
     param (
@@ -1455,18 +1279,15 @@ function ReadYamlHeader {
     )
 
     process {
-
         # Read the file
         $content = Get-Content -Path $Path -Raw;
 
         # Detect Yaml header
-        if (![String]::IsNullOrEmpty($content) -and $content -match '^(---\r\n(?<yaml>([A-Z0-9]{1,}:[A-Z0-9 ]{1,}(\r\n){0,}){1,})\r\n---\r\n)') {
-
+        if (![String]::IsNullOrEmpty($content) -and $content -match '^(---(\r|\n|\r\n)(?<yaml>([A-Z0-9]{1,}:[A-Z0-9 ]{1,}(\r|\n|\r\n){0,}){1,})(\r|\n|\r\n)---(\r|\n|\r\n))') {
             Write-Verbose -Message "[Doc][Toc]`t-- Reading Yaml header: $Path";
 
             # Extract yaml header key value pair
             [String[]]$yamlHeader = $Matches.yaml -split "`n";
-
             $result = @{ };
 
             # Read key values into hashtable
@@ -1474,7 +1295,6 @@ function ReadYamlHeader {
                 $kv = $item.Split(':', 2, [System.StringSplitOptions]::RemoveEmptyEntries);
 
                 Write-Debug -Message "Found yaml keypair from: $item";
-
                 if ($kv.Length -eq 2) {
                     $result[$kv[0].Trim()] = $kv[1].Trim();
                 }
@@ -1487,15 +1307,10 @@ function ReadYamlHeader {
 }
 
 function IsDeviceGuardEnabled {
-
     [CmdletBinding()]
     [OutputType([System.Boolean])]
-    param (
-
-    )
-
+    param ()
     process {
-
         if ((Get-Variable -Name IsMacOS -ErrorAction Ignore) -or (Get-Variable -Name IsLinux -ErrorAction Ignore)) {
             return $False;
         }
@@ -1504,20 +1319,16 @@ function IsDeviceGuardEnabled {
         if ($PSVersionTable.PSVersion -ge '6.0' -and $PSVersionTable.PSVersion -lt '6.1') {
             return $False;
         }
-
         return [System.Management.Automation.Security.SystemPolicy]::GetSystemLockdownPolicy() -eq [System.Management.Automation.Security.SystemEnforcementMode]::Enforce;
     }
 }
 
 function InitEditorServices {
-
     [CmdletBinding()]
     param (
-
     )
 
     process {
-
         Export-ModuleMember -Function @(
             'Section'
             'Table'

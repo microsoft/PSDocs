@@ -38,34 +38,23 @@ namespace PSDocs.Models
 
             // Start loading matching values
 
-            object value;
 
-            if (index.TryGetValue("name", out value))
-            {
+            if (index.TryGetValue("name", out object value))
                 header.Label = (string)value;
-            }
 
             if (index.TryGetValue("label", out value))
-            {
                 header.Label = (string)value;
-            }
 
             if (index.TryGetValue("width", out value))
-            {
                 header.Width = (int)value;
-            }
 
             if (index.TryGetValue("alignment", out value))
-            {
                 header.Alignment = (Alignment)Enum.Parse(typeof(Alignment), (string)value, true);
-            }
 
             // Validate header
 
             if (string.IsNullOrEmpty(header.Label))
-            {
                 throw new Exception("Label must be set");
-            }
 
             _Headers.Add(header);
         }

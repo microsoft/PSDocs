@@ -1,13 +1,58 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net452;netstandard2.0</TargetFrameworks>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>7.3</LangVersion>
     <OutputType>Library</OutputType>
+    <ProjectGuid>{1f6df554-c081-40d8-9aca-32c1abe4a1b6}</ProjectGuid>
     <DebugType>portable</DebugType>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <DebugSymbols>true</DebugSymbols>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <!-- <TreatWarningsAsErrors>true</TreatWarningsAsErrors> -->
+    <Authors>Bernie White</Authors>
+    <AssemblyTitle>PSDocs</AssemblyTitle>
+    <RepositoryUrl>https://github.com/BernieWhite/PSDocs</RepositoryUrl>
+    <PackageLicenseExpression>https://github.com/BernieWhite/PSDocs/blob/master/LICENSE</PackageLicenseExpression>
+    <Version>0.0.1</Version>
+    <Copyright>(c) Bernie White. All rights reserved.</Copyright>
+    <Description>Generate markdown from objects using PowerShell syntax.
+
+This project is to be considered a proof-of-concept and not a supported product.</Description>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
+    <DefineConstants>Windows</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
+    <WarningsAsErrors />
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.3.0" PrivateAssets="All" />
+    <PackageReference Include="PowerShellStandard.Library" Version="5.1.0" PrivateAssets="All" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="YamlDotNet" Version="5.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Resources\PSDocsResources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>PSDocsResources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\PSDocsResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>PSDocsResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Common\" />
   </ItemGroup>
 
 </Project>

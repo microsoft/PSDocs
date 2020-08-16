@@ -12,61 +12,29 @@ $ErrorActionPreference = 'Stop';
 Set-StrictMode -Version latest;
 
 # Setup tests paths
-$rootPath = (Resolve-Path $PSScriptRoot\..\..).Path;
-$here = Split-Path -Parent $MyInvocation.MyCommand.Path;
-$temp = "$here\..\..\build";
+$rootPath = $PWD;
+Import-Module (Join-Path -Path $rootPath -ChildPath out/modules/PSDocs) -Force;
+$here = (Resolve-Path $PSScriptRoot).Path;
 
-Import-Module (Join-Path -Path $rootPath -ChildPath "out/modules/PSDocs") -Force;
-
-$outputPath = "$temp\PSDocs.Tests\Title";
-Remove-Item -Path $outputPath -Force -Recurse -Confirm:$False -ErrorAction SilentlyContinue;
-$Null = New-Item -Path $outputPath -ItemType Directory -Force;
-
-$dummyObject = New-Object -TypeName PSObject;
-
-$Global:TestVars = @{ };
-
-Describe 'PSDocs -- Title keyword' {
-
-    Context 'Single title markdown' {
-
-        # Define a test document with a title
-        document 'SingleTitle' {
-            
-            Title 'Test title'
-        }
-
-        $outputDoc = "$outputPath\SingleTitle.md";
-        SingleTitle -InputObject $dummyObject -OutputPath $outputPath;
-
-        It 'Should have generated output' {
-            Test-Path -Path $outputDoc | Should be $True;
-        }
-
-        It 'Should match expected format' {
-            Get-Content -Path $outputDoc -Raw | Should match '^(\# Test title\r\n)';
-        }
+Describe 'PSDocs -- Title keyword' -Tag Title {
+    $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Keyword.Doc.ps1';
+    $testObject = [PSCustomObject]@{
+        Name = 'TestObject'
     }
 
-    Context 'Multiple title markdown' {
-        
-        # Define a test document with multiple titles
-        document 'MultipleTitle' {
-            
-            Title 'Title 1'
-
-            Title 'Title 2'
+    Context 'Markdown' {
+        $invokeParams = @{
+            Path = $docFilePath
+            InputObject = $testObject
+            PassThru = $True
         }
-
-        $outputDoc = "$outputPath\MultipleTitle.md";
-        MultipleTitle -InputObject $dummyObject -OutputPath $outputPath;
-
-        It 'Should have generated output' {
-            Test-Path -Path $outputDoc | Should be $True;
+        It 'With single title' {
+            $result = Invoke-PSDocument @invokeParams -Name 'SingleTitle';
+            $result | Should -Match "^(`# Test title(\r|\n|\r\n))";
         }
-
-        It 'Should match expected format' {
-            Get-Content -Path $outputDoc -Raw | Should match '^(\# Title 2\r\n)';
+        It 'With multiple titles' {
+            $result = Invoke-PSDocument @invokeParams -Name 'MultipleTitle';
+            $result | Should -Match "^(`# Title 2(\r|\n|\r\n))";
         }
     }
 }

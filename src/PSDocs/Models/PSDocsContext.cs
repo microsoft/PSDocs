@@ -1,5 +1,4 @@
 ﻿using PSDocs.Configuration;
-using System.Collections.Generic;
 using System.IO;
 
 namespace PSDocs.Models

@@ -13,53 +13,28 @@ Set-StrictMode -Version latest;
 
 # Setup tests paths
 $rootPath = $PWD;
-
 Import-Module (Join-Path -Path $rootPath -ChildPath out/modules/PSDocs) -Force;
-
-$outputPath = Join-Path -Path $rootPath -ChildPath out/tests/PSDocs.Tests/Warning;
-Remove-Item -Path $outputPath -Force -Recurse -Confirm:$False -ErrorAction Ignore;
-$Null = New-Item -Path $outputPath -ItemType Directory -Force;
+$here = (Resolve-Path $PSScriptRoot).Path;
 
 Describe 'PSDocs -- Warning keyword' -Tag Warning {
+    $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Keyword.Doc.ps1';
+    $testObject = [PSCustomObject]@{
+        Name = 'TestObject'
+    }
+
     Context 'Markdown' {
-
+        $invokeParams = @{
+            Path = $docFilePath
+            InputObject = $testObject
+            PassThru = $True
+        }
         It 'Should handle single line input' {
-            document 'WarningSingleMarkdown' {
-                'This is a single line' | Warning
-            }
-
-            $outputDoc = "$outputPath\WarningSingleMarkdown.md";
-            WarningSingleMarkdown -OutputPath $outputPath;
-
-            Test-Path -Path $outputDoc | Should be $True;
-            $outputDoc | Should -FileContentMatchMultiline '\> \[\!WARNING\]\r\n\> This is a single line';
+            $result = Invoke-PSDocument @invokeParams -Name 'WarningSingleMarkdown';
+            $result | Should -Match '\> \[\!WARNING\](\r|\n|\r\n)> This is a single line';
         }
-
         It 'Should handle multiline input' {
-            document 'WarningMultiMarkdown' {
-                @('This is the first line.'
-                'This is the second line.') | Warning
-            }
-
-            $outputDoc = "$outputPath\WarningMultiMarkdown.md";
-            WarningMultiMarkdown -OutputPath $outputPath;
-
-            Test-Path -Path $outputDoc | Should -Be $True;
-            $outputDoc | Should -FileContentMatchMultiline '\> \[\!WARNING\]\r\n\> This is the first line.\r\n\> This is the second line.';
-        }
-
-        It 'Should handle script block input' {
-            document 'WarningScriptBlockMarkdown' {
-                Warning {
-                    'This is a single line'
-                }
-            }
-
-            $outputDoc = "$outputPath\WarningScriptBlockMarkdown.md";
-            WarningScriptBlockMarkdown -OutputPath $outputPath;
-
-            Test-Path -Path $outputDoc | Should be $True;
-            $outputDoc | Should -FileContentMatchMultiline '\> \[\!WARNING\]\r\n\> This is a single line';
+            $result = Invoke-PSDocument @invokeParams -Name 'WarningMultiMarkdown';
+            $result | Should -Match '\> \[\!WARNING\](\r|\n|\r\n)> This is the first line\.(\r|\n|\r\n)> This is the second line\.';
         }
     }
 }

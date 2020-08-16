@@ -1,11 +1,12 @@
 
-/**/.vs/
-/**/bin/
-/**/obj/
-/artifacts/
-/build/
-/reports/
-/out/
-/**/*.user
-/src/**/*-help.xml
-/src/**/*.help.txt
+.vs/
+build/
+reports/
+out/
+**/bin/
+**/obj/
+*.user
+*.diagsession
+src/**/*-help.xml
+src/**/*.help.txt
+BenchmarkDotNet.Artifacts/
