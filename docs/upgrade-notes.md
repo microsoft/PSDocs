@@ -1,8 +1,10 @@
-# Migrating to v0.7.0
+# Upgrade notes
 
-This document contains instructions to help migrate from previous versions of PSDocs.
+This document contains notes to help upgrade from previous versions of PSDocs.
 
-## Migrating from v0.6.x
+## Upgrade to v0.7.0 from v0.6.x
+
+Follow these notes to upgrade from PSDocs v0.6.x to v0.7.0.
 
 ### Inline blocks
 

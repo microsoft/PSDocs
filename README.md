@@ -6,9 +6,10 @@ A PowerShell module with commands to generate markdown from objects using PowerS
 
 ## Disclaimer
 
-This project is to be considered a **proof-of-concept** and **not a supported product**.
+This project is open source and **not a supported product**.
 
-If you have any problems please check our GitHub [issues] page. If you do not see your problem captured, please file a new issue and follow the provided template.
+If you are experiencing problems, have a feature request, or a question, please check for an [issue] on GitHub.
+If you do not see your problem captured, please file a new issue, and follow the provided template.
 
 ## Getting the modules
 
@@ -18,11 +19,12 @@ Module     | Description | Downloads / instructions
 ------     | ----------- | ------------------------
 PSDocs     | Generate markdown from PowerShell | [latest][psg-psdocs] / [instructions][install]
 
-For rule and integration modules see [related projects](#related-projects).
+For integration modules see [related projects](#related-projects).
 
 ## Getting started
 
-The following example shows basic PSDocs usage. For specific use cases see [scenarios](#scenarios).
+The following example shows basic PSDocs usage.
+For specific use cases see [scenarios](#scenarios).
 
 ### Define a document
 
@@ -151,7 +153,7 @@ For a list of module changes please see the [change log](CHANGELOG.md).
 This project is [licensed under the MIT License](LICENSE).
 
 [install]: docs/install-instructions.md
-[issues]: https://github.com/BernieWhite/PSDocs/issues
+[issue]: https://github.com/BernieWhite/PSDocs/issues
 [ci-badge]: https://bewhite.visualstudio.com/PSDocs/_apis/build/status/PSDocs-CI?branchName=main
 [psg-psdocs]: https://www.powershellgallery.com/packages/PSDocs
 [psg-psdocs-version-badge]: https://img.shields.io/powershellgallery/v/PSDocs.svg

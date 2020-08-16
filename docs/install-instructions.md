@@ -68,6 +68,13 @@ Additionally .NET Core SDK v3.1 is required.
 .NET Core will not be automatically downloaded and installed.
 To download and install the latest SDK see [Download .NET Core 3.1][dotnet].
 
+## Upgrading from previous versions
+
+If you are upgrading PSDocs from a previous version:
+
+- Please review any breaking changes in the [change log](../CHANGELOG.md).
+- See [upgrade notes](upgrade-notes.md) for helpful information.
+
 [module]: https://www.powershellgallery.com/packages/PSDocs
 [get-powershell]: https://github.com/PowerShell/PowerShell#get-powershell
 [dotnet]: https://dotnet.microsoft.com/download/dotnet-core/3.1
