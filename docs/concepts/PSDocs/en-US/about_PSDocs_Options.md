@@ -271,12 +271,12 @@ execution:
 
 ## NOTE
 
-An online version of this document is available at https://github.com/BernieWhite/PSDocs/blob/master/docs/concepts/PSDocs/en-US/about_PSDocs_Options.md.
+An online version of this document is available at https://github.com/BernieWhite/PSDocs/blob/main/docs/concepts/PSDocs/en-US/about_PSDocs_Options.md.
 
 ## SEE ALSO
 
-- [Invoke-PSDocument](https://github.com/BernieWhite/PSDocs/blob/master/docs/commands/PSDocs/en-US/Invoke-PSDocument.md)
-- [New-PSDocumentOption](https://github.com/BernieWhite/PSDocs/blob/master/docs/commands/PSDocs/en-US/New-PSDocumentOption.md)
+- [Invoke-PSDocument](https://github.com/BernieWhite/PSDocs/blob/main/docs/commands/PSDocs/en-US/Invoke-PSDocument.md)
+- [New-PSDocumentOption](https://github.com/BernieWhite/PSDocs/blob/main/docs/commands/PSDocs/en-US/New-PSDocumentOption.md)
 
 ## KEYWORDS
 
