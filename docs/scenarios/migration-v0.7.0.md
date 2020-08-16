@@ -21,8 +21,10 @@ Sample -InputObject @{ }
 Support for inline `Document` blocks has been removed.
 Use the following steps to migrate inline blocks to a file if you previously used this feature:
 
-- Create a new file ending with `.Doc.ps1` file extension. For example `Sample.Doc.ps1`.
+- Create a new file ending with `.Doc.ps1` file extension.
+For example `Sample.Doc.ps1`.
 - Copy and paste the previous inline `Document` block into the file.
+Multiple document blocks can be included in the same file.
 - Update command-line to use `Invoke-PSDocument` instead of using the name of the document block directly.
 
 Example `Sample.Doc.ps1`:
@@ -36,7 +38,7 @@ Document 'SampleMessage' {
 The cmdlet `Invoke-PSDocument` can be called as follows:
 
 ```powershell
-Invoke-PSDocument -Path .\Sample.doc.ps1 -Name SampleMessage;
+Invoke-PSDocument -Path .\Sample.Doc.ps1 -Name SampleMessage;
 ```
 
 On Linux, the file extension `.doc.ps1` is not automatically found by PSDocs because of file system case-sensitivity.
@@ -44,7 +46,9 @@ For consistency, use `.Doc.ps1` on all platforms.
 
 ### Script block usage of Note and Warning
 
-Previously the following was possible.
+Previously `Note` and `Warning` blocks could contain a script block.
+
+For example:
 
 ```powershell
 Document 'NoteScriptBlock' {
@@ -67,7 +71,9 @@ Document 'NotePipe' {
 
 ### Section -When parameter
 
-Previously the following was possible.
+Previously the `-When` parameter could be used with the section keyword.
+
+For example:
 
 ```powershell
 Document 'SectionWhen' {

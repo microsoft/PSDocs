@@ -30,7 +30,7 @@ Import-LocalizedData -BindingVariable LocalizedHelp -FileName 'PSDocs.Resources.
 
 # .ExternalHelp PSDocs-Help.xml
 function Invoke-PSDocument {
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'Input')]
     param (
         # The name of the document
         [Parameter(Mandatory = $False)]
@@ -42,11 +42,11 @@ function Invoke-PSDocument {
         [Parameter(Mandatory = $False)]
         [String[]]$InstanceName,
 
-        [Parameter(Mandatory = $False, ValueFromPipeline = $True)]
+        [Parameter(Mandatory = $False, ValueFromPipeline = $True, ParameterSetName = 'Input')]
         [PSObject]$InputObject,
 
         # The path to look for document definitions in
-        [Parameter(Position = 0, Mandatory = $True)]
+        [Parameter(Position = 0, Mandatory = $False)]
         [PSDefaultValue(Help = '.')]
         [String]$Path = $PWD,
 

@@ -28,7 +28,6 @@ The name of the culture currently being processed.
 `$Culture` is set by using the `-Culture` parameter of `Invoke-PSDocument` or inline functions.
 
 When more than one culture is set, each will be processed sequentially.
-
 If a culture has not been specified, `$Culture` will default to the culture of the current thread.
 
 Syntax:
@@ -86,7 +85,6 @@ The name of the instance currently being processed.
 `$InstanceName` is set by using the `-InstanceName` parameter of `Invoke-PSDocument` or inline functions.
 
 When more than one instance name is set, each will be processed sequentially.
-
 If an instance name is not specified, `$InstanceName` will default to the name of the document definition.
 
 Syntax:
@@ -101,7 +99,6 @@ The value of the pipeline object currently being processed.
 `$InputObject` is set by using the `-InputObject` parameter of `Invoke-PSDocument` or inline functions.
 
 When more than one input object is set, each object will be processed sequentially.
-
 If an input object is not specified, `$InputObject` will default to `$Null`.
 
 Syntax:

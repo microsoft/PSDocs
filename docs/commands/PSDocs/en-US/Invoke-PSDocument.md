@@ -31,7 +31,8 @@ Invoke-PSDocument [-Name <String[]>] [-Tag <String[]>] [-InstanceName <String[]>
 
 ## DESCRIPTION
 
-Create markdown from an input object using a document definition. A document is defined using the `document` keyword.
+Create markdown from an input object using a document definition.
+A document is defined using the `Document` keyword.
 
 ## EXAMPLES
 
@@ -60,32 +61,6 @@ Invoke-PSDocument -Path .;
 
 Create markdown using *.Doc.ps1 files loaded from the current working directory.
 
-### Example 2
-
-```powershell
-# Define an inline document called Sample
-Document Sample {
-
-    # Add an introduction section
-    Section Introduction {
-
-        # Add a comment
-        "This is a sample file list from $InputObject"
-
-        # Generate a table
-        Get-ChildItem -Path $InputObject | Table -Property Name,PSIsContainer
-    }
-}
-
-# Calling an inline document definition by name using Invoke-PSDocument is deprecated
-Invoke-PSDocument -Name 'Sample' -InputObject 'C:\';
-
-# This is recommended way to call Sample
-Sample -InputObject 'C:\';
-```
-
-Create markdown using the inline documentation definition called Sample using as input 'C:\'.
-
 ## PARAMETERS
 
 ### -InputObject
@@ -106,10 +81,10 @@ Accept wildcard characters: False
 
 ### -InstanceName
 
-The name of the resulting markdown file. During execution of this command, the variable `$InstanceName` will be available within the document definition for use by expressions.
+The name of the resulting markdown file.
+During execution of this command, the variable `$InstanceName` will be available within the document definition for use by expressions.
 
 If InstanceName is not specified the name of the document definition will be used instead.
-
 If more then one InstanceName is specified, multiple markdown files will be generated in the order they were specified.
 
 ```yaml
