@@ -5,7 +5,7 @@
 - Engine features:
   - Added support for MacOS and Linux. [#59](https://github.com/BernieWhite/PSDocs/issues/59)
 - Deprecations and removals:
-  - Added migration guide for v0.6.x to v0.7.0.
+  - Added [upgrade notes](docs/upgrade-notes.md) for migration from v0.6.x to v0.7.0.
   - **Breaking change**: Removed support for inline document blocks.
     - Use `Invoke-PSDocument` with `.Doc.ps1` files instead.
   - **Breaking change**: Removed script block usage of `Note` and `Warning`.
@@ -15,6 +15,8 @@
     - `-When` was previously replaced with `-If` in v0.6.0.
 - Engineering:
   - Bump YamlDotNet dependency to v8.1.2.
+
+See [upgrade notes](docs/upgrade-notes.md) for helpful information when upgrading from previous versions.
 
 ## v0.6.3
 
