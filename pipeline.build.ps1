@@ -250,7 +250,6 @@ task platyPS {
     if ($Null -eq (Get-InstalledModule -Name PlatyPS -MinimumVersion 0.14.0 -ErrorAction Ignore)) {
         Install-Module -Name PlatyPS -Scope CurrentUser -MinimumVersion 0.14.0 -Force;
     }
-    Import-Module -Name PlatyPS -Verbose:$False;
 }
 
 # Synopsis: Test the module

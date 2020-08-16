@@ -17,6 +17,3 @@ updates:
   - "dependencies"
   reviewers:
   - "berniewhite"
-  ignore:
-  # Ignore updates for YamlDotNet
-  - dependency-name: "YamlDotNet"

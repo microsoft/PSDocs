@@ -13,6 +13,8 @@
     - Use pipeline instead.
   - **Breaking change**: Removed support for `-When` section parameter.
     - `-When` was previously replaced with `-If` in v0.6.0.
+- Engineering:
+  - Bump YamlDotNet dependency to v8.1.2.
 
 ## v0.6.3
 
