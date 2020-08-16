@@ -72,7 +72,7 @@ An example of the output generated is available [here](docs/examples/Get-child-i
 ### Scenarios
 
 - [Azure Resource Manager template example](docs/scenarios/arm-template/arm-template.md)
-- [Integration with DocFX](docs/scenarios/integration-with-docfx.md)
+- [Integration with DocFX](docs/scenarios/docfx/integration-with-docfx.md)
 
 ## Language reference
 
@@ -150,7 +150,7 @@ For a list of module changes please see the [change log](CHANGELOG.md).
 
 This project is [licensed under the MIT License](LICENSE).
 
-[install]: docs/scenarios/install-instructions.md
+[install]: docs/install-instructions.md
 [issues]: https://github.com/BernieWhite/PSDocs/issues
 [ci-badge]: https://bewhite.visualstudio.com/PSDocs/_apis/build/status/PSDocs-CI?branchName=master
 [psg-psdocs]: https://www.powershellgallery.com/packages/PSDocs
