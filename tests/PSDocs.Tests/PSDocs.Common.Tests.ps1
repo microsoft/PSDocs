@@ -33,7 +33,7 @@ $dummyObject = New-Object -TypeName PSObject -Property @{
     }
 }
 
-Describe 'PSDocs instance names' -Tag Common {
+Describe 'PSDocs instance names' -Tag 'Common', 'InstanceName' {
     $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Cmdlets.Doc.ps1';
 
     Context 'Generate a document without an instance name' {
@@ -120,7 +120,7 @@ Describe 'PSDocs instance names' -Tag Common {
     }
 }
 
-Describe 'Invoke-PSDocument' -Tag 'FromPath' {
+Describe 'Invoke-PSDocument' -Tag 'Common', 'Invoke-PSDocument', 'FromPath' {
     Context 'With -Path' {
         It 'Should match name' {
             # Only generate documents for the named document

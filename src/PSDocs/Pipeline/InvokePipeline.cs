@@ -72,14 +72,12 @@ namespace PSDocs.Pipeline
 
         private void ProcessObject(PSObject sourceObject)
         {
-            var instanceName = Context.InstanceNameBinder.GetInstanceName();
-            _Runspace.InstanceName = instanceName;
             try
             {
                 var doc = BuildDocument(sourceObject);
                 for (var i = 0; i < doc.Length; i++)
                 {
-                    var result = WriteDocument(doc[i], instanceName);
+                    var result = WriteDocument(doc[i]);
                     if (result != null)
                         Context.WriteOutput(result);
                 }
@@ -90,9 +88,9 @@ namespace PSDocs.Pipeline
             }
         }
 
-        private IDocumentResult WriteDocument(Document document, string instanceName)
+        private IDocumentResult WriteDocument(Document document)
         {
-            return _Processor.Process(Context.Option, document, instanceName);
+            return _Processor.Process(Context.Option, document);
         }
 
         internal Document[] BuildDocument(PSObject sourceObject)
@@ -104,9 +102,14 @@ namespace PSDocs.Pipeline
                 _Runspace.EnterCulture(Context.Option.Output.Culture[c]);
                 for (var i = 0; i < _Builder.Length; i++)
                 {
-                    // TODO: Add target name binding
-                    var document = _Builder[i].Process(_Runspace, sourceObject);
-                    result.Add(document);
+                    foreach (var instanceName in Context.InstanceNameBinder.GetInstanceName(_Builder[i].Name))
+                    {
+                        _Runspace.InstanceName = instanceName;
+
+                        // TODO: Add target name binding
+                        var document = _Builder[i].Process(_Runspace, sourceObject);
+                        result.Add(document);
+                    }
                 }
             }
             return result.ToArray();

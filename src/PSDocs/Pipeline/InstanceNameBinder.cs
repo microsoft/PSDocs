@@ -1,4 +1,6 @@
-﻿namespace PSDocs.Pipeline
+﻿using System.Collections.Generic;
+
+namespace PSDocs.Pipeline
 {
     /// <summary>
     /// Handles binding of instance names to objects.
@@ -6,19 +8,19 @@
     internal sealed class InstanceNameBinder
     {
         private readonly string[] _InstanceName;
-        private int _Counter;
 
         internal InstanceNameBinder(string[] instanceName)
         {
             _InstanceName = instanceName;
         }
 
-        internal string GetInstanceName()
+        internal IEnumerable<string> GetInstanceName(string defaultInstanceName)
         {
-            if (_InstanceName == null || _Counter >= _InstanceName.Length)
-                return null;
+            if (_InstanceName == null || _InstanceName.Length == 0)
+                yield return defaultInstanceName;
 
-            return _InstanceName[_Counter++];
+            for (var i = 0; _InstanceName != null && i < _InstanceName.Length; i++)
+                yield return _InstanceName[i];
         }
     }
 }

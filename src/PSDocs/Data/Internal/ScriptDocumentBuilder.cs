@@ -29,7 +29,7 @@ namespace PSDocs.Data.Internal
             _Block = block;
         }
 
-        internal string Name => _Block.Name;
+        public string Name => _Block.Name;
 
         internal Document Document => _Document;
 
@@ -38,7 +38,7 @@ namespace PSDocs.Data.Internal
             context.EnterBuilder(this);
             try
             {
-                _Current = _Document = new Document(_Block.Name, context.Culture);
+                _Current = _Document = new Document(context.InstanceName, context.Culture);
                 _Parent = new Stack<SectionNode>();
                 _Document.AddNodes(_Block.Body.Invoke());
                 return _Document;

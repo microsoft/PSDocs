@@ -42,12 +42,12 @@ namespace PSDocs.Processor.Markdown
             }
         }
 
-        public IDocumentResult Process(PSDocumentOption option, Document document, string instanceName)
+        public IDocumentResult Process(PSDocumentOption option, Document document)
         {
             if (document == null)
                 return null;
 
-            var name = instanceName ?? document.Name;
+            var name = document.Name;
             var culture = document.Culture;
             var context = new MarkdownProcessorContext(option, document);
             Document(context);

@@ -11,7 +11,7 @@ namespace PSDocs
         public void LineEndings()
         {
             var document = GetDocument();
-            var actual = GetProcessor().Process(GetOption(), document, "LineEndings").ToString();
+            var actual = GetProcessor().Process(GetOption(), document).ToString();
             var expected = @"# Test document
 
 ## Section 1

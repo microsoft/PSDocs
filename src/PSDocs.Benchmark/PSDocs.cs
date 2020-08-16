@@ -35,7 +35,7 @@ namespace PSDocs.Benchmark
         {
             var option = GetOption();
             var processor = GetProcessor();
-            _InvokeMarkdownProcessor = (document) => processor.Process(option, document, "InstanceName");
+            _InvokeMarkdownProcessor = (document) => processor.Process(option, document);
         }
 
         private void PrepareInvokePipeline()

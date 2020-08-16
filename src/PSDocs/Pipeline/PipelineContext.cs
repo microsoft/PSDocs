@@ -3,14 +3,11 @@ using PSDocs.Configuration;
 using PSDocs.Models;
 using PSDocs.Processor;
 using System;
-using System.Management.Automation.Runspaces;
 
 namespace PSDocs.Pipeline
 {
     internal sealed class PipelineContext : IDisposable
     {
-        private RunspacePool _Pool;
-
         internal readonly PSDocumentOption Option;
         internal readonly LanguageMode LanguageMode;
         internal readonly DocumentFilter Filter;
@@ -29,34 +26,7 @@ namespace PSDocs.Pipeline
             Filter = DocumentFilter.Create(Option.Document.Include, Option.Document.Tag);
             Writer = writer;
             InstanceNameBinder = instanceNameBinder;
-
             _OutputVisitor = _Output;
-        }
-
-        //internal RunspacePool GetRunspace()
-        //{
-        //    if (_Pool == null)
-        //    {
-        //        var state = HostState.CreateSessionState();
-        //        state.LanguageMode = LanguageMode == LanguageMode.FullLanguage ? PSLanguageMode.FullLanguage : PSLanguageMode.ConstrainedLanguage;
-        //        state.ThreadOptions = PSThreadOptions.ReuseThread;
-
-        //        _Pool = RunspaceFactory.CreateRunspacePool(
-        //            //minRunspaces: 1,
-        //            //maxRunspaces: 1,
-        //            initialSessionState: state
-        //        //host: new Host()
-        //        );
-        //        _Pool.ThreadOptions = PSThreadOptions.ReuseThread;
-        //        _Pool.Open();
-        //    }
-
-        //    return _Pool;
-        //}
-
-        internal void WaitAll()
-        {
-
         }
 
         internal void WriteOutput(IDocumentResult result)
