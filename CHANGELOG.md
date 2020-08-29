@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## v0.7.0-B2008035 (pre-release)
+
+What's changed since pre-release v0.7.0-B2008022:
+
 - Engine features:
   - Added support for using document definitions from modules. [#81](https://github.com/BernieWhite/PSDocs/issues/81)
 
