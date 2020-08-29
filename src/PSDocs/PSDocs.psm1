@@ -12,15 +12,10 @@ $Script:UTF8_NO_BOM = New-Object -TypeName System.Text.UTF8Encoding -ArgumentLis
 # Localization
 #
 
-$LocalizedData = data {
-
-}
-$LocalizedHelp = data {
-
-}
-
-Import-LocalizedData -BindingVariable LocalizedData -FileName 'PSDocs.Resources.psd1' -ErrorAction SilentlyContinue;
 Import-LocalizedData -BindingVariable LocalizedHelp -FileName 'PSDocs.Resources.psd1' -ErrorAction SilentlyContinue;
+if ($Null -eq (Get-Variable -Name LocalizedHelp -ErrorAction SilentlyContinue)) {
+    Import-LocalizedData -BindingVariable LocalizedHelp -FileName 'PSDocs.Resources.psd1' -UICulture 'en-US' -ErrorAction SilentlyContinue;
+}
 
 #
 # Public functions
@@ -78,7 +73,7 @@ function Invoke-PSDocument {
 
         # Check if the path is a directory
         if (!(Test-Path -Path $Path)) {
-            Write-Error -Message $LocalizedData.PathNotFound -ErrorAction Stop;
+            Write-Error -Message $LocalizedHelp.PathNotFound -ErrorAction Stop;
 
             return;
         }
