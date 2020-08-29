@@ -15,7 +15,7 @@ namespace PSDocs
         [Fact]
         public void GetDocumentBuilder()
         {
-            var actual = HostHelper.GetDocumentBuilder(new RunspaceContext(new PipelineContext(GetOption(), null, null, null), GetSource()), GetSource());
+            var actual = HostHelper.GetDocumentBuilder(new RunspaceContext(new PipelineContext(GetOption(), null, null, null)), GetSource());
             Assert.Equal(7, actual.Length);
         }
 
@@ -44,7 +44,7 @@ namespace PSDocs
 
         private static Source[] GetSource()
         {
-            var builder = new SourceBuilder(new HostContext(null, null));
+            var builder = new SourcePipelineBuilder(new HostContext(null, null));
             builder.Directory(GetSourcePath("FromFile.Doc.ps1"));
             return builder.Build();
         }

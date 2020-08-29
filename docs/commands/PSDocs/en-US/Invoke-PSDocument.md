@@ -13,25 +13,19 @@ Create markdown from an input object.
 
 ## SYNTAX
 
-### Inline (Default)
-
 ```text
-Invoke-PSDocument -Name <String[]> [-InstanceName <String[]>] [-InputObject <PSObject>] [-OutputPath <String>]
- [-PassThru] [-Option <PSDocumentOption>] [-Encoding <MarkdownEncoding>] [-Culture <String[]>]
- [<CommonParameters>]
-```
-
-### Path
-
-```text
-Invoke-PSDocument [-Name <String[]>] [-Tag <String[]>] [-InstanceName <String[]>] [-InputObject <PSObject>]
- [-Path] <String> [-OutputPath <String>] [-PassThru] [-Option <PSDocumentOption>]
+Invoke-PSDocument [-Module <String[]>] [-Name <String[]>] [-Tag <String[]>] [-InstanceName <String[]>]
+ [-InputObject <PSObject>] [[-Path] <String>] [-OutputPath <String>] [-PassThru] [-Option <PSDocumentOption>]
  [-Encoding <MarkdownEncoding>] [-Culture <String[]>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
 
 Create markdown from an input object using a document definition.
+Document definitions are discovered within files ending in `.Doc.ps1`.
+By default, definitions will be be discovered from the current working path.
+Use `-Module` to discover definitions from modules.
+
 A document is defined using the `Document` keyword.
 
 ## EXAMPLES
@@ -47,10 +41,10 @@ Document Sample {
     Section Introduction {
 
         # Add a comment
-        "This is a sample file list from $InputObject"
+        "This is a sample file list from $TargetObject"
 
         # Generate a table
-        Get-ChildItem -Path $InputObject | Table -Property Name,PSIsContainer
+        Get-ChildItem -Path $TargetObject | Table -Property Name,PSIsContainer
     }
 }
 '@
@@ -63,19 +57,54 @@ Create markdown using *.Doc.ps1 files loaded from the current working directory.
 
 ## PARAMETERS
 
-### -InputObject
+### -Module
 
-An input object that will be passed to each document and can be referenced within document blocks as `$TargetObject`.
+Get document definitions in the specified modules.
+When specified, only document definitions from modules will be used.
+To additionally use document definitions in paths use `-Path` together with `-Module`.
 
 ```yaml
-Type: PSObject
+Type: String[]
+Parameter Sets: (All)
+Aliases: m
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Name
+
+The name of a specific document definitions to use.
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases: n
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Tag
+
+One or more tags that the document definition must contain.
+If more then one tag is specified, all tags be present on the document definition to be evaluated.
+
+```yaml
+Type: String[]
 Parameter Sets: (All)
 Aliases:
 
 Required: False
 Position: Named
 Default value: None
-Accept pipeline input: True (ByValue)
+Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
@@ -99,33 +128,19 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Name
+### -InputObject
 
-The name of a specific document definition to use to generate markdown.
-
-When this option is used with `-Path`, script files will be executed in order, and document blocks that do not match name are skipped.
+An input object that will be passed to each document and can be referenced within document blocks as `$TargetObject`.
 
 ```yaml
-Type: String[]
-Parameter Sets: Inline
-Aliases:
-
-Required: True
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-```yaml
-Type: String[]
-Parameter Sets: Path
+Type: PSObject
+Parameter Sets: (All)
 Aliases:
 
 Required: False
 Position: Named
 Default value: None
-Accept pipeline input: False
+Accept pipeline input: True (ByValue)
 Accept wildcard characters: False
 ```
 
@@ -164,7 +179,7 @@ Accept wildcard characters: False
 
 ### -Option
 
-Additional options that configure document generation.
+Additional options that configure PSDocs.
 A `PSDocumentOption` can be created by using the `New-PSDocumentOption` cmdlet.
 Alternatively a hashtable or path to YAML file can be specified with options.
 
@@ -201,13 +216,12 @@ Accept wildcard characters: False
 
 ### -Path
 
-A directory path to read document definitions recursively from.
-Document definitions are discovered within files ending in `.Doc.ps1`.
+A list of paths to use document definitions from.
 
 ```yaml
 Type: String
-Parameter Sets: Path
-Aliases:
+Parameter Sets: (All)
+Aliases: p
 
 Required: False
 Position: 0
@@ -216,27 +230,9 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Tag
-
-One or more tags that the document definition must contain.
-If more then one tag is specified, all tags be present on the document definition to be evaluated.
-
-```yaml
-Type: String[]
-Parameter Sets: Path
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
 ### -Culture
 
 One or more culture names when building documents that are localized. i.e. en-AU, en-US
-
 When culture names are specified, the generated document will be written to a culture specific subdirectory.
 
 ```yaml
@@ -253,7 +249,7 @@ Accept wildcard characters: False
 
 ### CommonParameters
 
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 

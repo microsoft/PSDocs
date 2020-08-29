@@ -50,12 +50,12 @@ document 'CodeMarkdownEval' {
 #region Include
 
 document 'IncludeRelative' {
-    Include tests/PSDocs.Tests/IncludeFile.md -BaseDirectory $InputObject
-    Include IncludeFile2.md -BaseDirectory (Join-Path -Path $InputObject -ChildPath tests/PSDocs.Tests/)
+    Include tests/PSDocs.Tests/IncludeFile.md -BaseDirectory $TargetObject
+    Include IncludeFile2.md -BaseDirectory (Join-Path -Path $TargetObject -ChildPath tests/PSDocs.Tests/)
 }
 
 document 'IncludeAbsolute' {
-    Include (Join-Path -Path $InputObject -ChildPath tests/PSDocs.Tests/IncludeFile.md)
+    Include (Join-Path -Path $TargetObject -ChildPath tests/PSDocs.Tests/IncludeFile.md)
 }
 
 document 'IncludeCulture' {
@@ -161,7 +161,7 @@ document 'SectionIf' {
 #region Table
 
 document 'TableTests' {
-    Get-ChildItem -Path $InputObject -File | Where-Object -FilterScript { 'README.md','LICENSE' -contains $_.Name } | Format-Table -Property 'Name','PSIsContainer'
+    Get-ChildItem -Path $TargetObject -File | Where-Object -FilterScript { 'README.md','LICENSE' -contains $_.Name } | Format-Table -Property 'Name','PSIsContainer'
     'EOF'
 }
 
@@ -184,19 +184,19 @@ document 'TableSingleEntryMarkdown' {
 
 document 'TableWithNull' {
     Section 'Windows features' -Force {
-        $InputObject.ResourceType.WindowsFeature | Table -Property Name,Ensure;
+        $TargetObject.ResourceType.WindowsFeature | Table -Property Name,Ensure;
     }
 }
 
 document 'TableWithMultilineColumn' {
-    $InputObject | Table;
+    $TargetObject | Table;
 }
 
 document 'TableWithEmptyColumn' {
     'Table1'
-    $InputObject | Table -Property Name,NotValue,Value
+    $TargetObject | Table -Property Name,NotValue,Value
     'Table2'
-    $InputObject | Table -Property Name,NotValue
+    $TargetObject | Table -Property Name,NotValue
     'EOF'
 }
 

@@ -1,4 +1,5 @@
 ﻿
+using PSDocs.Definitions;
 using PSDocs.Pipeline;
 using System;
 using System.Diagnostics;
@@ -6,32 +7,39 @@ using System.Management.Automation;
 
 namespace PSDocs.Runtime
 {
+    /// <summary>
+    /// A Document block.
+    /// </summary>
     [DebuggerDisplay("{Id} @{SourcePath}")]
-    internal sealed class ScriptDocumentBlock : ILanguageBlock, IDisposable
+    internal sealed class ScriptDocumentBlock : IDocumentDefinition, IDisposable
     {
-        public readonly string Id;
-
-        public readonly string Name;
-        public readonly PowerShell Body;
-        public readonly string[] Tag;
+        internal readonly PowerShell Body;
+        internal readonly string[] Tag;
 
         private readonly SourceFile Source;
 
         // Track whether Dispose has been called.
-        private bool _Disposed = false;
+        private bool _Disposed;
 
-        public ScriptDocumentBlock(SourceFile source, string name, PowerShell body, string[] tag)
+        internal ScriptDocumentBlock(SourceFile source, string name, PowerShell body, string[] tag, IResourceExtent extent)
         {
             Source = source;
-            Id = name;
             Name = name;
+            Id = ResourceHelper.GetId(source.ModuleName, name);
             Body = body;
             Tag = tag;
+            Extent = extent;
         }
+
+        public string Id { get; }
+
+        public string Name { get; }
 
         public string SourcePath => Source.Path;
 
         public string Module => Source.ModuleName;
+
+        internal IResourceExtent Extent { get; }
 
         #region IDisposable
 

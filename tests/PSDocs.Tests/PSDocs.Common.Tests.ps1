@@ -120,7 +120,7 @@ Describe 'PSDocs instance names' -Tag 'Common', 'InstanceName' {
     }
 }
 
-Describe 'Invoke-PSDocument' -Tag 'Common', 'Invoke-PSDocument', 'FromPath' {
+Describe 'Invoke-PSDocument' -Tag 'Cmdlet', 'Common', 'Invoke-PSDocument', 'FromPath' {
     Context 'With -Path' {
         It 'Should match name' {
             # Only generate documents for the named document
@@ -178,7 +178,114 @@ Describe 'Invoke-PSDocument' -Tag 'Common', 'Invoke-PSDocument', 'FromPath' {
     }
 }
 
-Describe 'Get-PSDocumentHeader' -Tag 'Common', 'Get-PSDocumentHeader' {
+Describe 'Get-PSDocument' -Tag 'Cmdlet', 'Common', 'Get-PSDocument' {
+    $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Cmdlets.Doc.ps1';
+
+    Context 'With -Module' {
+        $testModuleSourcePath = Join-Path $here -ChildPath 'TestModule';
+
+        It 'Returns documents' {
+            $Null = Import-Module $testModuleSourcePath -Force;
+            $result = @(Get-PSDocument -Module 'TestModule');
+            $result | Should -Not -BeNullOrEmpty;
+            $result.Length | Should -Be 2;
+            $result.Id | Should -BeIn 'TestModule\TestDocument1', 'TestModule\TestDocument2';
+        }
+
+        if ($Null -ne (Get-Module -Name TestModule -ErrorAction SilentlyContinue)) {
+            $Null = Remove-Module -Name TestModule;
+        }
+
+        It 'Loads module with preference' {
+            Mock -CommandName 'LoadModule' -ModuleName 'PSDocs';
+            $currentLoadingPreference = Get-Variable -Name PSModuleAutoLoadingPreference -ErrorAction SilentlyContinue -ValueOnly;
+
+            try {
+                # Test negative case
+                $Global:PSModuleAutoLoadingPreference = [System.Management.Automation.PSModuleAutoLoadingPreference]::None;
+                $Null = Get-PSDocument -Module 'TestModule';
+                Assert-MockCalled -CommandName 'LoadModule' -ModuleName 'PSDocs' -Times 0 -Scope 'It';
+
+                # Test positive case
+                $Global:PSModuleAutoLoadingPreference = [System.Management.Automation.PSModuleAutoLoadingPreference]::All;
+                $Null = Get-PSDocument -Module 'TestModule';
+                Assert-MockCalled -CommandName 'LoadModule' -ModuleName 'PSDocs' -Times 1 -Scope 'It';
+            }
+            finally {
+                if ($Null -eq $currentLoadingPreference) {
+                    Remove-Variable -Name PSModuleAutoLoadingPreference -Force -ErrorAction SilentlyContinue;
+                }
+                else {
+                    $Global:PSModuleAutoLoadingPreference = $currentLoadingPreference;
+                }
+            }
+        }
+
+        It 'Use modules already loaded' {
+            Mock -CommandName 'GetAutoloadPreference' -ModuleName 'PSDocs' -MockWith {
+                return [System.Management.Automation.PSModuleAutoLoadingPreference]::All;
+            }
+            Mock -CommandName 'LoadModule' -ModuleName 'PSDocs';
+            $Null = Import-Module $testModuleSourcePath -Force;
+            $result = @(Get-PSDocument -Module 'TestModule')
+            Assert-MockCalled -CommandName 'LoadModule' -ModuleName 'PSDocs' -Times 0 -Scope 'It';
+            $result | Should -Not -BeNullOrEmpty;
+            $result.Length | Should -Be 2;
+            $result.Id | Should -BeIn 'TestModule\TestDocument1', 'TestModule\TestDocument2';
+        }
+
+        if ($Null -ne (Get-Module -Name TestModule -ErrorAction SilentlyContinue)) {
+            $Null = Remove-Module -Name TestModule;
+        }
+
+        It 'Handles path spaces' {
+            # Copy file
+            $testParentPath = Join-Path -Path $outputPath -ChildPath 'Program Files\';
+            $testDestinationPath = Join-Path -Path $testParentPath -ChildPath 'FromFile.Doc.ps1';
+            if (!(Test-Path -Path $testParentPath)) {
+                $Null = New-Item -Path $testParentPath -ItemType Directory -Force;
+            }
+            $Null = Copy-Item -Path $docFilePath -Destination $testDestinationPath -Force;
+
+            $result = @(Get-PSDocument -Path $testDestinationPath);
+            $result | Should -Not -BeNullOrEmpty;
+            $result.Length | Should -BeGreaterOrEqual 6;
+
+            # Copy module to test path
+            $testModuleDestinationPath = Join-Path -Path $testParentPath -ChildPath 'TestModule';
+            $Null = Copy-Item -Path $testModuleSourcePath -Destination $testModuleDestinationPath -Recurse -Force;
+
+            # Test modules with spaces in paths
+            $Null = Import-Module $testModuleDestinationPath -Force;
+            $result = @(Get-PSDocument -Module 'TestModule');
+            $result | Should -Not -BeNullOrEmpty;
+            $result.Length | Should -Be 2;
+            $result[0].Id | Should -Be 'TestModule\TestDocument1';
+        }
+
+        if ($Null -ne (Get-Module -Name TestModule -ErrorAction SilentlyContinue)) {
+            $Null = Remove-Module -Name TestModule;
+        }
+
+        It 'Returns module and path documents' {
+            $Null = Import-Module $testModuleSourcePath -Force;
+            $result = @(Get-PSDocument -Path $testModuleSourcePath -Module 'TestModule');
+            $result | Should -Not -BeNullOrEmpty;
+            $result.Length | Should -Be 4;
+            $result.Id | Should -BeIn 'TestModule\TestDocument1', 'TestModule\TestDocument2', '.\TestDocument1', '.\TestDocument2';
+        }
+
+        if ($Null -ne (Get-Module -Name TestModule -ErrorAction SilentlyContinue)) {
+            $Null = Remove-Module -Name TestModule;
+        }
+
+        if ($Null -ne (Get-Module -Name TestModule -ErrorAction SilentlyContinue)) {
+            $Null = Remove-Module -Name TestModule;
+        }
+    }
+}
+
+Describe 'Get-PSDocumentHeader' -Tag 'Cmdlet', 'Common', 'Get-PSDocumentHeader' {
     $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Cmdlets.Doc.ps1';
 
     Context 'With -Path' {

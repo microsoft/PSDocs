@@ -51,10 +51,10 @@ Document Sample {
     # Add an introduction section
     Section Introduction {
         # Add a comment
-        "This is a sample file list from $InputObject"
+        "This is a sample file list from $TargetObject"
 
         # Generate a table
-        Get-ChildItem -Path $InputObject | Table -Property Name,PSIsContainer
+        Get-ChildItem -Path $TargetObject | Table -Property Name,PSIsContainer
     }
 }
 ```
@@ -100,6 +100,7 @@ The following language keywords are used by the `PSDocs` module:
 The following commands exist in the `PSDocs` module:
 
 - [Invoke-PSDocument](docs/commands/PSDocs/en-US/Invoke-PSDocument.md)
+- [Get-PSDocument](docs/commands/PSDocs/en-US/Get-PSDocument.md)
 - [Get-PSDocumentHeader](docs/commands/PSDocs/en-US/Get-PSDocumentHeader.md)
 - [New-PSDocumentOption](docs/commands/PSDocs/en-US/New-PSDocumentOption.md)
 
@@ -123,7 +124,7 @@ The following conceptual topics exist in the `PSDocs` module:
   - [$Culture](docs/concepts/PSDocs/en-US/about_PSDocs_Variables.md#culture)
   - [$Document](docs/concepts/PSDocs/en-US/about_PSDocs_Variables.md#document)
   - [$InstanceName](docs/concepts/PSDocs/en-US/about_PSDocs_Variables.md#instancename)
-  - [$InputObject](docs/concepts/PSDocs/en-US/about_PSDocs_Variables.md#inputobject)
+  - [$TargetObject](docs/concepts/PSDocs/en-US/about_PSDocs_Variables.md#targetobject)
   - [$Section](docs/concepts/PSDocs/en-US/about_PSDocs_Variables.md#section)
 
 ## Related projects

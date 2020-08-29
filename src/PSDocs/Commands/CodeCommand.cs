@@ -15,7 +15,6 @@ namespace PSDocs.Commands
         private const string ParameterSet_StringInfoString = "StringInfoString";
         private const string ParameterSet_Default = "Default";
 
-        private Code _Code;
         private List<string> _Content;
 
         [Parameter(Position = 0, Mandatory = true, ParameterSetName = ParameterSet_InfoString)]
@@ -32,8 +31,6 @@ namespace PSDocs.Commands
 
         protected override void BeginProcessing()
         {
-            _Code = GetBuilder().Code();
-            _Code.Info = Info;
             _Content = new List<string>();
         }
 
@@ -47,8 +44,17 @@ namespace PSDocs.Commands
 
         protected override void EndProcessing()
         {
-            _Code.Content = string.Join(Environment.NewLine, _Content.ToArray());
-            WriteObject(_Code);
+            try
+            {
+                var node = ModelHelper.NewCode();
+                node.Info = Info;
+                node.Content = string.Join(Environment.NewLine, _Content.ToArray());
+                WriteObject(node);
+            }
+            finally
+            {
+                _Content.Clear();
+            }
         }
 
         private void AddContent(string input)

@@ -19,7 +19,7 @@ The following variables are available for use:
 - [$Culture](#culture)
 - [$Document](#document)
 - [$InstanceName](#instancename)
-- [$InputObject](#inputobject)
+- [$TargetObject](#targetobject)
 - [$Section](#section)
 
 ### Culture
@@ -93,18 +93,18 @@ Syntax:
 $InstanceName
 ```
 
-### InputObject
+### TargetObject
 
 The value of the pipeline object currently being processed.
-`$InputObject` is set by using the `-InputObject` parameter of `Invoke-PSDocument` or inline functions.
+`$TargetObject` is set by using the `-InputObject` parameter of `Invoke-PSDocument` or inline functions.
 
 When more than one input object is set, each object will be processed sequentially.
-If an input object is not specified, `$InputObject` will default to `$Null`.
+If an input object is not specified, `$TargetObject` will default to `$Null`.
 
 Syntax:
 
 ```powershell
-$InputObject
+$TargetObject
 ```
 
 ### Section

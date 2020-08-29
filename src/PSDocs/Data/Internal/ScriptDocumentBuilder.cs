@@ -8,15 +8,14 @@ using System.Management.Automation;
 
 namespace PSDocs.Data.Internal
 {
+    /// <summary>
+    /// Executes a script block to generate a document model.
+    /// </summary>
     internal sealed class ScriptDocumentBuilder : IDocumentBuilder
     {
         private readonly ScriptDocumentBlock _Block;
 
-        [ThreadStatic]
-        private static Document _Document;
-
-        [ThreadStatic]
-        private static SectionNode _Current;
+        private SectionNode _Current;
 
         [ThreadStatic]
         private static Stack<SectionNode> _Parent;
@@ -31,17 +30,17 @@ namespace PSDocs.Data.Internal
 
         public string Name => _Block.Name;
 
-        internal Document Document => _Document;
+        internal Document Document { get; private set; }
 
         Document IDocumentBuilder.Process(RunspaceContext context, PSObject sourceObject)
         {
             context.EnterBuilder(this);
             try
             {
-                _Current = _Document = new Document(context.InstanceName, context.Culture);
+                _Current = Document = new Document(context.InstanceName, context.Culture);
                 _Parent = new Stack<SectionNode>();
-                _Document.AddNodes(_Block.Body.Invoke());
-                return _Document;
+                Document.AddNodes(_Block.Body.Invoke());
+                return Document;
             }
             catch (Exception e)
             {
@@ -50,7 +49,7 @@ namespace PSDocs.Data.Internal
             }
             finally
             {
-                _Document = null;
+                Document = null;
                 _Current = null;
                 _Parent.Clear();
                 _Parent = null;
@@ -60,13 +59,13 @@ namespace PSDocs.Data.Internal
 
         internal void Title(string text)
         {
-            _Document.Title = text;
+            Document.Title = text;
         }
 
         internal void Metadata(IDictionary metadata)
         {
             foreach (DictionaryEntry kv in metadata)
-                _Document.Metadata[kv.Key] = kv.Value;
+                Document.Metadata[kv.Key] = kv.Value;
         }
 
         internal SectionNode EnterSection(string name)
@@ -88,21 +87,6 @@ namespace PSDocs.Data.Internal
             _Current = _Parent.Pop();
         }
 
-        internal Code Code()
-        {
-            return ModelHelper.NewCode();
-        }
-
-        internal BlockQuote BlockQuote(string info, string title)
-        {
-            return ModelHelper.BlockQuote(info, title);
-        }
-
-        internal TableBuilder Table()
-        {
-            return ModelHelper.Table();
-        }
-
         #region IDisposable
 
         public void Dispose()
@@ -118,7 +102,7 @@ namespace PSDocs.Data.Internal
                 if (disposing)
                 {
                     _Block.Dispose();
-                    _Document = null;
+                    Document = null;
                     _Current = null;
                     _Parent = null;
                 }

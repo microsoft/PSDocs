@@ -6,6 +6,9 @@ using System;
 
 namespace PSDocs.Pipeline
 {
+    /// <summary>
+    /// A context for an end-to-end pipeline execution.
+    /// </summary>
     internal sealed class PipelineContext : IDisposable
     {
         internal readonly PSDocumentOption Option;

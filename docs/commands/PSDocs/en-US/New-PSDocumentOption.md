@@ -14,7 +14,7 @@ Create options to configure document generation.
 ## SYNTAX
 
 ```text
-New-PSDocumentOption [-Option <PSDocumentOption>] [-Path <String>] [-Encoding <MarkdownEncoding>]
+New-PSDocumentOption [-Path <String>] [-Option <PSDocumentOption>] [-Encoding <MarkdownEncoding>]
  [<CommonParameters>]
 ```
 
@@ -86,7 +86,7 @@ Accept wildcard characters: False
 
 ### CommonParameters
 
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 

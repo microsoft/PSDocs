@@ -10,3 +10,4 @@ out/
 src/**/*-help.xml
 src/**/*.help.txt
 BenchmarkDotNet.Artifacts/
+PSDocs.Benchmark*.log

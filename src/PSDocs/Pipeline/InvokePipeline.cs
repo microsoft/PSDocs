@@ -13,6 +13,9 @@ namespace PSDocs.Pipeline
         void InstanceName(string[] instanceName);
     }
 
+    /// <summary>
+    /// The pipeline builder for Invoke-PSDocument.
+    /// </summary>
     internal sealed class InvokePipelineBuilder : PipelineBuilderBase, IInvokePipelineBuilder
     {
         private string[] _InstanceName;
@@ -33,6 +36,9 @@ namespace PSDocs.Pipeline
 
         public override IPipeline Build()
         {
+            if (!RequireSources())
+                return null;
+
             return new InvokePipeline(PrepareContext(), Source);
         }
 
@@ -44,10 +50,11 @@ namespace PSDocs.Pipeline
         }
     }
 
-    internal sealed class InvokePipeline : PipelineBase, IPipeline
+    /// <summary>
+    /// The pipeline for Invoke-PSDocument.
+    /// </summary>
+    internal sealed class InvokePipeline : StreamPipeline, IPipeline
     {
-        private readonly PipelineStream _Stream;
-
         private IDocumentBuilder[] _Builder;
         private MarkdownProcessor _Processor;
         private RunspaceContext _Runspace;
@@ -55,22 +62,12 @@ namespace PSDocs.Pipeline
         internal InvokePipeline(PipelineContext context, Source[] source)
             : base(context, source)
         {
-            _Stream = new PipelineStream(context);
-            Prepare();
+            _Runspace = new RunspaceContext(Context);
+            _Builder = HostHelper.GetDocumentBuilder(_Runspace, Source);
+            _Processor = new MarkdownProcessor();
         }
 
-        public override void Process(PSObject sourceObject)
-        {
-            //if (sourceObject != null)
-            //{
-            _Stream.Enqueue(sourceObject);
-            //}
-
-            while (!_Stream.IsEmpty && _Stream.TryDequeue(out PSObject nextObject))
-                ProcessObject(nextObject);
-        }
-
-        private void ProcessObject(PSObject sourceObject)
+        protected override void ProcessObject(PSObject sourceObject)
         {
             try
             {
@@ -113,13 +110,6 @@ namespace PSDocs.Pipeline
                 }
             }
             return result.ToArray();
-        }
-
-        private void Prepare()
-        {
-            _Runspace = new RunspaceContext(Context, Source);
-            _Builder = HostHelper.GetDocumentBuilder(_Runspace, Source);
-            _Processor = new MarkdownProcessor();
         }
 
         #region IDisposable

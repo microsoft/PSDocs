@@ -14,6 +14,9 @@ namespace PSDocs.Pipeline
 
     public static class PipelineBuilder
     {
+        /// <summary>
+        /// Invoke-PSDocument.
+        /// </summary>
         public static IInvokePipelineBuilder Invoke(Source[] source, PSDocumentOption option, PSCmdlet commandRuntime, EngineIntrinsics executionContext)
         {
             var hostContext = new HostContext(commandRuntime, executionContext);
@@ -22,11 +25,19 @@ namespace PSDocs.Pipeline
             return builder;
         }
 
-        public static SourceBuilder Source(PSDocumentOption option, PSCmdlet commandRuntime, EngineIntrinsics executionContext)
+        public static IGetPipelineBuilder Get(Source[] source, PSDocumentOption option, PSCmdlet commandRuntime, EngineIntrinsics executionContext)
         {
             var hostContext = new HostContext(commandRuntime, executionContext);
-            var builder = new SourceBuilder(hostContext);
+            var builder = new GetPipelineBuilder(source, hostContext);
             builder.Configure(option);
+            return builder;
+        }
+
+        public static SourcePipelineBuilder Source(PSDocumentOption option, PSCmdlet commandRuntime, EngineIntrinsics executionContext)
+        {
+            var hostContext = new HostContext(commandRuntime, executionContext);
+            var builder = new SourcePipelineBuilder(hostContext);
+            //builder.Configure(option);
             return builder;
         }
     }
@@ -71,15 +82,26 @@ namespace PSDocs.Pipeline
             Option.Output = new OutputOption(option.Output);
 
             if (!string.IsNullOrEmpty(Option.Output.Path))
-            {
                 OutputVisitor = (o, enumerate) => WriteToFile(o, Option, Writer, ShouldProcess);
-            }
 
             ConfigureCulture();
             return this;
         }
 
         public abstract IPipeline Build();
+
+        /// <summary>
+        /// Require sources for pipeline execution.
+        /// </summary>
+        protected bool RequireSources()
+        {
+            if (Source == null || Source.Length == 0)
+            {
+                //Writer.WarnRulePathNotFound();
+                return false;
+            }
+            return true;
+        }
 
         protected virtual PipelineContext PrepareContext()
         {

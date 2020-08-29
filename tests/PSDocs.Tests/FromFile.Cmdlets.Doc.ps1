@@ -5,8 +5,8 @@
 # Synopsis: Document for unit testing
 Document 'WithoutInstanceName' {
     $InstanceName;
-    $InputObject.Object.Name;
-    $InputObject.Hashtable.Name;
+    $TargetObject.Object.Name;
+    $TargetObject.Hashtable.Name;
 }
 
 # Synopsis: Document for unit testing
