@@ -1,6 +1,4 @@
-﻿
-using PSDocs.Data.Internal;
-using PSDocs.Models;
+﻿using PSDocs.Models;
 using System.Collections.Generic;
 using System.Management.Automation;
 
@@ -8,9 +6,9 @@ namespace PSDocs.Commands
 {
     internal abstract class BlockQuoteCommandBase : KeywordCmdlet
     {
-        private ScriptDocumentBuilder _Builder;
-        private BlockQuote _BlockQuote;
         private List<string> _Content;
+
+        #region Properties
 
         [Parameter()]
         public string Title { get; set; }
@@ -18,10 +16,10 @@ namespace PSDocs.Commands
         [Parameter(Position = 0, Mandatory = true, ValueFromPipeline = true)]
         public string Text { get; set; }
 
+        #endregion Properties
+
         protected override void BeginProcessing()
         {
-            _Builder = GetBuilder();
-            _BlockQuote = GetBuilder().BlockQuote(GetInfo(), Title);
             _Content = new List<string>();
         }
 
@@ -32,9 +30,16 @@ namespace PSDocs.Commands
 
         protected override void EndProcessing()
         {
-            _BlockQuote.Content = _Content.ToArray();
-            _Content.Clear();
-            WriteObject(_BlockQuote);
+            try
+            {
+                var node = ModelHelper.BlockQuote(GetInfo(), Title);
+                node.Content = _Content.ToArray();
+                WriteObject(node);
+            }
+            finally
+            {
+                _Content.Clear();
+            }
         }
 
         protected abstract string GetInfo();

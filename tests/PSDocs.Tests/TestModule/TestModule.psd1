@@ -1,11 +1,10 @@
 #
-# PSDocs module
+# A module for testing
 #
-
 @{
 
 # Script module or binary module file associated with this manifest.
-RootModule = 'PSDocs.psm1'
+# RootModule = ''
 
 # Version number of this module.
 ModuleVersion = '0.0.1'
@@ -14,7 +13,7 @@ ModuleVersion = '0.0.1'
 CompatiblePSEditions = 'Core', 'Desktop'
 
 # ID used to uniquely identify this module
-GUID = '1f6df554-c081-40d8-9aca-32c1abe4a1b6'
+GUID = '9190b71c-7959-4c86-a420-2d78c62ecbba'
 
 # Author of this module
 Author = 'Bernie White'
@@ -26,24 +25,22 @@ CompanyName = 'Bernie White'
 Copyright = '(c) Bernie White. All rights reserved.'
 
 # Description of the functionality provided by this module
-Description = 'Generate markdown from PowerShell.
+# Description = ''
 
-This project is to be considered a proof-of-concept and not a supported product.'
+# Minimum version of the PowerShell engine required by this module
+# PowerShellVersion = ''
 
-# Minimum version of the Windows PowerShell engine required by this module
-PowerShellVersion = '5.1'
-
-# Name of the Windows PowerShell host required by this module
+# Name of the PowerShell host required by this module
 # PowerShellHostName = ''
 
-# Minimum version of the Windows PowerShell host required by this module
+# Minimum version of the PowerShell host required by this module
 # PowerShellHostVersion = ''
 
 # Minimum version of Microsoft .NET Framework required by this module. This prerequisite is valid for the PowerShell Desktop edition only.
-DotNetFrameworkVersion = '4.7.2'
+# DotNetFrameworkVersion = ''
 
 # Minimum version of the common language runtime (CLR) required by this module. This prerequisite is valid for the PowerShell Desktop edition only.
-# CLRVersion = ''
+# ClrVersion = ''
 
 # Processor architecture (None, X86, Amd64) required by this module
 # ProcessorArchitecture = ''
@@ -52,9 +49,7 @@ DotNetFrameworkVersion = '4.7.2'
 # RequiredModules = @()
 
 # Assemblies that must be loaded prior to importing this module
-RequiredAssemblies = @(
-    'PSDocs.dll'
-)
+# RequiredAssemblies = @()
 
 # Script files (.ps1) that are run in the caller's environment prior to importing this module.
 # ScriptsToProcess = @()
@@ -63,36 +58,19 @@ RequiredAssemblies = @(
 # TypesToProcess = @()
 
 # Format files (.ps1xml) to be loaded when importing this module
-FormatsToProcess = @(
-    'PSDocs.Format.ps1xml'
-)
+# FormatsToProcess = @()
 
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
 # NestedModules = @()
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-FunctionsToExport = @(
-    'Document'
-    'Invoke-PSDocument'
-    'Get-PSDocument'
-    'Get-PSDocumentHeader'
-    'New-PSDocumentOption'
-    'Section'
-    'Table'
-    'Metadata'
-    'Title'
-    'Code'
-    'BlockQuote'
-    'Note'
-    'Warning'
-    'Include'
-)
+FunctionsToExport = @()
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = @()
 
 # Variables to export from this module
-VariablesToExport = @()
+VariablesToExport = '*'
 
 # Aliases to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no aliases to export.
 AliasesToExport = @()
@@ -108,22 +86,32 @@ AliasesToExport = @()
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
 PrivateData = @{
+
     PSData = @{
 
         # Tags applied to this module. These help with module discovery in online galleries.
-        Tags = @('Markdown', 'PSDocs', 'DevOps', 'CI')
+        Tags = @('PSDocs-documents')
 
         # A URL to the license for this module.
-        LicenseUri = 'https://github.com/BernieWhite/PSDocs/blob/main/LICENSE'
+        # LicenseUri = ''
 
         # A URL to the main website for this project.
-        ProjectUri = 'https://github.com/BernieWhite/PSDocs'
+        # ProjectUri = ''
 
         # A URL to an icon representing this module.
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = 'https://github.com/BernieWhite/PSDocs/releases'
+        # ReleaseNotes = ''
+
+        # Prerelease string of this module
+        # Prerelease = ''
+
+        # Flag to indicate whether the module requires explicit user acceptance for install/update/save
+        # RequireLicenseAcceptance = $false
+
+        # External dependent modules of this module
+        # ExternalModuleDependencies = @()
 
     } # End of PSData hashtable
 
@@ -136,3 +124,4 @@ PrivateData = @{
 # DefaultCommandPrefix = ''
 
 }
+

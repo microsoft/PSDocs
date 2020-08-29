@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Management.Automation;
-using System.Threading;
 
 namespace PSDocs.Pipeline
 {
@@ -74,35 +73,35 @@ namespace PSDocs.Pipeline
     /// <summary>
     /// A helper to build a list of rule sources for discovery.
     /// </summary>
-    public sealed class SourceBuilder
+    public sealed class SourcePipelineBuilder
     {
         private readonly List<Source> _Source;
+        private readonly HostContext _HostContext;
         private readonly IPipelineWriter _Writer;
 
-        internal SourceBuilder(HostContext hostContext)
+        internal SourcePipelineBuilder(HostContext hostContext)
         {
             _Source = new List<Source>();
+            _HostContext = hostContext;
             _Writer = new HostPipelineWriter(hostContext);
         }
 
-        public SourceBuilder Configure(PSDocumentOption option)
+        public bool ShouldLoadModule
         {
-            //_Writer.Configure(option);
-            //_Writer.EnterScope("[Discovery.Source]");
-            return this;
+            get { return _HostContext.GetAutoLoadingPreference() == PSModuleAutoLoadingPreference.All; }
         }
 
-        public void VerboseScanSource(string path)
+        private void VerboseScanSource(string path)
         {
             _Writer.WriteVerbose(PSDocsResources.ScanSource, path);
         }
 
-        public void VerboseFoundModules(int count)
+        private void VerboseFoundModules(int count)
         {
             _Writer.WriteVerbose(PSDocsResources.FoundModules, count);
         }
 
-        public void VerboseScanModule(string moduleName)
+        private void VerboseScanModule(string moduleName)
         {
             _Writer.WriteVerbose(PSDocsResources.ScanModule, moduleName);
         }
@@ -117,9 +116,7 @@ namespace PSDocs.Pipeline
                 return;
 
             for (var i = 0; i < path.Length; i++)
-            {
                 Directory(path[i]);
-            }
         }
 
         public void Directory(string path)

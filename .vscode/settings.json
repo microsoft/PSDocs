@@ -16,6 +16,8 @@
         "**/.azure-pipelines/**/*.yaml": "azure-pipelines"
     },
     "cSpell.words": [
+        "cmdlet",
+        "hashtable",
         "runspace"
     ],
 }

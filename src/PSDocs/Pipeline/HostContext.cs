@@ -5,6 +5,8 @@ namespace PSDocs.Pipeline
     public interface IHostContext
     {
         ActionPreference GetPreferenceVariable(string variableName);
+
+        T GetVariable<T>(string variableName);
     }
 
     internal static class HostContextExtensions
@@ -14,6 +16,7 @@ namespace PSDocs.Pipeline
         private const string InformationPreference = "InformationPreference";
         private const string VerbosePreference = "VerbosePreference";
         private const string DebugPreference = "DebugPreference";
+        private const string AutoLoadingPreference = "PSModuleAutoLoadingPreference";
 
         public static ActionPreference GetErrorPreference(this IHostContext hostContext)
         {
@@ -39,6 +42,11 @@ namespace PSDocs.Pipeline
         {
             return hostContext.GetPreferenceVariable(DebugPreference);
         }
+
+        public static PSModuleAutoLoadingPreference GetAutoLoadingPreference(this IHostContext hostContext)
+        {
+            return hostContext.GetVariable<PSModuleAutoLoadingPreference>(AutoLoadingPreference);
+        }
     }
 
     internal sealed class HostContext : IHostContext
@@ -58,6 +66,14 @@ namespace PSDocs.Pipeline
                 return ActionPreference.SilentlyContinue;
 
             return (ActionPreference)ExecutionContext.SessionState.PSVariable.GetValue(variableName);
+        }
+
+        public T GetVariable<T>(string variableName)
+        {
+            if (ExecutionContext == null)
+                return default;
+
+            return (T)ExecutionContext.SessionState.PSVariable.GetValue(variableName);
         }
 
         public bool ShouldProcess(string target, string action)

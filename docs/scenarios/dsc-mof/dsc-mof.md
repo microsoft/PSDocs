@@ -13,7 +13,7 @@ Document 'Sample' {
         'The following Windows features have been installed.'
 
         # Generate a table of Windows Features
-        $InputObject.ResourceType.WindowsFeature | Table -Property Name,Ensure
+        $TargetObject.ResourceType.WindowsFeature | Table -Property Name,Ensure
     }
 }
 

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Engine features:
+  - Added support for using document definitions from modules. [#81](https://github.com/BernieWhite/PSDocs/issues/81)
+
 ## v0.7.0-B2008022 (pre-release)
 
 What's changed since v0.6.3:

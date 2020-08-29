@@ -40,6 +40,11 @@ namespace PSDocs.Commands
 
     internal abstract class KeywordCmdlet : PSCmdlet
     {
+        protected ScriptDocumentBuilder Builder
+        {
+            get { return RunspaceContext.CurrentThread.Builder; }
+        }
+
         protected ScriptDocumentBuilder GetBuilder()
         {
             return RunspaceContext.CurrentThread.Builder;

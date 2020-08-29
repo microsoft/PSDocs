@@ -9,9 +9,15 @@ using System.Management.Automation.Runspaces;
 
 namespace PSDocs.Runtime
 {
+    /// <summary>
+    /// A context for a runspace.
+    /// </summary>
     internal sealed class RunspaceContext : IDisposable
     {
-        private readonly Source[] _Source;
+        private const string ErrorPreference = "ErrorActionPreference";
+        private const string WarningPreference = "WarningPreference";
+        private const string VerbosePreference = "VerbosePreference";
+        private const string DebugPreference = "DebugPreference";
 
         internal readonly PipelineContext Pipeline;
 
@@ -22,10 +28,9 @@ namespace PSDocs.Runtime
         // Track whether Dispose has been called.
         private bool _Disposed;
 
-        public RunspaceContext(PipelineContext pipeline, Source[] source)
+        public RunspaceContext(PipelineContext pipeline)
         {
             Pipeline = pipeline;
-            _Source = source;
             _Runspace = GetRunspace();
         }
 
@@ -68,10 +73,10 @@ namespace PSDocs.Runtime
                 _Runspace.SessionStateProxy.PSVariable.Set(new HostState.TargetObjectVariable());
                 _Runspace.SessionStateProxy.PSVariable.Set(new HostState.InputObjectVariable());
                 _Runspace.SessionStateProxy.PSVariable.Set(new HostState.DocumentVariable());
-                _Runspace.SessionStateProxy.PSVariable.Set("ErrorActionPreference", ActionPreference.Continue);
-                _Runspace.SessionStateProxy.PSVariable.Set("WarningPreference", ActionPreference.Continue);
-                _Runspace.SessionStateProxy.PSVariable.Set("VerbosePreference", ActionPreference.Continue);
-                _Runspace.SessionStateProxy.PSVariable.Set("DebugPreference", ActionPreference.Continue);
+                _Runspace.SessionStateProxy.PSVariable.Set(ErrorPreference, ActionPreference.Continue);
+                _Runspace.SessionStateProxy.PSVariable.Set(WarningPreference, ActionPreference.Continue);
+                _Runspace.SessionStateProxy.PSVariable.Set(VerbosePreference, ActionPreference.Continue);
+                _Runspace.SessionStateProxy.PSVariable.Set(DebugPreference, ActionPreference.Continue);
                 _Runspace.SessionStateProxy.Path.SetLocation(PSDocumentOption.GetWorkingPath());
             }
             return _Runspace;
@@ -79,23 +84,18 @@ namespace PSDocs.Runtime
 
         #region SourceFile
 
-        public void EnterSourceFile(SourceFile file)
+        public bool EnterSourceFile(SourceFile file)
         {
-            if (file == null)
-                return;
+            if (file == null || !File.Exists(file.Path))
+                return false;
 
             SourceFile = file;
+            return true;
         }
 
         public void ExitSourceFile()
         {
             SourceFile = null;
-        }
-
-        public bool TrySourceFile(SourceFile file)
-        {
-            EnterSourceFile(file);
-            return File.Exists(file.Path);
         }
 
         #endregion SourceFile
@@ -140,7 +140,7 @@ namespace PSDocs.Runtime
 
         #region Logging
 
-        internal static void EnableLogging(PowerShell ps)
+        private static void EnableLogging(PowerShell ps)
         {
             ps.Streams.Error.DataAdded += Error_DataAdded;
             ps.Streams.Warning.DataAdded += Warning_DataAdded;

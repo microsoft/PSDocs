@@ -38,10 +38,10 @@ namespace PSDocs.Configuration
         public PSDocumentOption(PSDocumentOption option)
         {
             // Set from existing option instance
-            Document = new DocumentOption(option.Document);
-            Execution = new ExecutionOption(option.Execution);
-            Markdown = new MarkdownOption(option.Markdown);
-            Output = new OutputOption(option.Output);
+            Document = new DocumentOption(option?.Document);
+            Execution = new ExecutionOption(option?.Execution);
+            Markdown = new MarkdownOption(option?.Markdown);
+            Output = new OutputOption(option?.Output);
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace PSDocs.Configuration
         public string ToYaml()
         {
             var s = new SerializerBuilder()
-                .WithNamingConvention(new CamelCaseNamingConvention())
+                .WithNamingConvention(CamelCaseNamingConvention.Instance)
                 .Build();
 
             return s.Serialize(this);
@@ -118,7 +118,7 @@ namespace PSDocs.Configuration
         {
             var d = new DeserializerBuilder()
                 .IgnoreUnmatchedProperties()
-                .WithNamingConvention(new CamelCaseNamingConvention())
+                .WithNamingConvention(CamelCaseNamingConvention.Instance)
                 .Build();
 
             return d.Deserialize<PSDocumentOption>(yaml) ?? new PSDocumentOption();
@@ -128,7 +128,7 @@ namespace PSDocs.Configuration
         {
             var d = new DeserializerBuilder()
                 .IgnoreUnmatchedProperties()
-                .WithNamingConvention(new CamelCaseNamingConvention())
+                .WithNamingConvention(CamelCaseNamingConvention.Instance)
                 .Build();
             var option = d.Deserialize<PSDocumentOption>(yaml) ?? new PSDocumentOption();
             //option.SourcePath = path;
@@ -238,7 +238,6 @@ namespace PSDocs.Configuration
         public static implicit operator PSDocumentOption(string path)
         {
             var option = FromFile(path);
-
             return option;
         }
 

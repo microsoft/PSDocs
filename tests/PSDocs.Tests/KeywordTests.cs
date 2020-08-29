@@ -55,7 +55,7 @@ namespace PSDocs
 
         private static Source[] GetSource()
         {
-            var builder = new SourceBuilder(new HostContext(null, null));
+            var builder = new SourcePipelineBuilder(new HostContext(null, null));
             builder.Directory(GetSourcePath("FromFile.Keyword.Doc.ps1"));
             return builder.Build();
         }

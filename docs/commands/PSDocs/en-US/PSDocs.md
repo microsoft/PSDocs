@@ -26,6 +26,10 @@ Get the Yaml header from a PSDocs generated markdown file.
 
 Create markdown from an input object.
 
+### [Get-PSDocument](Get-PSDocument.md)
+
+Get document definitions.
+
 ### [New-PSDocumentOption](New-PSDocumentOption.md)
 
 Create options to configure document generation.

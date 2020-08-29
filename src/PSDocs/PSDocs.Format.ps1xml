@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Configuration>
+  <Controls />
+  <ViewDefinitions>
+    <View>
+      <Name>PSDocs.Runtime.ScriptDocumentBlock</Name>
+      <ViewSelectedBy>
+        <TypeName>PSDocs.Runtime.ScriptDocumentBlock</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader>
+            <Label AssemblyName="PSDocs" BaseName="PSDocs.Resources.ViewStrings" ResourceId="Name"/>
+            <Width>35</Width>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label AssemblyName="PSDocs" BaseName="PSDocs.Resources.ViewStrings" ResourceId="Module"/>
+            <Width>26</Width>
+          </TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem>
+              <PropertyName>Name</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>Module</PropertyName>
+              </TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+  </ViewDefinitions>
+</Configuration>

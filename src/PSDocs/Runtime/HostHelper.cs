@@ -1,10 +1,10 @@
 ﻿using PSDocs.Data;
 using PSDocs.Data.Internal;
+using PSDocs.Definitions;
 using PSDocs.Pipeline;
 using PSDocs.Resources;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 
@@ -12,9 +12,17 @@ namespace PSDocs.Runtime
 {
     internal static class HostHelper
     {
-        public static IDocumentBuilder[] GetDocumentBuilder(RunspaceContext runspace, Source[] source)
+        /// <summary>
+        /// Executes get document builders from Document script blocks.
+        /// </summary>
+        internal static IDocumentBuilder[] GetDocumentBuilder(RunspaceContext runspace, Source[] source)
         {
-            return ToDocumentBuilder(GetLanguageBlock(runspace, source), runspace);
+            return ToDocumentBuilder(ToDocumentBlock(GetLanguageBlock(runspace, source), runspace));
+        }
+
+        internal static IDocumentDefinition[] GetDocumentBlock(RunspaceContext runspace, Source[] source)
+        {
+            return ToDocumentBlock(GetLanguageBlock(runspace, source), runspace);
         }
 
         /// <summary>
@@ -25,28 +33,19 @@ namespace PSDocs.Runtime
         /// <returns></returns>
         private static ILanguageBlock[] GetLanguageBlock(RunspaceContext context, Source[] sources)
         {
-            var results = new Collection<ILanguageBlock>();
+            var results = new List<ILanguageBlock>();
             var ps = context.NewPowerShell();
-
             try
             {
-                //context.EnterScope("[Discovery.Rule]");
-
-                // Process scripts
-
+                // Process each source
                 foreach (var source in sources)
                 {
+                    // Process search file per source
                     foreach (var file in source.File)
                     {
                         ps.Commands.Clear();
-
-                        if (!context.TrySourceFile(file))
+                        if (!context.EnterSourceFile(file))
                             throw new FileNotFoundException(PSDocsResources.ScriptNotFound, file.Path);
-
-                        //context.
-                        //PipelineContext.CurrentThread.Source = source;
-                        //PipelineContext.CurrentThread.VerboseRuleDiscovery(path: source.Path);
-                        //PipelineContext.CurrentThread.UseSource(source: source);
 
                         try
                         {
@@ -54,18 +53,14 @@ namespace PSDocs.Runtime
                             ps.AddScript(string.Concat("& '", file.Path, "'"), true);
                             var invokeResults = ps.Invoke();
 
+                            // Discovery has errors so skip this file
                             if (ps.HadErrors)
-                            {
-                                // Discovery has errors so skip this file
                                 continue;
-                            }
 
                             foreach (var ir in invokeResults)
                             {
                                 if (ir.BaseObject is ScriptDocumentBlock block)
-                                {
                                     results.Add(block);
-                                }
                             }
                         }
                         catch (Exception e)
@@ -77,9 +72,7 @@ namespace PSDocs.Runtime
             }
             finally
             {
-                //context.ExitScope();
                 context.ExitSourceFile();
-                //PipelineContext.CurrentThread.Source = null;
                 ps.Runspace = null;
                 ps.Dispose();
             }
@@ -87,31 +80,39 @@ namespace PSDocs.Runtime
         }
 
         /// <summary>
-        /// Convert language blocks to a document builder.
+        /// Convert document blocks to document builders.
         /// </summary>
-        private static IDocumentBuilder[] ToDocumentBuilder(ILanguageBlock[] blocks, RunspaceContext context)
+        private static IDocumentBuilder[] ToDocumentBuilder(ScriptDocumentBlock[] blocks)
         {
-            // Index rules by RuleId
-            var results = new Dictionary<string, IDocumentBuilder>(StringComparer.OrdinalIgnoreCase);
+            var result = new ScriptDocumentBuilder[blocks.Length];
+            for (var i = 0; i < blocks.Length; i++)
+                result[i] = new ScriptDocumentBuilder(blocks[i]);
+
+            return result;
+        }
+
+        /// <summary>
+        /// Convert language blocks to document blocks.
+        /// </summary>
+        private static ScriptDocumentBlock[] ToDocumentBlock(ILanguageBlock[] blocks, RunspaceContext context)
+        {
+            // Index by Id
+            var results = new Dictionary<string, ScriptDocumentBlock>(StringComparer.OrdinalIgnoreCase);
             try
             {
                 foreach (var block in blocks.OfType<ScriptDocumentBlock>())
                 {
-                    // Ignore rule blocks that don't match
+                    // Ignore blocks that don't match
                     if (!Match(context, block))
-                    {
                         continue;
-                    }
+
                     if (!results.ContainsKey(block.Id))
-                    {
-                        //results[block.RuleId] = block.Info;
-                        results[block.Id] = new ScriptDocumentBuilder(block);
-                    }
+                        results[block.Id] = block;
                 }
             }
             finally
             {
-                context.ExitSourceFile();
+                //context.ExitSourceFile();
             }
             return results.Values.ToArray();
         }

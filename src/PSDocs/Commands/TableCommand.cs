@@ -11,6 +11,9 @@ namespace PSDocs.Commands
     [Cmdlet(VerbsCommon.Format, LanguageKeywords.Table)]
     internal sealed class TableCommand : KeywordCmdlet
     {
+        private const string ObjectKey_Label = "label";
+        private const string ObjectKey_Name = "name";
+
         private TableBuilder _TableBuilder;
         private List<PSObject> _RowData;
         private PropertyReader _Reader;
@@ -54,7 +57,7 @@ namespace PSDocs.Commands
 
         protected override void BeginProcessing()
         {
-            _TableBuilder = GetBuilder().Table();
+            _TableBuilder = ModelHelper.Table();
             _RowData = new List<PSObject>();
             BuildReader();
         }
@@ -140,11 +143,11 @@ namespace PSDocs.Commands
 
         private static string GetPropertyName(Hashtable propertyExpression)
         {
-            if (propertyExpression.ContainsKey("label"))
-                return propertyExpression["label"].ToString();
+            if (propertyExpression.ContainsKey(ObjectKey_Label))
+                return propertyExpression[ObjectKey_Label].ToString();
 
-            if (propertyExpression.ContainsKey("name"))
-                return propertyExpression["name"].ToString();
+            if (propertyExpression.ContainsKey(ObjectKey_Name))
+                return propertyExpression[ObjectKey_Name].ToString();
 
             return null;
         }

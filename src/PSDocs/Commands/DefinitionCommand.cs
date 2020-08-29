@@ -13,56 +13,46 @@ namespace PSDocs.Commands
         private const string InvokeBlockCmdlet_BodyParameter = "Body";
 
         /// <summary>
-        /// The name of the document.
+        /// Document block name.
         /// </summary>
         [Parameter(Mandatory = true, Position = 0)]
         [ValidateNotNullOrEmpty()]
         public string Name { get; set; }
 
         /// <summary>
-        /// The definition of the document.
+        /// Document block body.
         /// </summary>
         [Parameter(Mandatory = true, Position = 1)]
         public ScriptBlock Body { get; set; }
 
+        /// <summary>
+        /// Document block tags.
+        /// </summary>
         [Parameter(Mandatory = false)]
         public string[] Tag { get; set; }
 
         protected override void ProcessRecord()
         {
             var context = RunspaceContext.CurrentThread;
-            //var metadata = GetMetadata(MyInvocation.ScriptName, MyInvocation.ScriptLineNumber, MyInvocation.OffsetInLine);
-            //var tag = GetTag(Tag);
-            //var source = context.Source;
+            var sourceFile = context.SourceFile;
+            var extent = new ResourceExtent(
+                file: sourceFile.Path,
+                startLineNumber: Body.Ast.Extent.StartLineNumber
+            );
 
-            //context.VerboseFoundRule(ruleName: Name, scriptName: MyInvocation.ScriptName);
-
-            //var visitor = new RuleLanguageAst(ruleName: Name, context: context);
-            //Body.Ast.Visit(visitor);
-
-            //if (visitor.Errors != null)
-            //{
-            //    foreach (var errorRecord in visitor.Errors)
-            //    {
-            //        WriteError(errorRecord: errorRecord);
-            //    }
-            //}
-
-            //CheckDependsOn();
-
+            // Create PS instance for execution
             var ps = context.NewPowerShell();
             ps.AddCommand(new CmdletInfo(InvokeBlockCmdletName, typeof(InvokeBlockCommand)));
             //ps.AddParameter(InvokeBlockCmdlet_TypeParameter, NodeType);
             ps.AddParameter(InvokeBlockCmdlet_BodyParameter, Body);
 
-            //PipelineContext.EnableLogging(ps);
-
             var block = new ScriptDocumentBlock(
-                source: context.SourceFile,
+                source: sourceFile,
                 name: Name,
                 //info: helpInfo,
                 body: ps,
-                tag: Tag
+                tag: Tag,
+                extent: extent
             //type: NodeType
             //dependsOn: RuleHelper.ExpandRuleName(DependsOn, MyInvocation.ScriptName, source.ModuleName),
             //configuration: Configure
