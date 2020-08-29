@@ -46,6 +46,38 @@ Invoke-PSDocument -Path .\Sample.Doc.ps1 -Name SampleMessage;
 On Linux, the file extension `.doc.ps1` is not automatically found by PSDocs because of file system case-sensitivity.
 For consistency, use `.Doc.ps1` on all platforms.
 
+### Helper functions
+
+Previously helper functions could be defined with the default scope.
+
+For example:
+
+```powershell
+function SampleHelperFn {
+    # Do something
+}
+
+Document 'SampleDocument' {
+    SampleHelperFn;
+}
+```
+
+The execution model of PSRule now uses a separate runspace sandbox.
+Blocks are enumerated first then executed.
+Helper functions can still be used however must be flagged with the global scope modifier.
+
+For example:
+
+```powershell
+function global:SampleHelperFn {
+    # Do something
+}
+
+Document 'SampleDocument' {
+    SampleHelperFn;
+}
+```
+
 ### Script block usage of Note and Warning
 
 Previously `Note` and `Warning` blocks could contain a script block.
