@@ -12,6 +12,7 @@ What's changed since v0.6.3:
   - Added [upgrade notes](docs/upgrade-notes.md) for migration from v0.6.x to v0.7.0.
   - **Breaking change**: Removed support for inline document blocks.
     - Use `Invoke-PSDocument` with `.Doc.ps1` files instead.
+    - Helper functions within the script scope must be flagged with `global` scope.
   - **Breaking change**: Removed script block usage of `Note` and `Warning`.
     - Script block support was previously deprecated in v0.6.0.
     - Use pipeline instead.
