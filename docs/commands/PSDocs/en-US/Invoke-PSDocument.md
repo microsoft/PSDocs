@@ -55,6 +55,37 @@ Invoke-PSDocument -Path .;
 
 Create markdown using *.Doc.ps1 files loaded from the current working directory.
 
+### Example 2
+
+```powershell
+# Create a new document definition called Sample in Sample.Doc.ps1
+Set-Content -Path .\Sample.Doc.ps1 -Value @'
+Document Sample {
+
+    $object = $InputObject
+    # Add an introduction section
+    Section $InputObject.name {
+
+        # Add a comment
+        "This is a sample file list from $InputObject.folder"
+
+        # Generate a table
+        Get-ChildItem -Path $InputObject.folder | Table -Property Name,PSIsContainer
+    }
+}
+'@
+#Create PSObject with info we want to pass into markdown
+$PSDocsInputObject = New-Object PSObject -property @{
+    'name' = 'foldername'
+    'folder' = 'C:\testfolder'
+}
+
+# Create document based on Sample.Doc.ps1 passing PSObject
+Invoke-PSDocument -Path .\Sample.Doc.ps1 -InputObject $PSDocsInputObject;
+```
+
+Create markdown using a Doc.ps1 file, passing a PSObject in to generate dynamic content.
+
 ## PARAMETERS
 
 ### -Module
