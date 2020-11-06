@@ -17,8 +17,8 @@ namespace PSDocs.Models
         public static DocumentFilter Create(string[] name, string[] tag)
         {
             return new DocumentFilter(
-                name: name ?? new string[] { },
-                tag: tag ?? new string[] { }
+                name: name ?? Array.Empty<string>(),
+                tag: tag ?? Array.Empty<string>()
             );
         }
 

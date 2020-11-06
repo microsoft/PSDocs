@@ -164,7 +164,7 @@ namespace PSDocs.Pipeline
             _Source.Add(source);
         }
 
-        private SourceFile[] GetFiles(string path, string helpPath, string moduleName = null)
+        private static SourceFile[] GetFiles(string path, string helpPath, string moduleName = null)
         {
             var result = new List<SourceFile>();
             var rootedPath = PSDocumentOption.GetRootedPath(path);

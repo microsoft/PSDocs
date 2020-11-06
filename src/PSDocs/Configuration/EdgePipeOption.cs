@@ -1,6 +1,6 @@
 ﻿namespace PSDocs.Configuration
 {
-    public enum EdgePipeOption : byte
+    public enum EdgePipeOption
     {
         WhenRequired,
 
