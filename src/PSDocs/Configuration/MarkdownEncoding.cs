@@ -1,6 +1,6 @@
 ﻿namespace PSDocs.Configuration
 {
-    public enum MarkdownEncoding : byte
+    public enum MarkdownEncoding
     {
         Default = 0,
 
