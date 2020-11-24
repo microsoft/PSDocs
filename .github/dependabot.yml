@@ -9,11 +9,15 @@ version: 2
 updates:
 
 # Maintain dependencies for NuGet
-- package-ecosystem: "nuget" # See documentation for possible values
-  directory: "/" # Location of package manifests
+- package-ecosystem: 'nuget' # See documentation for possible values
+  directory: '/' # Location of package manifests
   schedule:
-    interval: "daily"
+    interval: 'daily'
   labels:
-  - "dependencies"
+  - 'dependencies'
   reviewers:
-  - "berniewhite"
+  - 'berniewhite'
+  ignore:
+  # Ignore upgrades to PS 7.1 for tool chain components at this time
+  # Testing against PS 7.1 is already completed
+  - dependency-name: 'Microsoft.PowerShell.SDK'
