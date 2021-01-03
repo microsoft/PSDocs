@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+What's changed since pre-release v0.7.0-B2008035:
+
+- Engine features:
+  - Added support for localized strings using the `$LocalizedData` variable. [#91](https://github.com/BernieWhite/PSDocs/issues/91)
+
 ## v0.7.0-B2008035 (pre-release)
 
 What's changed since pre-release v0.7.0-B2008022:

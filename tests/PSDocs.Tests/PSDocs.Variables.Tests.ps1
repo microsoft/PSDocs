@@ -3,9 +3,7 @@
 #
 
 [CmdletBinding()]
-param (
-
-)
+param ()
 
 # Setup error handling
 $ErrorActionPreference = 'Stop';
@@ -28,9 +26,11 @@ Describe 'PSDocs variables' -Tag 'Variables' {
             InputObject = $testObject
             PassThru = $True
         }
-        It '$PWD' {
+        It 'Paths' {
             $result = (Invoke-PSDocument @invokeParams -Name 'PSAutomaticVariables' | Out-String).Split([System.Environment]::NewLine, [System.StringSplitOptions]::RemoveEmptyEntries);
             $result | Where-Object -FilterScript { $_ -like "PWD=*" } | Should -Be "PWD=$PWD;";
+            $result | Where-Object -FilterScript { $_ -like "PSScriptRoot=*" } | Should -Be "PSScriptRoot=$PSScriptRoot;";
+            $result | Where-Object -FilterScript { $_ -like "PSCommandPath=*" } | Should -Be "PSCommandPath=$docFilePath;";
         }
     }
 
@@ -40,10 +40,18 @@ Describe 'PSDocs variables' -Tag 'Variables' {
             InputObject = $testObject
             PassThru = $True
         }
+        It '$PSDocs' {
+            $result = (Invoke-PSDocument @invokeParams -Name 'PSDocsVariable' | Out-String).Split([System.Environment]::NewLine, [System.StringSplitOptions]::RemoveEmptyEntries);
+            $result | Where-Object -FilterScript { $_ -like "TargetObject.Name=*" } | Should -Be 'TargetObject.Name=TestObject;';
+        }
         It '$Document' {
-            $result = (Invoke-PSDocument @invokeParams -Name 'PSDocsAutomaticVariables' | Out-String).Split([System.Environment]::NewLine, [System.StringSplitOptions]::RemoveEmptyEntries);
-            $result | Where-Object -FilterScript { $_ -like "Document.Title=*" } | Should -Be "Document.Title=001;";
-            $result | Where-Object -FilterScript { $_ -like "Document.Metadata=*" } | Should -Be "Document.Metadata=002;";
+            $result = (Invoke-PSDocument @invokeParams -Name 'PSDocsDocumentVariable' | Out-String).Split([System.Environment]::NewLine, [System.StringSplitOptions]::RemoveEmptyEntries);
+            $result | Where-Object -FilterScript { $_ -like "Document.Title=*" } | Should -Be 'Document.Title=001;';
+            $result | Where-Object -FilterScript { $_ -like "Document.Metadata=*" } | Should -Be 'Document.Metadata=002;';
+        }
+        It '$LocalizedData' {
+            $result = (Invoke-PSDocument @invokeParams -Name 'PSDocsLocalizedDataVariable' | Out-String).Split([System.Environment]::NewLine, [System.StringSplitOptions]::RemoveEmptyEntries);
+            $result | Where-Object -FilterScript { $_ -like "LocalizedData.Key1=*" } | Should -Be 'LocalizedData.Key1=Value1;';
         }
     }
 }

@@ -60,8 +60,4 @@ This project is to be considered a proof-of-concept and not a supported product.
     </EmbeddedResource>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Common\" />
-  </ItemGroup>
-
 </Project>

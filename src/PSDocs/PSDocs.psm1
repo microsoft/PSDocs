@@ -74,7 +74,6 @@ function Invoke-PSDocument {
         # Check if the path is a directory
         if (!(Test-Path -Path $Path)) {
             Write-Error -Message $LocalizedHelp.PathNotFound -ErrorAction Stop;
-
             return;
         }
 
@@ -170,7 +169,6 @@ function Invoke-PSDocument {
         Write-Verbose -Message "[Invoke-PSDocument]::END";
     }
 }
-
 
 # .ExternalHelp PSDocs-Help.xml
 function Get-PSDocument {
@@ -282,7 +280,6 @@ function Get-PSDocumentHeader {
         [Alias('FullName')]
         [String]$Path = $PWD
     )
-
     process {
         $filteredItems = Get-ChildItem -Path (Join-Path -Path $Path -ChildPath '*') -File;
         foreach ($item in $filteredItems) {
@@ -305,7 +302,6 @@ function New-PSDocumentOption {
         [Parameter(Mandatory = $False)]
         [PSDocs.Configuration.MarkdownEncoding]$Encoding
     )
-
     process {
 
         if ($PSBoundParameters.ContainsKey('Option')) {
@@ -338,6 +334,7 @@ function New-PSDocumentOption {
 # .ExternalHelp PSDocs-Help.xml
 function Document {
     [CmdletBinding()]
+    [OutputType([void])]
     param (
         [Parameter(Position = 0, Mandatory = $True)]
         [String]$Name,
@@ -384,6 +381,7 @@ function Section {
 
 function Title {
     [CmdletBinding()]
+    [OutputType([void])]
     param (
         [Parameter(Position = 0, Mandatory = $True)]
         [AllowEmptyString()]
@@ -396,7 +394,6 @@ function Title {
 }
 
 function Code {
-
     [CmdletBinding()]
     [OutputType([PSDocs.Models.Code])]
     param (
@@ -422,6 +419,7 @@ function Code {
 
 function Note {
     [CmdletBinding(DefaultParameterSetName = 'ScriptBlock')]
+    [OutputType([PSDocs.Models.BlockQuote])]
     param (
         [Parameter(Position = 0, Mandatory = $True, ParameterSetName = 'ScriptBlock')]
         [ScriptBlock]$Body,
@@ -437,6 +435,7 @@ function Note {
 
 function Warning {
     [CmdletBinding(DefaultParameterSetName = 'ScriptBlock')]
+    [OutputType([PSDocs.Models.BlockQuote])]
     param (
         [Parameter(Position = 0, Mandatory = $True, ParameterSetName = 'ScriptBlock')]
         [ScriptBlock]$Body,
@@ -452,6 +451,7 @@ function Warning {
 
 function BlockQuote {
     [CmdletBinding()]
+    [OutputType([PSDocs.Models.BlockQuote])]
     param (
         [Parameter(Mandatory = $True, ValueFromPipeline = $True)]
         [String]$Text,
@@ -470,6 +470,7 @@ function BlockQuote {
 
 function Include {
     [CmdletBinding()]
+    [OutputType([PSDocs.Models.Include])]
     param (
         [Parameter(Position = 0, Mandatory = $True)]
         [String]$FileName,
@@ -491,6 +492,7 @@ function Include {
 
 function Metadata {
     [CmdletBinding()]
+    [OutputType([void])]
     param (
         [Parameter(Position = 0, Mandatory = $True)]
         [AllowNull()]
@@ -504,6 +506,7 @@ function Metadata {
 
 function Table {
     [CmdletBinding()]
+    [OutputType([PSDocs.Models.Table])]
     param (
         [Parameter(Mandatory = $False, ValueFromPipeline = $True)]
         [AllowNull()]

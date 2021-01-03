@@ -70,6 +70,15 @@ namespace PSDocs.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The included file was not found..
+        /// </summary>
+        internal static string IncludeNotFound {
+            get {
+                return ResourceManager.GetString("IncludeNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Options file does not exist..
         /// </summary>
         internal static string OptionsNotFound {

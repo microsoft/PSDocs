@@ -120,6 +120,9 @@
   <data name="FoundModules" xml:space="preserve">
     <value>[PSDocs][D] -- Found {0} PSDocs module(s)</value>
   </data>
+  <data name="IncludeNotFound" xml:space="preserve">
+    <value>The included file was not found.</value>
+  </data>
   <data name="OptionsNotFound" xml:space="preserve">
     <value>Options file does not exist.</value>
     <comment>Occurs when explicit path to a YAML file is specified and doesn't exist.</comment>

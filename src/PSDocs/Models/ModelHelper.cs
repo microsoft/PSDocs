@@ -1,9 +1,11 @@
-﻿using PSDocs.Configuration;
+﻿
+using PSDocs.Configuration;
+using PSDocs.Resources;
 using System.IO;
 
 namespace PSDocs.Models
 {
-    public static class ModelHelper
+    internal static class ModelHelper
     {
         public static Document NewDocument()
         {
@@ -51,21 +53,16 @@ namespace PSDocs.Models
 
         public static Include Include(string baseDirectory, string culture, string fileName, bool useCulture)
         {
+            baseDirectory = PSDocumentOption.GetRootedPath(baseDirectory);
             var absolutePath = Path.IsPathRooted(fileName) ? fileName : Path.Combine(baseDirectory, (useCulture ? culture : string.Empty), fileName);
-
-            if (!Path.IsPathRooted(absolutePath))
-            {
-                absolutePath = Path.Combine(PSDocumentOption.GetWorkingPath(), absolutePath);
-            }
-
             if (!File.Exists(absolutePath))
-            {
-                throw new FileNotFoundException("The included file was not found.", absolutePath);
-            }
+                throw new FileNotFoundException(PSDocsResources.IncludeNotFound, absolutePath);
 
+            var text = File.ReadAllText(absolutePath);
             return new Include
             {
-                Path = absolutePath
+                Path = absolutePath,
+                Content = text,
             };
         }
     }

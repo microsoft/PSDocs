@@ -16,8 +16,6 @@ namespace PSDocs.Runtime
         internal readonly PowerShell Body;
         internal readonly string[] Tag;
 
-        private readonly SourceFile Source;
-
         // Track whether Dispose has been called.
         private bool _Disposed;
 
@@ -38,6 +36,8 @@ namespace PSDocs.Runtime
         public string SourcePath => Source.Path;
 
         public string Module => Source.ModuleName;
+
+        internal SourceFile Source { get; }
 
         internal IResourceExtent Extent { get; }
 

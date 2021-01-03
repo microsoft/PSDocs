@@ -35,6 +35,7 @@ namespace PSDocs.Data.Internal
         Document IDocumentBuilder.Process(RunspaceContext context, PSObject sourceObject)
         {
             context.EnterBuilder(this);
+            context.EnterSourceFile(_Block.Source);
             try
             {
                 _Current = Document = new Document(context.InstanceName, context.Culture);

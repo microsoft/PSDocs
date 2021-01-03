@@ -273,6 +273,9 @@ namespace PSDocs.Configuration
         /// <returns></returns>
         internal static string GetRootedPath(string path)
         {
+            if (string.IsNullOrEmpty(path))
+                return Path.GetFullPath(GetWorkingPath());
+
             return Path.IsPathRooted(path) ? path : Path.GetFullPath(Path.Combine(GetWorkingPath(), path));
         }
 
