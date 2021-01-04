@@ -145,7 +145,6 @@ namespace PSDocs.Processor.Markdown
 
         private static void BlockQuote(MarkdownProcessorContext context, BlockQuote node)
         {
-            context.LineBreak();
             if (!string.IsNullOrEmpty(node.Info))
             {
                 context.Write(MARKDOWN_BLOCKQUOTE);
@@ -163,6 +162,7 @@ namespace PSDocs.Processor.Markdown
                 context.Write(MARKDOWN_BLOCKQUOTE);
                 context.WriteLine(line);
             }
+            context.LineBreak();
         }
 
         private static void Code(MarkdownProcessorContext context, Code code)

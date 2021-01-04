@@ -5,20 +5,28 @@
 #region BlockQuote
 
 Document 'BlockQuoteSingleMarkdown' {
+    'Begin'
     'This is a single line' | BlockQuote
+    'End'
 }
 
 Document 'BlockQuoteMultiMarkdown' {
+    'Begin'
     @('This is the first line.'
     'This is the second line.') | BlockQuote
+    'End'
 }
 
 Document 'BlockQuoteTitleMarkdown' {
+    'Begin'
     'This is a single block quote' | BlockQuote -Title 'Test'
+    'End'
 }
 
 Document 'BlockQuoteInfoMarkdown' {
+    'Begin'
     'This is a single block quote' | BlockQuote -Info 'Tip'
+    'End'
 }
 
 #endregion BlockQuote

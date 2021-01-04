@@ -10,6 +10,7 @@ What's changed since pre-release v0.7.0-B2008035:
   - Added parameter alias `-MarkdownEncoding` on `New-PSDocumentOption` for `-Encoding`. [#106](https://github.com/BernieWhite/PSDocs/issues/106)
 - Bug fixes:
   - Fixed inconsistencies with default options file name. [#103](https://github.com/BernieWhite/PSDocs/issues/103)
+  - Fixed line break after block quote. [#104](https://github.com/BernieWhite/PSDocs/issues/104)
 
 ## v0.7.0-B2008035 (pre-release)
 
