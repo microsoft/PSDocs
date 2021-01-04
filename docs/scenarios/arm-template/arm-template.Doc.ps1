@@ -3,7 +3,7 @@
 #
 
 # A function to break out parameters from an ARM template
-function GetTemplateParameter {
+function global:GetTemplateParameter {
     param (
         [Parameter(Mandatory = $True)]
         [String]$Path
@@ -21,7 +21,7 @@ function GetTemplateParameter {
 }
 
 # A function to import metadata
-function GetTemplateMetadata {
+function global:GetTemplateMetadata {
     param (
         [Parameter(Mandatory = $True)]
         [String]$Path

@@ -1,6 +1,7 @@
 # Azure Resource Manager template example
 
-This is an example of how PSDocs can be used to generate documentation for an ARM template. Documentation for ARM templates might be used by an internal technical team, who creates and maintains ARM templates for their company.
+This is an example of how PSDocs can be used to generate documentation for an ARM template.
+Documentation for ARM templates might be used by an internal technical team, who creates and maintains ARM templates for their company.
 
 In this scenario we will use two JSON files:
 
@@ -28,16 +29,16 @@ An example parameter might look like this:
 
 We will need to import our two JSON files and convert them to objects so that we can easily read the name of each parameter, but also the description.
 
-While this could be done inline, we will create separate functions that can be called as required. Using separate functions in this case will improve the readability of our code.
+While this could be done inline, we will create separate functions that can be called as required.
+Using separate functions in this case will improve the readability of our code.
 
 ```powershell
 # A function to break out parameters from an ARM template
-function GetTemplateParameter {
+function global:GetTemplateParameter {
     param (
         [Parameter(Mandatory = $True)]
         [String]$Path
     )
-
     process {
         $template = Get-Content $Path | ConvertFrom-Json;
         foreach ($property in $template.parameters.PSObject.Properties) {
@@ -50,12 +51,11 @@ function GetTemplateParameter {
 }
 
 # A function to import metadata
-function GetTemplateMetadata {
+function global:GetTemplateMetadata {
     param (
         [Parameter(Mandatory = $True)]
         [String]$Path
     )
-
     process {
         $metadata = Get-Content $Path | ConvertFrom-Json;
         return $metadata;
@@ -65,9 +65,11 @@ function GetTemplateMetadata {
 
 ## Create a document definition
 
-PSDocs uses the `Document` keyword to describe a document definition. A document definition is designed to be reusable.
+PSDocs uses the `Document` keyword to describe a document definition.
+A document definition is designed to be reusable.
 
-With our two helper functions already implemented, we are ready to define our document. For our example, our JSON files are in the same directory as the documentation definition so we are using `$PSScriptRoot`.
+With our two helper functions already implemented, we are ready to define our document.
+For our example, our JSON files are in the same directory as the documentation definition so we are using `$PSScriptRoot`.
 
 ```powershell
 Document 'arm-template' {
@@ -95,7 +97,8 @@ Document 'arm-template' {
 }
 ```
 
-Next we need to output the template parameters into a table with metadata descriptions. To format our parameters in a table we use the `Table` keyword.
+Next we need to output the template parameters into a table with metadata descriptions.
+To format our parameters in a table we use the `Table` keyword.
 
 ```powershell
 Document 'arm-template' {
@@ -113,7 +116,8 @@ Document 'arm-template' {
 }
 ```
 
-We can also provide an example command line that can be used to deploy our ARM template. To insert a code sample use the `Code` keyword.
+We can also provide an example command line that can be used to deploy our ARM template.
+To insert a code sample use the `Code` keyword.
 
 ```powershell
 Document 'arm-template' {
@@ -135,7 +139,8 @@ Document 'arm-template' {
 
 ## Generate markdown
 
-Document definitions can be called inline or from a path. In this example, we've saved our definition to a file.
+Document definitions can be called inline or from a path.
+In this example, we've saved our definition to a file.
 
 To generate markdown from a path, we used the `Invoke-PSDocument` cmdlet with the `-Path` parameter.
 
