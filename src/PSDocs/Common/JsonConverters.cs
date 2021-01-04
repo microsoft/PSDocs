@@ -1,0 +1,135 @@
+﻿
+using Newtonsoft.Json;
+using PSDocs.Pipeline;
+using PSDocs.Resources;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Management.Automation;
+
+namespace PSDocs
+{
+    /// <summary>
+    /// A custom serializer to correctly convert PSObject properties to JSON instead of CLIXML.
+    /// </summary>
+    internal sealed class PSObjectJsonConverter : JsonConverter
+    {
+        public override bool CanConvert(Type objectType)
+        {
+            return objectType == typeof(PSObject);
+        }
+
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            if (!(value is PSObject pso))
+                throw new ArgumentException(message: PSDocsResources.SerializeNullPSObject, paramName: nameof(value));
+
+            if (WriteFileSystemInfo(writer, value, serializer) || WriteBaseObject(writer, pso, serializer))
+                return;
+
+            writer.WriteStartObject();
+            foreach (var property in pso.Properties)
+            {
+                // Ignore properties that are not readable or can cause race condition
+                if (SkipSerialize(property))
+                    continue;
+
+                writer.WritePropertyName(property.Name);
+                serializer.Serialize(writer, property.Value);
+            }
+            writer.WriteEndObject();
+        }
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        {
+            // Create target object based on JObject
+            var result = existingValue as PSObject ?? new PSObject();
+
+            // Read tokens
+            ReadObject(value: result, reader: reader);
+            return result;
+        }
+
+        private static bool SkipSerialize(PSPropertyInfo property)
+        {
+            return !property.IsGettable ||
+                !property.IsInstance ||
+                property.Value is PSDriveInfo ||
+                property.Value is ProviderInfo ||
+                property.Value is DirectoryInfo;
+        }
+
+        private static void ReadObject(PSObject value, JsonReader reader)
+        {
+            if (reader.TokenType != JsonToken.StartObject)
+                throw new PipelineSerializationException(PSDocsResources.ReadJsonFailed);
+
+            reader.Read();
+            string name = null;
+
+            // Read each token
+            while (reader.TokenType != JsonToken.EndObject)
+            {
+                switch (reader.TokenType)
+                {
+                    case JsonToken.PropertyName:
+                        name = reader.Value.ToString();
+                        break;
+
+                    case JsonToken.StartObject:
+                        var child = new PSObject();
+                        ReadObject(value: child, reader: reader);
+                        value.Properties.Add(new PSNoteProperty(name: name, value: child));
+                        break;
+
+                    case JsonToken.StartArray:
+                        var items = new List<PSObject>();
+                        reader.Read();
+                        var item = new PSObject();
+
+                        while (reader.TokenType != JsonToken.EndArray)
+                        {
+                            ReadObject(value: item, reader: reader);
+                            items.Add(item);
+                            reader.Read();
+                        }
+
+                        value.Properties.Add(new PSNoteProperty(name: name, value: items.ToArray()));
+                        break;
+
+                    case JsonToken.Comment:
+                        break;
+
+                    default:
+                        value.Properties.Add(new PSNoteProperty(name: name, value: reader.Value));
+                        break;
+                }
+                reader.Read();
+            }
+        }
+
+        /// <summary>
+        /// Serialize a file system info object.
+        /// </summary>
+        private static bool WriteFileSystemInfo(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            if (!(value is FileSystemInfo fileSystemInfo))
+                return false;
+
+            serializer.Serialize(writer, fileSystemInfo.FullName);
+            return true;
+        }
+
+        /// <summary>
+        /// Serialize the base object.
+        /// </summary>
+        private static bool WriteBaseObject(JsonWriter writer, PSObject value, JsonSerializer serializer)
+        {
+            if (value.BaseObject == null || value.HasNoteProperty())
+                return false;
+
+            serializer.Serialize(writer, value.BaseObject);
+            return true;
+        }
+    }
+}

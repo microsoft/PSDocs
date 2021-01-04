@@ -8,7 +8,8 @@ Describes the language keywords that can be used within PSDocs document definiti
 
 ## LONG DESCRIPTION
 
-PSDocs lets you generate dynamic markdown documents using PowerShell blocks. To generate markdown, a document is defined inline or within script files by using the `document` keyword.
+PSDocs lets you generate dynamic markdown documents using PowerShell blocks.
+To generate markdown, a document is defined inline or within script files by using the `document` keyword.
 
 Within a document definition, PSDocs keywords in addition to regular PowerShell expressions can be used to dynamically generate documents.
 
@@ -27,7 +28,8 @@ The following PSDocs keywords are available:
 
 ### Document
 
-Defines a named block that can be called to output documentation. The document keyword can be defined inline or in a separate script file.
+Defines a named block that can be called to output documentation.
+The document keyword can be defined inline or in a separate script file.
 
 Syntax:
 
@@ -217,15 +219,29 @@ Generates a new `Sample.md` document containing the heading `Level 1`.
 
 ### Code
 
-You can use the Code statement to generate fenced code sections in markdown. An info string can optionally be specified using the `-Info` parameter.
+You can use the Code statement to generate fenced code sections in markdown.
+An info string can optionally be specified using the `-Info` parameter.
 
-Syntax:
+Syntax with block:
 
 ```text
 Code [-Info] [<String>] [-Body] <ScriptBlock>
 ```
 
+Syntax with pipeline:
+
+```text
+<object> | Code [-Info] [<String>]
+```
+
 - `Info` - An info string that can be used to specify the language of the code block.
+By default, no info string will be set unless a script block is used.
+When a script block is used, the info string will default to `powershell` unless overridden.
+
+When the following info strings are used, PSDocs will automatic serialize custom objects.
+
+- `json` - Serializes as JSON.
+- `yaml`, or `yml` - Serializes as YAML.
 
 Examples:
 
@@ -242,7 +258,7 @@ Document 'CodeBlock' {
 
 Generates a new `CodeBlock.md` document containing the `powershell.exe -Help` command line.
 
-    ```
+    ```powershell
     powershell.exe -Help
     ```
 
@@ -257,7 +273,7 @@ Document 'CodeBlockWithInfo' {
 }
 ```
 
-Generates a new document containing script code formatted with the powershell info string.
+Generates a new document containing script code formatted with the `powershell` info string.
 
     ```powershell
     Get-Item -Path .\;
@@ -271,6 +287,22 @@ Document 'CodeBlockFromPipeline' {
     Get-Help 'Invoke-PSDocument' | Code
 }
 ```
+
+Generates a new document from the output of `Get-Help`.
+
+```powershell
+Document 'CodeYaml' {
+    [PSCustomObject]@{
+        Name = 'Value'
+    } | Code 'yaml'
+}
+```
+
+Generates a new document with a YAML code block.
+
+    ```yaml
+    Name: Value
+    ```
 
 ### BlockQuote
 
@@ -333,7 +365,8 @@ Document 'BlockQuote' {
 
 ### Note
 
-Creates a block quote formatted as a DocFx Formatted Markdown (DFM) note. This is an alternative to using the `BlockQuote` keyword.
+Creates a block quote formatted as a DocFx Formatted Markdown (DFM) note.
+This is an alternative to using the `BlockQuote` keyword.
 
 Syntax:
 
@@ -341,7 +374,8 @@ Syntax:
 Note -Text <String>
 ```
 
-- `Text` - The text of the note. This parameter can be specified directly or accept input from the pipeline.
+- `Text` - The text of the note.
+This parameter can be specified directly or accept input from the pipeline.
 
 Examples:
 
@@ -363,7 +397,8 @@ Generates a new `NoteBlock.md` document containing a block quote formatted as a 
 
 ### Warning
 
-Creates a block quote formatted as a DocFx Formatted Markdown (DFM) warning. This is an alternative to using the `BlockQuote` keyword.
+Creates a block quote formatted as a DocFx Formatted Markdown (DFM) warning.
+This is an alternative to using the `BlockQuote` keyword.
 
 Syntax:
 
@@ -371,7 +406,8 @@ Syntax:
 Warning -Text <String>
 ```
 
-- `Text` - The text of the warning. This parameter can be specified directly or accept input from the pipeline.
+- `Text` - The text of the warning.
+This parameter can be specified directly or accept input from the pipeline.
 
 Examples:
 
@@ -431,7 +467,8 @@ Users | True
 Windows | True
 ```
 
-Generates a new `SimpleTable.md` document containing a table populated with a row for each item. Only the properties Name and PSIsContainer are added as columns.
+Generates a new `SimpleTable.md` document containing a table populated with a row for each item.
+Only the properties Name and PSIsContainer are added as columns.
 
 ```powershell
 # A document definition named CalculatedTable
@@ -456,11 +493,14 @@ Users               | True
 Windows             | True
 ```
 
-Generates a new `CalculatedTable.md` document containing a table populated with a row for each item. Only the properties Name and Is Container are added as columns. A property expression is used on the `PSIsContainer` property to render the column as `Is Container`.
+Generates a new `CalculatedTable.md` document containing a table populated with a row for each item.
+Only the properties Name and Is Container are added as columns.
+A property expression is used on the `PSIsContainer` property to render the column as `Is Container`.
 
 ### Metadata
 
-Creates a metadata header, that will be rendered as yaml front matter. Multiple `Metadata` blocks can be used and they will be aggregated together.
+Creates a metadata header, that will be rendered as yaml front matter.
+Multiple `Metadata` blocks can be used and they will be aggregated together.
 
 Syntax:
 
@@ -492,7 +532,8 @@ Document 'MetadataBlock' {
 MetadataBlock;
 ```
 
-Generates a new MetadataBlock.md document containing a yaml front matter. An example of the output generated is available [here](/docs/examples/Yaml-header-output.md).
+Generates a new MetadataBlock.md document containing a yaml front matter.
+An example of the output generated is available [here](/docs/examples/Yaml-header-output.md).
 
 ```text
 ---
@@ -514,7 +555,8 @@ Include [-FileName] <String> [-BaseDirectory <String>] [-UseCulture]
 ```
 
 - `FileName` - The path to a markdown file to include. An absolute or relative path is accepted.
-- `BaseDirectory` - The base path to work from for relative paths specified with the `FileName` parameter. By default this is the current working path.
+- `BaseDirectory` - The base path to work from for relative paths specified with the `FileName` parameter.
+By default this is the current working path.
 - `UseCulture` - When specified include will look for the file within a subdirectory for a named culture.
 
 Examples:

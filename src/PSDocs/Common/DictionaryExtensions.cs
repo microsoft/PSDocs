@@ -19,7 +19,7 @@ namespace PSDocs
         public static bool TryPopValue<T>(this IDictionary<string, object> dictionary, string key, out T value)
         {
             value = default;
-            if (TryPopValue(dictionary, key, out object v) && GetBaseObject(v) is T result)
+            if (TryPopValue(dictionary, key, out object v) && ObjectHelper.GetBaseObject(v) is T result)
             {
                 value = result;
                 return true;
@@ -54,7 +54,7 @@ namespace PSDocs
             if (!TryPopValue(dictionary, key, out object result))
                 return false;
 
-            var o = GetBaseObject(result);
+            var o = ObjectHelper.GetBaseObject(result);
             value = o.GetType().IsArray ? ((object[])o).OfType<string>().ToArray() : new string[] { o.ToString() };
             return true;
         }
@@ -80,11 +80,6 @@ namespace PSDocs
             foreach (var kv in values)
                 if (!dictionary.ContainsKey(kv.Key))
                     dictionary.Add(kv.Key, kv.Value);
-        }
-
-        private static object GetBaseObject(object o)
-        {
-            return o is PSObject pso ? pso.BaseObject : o;
         }
     }
 }

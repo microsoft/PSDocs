@@ -97,6 +97,15 @@ namespace PSDocs.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Read JSON failed..
+        /// </summary>
+        internal static string ReadJsonFailed {
+            get {
+                return ResourceManager.GetString("ReadJsonFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to [PSDocs][D] -- Scanning for source files in module: {0}.
         /// </summary>
         internal static string ScanModule {
@@ -120,6 +129,15 @@ namespace PSDocs.Resources {
         internal static string ScriptNotFound {
             get {
                 return ResourceManager.GetString("ScriptNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Can not serialize a null PSObject..
+        /// </summary>
+        internal static string SerializeNullPSObject {
+            get {
+                return ResourceManager.GetString("SerializeNullPSObject", resourceCulture);
             }
         }
         
