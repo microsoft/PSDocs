@@ -13,6 +13,7 @@ Set-StrictMode -Version latest;
 $rootPath = $PWD;
 Import-Module (Join-Path -Path $rootPath -ChildPath out/modules/PSDocs) -Force;
 $here = (Resolve-Path $PSScriptRoot).Path;
+$nl = [System.Environment]::NewLine;
 
 Describe 'PSDocs -- Code keyword' -Tag Code {
     $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Keyword.Doc.ps1';
@@ -28,19 +29,27 @@ Describe 'PSDocs -- Code keyword' -Tag Code {
         }
         It 'Should have generated output' {
             $result = Invoke-PSDocument @invokeParams -Name 'CodeMarkdown';
-            $result | Should -Match "``````$([System.Environment]::NewLine)`# This is a comment$([System.Environment]::NewLine)This is code$([System.Environment]::NewLine)$([System.Environment]::NewLine)`# Another comment$([System.Environment]::NewLine)And code$([System.Environment]::NewLine)``````";
+            $result | Should -Match "Begin$($nl)$($nl)``````powershell$($nl)`# This is a comment$($nl)This is code$($nl)$($nl)`# Another comment$($nl)And code$($nl)``````$($nl)$($nl)End";
         }
         It 'Code markdown with named format' {
             $result = Invoke-PSDocument @invokeParams -Name 'CodeMarkdownNamedFormat';
-            $result | Should -Match "``````powershell$([System.Environment]::NewLine)Get-Content$([System.Environment]::NewLine)``````";
+            $result | Should -Match "Begin$($nl)$($nl)``````powershell$($nl)Get-Content$($nl)``````$($nl)$($nl)End";
         }
         It 'Code markdown with evaluation' {
             $result = Invoke-PSDocument @invokeParams -Name 'CodeMarkdownEval';
-            $result | Should -Match "``````powershell$([System.Environment]::NewLine)2$([System.Environment]::NewLine)``````";
+            $result | Should -Match "Begin$($nl)$($nl)``````powershell$($nl)2$($nl)``````$($nl)$($nl)End";
         }
         It 'Code markdown with include' {
             $result = Invoke-PSDocument @invokeParams -Name 'CodeInclude';
-            $result | Should -Match "``````yaml$([System.Environment]::NewLine)generator: PSDocs$([System.Environment]::NewLine)``````";
+            $result | Should -Match "Begin$($nl)$($nl)``````yaml$($nl)generator: PSDocs$($nl)``````$($nl)$($nl)End";
+        }
+        It 'Code markdown with JSON conversion' {
+            $result = Invoke-PSDocument @invokeParams -Name 'CodeJson';
+            $result | Should -Match "``````json$($nl){$($nl)    `"Name`": `"Value`"$($nl)}$($nl)``````";
+        }
+        It 'Code markdown with YAML conversion' {
+            $result = Invoke-PSDocument @invokeParams -Name 'CodeYaml';
+            $result | Should -Match "``````yaml$($nl)name: Value$($nl)``````";
         }
     }
 }

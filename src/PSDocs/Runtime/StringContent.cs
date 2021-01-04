@@ -8,10 +8,13 @@ namespace PSDocs.Runtime
     {
         private readonly string _Input;
 
-        public StringContent(string input)
+        public StringContent(string input, string info = null)
         {
             _Input = input;
+            Info = info;
         }
+
+        public string Info { get; }
 
         internal string[] ReadLines()
         {

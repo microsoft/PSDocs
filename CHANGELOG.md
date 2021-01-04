@@ -6,8 +6,14 @@ What's changed since pre-release v0.7.0-B2008035:
 
 - Engine features:
   - Added support for localized strings using the `$LocalizedData` variable. [#91](https://github.com/BernieWhite/PSDocs/issues/91)
+  - Automatically serialize `Code` objects to JSON and YAML. [#93](https://github.com/BernieWhite/PSDocs/issues/93)
+    - Use the `json`, `yaml`, or `yml` info strings to automatically serialize custom objects.
+    - See `about_PSDocs_Keywords` for more details.
+- General improvements:
   - Added configuration for setting output options. [#105](https://github.com/BernieWhite/PSDocs/issues/105)
   - Added parameter alias `-MarkdownEncoding` on `New-PSDocumentOption` for `-Encoding`. [#106](https://github.com/BernieWhite/PSDocs/issues/106)
+  - Default the info string to `powershell` for `Code` script blocks. [#92](https://github.com/BernieWhite/PSDocs/issues/92)
+    - See `about_PSDocs_Keywords` for more details.
 - Bug fixes:
   - Fixed inconsistencies with default options file name. [#103](https://github.com/BernieWhite/PSDocs/issues/103)
   - Fixed line break after block quote. [#104](https://github.com/BernieWhite/PSDocs/issues/104)

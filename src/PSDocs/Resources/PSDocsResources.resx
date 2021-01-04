@@ -130,6 +130,9 @@
     <value>Options file does not exist.</value>
     <comment>Occurs when explicit path to a YAML file is specified and doesn't exist.</comment>
   </data>
+  <data name="ReadJsonFailed" xml:space="preserve">
+    <value>Read JSON failed.</value>
+  </data>
   <data name="ScanModule" xml:space="preserve">
     <value>[PSDocs][D] -- Scanning for source files in module: {0}</value>
   </data>
@@ -138,6 +141,9 @@
   </data>
   <data name="ScriptNotFound" xml:space="preserve">
     <value>The script was not found.</value>
+  </data>
+  <data name="SerializeNullPSObject" xml:space="preserve">
+    <value>Can not serialize a null PSObject.</value>
   </data>
   <data name="ShouldCreatePath" xml:space="preserve">
     <value>Create path</value>

@@ -69,7 +69,7 @@ namespace PSDocs.Commands
         protected static bool TryBool(object o, out bool value)
         {
             value = false;
-            if (GetBaseObject(o) is bool result)
+            if (ObjectHelper.GetBaseObject(o) is bool result)
             {
                 value = result;
                 return true;
@@ -80,17 +80,12 @@ namespace PSDocs.Commands
         protected static bool TryString(object o, out string value)
         {
             value = null;
-            if (GetBaseObject(o) is string result)
+            if (ObjectHelper.GetBaseObject(o) is string result)
             {
                 value = result;
                 return true;
             }
             return false;
-        }
-
-        private static object GetBaseObject(object o)
-        {
-            return o is PSObject pso ? pso.BaseObject : o;
         }
     }
 }

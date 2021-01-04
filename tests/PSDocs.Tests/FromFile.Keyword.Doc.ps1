@@ -34,6 +34,7 @@ Document 'BlockQuoteInfoMarkdown' {
 #region Code
 
 Document 'CodeMarkdown' {
+    'Begin'
     Code {
         # This is a comment
         This is code
@@ -41,20 +42,41 @@ Document 'CodeMarkdown' {
         # Another comment
         And code
     }
+    'End'
 }
 
 Document 'CodeMarkdownNamedFormat' {
+    'Begin'
     Code powershell {
         Get-Content
     }
+    'End'
 }
 
 Document 'CodeMarkdownEval' {
+    'Begin'
     $a = 1; $a += 1; $a | Code powershell;
+    'End'
 }
 
 Document 'CodeInclude' {
+    'Begin'
     Include 'psdocs.yml' -BaseDirectory $PSScriptRoot | Code 'yaml'
+    'End'
+}
+
+Document 'CodeJson' {
+    $a = [PSCustomObject]@{
+        Name = 'Value'
+    }
+    $a | Code 'json'
+}
+
+Document 'CodeYaml' {
+    $a = [PSCustomObject]@{
+        Name = 'Value'
+    }
+    $a | Code 'yaml'
 }
 
 #endregion Code
