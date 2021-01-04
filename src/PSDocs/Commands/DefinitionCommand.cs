@@ -8,8 +8,6 @@ namespace PSDocs.Commands
     internal sealed class DefinitionCommand : PSCmdlet
     {
         private const string InvokeBlockCmdletName = "Invoke-Block";
-        private const string InvokeBlockCmdlet_TypeParameter = "Type";
-        private const string InvokeBlockCmdlet_IfParameter = "If";
         private const string InvokeBlockCmdlet_BodyParameter = "Body";
 
         /// <summary>

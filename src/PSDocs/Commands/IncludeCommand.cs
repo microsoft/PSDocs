@@ -6,6 +6,7 @@ using System.Management.Automation;
 namespace PSDocs.Commands
 {
     [Cmdlet(VerbsCommon.Add, LanguageKeywords.Include)]
+    [OutputType(typeof(Include))]
     internal sealed class IncludeCommand : KeywordCmdlet
     {
         [Parameter(Position = 0, Mandatory = true)]

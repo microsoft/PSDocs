@@ -1,6 +1,6 @@
 ﻿namespace PSDocs.Configuration
 {
-    public enum ColumnPadding : byte
+    public enum ColumnPadding
     {
         None,
 

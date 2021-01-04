@@ -185,8 +185,7 @@ namespace PSDocs.Processor.Markdown
 
         private static void Include(MarkdownProcessorContext context, Include include)
         {
-            var text = File.ReadAllText(include.Path);
-            context.WriteLine(text);
+            context.WriteLine(include.Content);
         }
 
         private static void Table(MarkdownProcessorContext context, Table table)

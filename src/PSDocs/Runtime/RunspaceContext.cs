@@ -3,8 +3,12 @@ using PSDocs.Configuration;
 using PSDocs.Data.Internal;
 using PSDocs.Pipeline;
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Management.Automation;
+using System.Management.Automation.Language;
 using System.Management.Automation.Runspaces;
 
 namespace PSDocs.Runtime
@@ -25,6 +29,9 @@ namespace PSDocs.Runtime
         internal static RunspaceContext CurrentThread;
         private Runspace _Runspace;
 
+        private readonly Dictionary<string, Hashtable> _LocalizedDataCache;
+        private string[] _Culture;
+
         // Track whether Dispose has been called.
         private bool _Disposed;
 
@@ -32,6 +39,7 @@ namespace PSDocs.Runtime
         {
             Pipeline = pipeline;
             _Runspace = GetRunspace();
+            _LocalizedDataCache = new Dictionary<string, Hashtable>();
         }
 
         public SourceFile SourceFile { get; private set; }
@@ -40,7 +48,10 @@ namespace PSDocs.Runtime
 
         public PSObject TargetObject { get; private set; }
 
-        public string Culture { get; private set; }
+        public string Culture
+        {
+            get { return _Culture[0]; }
+        }
 
         public string InstanceName { get; internal set; }
 
@@ -69,6 +80,7 @@ namespace PSDocs.Runtime
 
                 _Runspace.Open();
                 _Runspace.SessionStateProxy.PSVariable.Set(new HostState.PSDocsVariable());
+                _Runspace.SessionStateProxy.PSVariable.Set(new HostState.LocalizedDataVariable(this));
                 _Runspace.SessionStateProxy.PSVariable.Set(new HostState.InstanceNameVariable());
                 _Runspace.SessionStateProxy.PSVariable.Set(new HostState.TargetObjectVariable());
                 _Runspace.SessionStateProxy.PSVariable.Set(new HostState.InputObjectVariable());
@@ -133,7 +145,109 @@ namespace PSDocs.Runtime
 
         public void EnterCulture(string culture)
         {
-            Culture = culture;
+            _Culture = GetCultures(culture);
+        }
+
+        /// <summary>
+        /// Build a list of cultures.
+        /// </summary>
+        private static string[] GetCultures(string culture)
+        {
+            var cultures = new List<string>();
+            if (!string.IsNullOrEmpty(culture))
+            {
+                var c = new CultureInfo(culture);
+                while (c != null && !string.IsNullOrEmpty(c.Name))
+                {
+                    cultures.Add(c.Name);
+                    c = c.Parent;
+                }
+            }
+            return cultures.ToArray();
+        }
+
+        private const string DATA_FILENAME = "PSDocs-strings.psd1";
+
+        private static readonly Hashtable Empty = new Hashtable();
+
+        internal Hashtable GetLocalizedStrings()
+        {
+            var path = GetLocalizedPaths(DATA_FILENAME);
+            if (path == null || path.Length == 0)
+                return Empty;
+
+            if (_LocalizedDataCache.TryGetValue(path[0], out Hashtable result))
+                return result;
+
+            result = ReadLocalizedStrings(path[0]) ?? new Hashtable();
+            for (var i = 1; i < path.Length; i++)
+                result.AddUnique(ReadLocalizedStrings(path[i]));
+
+            _LocalizedDataCache[path[0]] = result;
+            return result;
+        }
+
+        private static Hashtable ReadLocalizedStrings(string path)
+        {
+            var ast = Parser.ParseFile(path, out Token[] tokens, out ParseError[] errors);
+            var data = ast.Find(a => a is HashtableAst, false);
+            if (data != null)
+            {
+                var result = (Hashtable)data.SafeGetValue();
+                return result;
+            }
+            return null;
+        }
+
+        public string GetLocalizedPath(string file)
+        {
+            if (string.IsNullOrEmpty(SourceFile.ResourcePath))
+                return null;
+
+            //if (!_RaisedUsingInvariantCulture && (Culture == null || culture.Length == 0))
+            //{
+            //    Pipeline.Writer.WarnUsingInvariantCulture();
+            //    _RaisedUsingInvariantCulture = true;
+            //    return null;
+            //}
+
+            for (var i = 0; i < _Culture.Length; i++)
+            {
+                if (TryLocalizedPath(_Culture[i], file, out string path))
+                    return path;
+            }
+            return null;
+        }
+
+        public string[] GetLocalizedPaths(string file)
+        {
+            if (string.IsNullOrEmpty(SourceFile.ResourcePath))
+                return null;
+
+            //if (!_RaisedUsingInvariantCulture && (Culture == null || culture.Length == 0))
+            //{
+            //    Pipeline.Writer.WarnUsingInvariantCulture();
+            //    _RaisedUsingInvariantCulture = true;
+            //    return null;
+            //}
+
+            var result = new List<string>();
+            for (var i = 0; i < _Culture.Length; i++)
+            {
+                if (TryLocalizedPath(_Culture[i], file, out string path))
+                    result.Add(path);
+            }
+            return result.ToArray();
+        }
+
+        private bool TryLocalizedPath(string culture, string file, out string path)
+        {
+            path = null;
+            if (SourceFile == null || string.IsNullOrEmpty(SourceFile.ResourcePath))
+                return false;
+
+            path = Path.Combine(SourceFile.ResourcePath, culture, file);
+            return File.Exists(path);
         }
 
         #endregion Culture

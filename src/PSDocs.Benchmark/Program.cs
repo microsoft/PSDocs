@@ -12,9 +12,11 @@ namespace PSDocs.Benchmark
     {
         static void Main(string[] args)
         {
-            var app = new CommandLineApplication();
-            app.Name = "PSDocs Benchmark";
-            app.Description = "A runner for testing PSDocs performance";
+            var app = new CommandLineApplication
+            {
+                Name = "PSDocs Benchmark",
+                Description = "A runner for testing PSDocs performance"
+            };
 
 #if !BENCHMARK
             // Do profiling

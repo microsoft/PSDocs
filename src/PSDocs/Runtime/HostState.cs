@@ -23,6 +23,27 @@ namespace PSDocs.Runtime
             public override object Value => _Value;
         }
 
+        public sealed class LocalizedDataVariable : PSVariable
+        {
+            internal const string VariableName = "LocalizedData";
+
+            private readonly LocalizedData _Value;
+
+            public LocalizedDataVariable()
+                : base(VariableName, null, ScopedItemOptions.ReadOnly)
+            {
+                _Value = new LocalizedData();
+            }
+
+            internal LocalizedDataVariable(RunspaceContext context)
+                : this()
+            {
+                _Value = new LocalizedData(context);
+            }
+
+            public override object Value => _Value;
+        }
+
         public sealed class InstanceNameVariable : PSVariable
         {
             internal const string VariableName = "InstanceName";

@@ -74,7 +74,6 @@ function Invoke-PSDocument {
         # Check if the path is a directory
         if (!(Test-Path -Path $Path)) {
             Write-Error -Message $LocalizedHelp.PathNotFound -ErrorAction Stop;
-
             return;
         }
 
@@ -170,7 +169,6 @@ function Invoke-PSDocument {
         Write-Verbose -Message "[Invoke-PSDocument]::END";
     }
 }
-
 
 # .ExternalHelp PSDocs-Help.xml
 function Get-PSDocument {
@@ -282,7 +280,6 @@ function Get-PSDocumentHeader {
         [Alias('FullName')]
         [String]$Path = $PWD
     )
-
     process {
         $filteredItems = Get-ChildItem -Path (Join-Path -Path $Path -ChildPath '*') -File;
         foreach ($item in $filteredItems) {
@@ -293,37 +290,75 @@ function Get-PSDocumentHeader {
 
 # .ExternalHelp PSDocs-Help.xml
 function New-PSDocumentOption {
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'FromPath')]
     [OutputType([PSDocs.Configuration.PSDocumentOption])]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Creates an in memory object only')]
     param (
-        [Parameter(Position = 0, Mandatory = $False)]
+        [Parameter(Position = 0, Mandatory = $False, ParameterSetName = 'FromPath')]
         [String]$Path = $PWD,
 
-        [Parameter(Mandatory = $False)]
+        [Parameter(Mandatory = $True, ParameterSetName = 'FromOption')]
         [PSDocs.Configuration.PSDocumentOption]$Option,
 
+        [Parameter(Mandatory = $True, ParameterSetName = 'FromDefault')]
+        [Switch]$Default,
+
+        # Options
+
+        # Sets the Markdown.Encoding option
         [Parameter(Mandatory = $False)]
-        [PSDocs.Configuration.MarkdownEncoding]$Encoding
+        [Alias('MarkdownEncoding')]
+        [PSDocs.Configuration.MarkdownEncoding]$Encoding = [PSDocs.Configuration.MarkdownEncoding]::Default,
+
+        # Sets the Output.Culture option
+        [Parameter(Mandatory = $False)]
+        [Alias('OutputCulture')]
+        [String[]]$Culture,
+
+        # Sets the Output.Path option
+        [Parameter(Mandatory = $False)]
+        [String]$OutputPath
     )
+    begin {
+        Write-Verbose -Message "[New-PSDocumentOption] BEGIN::";
 
-    process {
+        # Get parameter options, which will override options from other sources
+        $optionParams = @{ };
+        $optionParams += $PSBoundParameters;
 
+        # Remove invalid parameters
+        if ($optionParams.ContainsKey('Path')) {
+            $optionParams.Remove('Path');
+        }
+        if ($optionParams.ContainsKey('Option')) {
+            $optionParams.Remove('Option');
+        }
+        if ($optionParams.ContainsKey('Default')) {
+            $optionParams.Remove('Default');
+        }
+        if ($optionParams.ContainsKey('Verbose')) {
+            $optionParams.Remove('Verbose');
+        }
         if ($PSBoundParameters.ContainsKey('Option')) {
-            $Option = $Option.Clone();
+            $Option = [PSDocs.Configuration.PSDocumentOption]::FromFileOrEmpty($Option, $Path);
         }
         elseif ($PSBoundParameters.ContainsKey('Path')) {
             Write-Verbose -Message "Attempting to read: $Path";
-            $Option = [PSDocs.Configuration.PSDocumentOption]::FromFile($Path, $False);
+            $Option = [PSDocs.Configuration.PSDocumentOption]::FromFile($Path);
+        }
+        elseif ($PSBoundParameters.ContainsKey('Default')) {
+            $Option = [PSDocs.Configuration.PSDocumentOption]::FromDefault();
         }
         else {
             Write-Verbose -Message "Attempting to read: $Path";
-            $Option = [PSDocs.Configuration.PSDocumentOption]::FromFile($Path, $True);
+            $Option = [PSDocs.Configuration.PSDocumentOption]::FromFileOrEmpty($Option, $Path);
         }
+    }
+    end {
+        # Options
+        $Option | SetOptions @optionParams -Verbose:$VerbosePreference;
 
-        if ($PSBoundParameters.ContainsKey('Encoding')) {
-            $Option.Markdown.Encoding = $Encoding;
-        }
-        return $Option;
+        Write-Verbose -Message "[New-PSDocumentOption] END::";
     }
 }
 
@@ -338,6 +373,7 @@ function New-PSDocumentOption {
 # .ExternalHelp PSDocs-Help.xml
 function Document {
     [CmdletBinding()]
+    [OutputType([void])]
     param (
         [Parameter(Position = 0, Mandatory = $True)]
         [String]$Name,
@@ -384,6 +420,7 @@ function Section {
 
 function Title {
     [CmdletBinding()]
+    [OutputType([void])]
     param (
         [Parameter(Position = 0, Mandatory = $True)]
         [AllowEmptyString()]
@@ -396,7 +433,6 @@ function Title {
 }
 
 function Code {
-
     [CmdletBinding()]
     [OutputType([PSDocs.Models.Code])]
     param (
@@ -422,6 +458,7 @@ function Code {
 
 function Note {
     [CmdletBinding(DefaultParameterSetName = 'ScriptBlock')]
+    [OutputType([PSDocs.Models.BlockQuote])]
     param (
         [Parameter(Position = 0, Mandatory = $True, ParameterSetName = 'ScriptBlock')]
         [ScriptBlock]$Body,
@@ -437,6 +474,7 @@ function Note {
 
 function Warning {
     [CmdletBinding(DefaultParameterSetName = 'ScriptBlock')]
+    [OutputType([PSDocs.Models.BlockQuote])]
     param (
         [Parameter(Position = 0, Mandatory = $True, ParameterSetName = 'ScriptBlock')]
         [ScriptBlock]$Body,
@@ -452,6 +490,7 @@ function Warning {
 
 function BlockQuote {
     [CmdletBinding()]
+    [OutputType([PSDocs.Models.BlockQuote])]
     param (
         [Parameter(Mandatory = $True, ValueFromPipeline = $True)]
         [String]$Text,
@@ -470,6 +509,7 @@ function BlockQuote {
 
 function Include {
     [CmdletBinding()]
+    [OutputType([PSDocs.Models.Include])]
     param (
         [Parameter(Position = 0, Mandatory = $True)]
         [String]$FileName,
@@ -491,6 +531,7 @@ function Include {
 
 function Metadata {
     [CmdletBinding()]
+    [OutputType([void])]
     param (
         [Parameter(Position = 0, Mandatory = $True)]
         [AllowNull()]
@@ -504,6 +545,7 @@ function Metadata {
 
 function Table {
     [CmdletBinding()]
+    [OutputType([PSDocs.Models.Table])]
     param (
         [Parameter(Mandatory = $False, ValueFromPipeline = $True)]
         [AllowNull()]
@@ -524,12 +566,53 @@ function Table {
 # Helper functions
 #
 
+function SetOptions {
+    [CmdletBinding()]
+    [OutputType([PSDocs.Configuration.PSDocumentOption])]
+    param (
+        [Parameter(Mandatory = $True, ValueFromPipeline = $True)]
+        [PSDocs.Configuration.PSDocumentOption]$InputObject,
+
+        # Options
+
+        # Sets the Markdown.Encoding option
+        [Parameter(Mandatory = $False)]
+        [ValidateSet('Default', 'UTF8', 'UTF7', 'Unicode', 'UTF32', 'ASCII')]
+        [PSDocs.Configuration.MarkdownEncoding]$Encoding = 'Default',
+
+        # Sets the Output.Culture option
+        [Parameter(Mandatory = $False)]
+        [String[]]$Culture,
+
+        # Sets the Output.Path option
+        [Parameter(Mandatory = $False)]
+        [String]$OutputPath
+    )
+    process {
+        # Options
+
+        # Sets option Markdown.Encoding
+        if ($PSBoundParameters.ContainsKey('Encoding')) {
+            $InputObject.Markdown.Encoding = $Encoding;
+        }
+
+        # Sets option Output.Culture
+        if ($PSBoundParameters.ContainsKey('Culture')) {
+            $InputObject.Output.Culture = $Culture;
+        }
+
+        # Sets option Output.Path
+        if ($PSBoundParameters.ContainsKey('OutputPath')) {
+            $InputObject.Output.Path = $OutputPath;
+        }
+
+        return $InputObject;
+    }
+}
+
 function InitDocumentContext {
     [CmdletBinding()]
-    param (
-
-    )
-
+    param ()
     process {
 
         if ($Null -eq (Get-Variable -Name DocumentBody -Scope Script -ErrorAction SilentlyContinue)) {

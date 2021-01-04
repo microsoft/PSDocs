@@ -1,4 +1,6 @@
-﻿using System;
+﻿
+using PSDocs.Resources;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Management.Automation;
@@ -25,13 +27,34 @@ namespace PSDocs.Pipeline
 
     public static class PipelineWriterExtensions
     {
-        [DebuggerStepThrough()]
+        [DebuggerStepThrough]
         public static void WriteError(this IPipelineWriter writer, Exception exception, string errorId, ErrorCategory errorCategory, object targetObject)
         {
             if (writer == null)
                 return;
 
             writer.WriteError(new ErrorRecord(exception, errorId, errorCategory, targetObject));
+        }
+
+        public static void WarnSourcePathNotFound(this IPipelineWriter writer)
+        {
+            if (writer == null)
+                return;
+
+            writer.WriteWarning(PSDocsResources.SourceNotFound);
+        }
+
+        public static void ErrorInvariantCulture(this IPipelineWriter writer)
+        {
+            if (writer == null)
+                return;
+
+            writer.WriteError(new ErrorRecord(
+                exception: new PipelineBuilderException(PSDocsResources.InvariantCulture),
+                errorId: "PSDocs.PipelineBuilder.InvariantCulture",
+                errorCategory: ErrorCategory.InvalidOperation,
+                null
+            ));
         }
     }
 

@@ -51,7 +51,8 @@ Get the Yaml header for all markdown files in the current working directory.
 
 ### -Path
 
-The path to a specific markdown file or a parent directory containing one or more markdown files. A trailing slash is not required.
+The path to a specific markdown file or a parent directory containing one or more markdown files.
+A trailing slash is not required.
 
 If a path is not specified the current working path will be used.
 
@@ -68,7 +69,8 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
+
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 

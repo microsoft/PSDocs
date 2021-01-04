@@ -3,9 +3,7 @@
 #
 
 [CmdletBinding()]
-param (
-
-)
+param ()
 
 # Setup error handling
 $ErrorActionPreference = 'Stop';
@@ -58,7 +56,7 @@ Describe 'PSDocs instance names' -Tag 'Common', 'InstanceName' {
             InputObject = $dummyObject
             OutputPath = $outputPath
         }
-        $result = Invoke-PSDocument @invokeParams -InstanceName 'Instance1' -Name 'WithInstanceName';
+        $null = Invoke-PSDocument @invokeParams -InstanceName 'Instance1' -Name 'WithInstanceName';
         It 'Should not create a output with the document name' {
             Test-Path -Path "$outputPath\WithInstanceName.md" | Should -Be $False;
             Test-Path -Path "$outputPath\Instance1.md" | Should -Be $True;
@@ -72,7 +70,7 @@ Describe 'PSDocs instance names' -Tag 'Common', 'InstanceName' {
             InputObject = $dummyObject
             OutputPath = $outputPath
         }
-        $result = Invoke-PSDocument @invokeParams -InstanceName 'Instance2','Instance3' -Name 'WithMultiInstanceName';
+        $null = Invoke-PSDocument @invokeParams -InstanceName 'Instance2','Instance3' -Name 'WithMultiInstanceName';
         It 'Should not create a output with the document name' {
             Test-Path -Path "$outputPath\WithMultiInstanceName.md" | Should be $False;
         }
@@ -149,6 +147,20 @@ Describe 'Invoke-PSDocument' -Tag 'Cmdlet', 'Common', 'Invoke-PSDocument', 'From
             $Error[0].Exception.Message | Should -Match '^(The term ''New-PSDocsInvalidCommand'' is not recognized)';
             { Invoke-PSDocument -Path $here -OutputPath $outputPath -Name WithWriteError -ErrorAction Stop } | Should -Throw;
             $Error[0].Exception.Message | Should -Match 'Verify Write-Error is raised as an exception';
+        }
+    }
+
+    Context 'With -Module' {
+        $testModuleSourcePath = Join-Path $here -ChildPath 'TestModule';
+
+        It 'Returns documents' {
+            $Null = Import-Module $testModuleSourcePath -Force;
+            $result = @(Invoke-PSDocument -Module 'TestModule' -Name 'TestDocument1' -Culture 'en-US', 'en-AU', 'en-ZZ');
+            $result | Should -Not -BeNullOrEmpty;
+            $result.Length | Should -Be 3;
+            $result[0].Split([System.Environment]::NewLine, [System.StringSplitOptions]::RemoveEmptyEntries) | Should -Be "Culture=en-US";
+            $result[1].Split([System.Environment]::NewLine, [System.StringSplitOptions]::RemoveEmptyEntries) | Should -Be "Culture=en-AU";
+            $result[2].Split([System.Environment]::NewLine, [System.StringSplitOptions]::RemoveEmptyEntries) | Should -Be "Culture=en";
         }
     }
 

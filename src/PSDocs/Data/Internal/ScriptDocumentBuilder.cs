@@ -35,10 +35,11 @@ namespace PSDocs.Data.Internal
         Document IDocumentBuilder.Process(RunspaceContext context, PSObject sourceObject)
         {
             context.EnterBuilder(this);
+            context.EnterSourceFile(_Block.Source);
             try
             {
-                _Current = Document = new Document(context.InstanceName, context.Culture);
                 _Parent = new Stack<SectionNode>();
+                _Current = Document = new Document(context.InstanceName, context.Culture);
                 Document.AddNodes(_Block.Body.Invoke());
                 return Document;
             }

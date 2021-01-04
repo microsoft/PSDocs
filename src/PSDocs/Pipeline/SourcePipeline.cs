@@ -1,7 +1,7 @@
-﻿using PSDocs.Configuration;
+﻿
+using PSDocs.Configuration;
 using PSDocs.Pipeline.Output;
 using PSDocs.Resources;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -9,13 +9,13 @@ using System.Management.Automation;
 
 namespace PSDocs.Pipeline
 {
-    public enum SourceType : byte
+    public enum SourceType
     {
         Script = 1
     }
 
     /// <summary>
-    /// A source file for rule definitions.
+    /// A source file for document definitions.
     /// </summary>
     [DebuggerDisplay("{Type}: {Path}")]
     public sealed class SourceFile
@@ -23,15 +23,16 @@ namespace PSDocs.Pipeline
         public readonly string Path;
         public readonly string ModuleName;
         public readonly SourceType Type;
-        public readonly string HelpPath;
 
         public SourceFile(string path, string moduleName, SourceType type, string helpPath)
         {
             Path = path;
             ModuleName = moduleName;
             Type = type;
-            HelpPath = helpPath;
+            ResourcePath = helpPath;
         }
+
+        public string ResourcePath { get; }
     }
 
     public sealed class Source
@@ -58,20 +59,17 @@ namespace PSDocs.Pipeline
         {
             public readonly string Path;
             public readonly string Name;
-            public readonly string Baseline;
 
             public ModuleInfo(PSModuleInfo info)
             {
                 Path = info.ModuleBase;
                 Name = info.Name;
-                if (info.PrivateData is Hashtable privateData && privateData.ContainsKey("PSRule") && privateData["PSRule"] is Hashtable moduleData)
-                    Baseline = moduleData.ContainsKey("Baseline") ? moduleData["Baseline"] as string : null;
             }
         }
     }
 
     /// <summary>
-    /// A helper to build a list of rule sources for discovery.
+    /// A helper to build a list of document sources for discovery.
     /// </summary>
     public sealed class SourcePipelineBuilder
     {
@@ -109,7 +107,7 @@ namespace PSDocs.Pipeline
         /// <summary>
         /// Add loose files as a source.
         /// </summary>
-        /// <param name="path">A file or directory path containing one or more rule files.</param>
+        /// <param name="path">A file or directory path containing one or more document files.</param>
         public void Directory(string[] path)
         {
             if (path == null || path.Length == 0)

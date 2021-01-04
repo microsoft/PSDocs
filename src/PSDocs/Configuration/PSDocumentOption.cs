@@ -1,4 +1,5 @@
-﻿using PSDocs.Resources;
+﻿
+using PSDocs.Resources;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -18,13 +19,17 @@ namespace PSDocs.Configuration
 
     public sealed class PSDocumentOption
     {
-        private const string DEFAULT_FILENAME = "psdocs.yml";
+        private const string DEFAULT_FILENAME = "ps-docs.yaml";
 
         private static readonly PSDocumentOption Default = new PSDocumentOption
         {
+            Document = DocumentOption.Default,
             Execution = ExecutionOption.Default,
-            //Markdown = MarkdownOption.Default
+            Markdown = MarkdownOption.Default,
+            Output = OutputOption.Default,
         };
+
+        private string SourcePath;
 
         public PSDocumentOption()
         {
@@ -35,8 +40,10 @@ namespace PSDocs.Configuration
             Output = new OutputOption();
         }
 
-        public PSDocumentOption(PSDocumentOption option)
+        private PSDocumentOption(string sourcePath, PSDocumentOption option)
         {
+            SourcePath = sourcePath;
+
             // Set from existing option instance
             Document = new DocumentOption(option?.Document);
             Execution = new ExecutionOption(option?.Execution);
@@ -84,7 +91,17 @@ namespace PSDocs.Configuration
 
         public PSDocumentOption Clone()
         {
-            return new PSDocumentOption(this);
+            return new PSDocumentOption(SourcePath, option: this);
+        }
+
+        private static PSDocumentOption Combine(PSDocumentOption o1, PSDocumentOption o2)
+        {
+            var result = new PSDocumentOption(o1?.SourcePath ?? o2?.SourcePath, o1);
+            result.Document = DocumentOption.Combine(result.Document, o2?.Document);
+            result.Execution = ExecutionOption.Combine(result.Execution, o2?.Execution);
+            result.Markdown = MarkdownOption.Combine(result.Markdown, o2?.Markdown);
+            result.Output = OutputOption.Combine(result.Output, o2?.Output);
+            return result;
         }
 
         /// <summary>
@@ -114,11 +131,54 @@ namespace PSDocs.Configuration
             return FromYaml(path: filePath, yaml: File.ReadAllText(filePath));
         }
 
+        public static PSDocumentOption FromDefault()
+        {
+            return Default.Clone();
+        }
+
+        // <summary>
+        /// Load a YAML formatted PSDocumentOption object from disk.
+        /// </summary>
+        /// <param name="path">A file or directory to read options from.</param>
+        /// <returns>An options object.</returns>
+        /// <remarks>
+        /// This method is called from PowerShell.
+        /// </remarks>
+        public static PSDocumentOption FromFileOrEmpty(string path)
+        {
+            // Get a rooted file path instead of directory or relative path
+            var filePath = GetFilePath(path);
+
+            // Return empty options if file does not exist
+            if (!File.Exists(filePath))
+                return new PSDocumentOption();
+
+            return FromYaml(path: filePath, yaml: File.ReadAllText(filePath));
+        }
+
+        /// <summary>
+        /// Load a YAML formatted PSDocumentOption object from disk.
+        /// </summary>
+        /// <param name="option"></param>
+        /// <param name="path">A file or directory to read options from.</param>
+        /// <returns>An options object.</returns>
+        /// <remarks>
+        /// This method is called from PowerShell.
+        /// </remarks>
+        public static PSDocumentOption FromFileOrEmpty(PSDocumentOption option, string path)
+        {
+            if (option == null)
+                return FromFileOrEmpty(path);
+
+            return !string.IsNullOrEmpty(path) ? Combine(option, FromFileOrEmpty(path)) : option;
+        }
+
         public static PSDocumentOption FromYaml(string yaml)
         {
             var d = new DeserializerBuilder()
                 .IgnoreUnmatchedProperties()
                 .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                .WithTypeConverter(new StringArrayTypeConverter())
                 .Build();
 
             return d.Deserialize<PSDocumentOption>(yaml) ?? new PSDocumentOption();
@@ -129,6 +189,7 @@ namespace PSDocs.Configuration
             var d = new DeserializerBuilder()
                 .IgnoreUnmatchedProperties()
                 .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                .WithTypeConverter(new StringArrayTypeConverter())
                 .Build();
             var option = d.Deserialize<PSDocumentOption>(yaml) ?? new PSDocumentOption();
             //option.SourcePath = path;
@@ -147,10 +208,8 @@ namespace PSDocs.Configuration
             if (executionContext == null)
             {
                 _GetWorkingPath = () => Directory.GetCurrentDirectory();
-
                 return;
             }
-
             _GetWorkingPath = () => executionContext.SessionState.Path.CurrentFileSystemLocation.Path;
         }
 
@@ -179,6 +238,33 @@ namespace PSDocs.Configuration
             return _CurrentCulture;
         }
 
+        public override bool Equals(object obj)
+        {
+            return obj is PSDocumentOption option && Equals(option);
+        }
+
+        public bool Equals(PSDocumentOption other)
+        {
+            return other != null &&
+                Document == other.Document &&
+                Execution == other.Execution &&
+                Markdown == other.Markdown &&
+                Output == other.Output;
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked // Overflow is fine
+            {
+                int hash = 17;
+                hash = hash * 23 + (Document != null ? Document.GetHashCode() : 0);
+                hash = hash * 23 + (Execution != null ? Execution.GetHashCode() : 0);
+                hash = hash * 23 + (Markdown != null ? Markdown.GetHashCode() : 0);
+                hash = hash * 23 + (Output != null ? Output.GetHashCode() : 0);
+                return hash;
+            }
+        }
+
         /// <summary>
         /// Convert from hashtable to options by processing key values. This enables -Option @{ } from PowerShell.
         /// </summary>
@@ -189,50 +275,39 @@ namespace PSDocs.Configuration
 
             // Build index to allow mapping
             var index = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-
             foreach (DictionaryEntry entry in hashtable)
-            {
                 index.Add(entry.Key.ToString(), entry.Value);
-            }
 
             // Start loading matching values
+            if (index.TryPopEnum("execution.languagemode", out LanguageMode languageMode))
+                option.Execution.LanguageMode = languageMode;
 
+            if (index.TryPopString("markdown.wrapseparator", out string svalue))
+                option.Markdown.WrapSeparator = svalue;
 
-            if (index.TryGetValue("markdown.wrapseparator", out object value))
-            {
-                option.Markdown.WrapSeparator = (string)value;
-            }
+            if (index.TryPopEnum("markdown.encoding", out MarkdownEncoding markdownEncoding))
+                option.Markdown.Encoding = markdownEncoding;
 
-            if (index.TryGetValue("markdown.encoding", out value))
-            {
-                option.Markdown.Encoding = (MarkdownEncoding)Enum.Parse(typeof(MarkdownEncoding), (string)value);
-            }
+            if (index.TryPopBool("markdown.skipemptysections", out bool bvalue))
+                option.Markdown.SkipEmptySections = bvalue;
 
-            if (index.TryGetValue("markdown.skipemptysections", out value))
-            {
-                option.Markdown.SkipEmptySections = (bool)value;
-            }
+            if (index.TryPopEnum("markdown.columnpadding", out ColumnPadding columnPadding))
+                option.Markdown.ColumnPadding = columnPadding;
 
-            if (index.TryGetValue("markdown.columnpadding", out value))
-            {
-                option.Markdown.ColumnPadding = (ColumnPadding)Enum.Parse(typeof(ColumnPadding), (string)value);
-            }
+            if (index.TryPopEnum("markdown.useedgepipes", out EdgePipeOption useEdgePipes))
+                option.Markdown.UseEdgePipes = useEdgePipes;
 
-            if (index.TryGetValue("markdown.useedgepipes", out value))
-            {
-                option.Markdown.UseEdgePipes = (EdgePipeOption)Enum.Parse(typeof(EdgePipeOption), (string)value);
-            }
+            if(index.TryPopStringArray("output.culture", out string[] savalue))
+                option.Output.Culture = savalue;
 
-            if (index.TryGetValue("execution.languagemode", out value))
-            {
-                option.Execution.LanguageMode = (LanguageMode)Enum.Parse(typeof(LanguageMode), (string)value);
-            }
+            if(index.TryPopString("output.path", out svalue))
+                option.Output.Path = svalue;
 
             return option;
         }
 
         /// <summary>
-        /// Convert from string to options by loading the yaml file from disk. This enables -Option '.\.psdocs.yml' from PowerShell.
+        /// Convert from string to options by loading the yaml file from disk. This enables -Option '.\ps-docs.yaml' from PowerShell.
         /// </summary>
         /// <param name="path"></param>
         public static implicit operator PSDocumentOption(string path)
@@ -253,9 +328,7 @@ namespace PSDocs.Configuration
             {
                 var ext = Path.GetExtension(rootedPath);
                 if (string.Equals(ext, ".yaml", StringComparison.OrdinalIgnoreCase) || string.Equals(ext, ".yml", StringComparison.OrdinalIgnoreCase))
-                {
                     return rootedPath;
-                }
             }
 
             // Check if default files exist and 
@@ -273,6 +346,9 @@ namespace PSDocs.Configuration
         /// <returns></returns>
         internal static string GetRootedPath(string path)
         {
+            if (string.IsNullOrEmpty(path))
+                return Path.GetFullPath(GetWorkingPath());
+
             return Path.IsPathRooted(path) ? path : Path.GetFullPath(Path.Combine(GetWorkingPath(), path));
         }
 

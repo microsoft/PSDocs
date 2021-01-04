@@ -3,9 +3,7 @@
 #
 
 [CmdletBinding()]
-param (
-
-)
+param ()
 
 # Setup error handling
 $ErrorActionPreference = 'Stop';
@@ -30,7 +28,7 @@ Describe 'PSDocs -- Code keyword' -Tag Code {
         }
         It 'Should have generated output' {
             $result = Invoke-PSDocument @invokeParams -Name 'CodeMarkdown';
-            $result | Should -Match "`# This is a comment$([System.Environment]::NewLine)This is code$([System.Environment]::NewLine)$([System.Environment]::NewLine)`# Another comment$([System.Environment]::NewLine)And code";
+            $result | Should -Match "``````$([System.Environment]::NewLine)`# This is a comment$([System.Environment]::NewLine)This is code$([System.Environment]::NewLine)$([System.Environment]::NewLine)`# Another comment$([System.Environment]::NewLine)And code$([System.Environment]::NewLine)``````";
         }
         It 'Code markdown with named format' {
             $result = Invoke-PSDocument @invokeParams -Name 'CodeMarkdownNamedFormat';
@@ -39,6 +37,10 @@ Describe 'PSDocs -- Code keyword' -Tag Code {
         It 'Code markdown with evaluation' {
             $result = Invoke-PSDocument @invokeParams -Name 'CodeMarkdownEval';
             $result | Should -Match "``````powershell$([System.Environment]::NewLine)2$([System.Environment]::NewLine)``````";
+        }
+        It 'Code markdown with include' {
+            $result = Invoke-PSDocument @invokeParams -Name 'CodeInclude';
+            $result | Should -Match "``````yaml$([System.Environment]::NewLine)generator: PSDocs$([System.Environment]::NewLine)``````";
         }
     }
 }

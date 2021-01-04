@@ -4,20 +4,20 @@
 
 #region BlockQuote
 
-document 'BlockQuoteSingleMarkdown' {
+Document 'BlockQuoteSingleMarkdown' {
     'This is a single line' | BlockQuote
 }
 
-document 'BlockQuoteMultiMarkdown' {
+Document 'BlockQuoteMultiMarkdown' {
     @('This is the first line.'
     'This is the second line.') | BlockQuote
 }
 
-document 'BlockQuoteTitleMarkdown' {
+Document 'BlockQuoteTitleMarkdown' {
     'This is a single block quote' | BlockQuote -Title 'Test'
 }
 
-document 'BlockQuoteInfoMarkdown' {
+Document 'BlockQuoteInfoMarkdown' {
     'This is a single block quote' | BlockQuote -Info 'Tip'
 }
 
@@ -25,7 +25,7 @@ document 'BlockQuoteInfoMarkdown' {
 
 #region Code
 
-document 'CodeMarkdown' {
+Document 'CodeMarkdown' {
     Code {
         # This is a comment
         This is code
@@ -35,30 +35,34 @@ document 'CodeMarkdown' {
     }
 }
 
-document 'CodeMarkdownNamedFormat' {
+Document 'CodeMarkdownNamedFormat' {
     Code powershell {
         Get-Content
     }
 }
 
-document 'CodeMarkdownEval' {
+Document 'CodeMarkdownEval' {
     $a = 1; $a += 1; $a | Code powershell;
+}
+
+Document 'CodeInclude' {
+    Include 'psdocs.yml' -BaseDirectory $PSScriptRoot | Code 'yaml'
 }
 
 #endregion Code
 
 #region Include
 
-document 'IncludeRelative' {
+Document 'IncludeRelative' {
     Include tests/PSDocs.Tests/IncludeFile.md -BaseDirectory $TargetObject
     Include IncludeFile2.md -BaseDirectory (Join-Path -Path $TargetObject -ChildPath tests/PSDocs.Tests/)
 }
 
-document 'IncludeAbsolute' {
+Document 'IncludeAbsolute' {
     Include (Join-Path -Path $TargetObject -ChildPath tests/PSDocs.Tests/IncludeFile.md)
 }
 
-document 'IncludeCulture' {
+Document 'IncludeCulture' {
     Include IncludeFile3.md -UseCulture -BaseDirectory tests/PSDocs.Tests/
 }
 
@@ -66,20 +70,20 @@ document 'IncludeCulture' {
 
 #region Metadata
 
-document 'MetadataSingleEntry' {
+Document 'MetadataSingleEntry' {
     Metadata ([ordered]@{
         title = 'Test'
     })
 }
 
-document 'MetadataMultipleEntry' {
+Document 'MetadataMultipleEntry' {
     Metadata ([ordered]@{
         value1 = 'ABC'
         value2 = 'EFG'
     })
 }
 
-document 'MetadataMultipleBlock' {
+Document 'MetadataMultipleBlock' {
     Metadata ([ordered]@{
         value1 = 'ABC'
     })
@@ -91,13 +95,13 @@ document 'MetadataMultipleBlock' {
     }
 }
 
-document 'NoMetdata' {
+Document 'NoMetdata' {
     Section 'Test' {
         'A test section.'
     }
 }
 
-document 'NullMetdata' {
+Document 'NullMetdata' {
     Metadata $Null
     Section 'Test' {
         'A test section.'
@@ -108,11 +112,11 @@ document 'NullMetdata' {
 
 #region Note
 
-document 'NoteSingleMarkdown' {
+Document 'NoteSingleMarkdown' {
     'This is a single line' | Note
 }
 
-document 'NoteMultiMarkdown' {
+Document 'NoteMultiMarkdown' {
     @('This is the first line.'
     'This is the second line.') | Note
 }
@@ -121,11 +125,11 @@ document 'NoteMultiMarkdown' {
 
 #region Warning
 
-document 'WarningSingleMarkdown' {
+Document 'WarningSingleMarkdown' {
     'This is a single line' | Warning
 }
 
-document 'WarningMultiMarkdown' {
+Document 'WarningMultiMarkdown' {
     @('This is the first line.'
     'This is the second line.') | Warning
 }
@@ -134,7 +138,7 @@ document 'WarningMultiMarkdown' {
 
 #region Section
 
-document 'SectionBlockTests' {
+Document 'SectionBlockTests' {
     Section 'SingleLine' {
         'This is a single line markdown section.'
     }
@@ -147,7 +151,7 @@ document 'SectionBlockTests' {
     }
 }
 
-document 'SectionIf' {
+Document 'SectionIf' {
     Section 'Section 1' -If { $False } {
         'Content 1'
     }
@@ -160,12 +164,12 @@ document 'SectionIf' {
 
 #region Table
 
-document 'TableTests' {
+Document 'TableTests' {
     Get-ChildItem -Path $TargetObject -File | Where-Object -FilterScript { 'README.md','LICENSE' -contains $_.Name } | Format-Table -Property 'Name','PSIsContainer'
     'EOF'
 }
 
-document 'TableWithExpression' {
+Document 'TableWithExpression' {
     $object = [PSCustomObject]@{
         Name = 'Dummy'
         Property = @{
@@ -178,21 +182,21 @@ document 'TableWithExpression' {
     'EOF'
 }
 
-document 'TableSingleEntryMarkdown' {
+Document 'TableSingleEntryMarkdown' {
     New-Object -TypeName PSObject -Property @{ Name = 'Single' } | Table -Property Name;
 }
 
-document 'TableWithNull' {
+Document 'TableWithNull' {
     Section 'Windows features' -Force {
         $TargetObject.ResourceType.WindowsFeature | Table -Property Name,Ensure;
     }
 }
 
-document 'TableWithMultilineColumn' {
+Document 'TableWithMultilineColumn' {
     $TargetObject | Table;
 }
 
-document 'TableWithEmptyColumn' {
+Document 'TableWithEmptyColumn' {
     'Table1'
     $TargetObject | Table -Property Name,NotValue,Value
     'Table2'
@@ -204,11 +208,11 @@ document 'TableWithEmptyColumn' {
 
 #region Title
 
-document 'SingleTitle' {
+Document 'SingleTitle' {
     Title 'Test title'
 }
 
-document 'MultipleTitle' {
+Document 'MultipleTitle' {
     Title 'Title 1'
     Title 'Title 2'
 }

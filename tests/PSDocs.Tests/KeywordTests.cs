@@ -50,6 +50,7 @@ namespace PSDocs
             {
                 option.Document.Include = name;
             }
+            option.Output.Culture = new string[] { "en-US" };
             return option;
         }
 

@@ -19,6 +19,7 @@ The following variables are available for use:
 - [$Culture](#culture)
 - [$Document](#document)
 - [$InstanceName](#instancename)
+- [$LocalizedData](#localizeddata)
 - [$TargetObject](#targetobject)
 - [$Section](#section)
 
@@ -91,6 +92,46 @@ Syntax:
 
 ```powershell
 $InstanceName
+```
+
+### LocalizedData
+
+A dynamic object with properties names that map to localized strings for the current culture.
+Localized strings are read from a `PSDocs-strings.psd1` file within a culture subdirectory.
+When the `.Doc.ps1` is loose, the culture subdirectory is within the same directory as the `.Doc.ps1`.
+If the `.Doc.ps1` is shipped in a module the culture subdirectory is relative to the module manifest _.psd1_ file.
+
+When accessing localized data:
+
+- String names are case sensitive.
+- String values are read only.
+
+Syntax:
+
+```powershell
+$LocalizedData.<stringName>
+```
+
+Examples:
+
+```powershell
+# Data for strings stored in PSDocs-strings.psd1
+@{
+    WithLocalizedString = 'Localized string for en-ZZ. Format={0}.'
+}
+```
+
+```powershell
+# Synopsis: Use -f to generate a formatted localized string
+Document 'WithLocalizedData' {
+    $LocalizedData.WithLocalizedString -f $TargetObject.Type;
+}
+```
+
+This document returns content similar to:
+
+```text
+Localized string for en-ZZ. Format=TestType.
 ```
 
 ### TargetObject

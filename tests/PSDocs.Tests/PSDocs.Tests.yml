@@ -7,3 +7,6 @@ markdown:
   useEdgePipes: Always
 execution:
   languageMode: ConstrainedLanguage
+output:
+  culture: 'en-ZZ'
+  path: out/

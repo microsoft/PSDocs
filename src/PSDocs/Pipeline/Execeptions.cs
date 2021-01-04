@@ -118,4 +118,44 @@ namespace PSDocs.Pipeline
             base.GetObjectData(info, context);
         }
     }
+
+    /// <summary>
+    /// An exception when building the pipeline.
+    /// </summary>
+    [Serializable]
+    public sealed class PipelineBuilderException : PipelineException
+    {
+        /// <summary>
+        /// Creates a pipeline builder exception.
+        /// </summary>
+        public PipelineBuilderException()
+            : base() { }
+
+        /// <summary>
+        /// Creates a pipeline builder exception.
+        /// </summary>
+        /// <param name="message">The detail of the exception.</param>
+        public PipelineBuilderException(string message)
+            : base(message) { }
+
+        /// <summary>
+        /// Creates a pipeline builder exception.
+        /// </summary>
+        /// <param name="message">The detail of the exception.</param>
+        /// <param name="innerException">A nested exception that caused the issue.</param>
+        public PipelineBuilderException(string message, Exception innerException)
+            : base(message, innerException) { }
+
+        private PipelineBuilderException(SerializationInfo info, StreamingContext context)
+            : base(info, context) { }
+
+        [SecurityPermission(SecurityAction.Demand, SerializationFormatter = true)]
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            if (info == null)
+                throw new ArgumentNullException(nameof(info));
+
+            base.GetObjectData(info, context);
+        }
+    }
 }
