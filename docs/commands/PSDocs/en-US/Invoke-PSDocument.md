@@ -263,8 +263,8 @@ Accept wildcard characters: False
 
 ### -Culture
 
-One or more culture names when building documents that are localized. i.e. en-AU, en-US
-When culture names are specified, the generated document will be written to a culture specific subdirectory.
+A list of cultures for building documents such as _en-AU_, and _en-US_.
+Documents are written to culture specific subdirectories when multiple cultures are generated.
 
 ```yaml
 Type: String[]

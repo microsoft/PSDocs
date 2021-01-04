@@ -54,7 +54,8 @@ namespace PSDocs
             if (!TryPopValue(dictionary, key, out object result))
                 return false;
 
-            value = result.GetType().IsArray ? ((object[])result).OfType<string>().ToArray() : new string[] { result.ToString() };
+            var o = GetBaseObject(result);
+            value = o.GetType().IsArray ? ((object[])o).OfType<string>().ToArray() : new string[] { o.ToString() };
             return true;
         }
 

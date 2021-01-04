@@ -307,8 +307,17 @@ function New-PSDocumentOption {
 
         # Sets the Markdown.Encoding option
         [Parameter(Mandatory = $False)]
-        [Alias('Encoding')]
-        [PSDocs.Configuration.MarkdownEncoding]$MarkdownEncoding = [PSDocs.Configuration.MarkdownEncoding]::Default
+        [Alias('MarkdownEncoding')]
+        [PSDocs.Configuration.MarkdownEncoding]$Encoding = [PSDocs.Configuration.MarkdownEncoding]::Default,
+
+        # Sets the Output.Culture option
+        [Parameter(Mandatory = $False)]
+        [Alias('OutputCulture')]
+        [String[]]$Culture,
+
+        # Sets the Output.Path option
+        [Parameter(Mandatory = $False)]
+        [String]$OutputPath
     )
     begin {
         Write-Verbose -Message "[New-PSDocumentOption] BEGIN::";
@@ -569,14 +578,32 @@ function SetOptions {
         # Sets the Markdown.Encoding option
         [Parameter(Mandatory = $False)]
         [ValidateSet('Default', 'UTF8', 'UTF7', 'Unicode', 'UTF32', 'ASCII')]
-        [PSDocs.Configuration.MarkdownEncoding]$MarkdownEncoding = 'Default'
+        [PSDocs.Configuration.MarkdownEncoding]$Encoding = 'Default',
+
+        # Sets the Output.Culture option
+        [Parameter(Mandatory = $False)]
+        [String[]]$Culture,
+
+        # Sets the Output.Path option
+        [Parameter(Mandatory = $False)]
+        [String]$OutputPath
     )
     process {
         # Options
 
         # Sets option Markdown.Encoding
-        if ($PSBoundParameters.ContainsKey('MarkdownEncoding')) {
-            $InputObject.Markdown.Encoding = $MarkdownEncoding;
+        if ($PSBoundParameters.ContainsKey('Encoding')) {
+            $InputObject.Markdown.Encoding = $Encoding;
+        }
+
+        # Sets option Output.Culture
+        if ($PSBoundParameters.ContainsKey('Culture')) {
+            $InputObject.Output.Culture = $Culture;
+        }
+
+        # Sets option Output.Path
+        if ($PSBoundParameters.ContainsKey('OutputPath')) {
+            $InputObject.Output.Path = $OutputPath;
         }
 
         return $InputObject;

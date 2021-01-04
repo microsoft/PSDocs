@@ -117,6 +117,7 @@ The following conceptual topics exist in the `PSDocs` module:
   - [Execution.LanguageMode](docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#executionlanguagemode)
   - [Markdown.ColumnPadding](docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#markdowncolumnpadding)
   - [Markdown.Encoding](docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#markdownencoding)
+  - [Markdown.SkipEmptySections](docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#markdownskipemptysections)
   - [Markdown.UseEdgePipes](docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#markdownuseedgepipes)
   - [Markdown.WrapSeparator](docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#markdownwrapseparator)
   - [Output.Culture](docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#outputculture)
