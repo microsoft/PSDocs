@@ -9,7 +9,7 @@ namespace PSDocs.Configuration
 
         internal static readonly ExecutionOption Default = new ExecutionOption
         {
-            LanguageMode = DEFAULT_LANGUAGEMODE
+            LanguageMode = DEFAULT_LANGUAGEMODE,
         };
 
         public ExecutionOption()
@@ -22,7 +22,36 @@ namespace PSDocs.Configuration
             LanguageMode = option.LanguageMode;
         }
 
-        [DefaultValue(DEFAULT_LANGUAGEMODE)]
+        public override bool Equals(object obj)
+        {
+            return obj is ExecutionOption option && Equals(option);
+        }
+
+        public bool Equals(ExecutionOption other)
+        {
+            return other != null &&
+                LanguageMode == other.LanguageMode;
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked // Overflow is fine
+            {
+                int hash = 17;
+                hash = hash * 23 + (LanguageMode.HasValue ? LanguageMode.Value.GetHashCode() : 0);
+                return hash;
+            }
+        }
+
+        internal static ExecutionOption Combine(ExecutionOption o1, ExecutionOption o2)
+        {
+            return new ExecutionOption(o1)
+            {
+                LanguageMode = o1.LanguageMode ?? o2.LanguageMode
+            };
+        }
+
+        [DefaultValue(null)]
         public LanguageMode? LanguageMode { get; set; }
     }
 }

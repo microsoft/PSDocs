@@ -38,8 +38,8 @@ namespace PSDocs.Data.Internal
             context.EnterSourceFile(_Block.Source);
             try
             {
-                _Current = Document = new Document(context.InstanceName, context.Culture);
                 _Parent = new Stack<SectionNode>();
+                _Current = Document = new Document(context.InstanceName, context.Culture);
                 Document.AddNodes(_Block.Body.Invoke());
                 return Document;
             }

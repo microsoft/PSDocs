@@ -36,7 +36,7 @@ namespace PSDocs.Pipeline
 
         public override IPipeline Build()
         {
-            if (!RequireSources())
+            if (RequireSources() || RequireCulture())
                 return null;
 
             return new InvokePipeline(PrepareContext(), Source);

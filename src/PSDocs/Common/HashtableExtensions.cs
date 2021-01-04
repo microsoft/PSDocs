@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Diagnostics;
 
-namespace PSDocs.Common
+namespace PSDocs
 {
     internal static class HashtableExtensions
     {

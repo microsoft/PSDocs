@@ -31,9 +31,26 @@ Describe 'New-PSDocumentOption' -Tag 'Option' {
         }
     }
 
+    Context 'Read Execution.LanguageMode' {
+        It 'from default' {
+            $option = New-PSDocumentOption -Default;
+            $option.Execution.LanguageMode | Should -Be 'FullLanguage';
+        }
+
+        It 'from Hashtable' {
+            $option = New-PSDocumentOption -Option @{ 'Execution.LanguageMode' = 'ConstrainedLanguage' };
+            $option.Execution.LanguageMode | Should -Be 'ConstrainedLanguage';
+        }
+
+        It 'from YAML' {
+            $option = New-PSDocumentOption -Option (Join-Path -Path $here -ChildPath 'PSDocs.Tests.yml');
+            $option.Execution.LanguageMode | Should -Be 'ConstrainedLanguage'
+        }
+    }
+
     Context 'Read Markdown.Encoding' {
         It 'from default' {
-            $option = New-PSDocumentOption;
+            $option = New-PSDocumentOption -Default;
             $option.Markdown.Encoding | Should -Be 'Default';
         }
 
@@ -50,7 +67,7 @@ Describe 'New-PSDocumentOption' -Tag 'Option' {
 
     Context 'Read Markdown.WrapSeparator' {
         It 'from default' {
-            $option = New-PSDocumentOption;
+            $option = New-PSDocumentOption -Default;
             $option.Markdown.WrapSeparator | Should -Be ' ';
         }
 
@@ -67,7 +84,7 @@ Describe 'New-PSDocumentOption' -Tag 'Option' {
 
     Context 'Read Markdown.SkipEmptySections' {
         It 'from default' {
-            $option = New-PSDocumentOption;
+            $option = New-PSDocumentOption -Default;
             $option.Markdown.SkipEmptySections | Should -Be $True;
         }
 
@@ -84,7 +101,7 @@ Describe 'New-PSDocumentOption' -Tag 'Option' {
 
     Context 'Read Markdown.ColumnPadding' {
         It 'from default' {
-            $option = New-PSDocumentOption;
+            $option = New-PSDocumentOption -Default;
             $option.Markdown.ColumnPadding | Should -Be 'MatchHeader';
         }
 
@@ -101,7 +118,7 @@ Describe 'New-PSDocumentOption' -Tag 'Option' {
 
     Context 'Read Markdown.UseEdgePipes' {
         It 'from default' {
-            $option = New-PSDocumentOption;
+            $option = New-PSDocumentOption -Default;
             $option.Markdown.UseEdgePipes | Should -Be 'WhenRequired';
         }
 
@@ -116,20 +133,37 @@ Describe 'New-PSDocumentOption' -Tag 'Option' {
         }
     }
 
-    Context 'Read Execution.LanguageMode' {
+    Context 'Read Output.Culture' {
         It 'from default' {
-            $option = New-PSDocumentOption;
-            $option.Execution.LanguageMode | Should -Be FullLanguage;
+            $option = New-PSDocumentOption -Default;
+            $option.Output.Culture | Should -BeNullOrEmpty;
         }
 
         It 'from Hashtable' {
-            $option = New-PSDocumentOption -Option @{ 'Execution.LanguageMode' = 'ConstrainedLanguage' };
-            $option.Execution.LanguageMode | Should -Be ConstrainedLanguage;
+            $option = New-PSDocumentOption -Option @{ 'Output.Culture' = 'en-ZZ' };
+            $option.Output.Culture | Should -Be 'en-ZZ';
         }
 
         It 'from YAML' {
             $option = New-PSDocumentOption -Option (Join-Path -Path $here -ChildPath 'PSDocs.Tests.yml');
-            $option.Execution.LanguageMode | Should -Be ConstrainedLanguage
+            $option.Output.Culture | Should -Be 'en-ZZ';
+        }
+    }
+
+    Context 'Read Output.Path' {
+        It 'from default' {
+            $option = New-PSDocumentOption -Default;
+            $option.Output.Path | Should -BeNullOrEmpty;
+        }
+
+        It 'from Hashtable' {
+            $option = New-PSDocumentOption -Option @{ 'Output.Path' = $here };
+            $option.Output.Path | Should -Be $here;
+        }
+
+        It 'from YAML' {
+            $option = New-PSDocumentOption -Option (Join-Path -Path $here -ChildPath 'PSDocs.Tests.yml');
+            $option.Output.Path | Should -Be 'out/';
         }
     }
 }

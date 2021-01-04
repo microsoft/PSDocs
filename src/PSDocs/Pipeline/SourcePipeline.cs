@@ -1,4 +1,5 @@
-﻿using PSDocs.Configuration;
+﻿
+using PSDocs.Configuration;
 using PSDocs.Pipeline.Output;
 using PSDocs.Resources;
 using System.Collections.Generic;

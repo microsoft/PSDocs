@@ -87,10 +87,10 @@ namespace PSDocs.Pipeline
 
         public virtual IPipelineBuilder Configure(PSDocumentOption option)
         {
-            Option.Document = new DocumentOption(option.Document);
-            Option.Execution = new ExecutionOption(option.Execution);
-            Option.Markdown = new MarkdownOption(option.Markdown);
-            Option.Output = new OutputOption(option.Output);
+            Option.Document = DocumentOption.Combine(option.Document, DocumentOption.Default);
+            Option.Execution = ExecutionOption.Combine(option.Execution, ExecutionOption.Default);
+            Option.Markdown = MarkdownOption.Combine(option.Markdown, MarkdownOption.Default);
+            Option.Output = OutputOption.Combine(option.Output, OutputOption.Default);
 
             if (!string.IsNullOrEmpty(Option.Output.Path))
                 OutputVisitor = (o, enumerate) => WriteToFile(o, Option, Writer, ShouldProcess);
@@ -104,14 +104,29 @@ namespace PSDocs.Pipeline
         /// <summary>
         /// Require sources for pipeline execution.
         /// </summary>
+        /// <returns>Returns true when the condition is not met.</returns>
         protected bool RequireSources()
         {
             if (Source == null || Source.Length == 0)
             {
-                //Writer.WarnRulePathNotFound();
-                return false;
+                Writer.WarnSourcePathNotFound();
+                return true;
             }
-            return true;
+            return false;
+        }
+
+        /// <summary>
+        /// Require culture for pipeline exeuction.
+        /// </summary>
+        /// <returns>Returns true when the condition is not met.</returns>
+        protected bool RequireCulture()
+        {
+            if (Option.Output.Culture == null || Option.Output.Culture.Length == 0)
+            {
+                Writer.ErrorInvariantCulture();
+                return true;
+            }
+            return false;
         }
 
         protected virtual PipelineContext PrepareContext()
@@ -132,7 +147,7 @@ namespace PSDocs.Pipeline
             }
             if (shouldProcess(target: rootedPath, action: PSDocsResources.ShouldWriteFile))
             {
-                var encoding = GetEncoding(option.Markdown.Encoding);
+                var encoding = GetEncoding(option.Markdown.Encoding.Value);
                 File.WriteAllText(filePath, result.ToString(), encoding);
 
                 // Write file info instead
@@ -171,6 +186,9 @@ namespace PSDocs.Pipeline
             {
                 // Fallback to current culture
                 var current = PSDocumentOption.GetCurrentCulture();
+                if (current == null || string.IsNullOrEmpty(current.Name))
+                    return;
+
                 Option.Output.Culture = new string[] { current.Name };
             }
         }

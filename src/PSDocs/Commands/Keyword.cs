@@ -1,5 +1,6 @@
 ﻿
 using PSDocs.Data.Internal;
+using PSDocs.Pipeline;
 using PSDocs.Runtime;
 using System.Management.Automation;
 
@@ -53,6 +54,11 @@ namespace PSDocs.Commands
         protected static PSObject GetTargetObject()
         {
             return RunspaceContext.CurrentThread.TargetObject;
+        }
+
+        protected static PipelineContext GetPipeline()
+        {
+            return RunspaceContext.CurrentThread.Pipeline;
         }
 
         protected static bool True(object o)

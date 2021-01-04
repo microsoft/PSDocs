@@ -14,7 +14,7 @@ Create options to configure document generation.
 ## SYNTAX
 
 ```text
-New-PSDocumentOption [-Path <String>] [-Option <PSDocumentOption>] [-Encoding <MarkdownEncoding>]
+New-PSDocumentOption [-Path <String>] [-Option <PSDocumentOption>] [-MarkdownEncoding <MarkdownEncoding>]
  [<CommonParameters>]
 ```
 
@@ -62,19 +62,19 @@ Aliases:
 
 Required: False
 Position: Named
-Default value: .\.psdocs.yml
+Default value: .\ps-docs.yaml
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Encoding
+### -MarkdownEncoding
 
 Specifies the file encoding for generated markdown files. By default, UTF-8 without byte order mark (BOM) will be used. To use UTF-8 with BOM specify `UTF8`.
 
 ```yaml
 Type: MarkdownEncoding
 Parameter Sets: (All)
-Aliases:
+Aliases: Encoding
 Accepted values: Default, UTF8, UTF7, Unicode, UTF32, ASCII
 
 Required: False

@@ -290,36 +290,66 @@ function Get-PSDocumentHeader {
 
 # .ExternalHelp PSDocs-Help.xml
 function New-PSDocumentOption {
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'FromPath')]
     [OutputType([PSDocs.Configuration.PSDocumentOption])]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Creates an in memory object only')]
     param (
-        [Parameter(Position = 0, Mandatory = $False)]
+        [Parameter(Position = 0, Mandatory = $False, ParameterSetName = 'FromPath')]
         [String]$Path = $PWD,
 
-        [Parameter(Mandatory = $False)]
+        [Parameter(Mandatory = $True, ParameterSetName = 'FromOption')]
         [PSDocs.Configuration.PSDocumentOption]$Option,
 
-        [Parameter(Mandatory = $False)]
-        [PSDocs.Configuration.MarkdownEncoding]$Encoding
-    )
-    process {
+        [Parameter(Mandatory = $True, ParameterSetName = 'FromDefault')]
+        [Switch]$Default,
 
+        # Options
+
+        # Sets the Markdown.Encoding option
+        [Parameter(Mandatory = $False)]
+        [Alias('Encoding')]
+        [PSDocs.Configuration.MarkdownEncoding]$MarkdownEncoding = [PSDocs.Configuration.MarkdownEncoding]::Default
+    )
+    begin {
+        Write-Verbose -Message "[New-PSDocumentOption] BEGIN::";
+
+        # Get parameter options, which will override options from other sources
+        $optionParams = @{ };
+        $optionParams += $PSBoundParameters;
+
+        # Remove invalid parameters
+        if ($optionParams.ContainsKey('Path')) {
+            $optionParams.Remove('Path');
+        }
+        if ($optionParams.ContainsKey('Option')) {
+            $optionParams.Remove('Option');
+        }
+        if ($optionParams.ContainsKey('Default')) {
+            $optionParams.Remove('Default');
+        }
+        if ($optionParams.ContainsKey('Verbose')) {
+            $optionParams.Remove('Verbose');
+        }
         if ($PSBoundParameters.ContainsKey('Option')) {
-            $Option = $Option.Clone();
+            $Option = [PSDocs.Configuration.PSDocumentOption]::FromFileOrEmpty($Option, $Path);
         }
         elseif ($PSBoundParameters.ContainsKey('Path')) {
             Write-Verbose -Message "Attempting to read: $Path";
-            $Option = [PSDocs.Configuration.PSDocumentOption]::FromFile($Path, $False);
+            $Option = [PSDocs.Configuration.PSDocumentOption]::FromFile($Path);
+        }
+        elseif ($PSBoundParameters.ContainsKey('Default')) {
+            $Option = [PSDocs.Configuration.PSDocumentOption]::FromDefault();
         }
         else {
             Write-Verbose -Message "Attempting to read: $Path";
-            $Option = [PSDocs.Configuration.PSDocumentOption]::FromFile($Path, $True);
+            $Option = [PSDocs.Configuration.PSDocumentOption]::FromFileOrEmpty($Option, $Path);
         }
+    }
+    end {
+        # Options
+        $Option | SetOptions @optionParams -Verbose:$VerbosePreference;
 
-        if ($PSBoundParameters.ContainsKey('Encoding')) {
-            $Option.Markdown.Encoding = $Encoding;
-        }
-        return $Option;
+        Write-Verbose -Message "[New-PSDocumentOption] END::";
     }
 }
 
@@ -527,12 +557,35 @@ function Table {
 # Helper functions
 #
 
+function SetOptions {
+    [CmdletBinding()]
+    [OutputType([PSDocs.Configuration.PSDocumentOption])]
+    param (
+        [Parameter(Mandatory = $True, ValueFromPipeline = $True)]
+        [PSDocs.Configuration.PSDocumentOption]$InputObject,
+
+        # Options
+
+        # Sets the Markdown.Encoding option
+        [Parameter(Mandatory = $False)]
+        [ValidateSet('Default', 'UTF8', 'UTF7', 'Unicode', 'UTF32', 'ASCII')]
+        [PSDocs.Configuration.MarkdownEncoding]$MarkdownEncoding = 'Default'
+    )
+    process {
+        # Options
+
+        # Sets option Markdown.Encoding
+        if ($PSBoundParameters.ContainsKey('MarkdownEncoding')) {
+            $InputObject.Markdown.Encoding = $MarkdownEncoding;
+        }
+
+        return $InputObject;
+    }
+}
+
 function InitDocumentContext {
     [CmdletBinding()]
-    param (
-
-    )
-
+    param ()
     process {
 
         if ($Null -eq (Get-Variable -Name DocumentBody -Scope Script -ErrorAction SilentlyContinue)) {

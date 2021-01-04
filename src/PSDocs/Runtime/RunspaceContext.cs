@@ -1,5 +1,4 @@
 ﻿
-using PSDocs.Common;
 using PSDocs.Configuration;
 using PSDocs.Data.Internal;
 using PSDocs.Pipeline;
@@ -8,7 +7,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Management.Automation;
 using System.Management.Automation.Language;
 using System.Management.Automation.Runspaces;
@@ -156,11 +154,14 @@ namespace PSDocs.Runtime
         private static string[] GetCultures(string culture)
         {
             var cultures = new List<string>();
-            var c = new CultureInfo(culture);
-            while (c != null && !string.IsNullOrEmpty(c.Name))
+            if (!string.IsNullOrEmpty(culture))
             {
-                cultures.Add(c.Name);
-                c = c.Parent;
+                var c = new CultureInfo(culture);
+                while (c != null && !string.IsNullOrEmpty(c.Name))
+                {
+                    cultures.Add(c.Name);
+                    c = c.Parent;
+                }
             }
             return cultures.ToArray();
         }

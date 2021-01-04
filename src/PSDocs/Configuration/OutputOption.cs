@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿
+using System.ComponentModel;
 
 namespace PSDocs.Configuration
 {
@@ -20,6 +21,38 @@ namespace PSDocs.Configuration
         {
             Culture = option.Culture;
             Path = option.Path;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is OutputOption option && Equals(option);
+        }
+
+        public bool Equals(OutputOption other)
+        {
+            return other != null &&
+                Culture == other.Culture &&
+                Path == other.Path;
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked // Overflow is fine
+            {
+                int hash = 17;
+                hash = hash * 23 + (Culture != null ? Culture.GetHashCode() : 0);
+                hash = hash * 23 + (Path != null ? Path.GetHashCode() : 0);
+                return hash;
+            }
+        }
+
+        internal static OutputOption Combine(OutputOption o1, OutputOption o2)
+        {
+            return new OutputOption(o1)
+            {
+                Culture = o1.Culture ?? o2.Culture,
+                Path = o1.Path ?? o2.Path
+            };
         }
 
         [DefaultValue(null)]

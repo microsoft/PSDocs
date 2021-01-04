@@ -17,7 +17,7 @@ namespace PSDocs.Pipeline
 
         public override IPipeline Build()
         {
-            if (!RequireSources())
+            if (RequireSources())
                 return null;
 
             return new GetPipeline(PrepareContext(), Source);

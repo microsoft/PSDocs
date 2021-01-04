@@ -1,4 +1,5 @@
 ﻿
+using PSDocs.Configuration;
 using PSDocs.Runtime;
 using System.Management.Automation;
 
@@ -46,7 +47,7 @@ namespace PSDocs.Commands
 
         private bool ShouldForce()
         {
-            return Force.ToBool() || !RunspaceContext.CurrentThread.Pipeline.Option.Markdown.SkipEmptySections;
+            return Force.ToBool() || !GetPipeline().Option.Markdown.SkipEmptySections.Value;
         }
 
         private bool TryCondition()
