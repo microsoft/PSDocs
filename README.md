@@ -34,6 +34,8 @@ To define a document, create the `Document` script block saved to a file with th
 For example:
 
 ```powershell
+# File: Sample.Doc.ps1
+
 # Define a document called Sample
 Document Sample {
     # Define content here
@@ -45,6 +47,8 @@ Within the document body provide one or more instructions.
 For example:
 
 ```powershell
+# File: Sample.Doc.ps1
+
 # Define a document called Sample
 Document Sample {
 
@@ -61,7 +65,7 @@ Document Sample {
 
 ### Execute a document
 
-To execute the document use Invoke-PSDocument.
+To execute the document use `Invoke-PSDocument`.
 
 For example:
 

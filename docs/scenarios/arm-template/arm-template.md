@@ -34,12 +34,11 @@ Using separate functions in this case will improve the readability of our code.
 
 ```powershell
 # A function to break out parameters from an ARM template
-function GetTemplateParameter {
+function global:GetTemplateParameter {
     param (
         [Parameter(Mandatory = $True)]
         [String]$Path
     )
-
     process {
         $template = Get-Content $Path | ConvertFrom-Json;
         foreach ($property in $template.parameters.PSObject.Properties) {
@@ -52,12 +51,11 @@ function GetTemplateParameter {
 }
 
 # A function to import metadata
-function GetTemplateMetadata {
+function global:GetTemplateMetadata {
     param (
         [Parameter(Mandatory = $True)]
         [String]$Path
     )
-
     process {
         $metadata = Get-Content $Path | ConvertFrom-Json;
         return $metadata;
