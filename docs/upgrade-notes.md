@@ -62,7 +62,7 @@ Document 'SampleDocument' {
 }
 ```
 
-The execution model of PSRule now uses a separate runspace sandbox.
+The execution model of PSDocs now uses a separate runspace sandbox.
 Blocks are enumerated first then executed.
 Helper functions can still be used however must be flagged with the global scope modifier.
 
