@@ -2,6 +2,44 @@
 
 ## Unreleased
 
+## v0.7.0
+
+What's changed since v0.6.3:
+
+- Engine features:
+  - Added support for MacOS and Linux. [#59](https://github.com/BernieWhite/PSDocs/issues/59)
+  - Added support for using document definitions from modules. [#81](https://github.com/BernieWhite/PSDocs/issues/81)
+  - Added support for localized strings using the `$LocalizedData` variable. [#91](https://github.com/BernieWhite/PSDocs/issues/91)
+  - Automatically serialize `Code` objects to JSON and YAML. [#93](https://github.com/BernieWhite/PSDocs/issues/93)
+    - Use the `json`, `yaml`, or `yml` info strings to automatically serialize custom objects.
+    - See `about_PSDocs_Keywords` for more details.
+- General improvements:
+  - Added configuration for setting output options. [#105](https://github.com/BernieWhite/PSDocs/issues/105)
+  - Added parameter alias `-MarkdownEncoding` on `New-PSDocumentOption` for `-Encoding`. [#106](https://github.com/BernieWhite/PSDocs/issues/106)
+  - Default the info string to `powershell` for `Code` script blocks. [#92](https://github.com/BernieWhite/PSDocs/issues/92)
+    - See `about_PSDocs_Keywords` for more details.
+- Deprecations and removals:
+  - Added [upgrade notes](docs/upgrade-notes.md) for migration from v0.6.x to v0.7.0.
+  - **Breaking change**: Removed support for inline document blocks.
+    - Use `Invoke-PSDocument` with `.Doc.ps1` files instead.
+    - Helper functions within the script scope must be flagged with `global` scope.
+  - **Breaking change**: Removed script block usage of `Note` and `Warning`.
+    - Script block support was previously deprecated in v0.6.0.
+    - Use pipeline instead.
+  - **Breaking change**: Removed support for `-When` section parameter.
+    - `-When` was previously replaced with `-If` in v0.6.0.
+- Engineering:
+  - Bump YamlDotNet dependency to v8.1.2.
+- Bug fixes:
+  - Fixed inconsistencies with default options file name. [#103](https://github.com/BernieWhite/PSDocs/issues/103)
+  - Fixed line break after block quote. [#104](https://github.com/BernieWhite/PSDocs/issues/104)
+
+See [upgrade notes](docs/upgrade-notes.md) for helpful information when upgrading from previous versions.
+
+What's changed since pre-release v0.7.0-B2101015:
+
+- No additional changes.
+
 ## v0.7.0-B2101015 (pre-release)
 
 What's changed since pre-release v0.7.0-B2008035:
