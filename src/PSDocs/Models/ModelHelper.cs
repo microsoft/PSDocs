@@ -1,6 +1,5 @@
 ﻿
 using PSDocs.Configuration;
-using PSDocs.Resources;
 using System.IO;
 
 namespace PSDocs.Models
@@ -55,15 +54,16 @@ namespace PSDocs.Models
         {
             baseDirectory = PSDocumentOption.GetRootedPath(baseDirectory);
             var absolutePath = Path.IsPathRooted(fileName) ? fileName : Path.Combine(baseDirectory, (useCulture ? culture : string.Empty), fileName);
-            if (!File.Exists(absolutePath))
-                throw new FileNotFoundException(PSDocsResources.IncludeNotFound, absolutePath);
-
-            var text = File.ReadAllText(absolutePath);
-            return new Include
+            var result = new Include
             {
-                Path = absolutePath,
-                Content = text,
+                Path = absolutePath
             };
+            if (result.Exists)
+            {
+                var text = File.ReadAllText(absolutePath);
+                result.Content = text;
+            }
+            return result;
         }
     }
 }

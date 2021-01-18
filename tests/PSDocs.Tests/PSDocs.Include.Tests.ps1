@@ -18,7 +18,6 @@ $outputPath = Join-Path -Path $rootPath -ChildPath out/tests/PSDocs.Tests/Includ
 Remove-Item -Path $outputPath -Force -Recurse -Confirm:$False -ErrorAction Ignore;
 $Null = New-Item -Path $outputPath -ItemType Directory -Force;
 $here = (Resolve-Path $PSScriptRoot).Path;
-$dummyObject = New-Object -TypeName PSObject;
 
 Describe 'PSDocs -- Include keyword' -Tag Include {
     $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Keyword.Doc.ps1';
@@ -27,12 +26,12 @@ Describe 'PSDocs -- Include keyword' -Tag Include {
         $invokeParams = @{
             Path = $docFilePath
             OutputPath = $outputPath
-            # PassThru = $True
+            ErrorAction = [System.Management.Automation.ActionPreference]::Stop
         }
 
         It 'Should include a relative path' {
             $outputDoc = "$outputPath\IncludeRelative.md";
-            $result = Invoke-PSDocument @invokeParams -InputObject $rootPath -Name 'IncludeRelative';
+            $Null = Invoke-PSDocument @invokeParams -InputObject $rootPath -Name 'IncludeRelative';
 
             Test-Path -Path $outputDoc | Should -Be $True;
             $outputDoc | Should -FileContentMatch 'This is included from an external file.';
@@ -41,14 +40,14 @@ Describe 'PSDocs -- Include keyword' -Tag Include {
 
         It 'Should include an absolute path' {
             $outputDoc = "$outputPath\IncludeAbsolute.md";
-            $result = Invoke-PSDocument @invokeParams -InputObject $rootPath -Name 'IncludeAbsolute';
+            $Null = Invoke-PSDocument @invokeParams -InputObject $rootPath -Name 'IncludeAbsolute';
 
             Test-Path -Path $outputDoc | Should -Be $True;
             $outputDoc | Should -FileContentMatch 'This is included from an external file.';
         }
 
         It 'Should include from culture' {
-            $result = Invoke-PSDocument @invokeParams -Culture 'en-AU','en-US' -Name 'IncludeCulture';
+            $Null = Invoke-PSDocument @invokeParams -Culture 'en-AU','en-US' -Name 'IncludeCulture';
 
             $outputDoc = "$outputPath\en-AU\IncludeCulture.md";
             Test-Path -Path $outputDoc | Should -Be $True;
@@ -57,6 +56,11 @@ Describe 'PSDocs -- Include keyword' -Tag Include {
             $outputDoc = "$outputPath\en-US\IncludeCulture.md";
             Test-Path -Path $outputDoc | Should -Be $True;
             $outputDoc | Should -FileContentMatch 'This is en-US.';
+        }
+
+        It 'Should include when file exists' {
+            $Null = Invoke-PSDocument @invokeParams -Name 'IncludeOptional';
+            { $Null = Invoke-PSDocument @invokeParams -Name 'IncludeRequired'; } | Should -Throw -Because 'PSDocs.Runtime.IncludeNotFound';
         }
     }
 }

@@ -7,6 +7,8 @@ What's changed since v0.7.0:
 - Engine features:
   - Added support for custom configuration key values. [#121](https://github.com/BernieWhite/PSDocs/issues/121)
     - See `about_PSDocs_Configuration` for more details.
+- Bug fixes:
+  - Fixed use of error action preference with `Include` keyword. [#127](https://github.com/BernieWhite/PSDocs/issues/127)
 
 ## v0.7.0
 
