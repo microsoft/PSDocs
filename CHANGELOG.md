@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.8.0-B2101006 (pre-release)
+
 What's changed since v0.7.0:
 
 - Engine features:
