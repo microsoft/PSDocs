@@ -34,6 +34,7 @@ namespace PSDocs.Configuration
         public PSDocumentOption()
         {
             // Set defaults
+            Configuration = new ConfigurationOption();
             Document = new DocumentOption();
             Execution = new ExecutionOption();
             Markdown = new MarkdownOption();
@@ -45,6 +46,7 @@ namespace PSDocs.Configuration
             SourcePath = sourcePath;
 
             // Set from existing option instance
+            Configuration = new ConfigurationOption(option?.Configuration);
             Document = new DocumentOption(option?.Document);
             Execution = new ExecutionOption(option?.Execution);
             Markdown = new MarkdownOption(option?.Markdown);
@@ -65,6 +67,8 @@ namespace PSDocs.Configuration
         /// Reserved for internal use.
         /// </summary>
         public string Generator { get; set; }
+
+        public ConfigurationOption Configuration { get; set; }
 
         public DocumentOption Document { get; set; }
 
@@ -97,6 +101,7 @@ namespace PSDocs.Configuration
         private static PSDocumentOption Combine(PSDocumentOption o1, PSDocumentOption o2)
         {
             var result = new PSDocumentOption(o1?.SourcePath ?? o2?.SourcePath, o1);
+            result.Configuration = ConfigurationOption.Combine(result.Configuration, o2?.Configuration);
             result.Document = DocumentOption.Combine(result.Document, o2?.Document);
             result.Execution = ExecutionOption.Combine(result.Execution, o2?.Execution);
             result.Markdown = MarkdownOption.Combine(result.Markdown, o2?.Markdown);
@@ -246,6 +251,7 @@ namespace PSDocs.Configuration
         public bool Equals(PSDocumentOption other)
         {
             return other != null &&
+                Configuration == other.Configuration &&
                 Document == other.Document &&
                 Execution == other.Execution &&
                 Markdown == other.Markdown &&
@@ -257,6 +263,7 @@ namespace PSDocs.Configuration
             unchecked // Overflow is fine
             {
                 int hash = 17;
+                hash = hash * 23 + (Configuration != null ? Configuration.GetHashCode() : 0);
                 hash = hash * 23 + (Document != null ? Document.GetHashCode() : 0);
                 hash = hash * 23 + (Execution != null ? Execution.GetHashCode() : 0);
                 hash = hash * 23 + (Markdown != null ? Markdown.GetHashCode() : 0);
@@ -303,6 +310,8 @@ namespace PSDocs.Configuration
             if(index.TryPopString("output.path", out svalue))
                 option.Output.Path = svalue;
 
+            // Process configuration values
+            option.Configuration.Load(index);
             return option;
         }
 

@@ -1,4 +1,5 @@
-﻿using System.Management.Automation;
+
+using System.Management.Automation;
 using System.Threading;
 
 namespace PSDocs.Runtime
@@ -9,6 +10,8 @@ namespace PSDocs.Runtime
     public sealed class PSDocs
     {
         private readonly RunspaceContext _Context;
+
+        private Configuration _Configuration;
 
         public PSDocs() { }
 
@@ -49,6 +52,13 @@ namespace PSDocs.Runtime
         //}
 
         /// <summary>
+        /// Custom configuration values.
+        /// </summary>
+        public Configuration Configuration
+        {
+            get { return GetConfiguration(); }
+        }
+        /// <summary>
         /// Format a string with arguments.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Exposed as instance method for PowerShell.")]
@@ -69,6 +79,14 @@ namespace PSDocs.Runtime
                 return RunspaceContext.CurrentThread;
 
             return _Context;
+        }
+
+        private Configuration GetConfiguration()
+        {
+            if (_Configuration == null)
+                _Configuration = new Configuration(GetContext());
+
+            return _Configuration;
         }
     }
 }

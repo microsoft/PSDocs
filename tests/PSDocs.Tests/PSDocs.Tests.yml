@@ -1,4 +1,9 @@
 # These are test options
+
+configuration:
+  Key1: Value2
+  UnitTests.String.1: Config string 1
+
 markdown:
   encoding: UTF8
   wrapSeparator: 'ZZZ'

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+What's changed since v0.7.0:
+
+- Engine features:
+  - Added support for custom configuration key values. [#121](https://github.com/BernieWhite/PSDocs/issues/121)
+    - See `about_PSDocs_Configuration` for more details.
+
 ## v0.7.0
 
 What's changed since v0.6.3:

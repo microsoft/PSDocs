@@ -31,6 +31,24 @@ Describe 'New-PSDocumentOption' -Tag 'Option' {
         }
     }
 
+    Context 'Read Configuration' {
+        It 'from default' {
+            $option = New-PSDocumentOption -Default;
+            $option.Configuration.Count | Should -Be 0;
+        }
+
+        It 'from Hashtable' {
+            $option = New-PSDocumentOption -Option @{ 'Configuration.Key1' = 'Value1' };
+            $option.Configuration.Key1 | Should -Be 'Value1';
+        }
+
+        It 'from YAML' {
+            $option = New-PSDocumentOption -Option (Join-Path -Path $here -ChildPath 'PSDocs.Tests.yml');
+            $option.Configuration.Key1 | Should -Be 'Value2';
+            $option.Configuration.'UnitTests.String.1' | Should -Be 'Config string 1'
+        }
+    }
+
     Context 'Read Execution.LanguageMode' {
         It 'from default' {
             $option = New-PSDocumentOption -Default;

@@ -11,7 +11,7 @@ Describes the automatic variables that can be used within PSDocs document defini
 PSDocs lets you generate dynamic markdown documents using PowerShell blocks.
 To generate markdown, a document is defined inline or within script files by using the `document` keyword.
 
-Within a document definition, PSDocs exposes a number of automatic variables that can be read to assist with dynamic document generation.
+Within a document definition, PSDocs exposes several automatic variables that can be read to assist with dynamic document generation.
 Overwriting these variables or variable properties is not supported.
 
 The following variables are available for use:
@@ -20,6 +20,7 @@ The following variables are available for use:
 - [$Document](#document)
 - [$InstanceName](#instancename)
 - [$LocalizedData](#localizeddata)
+- [$PSDocs](#psdocs)
 - [$TargetObject](#targetobject)
 - [$Section](#section)
 
@@ -134,6 +135,42 @@ This document returns content similar to:
 Localized string for en-ZZ. Format=TestType.
 ```
 
+### PSDocs
+
+An object representing the current context of PSDocs.
+
+In addition, `$PSDocs` provides several helper properties and functions.
+
+The following properties are available for public read access:
+
+- `Configuration` - An object with custom configuration properties.
+Each configuration key specified in `ps-docs.yaml` is assessable as a property.
+Additionally helper methods can be used.
+See `about_PSDocs_Configuration` for more information.
+- `Culture` - The name of the culture currently being processed.
+- `TargetObject` - The value of the pipeline object currently being processed.
+
+Syntax:
+
+```powershell
+$PSDocs
+```
+
+```powershell
+# Get the value of the custom configuration 'Key1'
+$PSDocs.Configuration.Key1
+```
+
+```powershell
+# Return the currently processed culture. e.g. 'en-US'
+$PSDocs.Culture
+```
+
+```powershell
+# Return the current pipeline object.
+$PSDocs.TargetObject
+```
+
 ### TargetObject
 
 The value of the pipeline object currently being processed.
@@ -196,5 +233,6 @@ An online version of this document is available at https://github.com/BernieWhit
 - Culture
 - Document
 - InstanceName
-- InputObject
+- PSDocs
+- TargetObject
 - Section
