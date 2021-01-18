@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Management.Automation;
 
 namespace PSDocs
 {
@@ -77,9 +76,14 @@ namespace PSDocs
         [DebuggerStepThrough]
         public static void AddUnique(this IDictionary<string, object> dictionary, IEnumerable<KeyValuePair<string, object>> values)
         {
+            if (values == null)
+                return;
+
             foreach (var kv in values)
+            {
                 if (!dictionary.ContainsKey(kv.Key))
                     dictionary.Add(kv.Key, kv.Value);
+            }
         }
     }
 }

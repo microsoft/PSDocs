@@ -87,6 +87,7 @@ namespace PSDocs.Pipeline
 
         public virtual IPipelineBuilder Configure(PSDocumentOption option)
         {
+            Option.Configuration = new ConfigurationOption(option.Configuration);
             Option.Document = DocumentOption.Combine(option.Document, DocumentOption.Default);
             Option.Execution = ExecutionOption.Combine(option.Execution, ExecutionOption.Default);
             Option.Markdown = MarkdownOption.Combine(option.Markdown, MarkdownOption.Default);

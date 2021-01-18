@@ -8,7 +8,13 @@ Document 'PSAutomaticVariables' {
 
 # Synopsis: Test $PSDocs variable
 Document 'PSDocsVariable' {
+    Metadata @{
+        author = $PSDocs.Configuration.author.name
+    }
     $PSDocs.Format("TargetObject.Name={0};", $PSDocs.TargetObject.Name);
+    if ($PSDocs.Configuration.GetBoolOrDefault('NotConfig', $True)) {
+        "Document.Metadata=$($Document.Metadata['author']);"
+    }
 }
 
 # Synopsis: Test $Document variable

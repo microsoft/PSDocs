@@ -13,6 +13,7 @@ This topic describes what options are available, when to and how to use them.
 
 The following workspace options are available for use:
 
+- [Configuration](#configuration)
 - [Execution.LanguageMode](#executionlanguagemode)
 - [Markdown.ColumnPadding](#markdowncolumnpadding)
 - [Markdown.Encoding](#markdownencoding)
@@ -60,6 +61,28 @@ For example:
 
 ```powershell
 Invoke-PSDocument -Path . -Option '.\myconfig.yml'.
+```
+
+### Configuration
+
+Sets custom configuration for document generation.
+Document definitions may allow custom configuration to be specified.
+To specify custom configuration, set a property of the configuration object.
+
+To ensure each custom key is unique use a prefix followed by an underscore that represent your module.
+Key names are not case sensitive, however we recommend you use uppercase for consistency.
+
+This option can be specified using:
+
+```powershell
+# PowerShell: Using the Configuration hashtable key to set custom configuration 'MODULE1_KEY1'
+$option = New-PSDocumentOption -Option @{ 'Configuration.MODULE1_KEY1' = 'Value1' }
+```
+
+```yaml
+# YAML: Using the configuration YAML property to set custom configuration 'MODULE2_KEY1'
+configuration:
+  MODULE2_KEY1: Value1
 ```
 
 ### Execution.LanguageMode
@@ -143,7 +166,8 @@ markdown:
 
 ### Markdown.Encoding
 
-Sets the text encoding used for markdown output files. One of the following values can be used:
+Sets the text encoding used for markdown output files.
+One of the following values can be used:
 
 - Default
 - UTF8
@@ -315,14 +339,19 @@ output:
 ### Example ps-docs.yaml
 
 ```yaml
-# Set markdown options
+configuration:
+  SAMPLE_USE_PARAMETERS_SNIPPET: true
+
 execution:
   languageMode: ConstrainedLanguage
+
+# Set markdown options
 markdown:
   # Use UTF-8 with BOM
   encoding: UTF8
   skipEmptySections: false
   wrapSeparator: '\'
+
 output:
   culture:
   - 'en-US'
@@ -334,14 +363,18 @@ output:
 ```yaml
 # These are the default options.
 # Only properties that differ from the default values need to be specified.
+configuration: { }
+
 execution:
   languageMode: FullLanguage
+
 markdown:
   encoding: Default
   skipEmptySections: true
   wrapSeparator: ' '
   columnPadding: MatchHeader
   useEdgePipes: WhenRequired
+
 output:
   culture: [ ]
   path: null
@@ -358,6 +391,9 @@ An online version of this document is available at https://github.com/BernieWhit
 
 ## KEYWORDS
 
+- Configuration
 - Options
 - Markdown
 - PSDocument
+- Output
+- Execution
