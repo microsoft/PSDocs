@@ -96,6 +96,16 @@ Document 'IncludeCulture' {
     Include IncludeFile3.md -UseCulture -BaseDirectory tests/PSDocs.Tests/
 }
 
+# Synopsis: Test Include keyword with -ErrorAction SilentlyContinue
+Document 'IncludeOptional' {
+    Include 'NotFile.md' -ErrorAction SilentlyContinue;
+}
+
+# Synopsis: Test Include keyword with missing file
+Document 'IncludeRequired' {
+    Include 'NotFile.md';
+}
+
 #endregion Include
 
 #region Metadata

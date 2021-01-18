@@ -1,6 +1,8 @@
 ﻿
 using PSDocs.Models;
+using PSDocs.Resources;
 using PSDocs.Runtime;
+using System.IO;
 using System.Management.Automation;
 
 namespace PSDocs.Commands
@@ -29,7 +31,18 @@ namespace PSDocs.Commands
 
         protected override void EndProcessing()
         {
-            WriteObject(ModelHelper.Include(BaseDirectory, Culture, FileName, UseCulture));
+            var result = ModelHelper.Include(BaseDirectory, Culture, FileName, UseCulture);
+            if (result == null || !result.Exists)
+            {
+                WriteError(new ErrorRecord(
+                    exception: new FileNotFoundException(PSDocsResources.IncludeNotFound, result.Path),
+                    errorId: "PSDocs.Runtime.IncludeNotFound",
+                    errorCategory: ErrorCategory.ObjectNotFound,
+                    targetObject: result.Path
+                ));
+                return;
+            }
+            WriteObject(result);            
         }
     }
 }
