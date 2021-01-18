@@ -167,5 +167,14 @@ namespace PSDocs.Resources {
                 return ResourceManager.GetString("SourceNotFound", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The specified document title is empty and will be skipped..
+        /// </summary>
+        internal static string TitleEmpty {
+            get {
+                return ResourceManager.GetString("TitleEmpty", resourceCulture);
+            }
+        }
     }
 }

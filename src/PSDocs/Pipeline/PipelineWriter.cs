@@ -44,6 +44,14 @@ namespace PSDocs.Pipeline
             writer.WriteWarning(PSDocsResources.SourceNotFound);
         }
 
+        public static void WarnTitleEmpty(this IPipelineWriter writer)
+        {
+            if (writer == null)
+                return;
+
+            writer.WriteWarning(PSDocsResources.TitleEmpty);
+        }
+
         public static void ErrorInvariantCulture(this IPipelineWriter writer)
         {
             if (writer == null)
