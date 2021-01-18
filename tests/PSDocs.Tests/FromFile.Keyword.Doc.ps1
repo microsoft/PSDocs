@@ -257,4 +257,11 @@ Document 'MultipleTitle' {
     Title 'Title 2'
 }
 
+# Synopsis: Tests Title with empty or null string
+Document 'EmptyTitle' {
+    $value = ''
+    Title $notValue
+    Title $value
+}
+
 #endregion Title

@@ -155,4 +155,7 @@
     <value>The source was not found.</value>
     <comment>Occurs when the source file specified does not exist.</comment>
   </data>
+  <data name="TitleEmpty" xml:space="preserve">
+    <value>The specified document title is empty and will be skipped.</value>
+  </data>
 </root>

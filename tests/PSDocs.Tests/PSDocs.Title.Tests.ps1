@@ -25,6 +25,7 @@ Describe 'PSDocs -- Title keyword' -Tag Title {
             Path = $docFilePath
             InputObject = $testObject
             PassThru = $True
+            ErrorAction = [System.Management.Automation.ActionPreference]::Stop
         }
         It 'With single title' {
             $result = Invoke-PSDocument @invokeParams -Name 'SingleTitle';
@@ -33,6 +34,12 @@ Describe 'PSDocs -- Title keyword' -Tag Title {
         It 'With multiple titles' {
             $result = Invoke-PSDocument @invokeParams -Name 'MultipleTitle';
             $result | Should -Match "^(`# Title 2(\r|\n|\r\n))";
+        }
+        It 'With empty title' {
+            $Null = Invoke-PSDocument @invokeParams -Name 'EmptyTitle' -WarningAction SilentlyContinue -WarningVariable outWarnings;
+            $outWarnings = @($outWarnings);
+            $outWarnings | Should -Not -BeNullOrEmpty;
+            $outWarnings.Length | Should -Be 2;
         }
     }
 }
