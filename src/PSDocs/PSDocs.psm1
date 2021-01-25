@@ -521,7 +521,10 @@ function Include {
         [String]$Culture = $Culture,
 
         [Parameter(Mandatory = $False)]
-        [Switch]$UseCulture = $False
+        [Switch]$UseCulture = $False,
+
+        [Parameter(Mandatory = $False)]
+        [System.Collections.IDictionary]$Replace
     )
     begin {
         # This is just a stub to improve authoring and discovery
