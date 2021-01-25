@@ -551,13 +551,15 @@ Insert content from an external file into this document.
 Syntax:
 
 ```text
-Include [-FileName] <String> [-BaseDirectory <String>] [-UseCulture]
+Include [-FileName] <String> [-BaseDirectory <String>] [-UseCulture] [-Replace <Hashtable>]
 ```
 
 - `FileName` - The path to a markdown file to include. An absolute or relative path is accepted.
 - `BaseDirectory` - The base path to work from for relative paths specified with the `FileName` parameter.
 By default this is the current working path.
 - `UseCulture` - When specified include will look for the file within a subdirectory for a named culture.
+- `Replace` - When specified include will replace keys occurring in the file with the specified value.
+Replacement keys are case-sensitive.
 
 Examples:
 
@@ -595,6 +597,20 @@ Document 'Sample' {
 
 ```text
 This is included from an external file.
+```
+
+```powershell
+# A document definition
+Document 'Sample' {
+    # Include IncludeFile.md replacing 'included' with 'an example'
+    Include IncludeFile.md -Replace @{
+        'included' = 'an example'
+    }
+}
+```
+
+```text
+This is an example from an external file.
 ```
 
 ## EXAMPLES

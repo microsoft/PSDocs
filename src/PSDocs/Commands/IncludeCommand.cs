@@ -2,6 +2,7 @@
 using PSDocs.Models;
 using PSDocs.Resources;
 using PSDocs.Runtime;
+using System.Collections;
 using System.IO;
 using System.Management.Automation;
 
@@ -23,6 +24,9 @@ namespace PSDocs.Commands
         [Parameter(Mandatory = false)]
         public SwitchParameter UseCulture { get; set; }
 
+        [Parameter(Mandatory = false)]
+        public IDictionary Replace { get; set; }
+
         protected override void BeginProcessing()
         {
             if (string.IsNullOrEmpty(Culture))
@@ -31,7 +35,7 @@ namespace PSDocs.Commands
 
         protected override void EndProcessing()
         {
-            var result = ModelHelper.Include(BaseDirectory, Culture, FileName, UseCulture);
+            var result = ModelHelper.Include(BaseDirectory, Culture, FileName, UseCulture, Replace);
             if (result == null || !result.Exists)
             {
                 WriteError(new ErrorRecord(

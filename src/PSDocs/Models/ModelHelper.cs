@@ -1,5 +1,6 @@
 ﻿
 using PSDocs.Configuration;
+using System.Collections;
 using System.IO;
 
 namespace PSDocs.Models
@@ -52,6 +53,11 @@ namespace PSDocs.Models
 
         public static Include Include(string baseDirectory, string culture, string fileName, bool useCulture)
         {
+            return Include(baseDirectory, culture, fileName, useCulture, null);
+        }
+
+        internal static Include Include(string baseDirectory, string culture, string fileName, bool useCulture, IDictionary replace)
+        {
             baseDirectory = PSDocumentOption.GetRootedPath(baseDirectory);
             var absolutePath = Path.IsPathRooted(fileName) ? fileName : Path.Combine(baseDirectory, (useCulture ? culture : string.Empty), fileName);
             var result = new Include
@@ -61,6 +67,15 @@ namespace PSDocs.Models
             if (result.Exists)
             {
                 var text = File.ReadAllText(absolutePath);
+                if (replace != null && replace.Count > 0)
+                {
+                    foreach (var key in replace.Keys)
+                    {
+                        var k = key?.ToString();
+                        var v = replace[key]?.ToString();
+                        text = text.Replace(k, v);
+                    }
+                }
                 result.Content = text;
             }
             return result;

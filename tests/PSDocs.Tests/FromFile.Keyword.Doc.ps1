@@ -106,6 +106,13 @@ Document 'IncludeRequired' {
     Include 'NotFile.md';
 }
 
+# Synopsis: Include and replace tokens
+Document 'IncludeReplace' {
+    Include IncludeFile2.md -BaseDirectory $PSScriptRoot -Replace @{
+        'second' = 'third'
+    }
+}
+
 #endregion Include
 
 #region Metadata

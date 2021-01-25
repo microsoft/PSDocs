@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+What's changed since pre-release v0.8.0-B2101006:
+
+- General improvements:
+  - Added `-Replace` parameter to `Include` keyword to replace tokens in included file. [#134](https://github.com/BernieWhite/PSDocs/issues/134)
+    - A hashtable of replacement tokens can be specified to replace contents within original file.
+    - See `about_PSDocs_Keywords` for more details.
+
 ## v0.8.0-B2101006 (pre-release)
 
 What's changed since v0.7.0:

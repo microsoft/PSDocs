@@ -62,5 +62,10 @@ Describe 'PSDocs -- Include keyword' -Tag Include {
             $Null = Invoke-PSDocument @invokeParams -Name 'IncludeOptional';
             { $Null = Invoke-PSDocument @invokeParams -Name 'IncludeRequired'; } | Should -Throw -Because 'PSDocs.Runtime.IncludeNotFound';
         }
+
+        It 'Should replace tokens' {
+            $result = Invoke-PSDocument @invokeParams -Name 'IncludeReplace' -PassThru;
+            $result | Should -BeLike 'This is a third file to include.*'
+        }
     }
 }
