@@ -1,4 +1,7 @@
-﻿using System;
+﻿
+using PSDocs.Pipeline;
+using PSDocs.Resources;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -6,6 +9,11 @@ namespace PSDocs.Models
 {
     public sealed class TableBuilder
     {
+        private const string FIELD_NAME = "name";
+        private const string FIELD_LABEL = "label";
+        private const string FIELD_WIDTH = "width";
+        private const string FIELD_ALIGNMENT = "alignment";
+
         private readonly List<TableColumnHeader> _Headers;
 
         public TableBuilder()
@@ -37,24 +45,21 @@ namespace PSDocs.Models
             var index = GetIndex(hashtable);
 
             // Start loading matching values
-
-
-            if (index.TryGetValue("name", out object value))
+            if (index.TryGetValue(FIELD_NAME, out object value))
                 header.Label = (string)value;
 
-            if (index.TryGetValue("label", out value))
+            if (index.TryGetValue(FIELD_LABEL, out value))
                 header.Label = (string)value;
 
-            if (index.TryGetValue("width", out value))
+            if (index.TryGetValue(FIELD_WIDTH, out value))
                 header.Width = (int)value;
 
-            if (index.TryGetValue("alignment", out value))
+            if (index.TryGetValue(FIELD_ALIGNMENT, out value))
                 header.Alignment = (Alignment)Enum.Parse(typeof(Alignment), (string)value, true);
 
             // Validate header
-
             if (string.IsNullOrEmpty(header.Label))
-                throw new Exception("Label must be set");
+                throw new RuntimeException(PSDocsResources.LabelNullOrEmpty);
 
             _Headers.Add(header);
         }
@@ -63,11 +68,8 @@ namespace PSDocs.Models
         {
             // Build index to allow mapping
             var index = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-
             foreach (DictionaryEntry entry in hashtable)
-            {
                 index.Add(entry.Key.ToString(), entry.Value);
-            }
 
             return index;
         }
@@ -75,23 +77,17 @@ namespace PSDocs.Models
         public IDictionary<string, object> GetPropertyFilter(Hashtable hashtable)
         {
             var index = GetIndex(hashtable);
+            if (index.ContainsKey(FIELD_ALIGNMENT))
+                index.Remove(FIELD_ALIGNMENT);
 
-            if (index.ContainsKey("alignment"))
+            if (index.ContainsKey(FIELD_WIDTH))
+                index.Remove(FIELD_WIDTH);
+
+            if (index.ContainsKey(FIELD_NAME))
             {
-                index.Remove("alignment");
+                index[FIELD_LABEL] = index[FIELD_NAME];
+                index.Remove(FIELD_NAME);
             }
-
-            if (index.ContainsKey("width"))
-            {
-                index.Remove("width");
-            }
-
-            if (index.ContainsKey("name"))
-            {
-                index["label"] = index["name"];
-                index.Remove("name");
-            }
-
             return index;
         }
     }

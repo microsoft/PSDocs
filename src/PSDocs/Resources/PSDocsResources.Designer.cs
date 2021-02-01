@@ -88,6 +88,15 @@ namespace PSDocs.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A label must be set..
+        /// </summary>
+        internal static string LabelNullOrEmpty {
+            get {
+                return ResourceManager.GetString("LabelNullOrEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Options file does not exist..
         /// </summary>
         internal static string OptionsNotFound {

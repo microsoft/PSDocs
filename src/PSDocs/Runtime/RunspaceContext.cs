@@ -204,13 +204,6 @@ namespace PSDocs.Runtime
             if (string.IsNullOrEmpty(SourceFile.ResourcePath))
                 return null;
 
-            //if (!_RaisedUsingInvariantCulture && (Culture == null || culture.Length == 0))
-            //{
-            //    Pipeline.Writer.WarnUsingInvariantCulture();
-            //    _RaisedUsingInvariantCulture = true;
-            //    return null;
-            //}
-
             for (var i = 0; i < _Culture.Length; i++)
             {
                 if (TryLocalizedPath(_Culture[i], file, out string path))
@@ -223,13 +216,6 @@ namespace PSDocs.Runtime
         {
             if (string.IsNullOrEmpty(SourceFile.ResourcePath))
                 return null;
-
-            //if (!_RaisedUsingInvariantCulture && (Culture == null || culture.Length == 0))
-            //{
-            //    Pipeline.Writer.WarnUsingInvariantCulture();
-            //    _RaisedUsingInvariantCulture = true;
-            //    return null;
-            //}
 
             var result = new List<string>();
             for (var i = 0; i < _Culture.Length; i++)

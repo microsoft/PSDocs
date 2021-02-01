@@ -197,7 +197,7 @@ namespace PSDocs.Configuration
                 .WithTypeConverter(new StringArrayTypeConverter())
                 .Build();
             var option = d.Deserialize<PSDocumentOption>(yaml) ?? new PSDocumentOption();
-            //option.SourcePath = path;
+            option.SourcePath = path;
             return option;
         }
 

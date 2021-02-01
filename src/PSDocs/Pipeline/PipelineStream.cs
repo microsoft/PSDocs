@@ -1,16 +1,15 @@
-﻿using System.Collections.Concurrent;
+﻿
+using System.Collections.Concurrent;
 using System.Management.Automation;
 
 namespace PSDocs.Pipeline
 {
     internal sealed class PipelineStream
     {
-        private readonly PipelineContext _Context;
         private readonly ConcurrentQueue<PSObject> _Queue;
 
-        public PipelineStream(PipelineContext context)
+        public PipelineStream()
         {
-            _Context = context;
             _Queue = new ConcurrentQueue<PSObject>();
         }
 

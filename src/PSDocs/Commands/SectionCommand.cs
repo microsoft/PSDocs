@@ -28,7 +28,6 @@ namespace PSDocs.Commands
             if (!TryCondition())
                 return;
 
-            var targetObect = InputObject ?? GetTargetObject();
             var builder = GetBuilder();
             var section = builder.EnterSection(Name);
             bool shouldWrite = true;

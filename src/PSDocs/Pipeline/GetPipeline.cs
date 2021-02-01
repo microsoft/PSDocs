@@ -26,7 +26,7 @@ namespace PSDocs.Pipeline
 
     internal sealed class GetPipeline : PipelineBase, IPipeline
     {
-        private RunspaceContext _Runspace;
+        private readonly RunspaceContext _Runspace;
 
         internal GetPipeline(PipelineContext context, Source[] source)
             : base(context, source)
