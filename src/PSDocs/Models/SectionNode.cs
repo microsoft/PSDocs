@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Management.Automation;
 
@@ -6,7 +7,7 @@ namespace PSDocs.Models
 {
     public abstract class SectionNode : DocumentNode
     {
-        public SectionNode()
+        protected SectionNode()
         {
             Title = string.Empty;
             Node = new List<DocumentNode>();
@@ -34,9 +35,8 @@ namespace PSDocs.Models
                     continue;
 
                 if (!(items[i].BaseObject is DocumentNode node))
-                {
                     node = new Text { Content = items[i].BaseObject.ToString() };
-                }
+
                 count++;
                 Node.Add(node);
             }

@@ -1,4 +1,5 @@
-﻿using System.Management.Automation;
+﻿
+using System.Management.Automation;
 
 namespace PSDocs.Pipeline
 {
@@ -9,16 +10,12 @@ namespace PSDocs.Pipeline
         internal StreamPipeline(PipelineContext context, Source[] source)
             : base(context, source)
         {
-            _Stream = new PipelineStream(context);
+            _Stream = new PipelineStream();
         }
 
         public override void Process(PSObject sourceObject)
         {
-            //if (sourceObject != null)
-            //{
             _Stream.Enqueue(sourceObject);
-            //}
-
             while (!_Stream.IsEmpty && _Stream.TryDequeue(out PSObject nextObject))
                 ProcessObject(nextObject);
         }

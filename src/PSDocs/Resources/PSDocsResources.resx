@@ -126,6 +126,9 @@
   <data name="InvariantCulture" xml:space="preserve">
     <value>A culture must be specified when no culture is specified by the system. To specify a culture use the 'Output.Culture' option.</value>
   </data>
+  <data name="LabelNullOrEmpty" xml:space="preserve">
+    <value>A label must be set.</value>
+  </data>
   <data name="OptionsNotFound" xml:space="preserve">
     <value>Options file does not exist.</value>
     <comment>Occurs when explicit path to a YAML file is specified and doesn't exist.</comment>

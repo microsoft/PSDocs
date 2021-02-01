@@ -49,10 +49,10 @@ namespace PSDocs.Pipeline
         {
             if (!_Disposed)
             {
-                if (disposing)
-                {
+                //if (disposing)
+                //{
 
-                }
+                //}
                 _Disposed = true;
             }
         }

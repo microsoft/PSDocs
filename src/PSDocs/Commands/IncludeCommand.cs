@@ -39,7 +39,7 @@ namespace PSDocs.Commands
             if (result == null || !result.Exists)
             {
                 WriteError(new ErrorRecord(
-                    exception: new FileNotFoundException(PSDocsResources.IncludeNotFound, result.Path),
+                    exception: new FileNotFoundException(PSDocsResources.IncludeNotFound, result?.Path),
                     errorId: "PSDocs.Runtime.IncludeNotFound",
                     errorCategory: ErrorCategory.ObjectNotFound,
                     targetObject: result.Path
