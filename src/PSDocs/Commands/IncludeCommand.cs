@@ -42,7 +42,7 @@ namespace PSDocs.Commands
                     exception: new FileNotFoundException(PSDocsResources.IncludeNotFound, result?.Path),
                     errorId: "PSDocs.Runtime.IncludeNotFound",
                     errorCategory: ErrorCategory.ObjectNotFound,
-                    targetObject: result.Path
+                    targetObject: result?.Path
                 ));
                 return;
             }
