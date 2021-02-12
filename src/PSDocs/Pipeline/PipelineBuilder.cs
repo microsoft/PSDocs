@@ -3,6 +3,7 @@ using PSDocs.Configuration;
 using PSDocs.Pipeline.Output;
 using PSDocs.Processor;
 using PSDocs.Resources;
+using PSDocs.Runtime;
 using System;
 using System.IO;
 using System.Management.Automation;
@@ -132,21 +133,21 @@ namespace PSDocs.Pipeline
 
         protected virtual PipelineContext PrepareContext()
         {
-            return new PipelineContext(Option, Writer, OutputVisitor, null);
+            return new PipelineContext(Option, Writer, OutputVisitor, null, null);
         }
 
         private static void WriteToFile(IDocumentResult result, PSDocumentOption option, IPipelineWriter writer, ShouldProcess shouldProcess)
         {
-            var rootedPath = PSDocumentOption.GetRootedPath(option.Output.Path);
-            var filePath = !string.IsNullOrEmpty(result.Culture) && option.Output?.Culture?.Length > 1 ?
-                Path.Combine(rootedPath, result.Culture, result.Name) : Path.Combine(rootedPath, result.Name);
+            // Calculate paths
+            var fileName = string.Concat(result.InstanceName, result.Extension);
+            var outputPath = PSDocumentOption.GetRootedPath(result.OutputPath);
+            var filePath = Path.Combine(outputPath, fileName);
             var parentPath = Directory.GetParent(filePath);
 
             if (!parentPath.Exists && shouldProcess(target: parentPath.FullName, action: PSDocsResources.ShouldCreatePath))
-            {
                 Directory.CreateDirectory(path: parentPath.FullName);
-            }
-            if (shouldProcess(target: rootedPath, action: PSDocsResources.ShouldWriteFile))
+
+            if (shouldProcess(target: outputPath, action: PSDocsResources.ShouldWriteFile))
             {
                 var encoding = GetEncoding(option.Markdown.Encoding.Value);
                 File.WriteAllText(filePath, result.ToString(), encoding);

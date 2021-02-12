@@ -1,4 +1,8 @@
 
+Export-PSDocumentConvention 'FromFileTest1' {
+
+}
+
 document 'FromFileTest1' {
     Title 'Test title'
     Metadata @{

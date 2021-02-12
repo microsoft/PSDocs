@@ -9,6 +9,7 @@ namespace PSDocs.Commands
     internal static class LanguageKeywords
     {
         public const string Definition = "Definition";
+        public const string Convention = "PSDocumentConvention";
         public const string Document = "Document";
         public const string Block = "Block";
         public const string Note = "Note";
@@ -26,8 +27,10 @@ namespace PSDocs.Commands
     internal static class LanguageCmdlets
     {
         public const string NewDefinition = "New-Definition";
+        public const string ExportConvention = "Export-PSDocumentConvention";
         public const string NewSection = "New-Section";
         public const string InvokeBlock = "Invoke-Block";
+        public const string InvokeConvention = "Invoke-PSDocumentConvention";
         public const string FormatCode = "Format-Code";
         public const string FormatBlockQuote = "Format-BlockQuote";
         public const string FormatNote = "Format-Note";

@@ -3,6 +3,7 @@ using PSDocs.Configuration;
 using PSDocs.Models;
 using PSDocs.Pipeline;
 using PSDocs.Processor.Markdown;
+using PSDocs.Runtime;
 using System;
 using System.IO;
 using System.Management.Automation;
@@ -56,7 +57,11 @@ namespace PSDocs.Benchmark
 
         private static Document GetDocument()
         {
-            var result = new Document("test-benchmark", null)
+            var context = new DocumentContext(null)
+            {
+                InstanceName = "test-benchmark"
+            };
+            var result = new Document(context)
             {
                 Title = "Test document"
             };

@@ -15,12 +15,25 @@ namespace PSDocs
         [Fact]
         public void GetDocumentBuilder()
         {
-            var actual = HostHelper.GetDocumentBuilder(new RunspaceContext(new PipelineContext(GetOption(), null, null, null)), GetSource());
+            var actual = HostHelper.GetDocumentBuilder(new RunspaceContext(new PipelineContext(GetOption(), null, null, null, null)), GetSource());
             Assert.Equal(7, actual.Length);
         }
 
         [Fact]
         public void InvokePipeline()
+        {
+            var builder = PipelineBuilder.Invoke(GetSource(), GetOption(new string[] { "FromFileTest1" }), null, null);
+            var pipeline = builder.Build() as InvokePipeline;
+            var targetObject = PSObject.AsPSObject(new TestModel());
+
+            var actual = pipeline.BuildDocument(targetObject);
+            Assert.Single(actual);
+            Assert.Equal("Test title", actual[0].Title);
+            Assert.Equal("Test1", actual[0].Metadata["test"]);
+        }
+
+        [Fact]
+        public void InvokePipelineWithConvention()
         {
             var builder = PipelineBuilder.Invoke(GetSource(), GetOption(new string[] { "FromFileTest1" }), null, null);
             var pipeline = builder.Build() as InvokePipeline;

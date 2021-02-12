@@ -4,6 +4,13 @@
 
 What's changed since pre-release v0.8.0-B2101011:
 
+- Engine features:
+  - Added support for running custom actions using conventions. [#18](https://github.com/BernieWhite/PSDocs/issues/18)
+  [#120](https://github.com/BernieWhite/PSDocs/issues/120)
+    - Conventions provide `Begin`, `Process` and `End` blocks to hook into the document pipeline.
+    - Name or change the output path of documents in `Begin` and `Process` blocks.
+    - Generate table of contents (TOC) and perform publishing actions in `End` blocks.
+    - See [about_PSDocs_Conventions] for more details.
 - Bug fixes:
   - Fixed boolean string conversion with the `GetBoolOrDefault` configuration helper. [#140](https://github.com/BernieWhite/PSDocs/issues/140)
 
@@ -14,7 +21,7 @@ What's changed since pre-release v0.8.0-B2101006:
 - General improvements:
   - Added `-Replace` parameter to `Include` keyword to replace tokens in included file. [#134](https://github.com/BernieWhite/PSDocs/issues/134)
     - A hashtable of replacement tokens can be specified to replace contents within original file.
-    - See `about_PSDocs_Keywords` for more details.
+    - See [about_PSDocs_Keywords] for more details.
 
 ## v0.8.0-B2101006 (pre-release)
 
@@ -22,7 +29,7 @@ What's changed since v0.7.0:
 
 - Engine features:
   - Added support for custom configuration key values. [#121](https://github.com/BernieWhite/PSDocs/issues/121)
-    - See `about_PSDocs_Configuration` for more details.
+    - See [about_PSDocs_Configuration] for more details.
 - General improvements:
   - Improve handling when an empty document title is set. [#122](https://github.com/BernieWhite/PSDocs/issues/122)
 - Bug fixes:
@@ -38,12 +45,12 @@ What's changed since v0.6.3:
   - Added support for localized strings using the `$LocalizedData` variable. [#91](https://github.com/BernieWhite/PSDocs/issues/91)
   - Automatically serialize `Code` objects to JSON and YAML. [#93](https://github.com/BernieWhite/PSDocs/issues/93)
     - Use the `json`, `yaml`, or `yml` info strings to automatically serialize custom objects.
-    - See `about_PSDocs_Keywords` for more details.
+    - See [about_PSDocs_Keywords] for more details.
 - General improvements:
   - Added configuration for setting output options. [#105](https://github.com/BernieWhite/PSDocs/issues/105)
   - Added parameter alias `-MarkdownEncoding` on `New-PSDocumentOption` for `-Encoding`. [#106](https://github.com/BernieWhite/PSDocs/issues/106)
   - Default the info string to `powershell` for `Code` script blocks. [#92](https://github.com/BernieWhite/PSDocs/issues/92)
-    - See `about_PSDocs_Keywords` for more details.
+    - See [about_PSDocs_Keywords] for more details.
 - Deprecations and removals:
   - Added [upgrade notes](docs/upgrade-notes.md) for migration from v0.6.x to v0.7.0.
   - **Breaking change**: Removed support for inline document blocks.
@@ -74,12 +81,12 @@ What's changed since pre-release v0.7.0-B2008035:
   - Added support for localized strings using the `$LocalizedData` variable. [#91](https://github.com/BernieWhite/PSDocs/issues/91)
   - Automatically serialize `Code` objects to JSON and YAML. [#93](https://github.com/BernieWhite/PSDocs/issues/93)
     - Use the `json`, `yaml`, or `yml` info strings to automatically serialize custom objects.
-    - See `about_PSDocs_Keywords` for more details.
+    - See [about_PSDocs_Keywords] for more details.
 - General improvements:
   - Added configuration for setting output options. [#105](https://github.com/BernieWhite/PSDocs/issues/105)
   - Added parameter alias `-MarkdownEncoding` on `New-PSDocumentOption` for `-Encoding`. [#106](https://github.com/BernieWhite/PSDocs/issues/106)
   - Default the info string to `powershell` for `Code` script blocks. [#92](https://github.com/BernieWhite/PSDocs/issues/92)
-    - See `about_PSDocs_Keywords` for more details.
+    - See [about_PSDocs_Keywords] for more details.
 - Bug fixes:
   - Fixed inconsistencies with default options file name. [#103](https://github.com/BernieWhite/PSDocs/issues/103)
   - Fixed line break after block quote. [#104](https://github.com/BernieWhite/PSDocs/issues/104)
@@ -237,3 +244,7 @@ What's changed since v0.1.0:
 ## v0.1.0
 
 - Initial release.
+
+[about_PSDocs_Configuration]: docs/concepts/PSDocs/en-US/about_PSDocs_Configuration.md
+[about_PSDocs_Conventions]: docs/concepts/PSDocs/en-US/about_PSDocs_Conventions.md
+[about_PSDocs_Keywords]: docs/concepts/PSDocs/en-US/about_PSDocs_Keywords.md

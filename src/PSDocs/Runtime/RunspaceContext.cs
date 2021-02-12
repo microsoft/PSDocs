@@ -13,6 +13,25 @@ using System.Management.Automation.Runspaces;
 
 namespace PSDocs.Runtime
 {
+    internal enum RunspaceScope
+    {
+        None = 0,
+
+        Source = 1,
+
+        Document = 2,
+
+        Condition = 4,
+
+        ConventionBegin = 8,
+        ConventionProcess = 16,
+        ConventionEnd = 32,
+
+        Convention = ConventionBegin | ConventionProcess | ConventionEnd,
+        Runtime = Document | Condition | Convention,
+        All = Source | Document | Condition | Convention,
+    }
+
     /// <summary>
     /// A context for a runspace.
     /// </summary>
@@ -21,6 +40,7 @@ namespace PSDocs.Runtime
         private const string ErrorPreference = "ErrorActionPreference";
         private const string WarningPreference = "WarningPreference";
         private const string VerbosePreference = "VerbosePreference";
+
         private const string DebugPreference = "DebugPreference";
 
         internal readonly PipelineContext Pipeline;
@@ -31,12 +51,14 @@ namespace PSDocs.Runtime
 
         private readonly Dictionary<string, Hashtable> _LocalizedDataCache;
         private string[] _Culture;
+        private Stack<RunspaceScope> _Scope;
 
         // Track whether Dispose has been called.
         private bool _Disposed;
 
         public RunspaceContext(PipelineContext pipeline)
         {
+            _Scope = new Stack<RunspaceScope>();
             Pipeline = pipeline;
             _Runspace = GetRunspace();
             _LocalizedDataCache = new Dictionary<string, Hashtable>();
@@ -53,7 +75,50 @@ namespace PSDocs.Runtime
             get { return _Culture[0]; }
         }
 
-        public string InstanceName { get; internal set; }
+        public DocumentContext DocumentContext { get; private set; }
+
+        internal void EnterDocument(string instanceName)
+        {
+            DocumentContext = new DocumentContext(this)
+            {
+                InstanceName = instanceName
+            };
+            PushScope(RunspaceScope.Document);
+        }
+
+        internal void ExitDocument()
+        {
+            DocumentContext = null;
+            PopScope();
+        }
+
+        public IEnumerable Output { get; private set; }
+
+        internal void SetOutput(IEnumerable output)
+        {
+            Output = output;
+        }
+
+        internal void ClearOutput()
+        {
+            Output = null;
+        }
+
+        internal bool IsScope(RunspaceScope scope)
+        {
+            var current = _Scope.Peek();
+            return (current & scope) == current;
+        }
+
+        internal void PushScope(RunspaceScope scope)
+        {
+            _Scope.Push(scope);
+        }
+
+        internal void PopScope()
+        {
+            _Scope.Pop();
+        }
 
         internal PowerShell NewPowerShell()
         {

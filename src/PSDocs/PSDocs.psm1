@@ -65,7 +65,10 @@ function Invoke-PSDocument {
         [PSDocs.Configuration.MarkdownEncoding]$Encoding = [PSDocs.Configuration.MarkdownEncoding]::Default,
 
         [Parameter(Mandatory = $False)]
-        [String[]]$Culture
+        [String[]]$Culture,
+
+        [Parameter(Mandatory = $False)]
+        [String[]]$Convention
     )
     begin {
         Write-Verbose -Message "[Invoke-PSDocument]::BEGIN";
@@ -134,6 +137,7 @@ function Invoke-PSDocument {
 
         $builder = [PSDocs.Pipeline.PipelineBuilder]::Invoke($sourceFiles, $Option, $PSCmdlet, $ExecutionContext);
         $builder.InstanceName($InstanceName);
+        $builder.Convention($Convention);
         try {
             $pipeline = $builder.Build();
             if ($Null -ne $pipeline) {
@@ -369,6 +373,28 @@ function New-PSDocumentOption {
 #
 
 #region Keywords
+
+function Export-PSDocumentConvention {
+    [CmdletBinding()]
+    [OutputType([void])]
+    param (
+        [Parameter(Position = 0, Mandatory = $True)]
+        [String]$Name,
+
+        [Parameter(Mandatory = $False)]
+        [ScriptBlock]$Begin,
+
+        [Parameter(Position = 1, Mandatory = $True)]
+        [ScriptBlock]$Process,
+
+        [Parameter(Mandatory = $False)]
+        [ScriptBlock]$End
+    )
+    begin {
+         # This is just a stub to improve authoring and discovery
+         Write-Error -Message $LocalizedHelp.KeywordOutsideEngine -Category InvalidOperation;
+    }
+}
 
 # .ExternalHelp PSDocs-Help.xml
 function Document {
@@ -800,6 +826,12 @@ function InitEditorServices {
             'Note'
             'Warning'
             'Include'
+            'Export-PSDocumentConvention'
+        );
+
+        # Export variables
+        Export-ModuleMember -Variable @(
+            'PSDocs'
         );
     }
 }
@@ -807,6 +839,10 @@ function InitEditorServices {
 #
 # Editor services
 #
+
+# Define variables and types
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignment', '', Justification = 'Variable is used for editor discovery only.')]
+[PSDocs.Runtime.PSDocs]$PSDocs = New-Object -TypeName 'PSDocs.Runtime.PSDocs';
 
 if ($Null -ne (Get-Variable -Name psEditor -ErrorAction Ignore)) {
     InitEditorServices;

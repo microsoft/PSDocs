@@ -1,9 +1,16 @@
-﻿namespace PSDocs.Processor
+﻿
+namespace PSDocs.Processor
 {
-    public interface IDocumentResult
+    internal interface IDocumentResult
     {
-        string Name { get; }
+        string InstanceName { get; }
+
+        string Extension { get; }
 
         string Culture { get; }
+
+        string OutputPath { get; }
+
+        string FullName { get; }
     }
 }

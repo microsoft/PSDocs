@@ -1,5 +1,7 @@
 ﻿
+using PSDocs.Definitions;
 using PSDocs.Models;
+using PSDocs.Processor;
 using PSDocs.Runtime;
 using System;
 using System.Collections;
@@ -14,6 +16,7 @@ namespace PSDocs.Data.Internal
     internal sealed class ScriptDocumentBuilder : IDocumentBuilder
     {
         private readonly ScriptDocumentBlock _Block;
+        private readonly IDocumentConvention[] _Conventions;
 
         private SectionNode _Current;
 
@@ -23,9 +26,10 @@ namespace PSDocs.Data.Internal
         // Track whether Dispose has been called.
         private bool _Disposed;
 
-        internal ScriptDocumentBuilder(ScriptDocumentBlock block)
+        internal ScriptDocumentBuilder(ScriptDocumentBlock block, IDocumentConvention[] conventions)
         {
             _Block = block;
+            _Conventions = conventions;
         }
 
         public string Name => _Block.Name;
@@ -38,9 +42,11 @@ namespace PSDocs.Data.Internal
             context.EnterSourceFile(_Block.Source);
             try
             {
+                BeginConventions(context, sourceObject);
                 _Parent = new Stack<SectionNode>();
-                _Current = Document = new Document(context.InstanceName, context.Culture);
+                _Current = Document = new Document(context.DocumentContext);
                 Document.AddNodes(_Block.Body.Invoke());
+                ProcessConventions(context, sourceObject);
                 return Document;
             }
             catch (Exception e)
@@ -56,6 +62,11 @@ namespace PSDocs.Data.Internal
                 _Parent = null;
                 context.ExitBuilder();
             }
+        }
+
+        void IDocumentBuilder.End(RunspaceContext context, IDocumentResult[] completed)
+        {
+            EndConventions(context, completed);
         }
 
         internal void Title(string text)
@@ -86,6 +97,63 @@ namespace PSDocs.Data.Internal
                 return;
 
             _Current = _Parent.Pop();
+        }
+
+        private void BeginConventions(RunspaceContext context, PSObject sourceObject)
+        {
+            if (_Conventions == null || _Conventions.Length == 0)
+                return;
+
+            try
+            {
+                context.PushScope(RunspaceScope.ConventionBegin);
+                for (var i = 0; i < _Conventions.Length; i++)
+                {
+                    _Conventions[i].Begin(context, new PSObject[] { sourceObject });
+                }
+            }
+            finally
+            {
+                context.PopScope();
+            }
+        }
+
+        private void ProcessConventions(RunspaceContext context, PSObject sourceObject)
+        {
+            if (_Conventions == null || _Conventions.Length == 0)
+                return;
+
+            try
+            {
+                context.PushScope(RunspaceScope.ConventionProcess);
+                for (var i = 0; i < _Conventions.Length; i++)
+                {
+                    _Conventions[i].Process(context, new PSObject[] { sourceObject });
+                }
+            }
+            finally
+            {
+                context.PopScope();
+            }
+        }
+
+        private void EndConventions(RunspaceContext context, IEnumerable results)
+        {
+            if (_Conventions == null || _Conventions.Length == 0)
+                return;
+
+            try
+            {
+                context.PushScope(RunspaceScope.ConventionEnd);
+                for (var i = 0; i < _Conventions.Length; i++)
+                {
+                    _Conventions[i].End(context, results);
+                }
+            }
+            finally
+            {
+                context.PopScope();
+            }
         }
 
         #region IDisposable
