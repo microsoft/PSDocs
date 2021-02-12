@@ -118,6 +118,7 @@ The following commands exist in the `PSDocs.Dsc` module:
 The following conceptual topics exist in the `PSDocs` module:
 
 - [Configuration](docs/concepts/PSDocs/en-US/about_PSDocs_Configuration.md)
+- [Conventions](docs/concepts/PSDocs/en-US/about_PSDocs_Conventions.md)
 - [Options](docs/concepts/PSDocs/en-US/about_PSDocs_Options.md)
   - [Configuration](docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#configuration)
   - [Execution.LanguageMode](docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#executionlanguagemode)
