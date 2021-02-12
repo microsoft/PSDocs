@@ -148,6 +148,9 @@ Each configuration key specified in `ps-docs.yaml` is assessable as a property.
 Additionally helper methods can be used.
 See `about_PSDocs_Configuration` for more information.
 - `Culture` - The name of the culture currently being processed.
+- `Document` - A document context object.
+- `Output` - All the document results generated.
+This property is only available within `End` convention blocks.
 - `TargetObject` - The value of the pipeline object currently being processed.
 
 Syntax:
@@ -157,13 +160,19 @@ $PSDocs
 ```
 
 ```powershell
-# Get the value of the custom configuration 'Key1'
+# Get the value of the custom configuration 'Key1'.
 $PSDocs.Configuration.Key1
 ```
 
 ```powershell
 # Return the currently processed culture. e.g. 'en-US'
 $PSDocs.Culture
+```
+
+```powershell
+# Access document context properties.
+$PSDocs.Document.InstanceName
+$PSDocs.Document.OutputPath
 ```
 
 ```powershell

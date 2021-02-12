@@ -16,13 +16,14 @@ namespace PSDocs.Pipeline
         internal readonly DocumentFilter Filter;
         internal readonly IPipelineWriter Writer;
         internal readonly InstanceNameBinder InstanceNameBinder;
+        internal readonly string[] Convention;
 
         private readonly Action<IDocumentResult, bool> _OutputVisitor;
 
         // Track whether Dispose has been called.
         private bool _Disposed;
 
-        public PipelineContext(PSDocumentOption option, IPipelineWriter writer, Action<IDocumentResult, bool> _Output, InstanceNameBinder instanceNameBinder)
+        public PipelineContext(PSDocumentOption option, IPipelineWriter writer, Action<IDocumentResult, bool> _Output, InstanceNameBinder instanceNameBinder, string[] convention)
         {
             Option = option;
             LanguageMode = option.Execution.LanguageMode.GetValueOrDefault(ExecutionOption.Default.LanguageMode.Value);
@@ -30,6 +31,7 @@ namespace PSDocs.Pipeline
             Writer = writer;
             InstanceNameBinder = instanceNameBinder;
             _OutputVisitor = _Output;
+            Convention = convention;
         }
 
         internal void WriteOutput(IDocumentResult result)

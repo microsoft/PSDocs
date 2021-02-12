@@ -40,7 +40,7 @@ namespace PSDocs.Commands
 
             // Create PS instance for execution
             var ps = context.NewPowerShell();
-            ps.AddCommand(new CmdletInfo(InvokeBlockCmdletName, typeof(InvokeBlockCommand)));
+            ps.AddCommand(new CmdletInfo(InvokeBlockCmdletName, typeof(InvokeDocumentCommand)));
             //ps.AddParameter(InvokeBlockCmdlet_TypeParameter, NodeType);
             ps.AddParameter(InvokeBlockCmdlet_BodyParameter, Body);
 

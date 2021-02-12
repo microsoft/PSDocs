@@ -133,6 +133,7 @@ The following conceptual topics exist in the `PSDocs` module:
   - [$Document](docs/concepts/PSDocs/en-US/about_PSDocs_Variables.md#document)
   - [$InstanceName](docs/concepts/PSDocs/en-US/about_PSDocs_Variables.md#instancename)
   - [$LocalizedData](docs/concepts/PSDocs/en-US/about_PSDocs_Variables.md#localizeddata)
+  - [$PSDocs](docs/concepts/PSDocs/en-US/about_PSDocs_Variables.md#psdocs)
   - [$TargetObject](docs/concepts/PSDocs/en-US/about_PSDocs_Variables.md#targetobject)
   - [$Section](docs/concepts/PSDocs/en-US/about_PSDocs_Variables.md#section)
 

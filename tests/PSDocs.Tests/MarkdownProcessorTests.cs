@@ -1,6 +1,7 @@
 using PSDocs.Configuration;
 using PSDocs.Models;
 using PSDocs.Processor.Markdown;
+using PSDocs.Runtime;
 using Xunit;
 
 namespace PSDocs
@@ -21,7 +22,7 @@ namespace PSDocs
 
         private static Document GetDocument()
         {
-            var result = new Document(null, null)
+            var result = new Document(new DocumentContext(null))
             {
                 Title = "Test document"
             };

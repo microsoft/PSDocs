@@ -1,11 +1,13 @@
-﻿using PSDocs.Configuration;
+﻿
+using PSDocs.Configuration;
 using PSDocs.Models;
+using PSDocs.Runtime;
 using System.Diagnostics;
 using System.IO;
 
 namespace PSDocs.Processor.Markdown
 {
-    public sealed class MarkdownProcessor
+    internal sealed class MarkdownProcessor
     {
         private const string MARKDOWN_BLOCKQUOTE = "> ";
 
@@ -14,15 +16,17 @@ namespace PSDocs.Processor.Markdown
         /// </summary>
         private sealed class DocumentResult : IDocumentResult
         {
-            private readonly string _Name;
-            private readonly string _Culture;
+            private const string DEFAULT_EXTENSION = ".md";
+
             private readonly string _Markdown;
 
-            internal DocumentResult(string name, string culture, string markdown)
+            internal DocumentResult(DocumentContext documentContext, string markdown)
             {
-                _Name = string.Concat(name, ".md");
-                _Culture = culture;
                 _Markdown = markdown;
+                InstanceName = documentContext.InstanceName;
+                Culture = documentContext.Culture;
+                OutputPath = PSDocumentOption.GetRootedPath(documentContext.OutputPath);
+                FullName = GetFullName();
             }
 
             [DebuggerStepThrough]
@@ -31,14 +35,20 @@ namespace PSDocs.Processor.Markdown
                 return _Markdown;
             }
 
-            string IDocumentResult.Name
-            {
-                get { return _Name; }
-            }
+            public string InstanceName { get; }
 
-            string IDocumentResult.Culture
+            public string Culture { get; }
+
+            public string Extension => DEFAULT_EXTENSION;
+
+            public string OutputPath { get; }
+
+            public string FullName { get; }
+
+            private string GetFullName()
             {
-                get { return _Culture; }
+                var fileName = string.Concat(InstanceName, Extension);
+                return Path.Combine(OutputPath, fileName);
             }
         }
 
@@ -47,11 +57,9 @@ namespace PSDocs.Processor.Markdown
             if (document == null)
                 return null;
 
-            var name = document.Name;
-            var culture = document.Culture;
             var context = new MarkdownProcessorContext(option, document);
             Document(context);
-            return new DocumentResult(name, culture, markdown: context.GetString());
+            return new DocumentResult(document.Context, markdown: context.GetString());
         }
 
         private static void Document(MarkdownProcessorContext context)

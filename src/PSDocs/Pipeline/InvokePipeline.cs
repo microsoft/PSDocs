@@ -1,8 +1,10 @@
-﻿using PSDocs.Data;
+﻿
+using PSDocs.Data;
 using PSDocs.Models;
 using PSDocs.Processor;
 using PSDocs.Processor.Markdown;
 using PSDocs.Runtime;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Management.Automation;
 
@@ -11,6 +13,8 @@ namespace PSDocs.Pipeline
     public interface IInvokePipelineBuilder : IPipelineBuilder
     {
         void InstanceName(string[] instanceName);
+
+        void Convention(string[] convention);
     }
 
     /// <summary>
@@ -19,6 +23,7 @@ namespace PSDocs.Pipeline
     internal sealed class InvokePipelineBuilder : PipelineBuilderBase, IInvokePipelineBuilder
     {
         private string[] _InstanceName;
+        private string[] _Convention;
 
         internal InvokePipelineBuilder(Source[] source, HostContext hostContext)
             : base(source, hostContext)
@@ -34,6 +39,14 @@ namespace PSDocs.Pipeline
             _InstanceName = instanceName;
         }
 
+        public void Convention(string[] convention)
+        {
+            if (convention == null || convention.Length == 0)
+                return;
+
+            _Convention = convention;
+        }
+
         public override IPipeline Build()
         {
             if (RequireSources() || RequireCulture())
@@ -45,7 +58,7 @@ namespace PSDocs.Pipeline
         protected override PipelineContext PrepareContext()
         {
             var instanceNameBinder = new InstanceNameBinder(_InstanceName);
-            var context = new PipelineContext(Option, Writer, OutputVisitor, instanceNameBinder);
+            var context = new PipelineContext(Option, Writer, OutputVisitor, instanceNameBinder, _Convention);
             return context;
         }
     }
@@ -55,6 +68,8 @@ namespace PSDocs.Pipeline
     /// </summary>
     internal sealed class InvokePipeline : StreamPipeline, IPipeline
     {
+        private readonly List<IDocumentResult> _Completed;
+
         private IDocumentBuilder[] _Builder;
         private MarkdownProcessor _Processor;
         private RunspaceContext _Runspace;
@@ -65,6 +80,7 @@ namespace PSDocs.Pipeline
             _Runspace = new RunspaceContext(Context);
             _Builder = HostHelper.GetDocumentBuilder(_Runspace, Source);
             _Processor = new MarkdownProcessor();
+            _Completed = new List<IDocumentResult>();
         }
 
         protected override void ProcessObject(PSObject sourceObject)
@@ -76,12 +92,35 @@ namespace PSDocs.Pipeline
                 {
                     var result = WriteDocument(doc[i]);
                     if (result != null)
+                    {
                         Context.WriteOutput(result);
+                        _Completed.Add(result);
+                    }
                 }
             }
             finally
             {
                 _Runspace.ExitTargetObject();
+            }
+        }
+
+        public override void End()
+        {
+            if (_Completed.Count == 0)
+                return;
+
+            var completed = _Completed.ToArray();
+            _Runspace.SetOutput(completed);
+            try
+            {
+                for (var i = 0; i < _Builder.Length; i++)
+                {
+                    _Builder[i].End(_Runspace, completed);
+                }
+            }
+            finally
+            {
+                _Runspace.ClearOutput();
             }
         }
 
@@ -101,11 +140,17 @@ namespace PSDocs.Pipeline
                 {
                     foreach (var instanceName in Context.InstanceNameBinder.GetInstanceName(_Builder[i].Name))
                     {
-                        _Runspace.InstanceName = instanceName;
-
-                        // TODO: Add target name binding
-                        var document = _Builder[i].Process(_Runspace, sourceObject);
-                        result.Add(document);
+                        _Runspace.EnterDocument(instanceName);
+                        try
+                        {
+                            // TODO: Add target name binding
+                            var document = _Builder[i].Process(_Runspace, sourceObject);
+                            result.Add(document);
+                        }
+                        finally
+                        {
+                            _Runspace.ExitDocument();
+                        }
                     }
                 }
             }

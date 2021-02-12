@@ -3,8 +3,8 @@ using System.Management.Automation;
 
 namespace PSDocs.Commands
 {
-    [Cmdlet(VerbsLifecycle.Invoke, LanguageKeywords.Block)]
-    internal sealed class InvokeBlockCommand : PSCmdlet
+    [Cmdlet(VerbsLifecycle.Invoke, LanguageKeywords.Convention)]
+    internal sealed class InvokeConventionCommand : PSCmdlet
     {
         [Parameter()]
         public string[] Type;
@@ -15,15 +15,17 @@ namespace PSDocs.Commands
         [Parameter()]
         public ScriptBlock Body;
 
+        [Parameter(ValueFromPipeline = true)]
+        public PSObject InputObject;
+
         protected override void ProcessRecord()
         {
             try
             {
                 if (Body == null)
-                {
                     return;
-                }
-                WriteObject(Body.Invoke(), true);
+
+                WriteObject(Body.Invoke(InputObject), true);
             }
             finally
             {

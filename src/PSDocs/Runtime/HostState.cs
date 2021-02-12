@@ -55,7 +55,7 @@ namespace PSDocs.Runtime
             {
                 get
                 {
-                    return RunspaceContext.CurrentThread.InstanceName ?? RunspaceContext.CurrentThread.Builder.Name;
+                    return RunspaceContext.CurrentThread?.DocumentContext.InstanceName ?? RunspaceContext.CurrentThread.Builder.Name;
                 }
             }
         }
@@ -96,8 +96,10 @@ namespace PSDocs.Runtime
         private readonly static SessionStateCmdletEntry[] BuiltInCmdlets = new SessionStateCmdletEntry[]
         {
             new SessionStateCmdletEntry(LanguageCmdlets.NewDefinition, typeof(DefinitionCommand), null),
+            new SessionStateCmdletEntry(LanguageCmdlets.ExportConvention, typeof(ExportConventionCommand), null),
             new SessionStateCmdletEntry(LanguageCmdlets.NewSection, typeof(SectionCommand), null),
-            new SessionStateCmdletEntry(LanguageCmdlets.InvokeBlock, typeof(InvokeBlockCommand), null),
+            new SessionStateCmdletEntry(LanguageCmdlets.InvokeBlock, typeof(InvokeDocumentCommand), null),
+            new SessionStateCmdletEntry(LanguageCmdlets.InvokeConvention, typeof(InvokeConventionCommand), null),
             new SessionStateCmdletEntry(LanguageCmdlets.FormatBlockQuote, typeof(BlockQuoteCommand), null),
             new SessionStateCmdletEntry(LanguageCmdlets.FormatCode, typeof(CodeCommand), null),
             new SessionStateCmdletEntry(LanguageCmdlets.FormatList, typeof(ListCommand), null),

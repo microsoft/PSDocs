@@ -1,6 +1,8 @@
-﻿using PSDocs.Data;
+﻿
+using PSDocs.Data;
 using PSDocs.Data.Internal;
 using PSDocs.Definitions;
+using PSDocs.Definitions.Conventions;
 using PSDocs.Pipeline;
 using PSDocs.Resources;
 using System;
@@ -17,12 +19,16 @@ namespace PSDocs.Runtime
         /// </summary>
         internal static IDocumentBuilder[] GetDocumentBuilder(RunspaceContext runspace, Source[] source)
         {
-            return ToDocumentBuilder(ToDocumentBlock(GetLanguageBlock(runspace, source), runspace));
+            runspace.PushScope(RunspaceScope.Source);
+            var blocks = GetLanguageBlock(runspace, source);
+            var documents = ToDocument(blocks, runspace);
+            var conventions = GetConventions(blocks, runspace);
+            return ToDocumentBuilder(documents, conventions);
         }
 
         internal static IDocumentDefinition[] GetDocumentBlock(RunspaceContext runspace, Source[] source)
         {
-            return ToDocumentBlock(GetLanguageBlock(runspace, source), runspace);
+            return ToDocument(GetLanguageBlock(runspace, source), runspace);
         }
 
         /// <summary>
@@ -35,6 +41,7 @@ namespace PSDocs.Runtime
         {
             var results = new List<ILanguageBlock>();
             var ps = context.NewPowerShell();
+            context.PushScope(RunspaceScope.Source);
             try
             {
                 // Process each source
@@ -59,8 +66,11 @@ namespace PSDocs.Runtime
 
                             foreach (var ir in invokeResults)
                             {
-                                if (ir.BaseObject is ScriptDocumentBlock block)
-                                    results.Add(block);
+                                if (ir.BaseObject is ScriptDocumentBlock document)
+                                    results.Add(document);
+
+                                if (ir.BaseObject is ScriptBlockDocumentConvention convention)
+                                    results.Add(convention);
                             }
                         }
                         catch (Exception e)
@@ -73,6 +83,7 @@ namespace PSDocs.Runtime
             finally
             {
                 context.ExitSourceFile();
+                context.PopScope();
                 ps.Runspace = null;
                 ps.Dispose();
             }
@@ -82,19 +93,19 @@ namespace PSDocs.Runtime
         /// <summary>
         /// Convert document blocks to document builders.
         /// </summary>
-        private static IDocumentBuilder[] ToDocumentBuilder(ScriptDocumentBlock[] blocks)
+        private static IDocumentBuilder[] ToDocumentBuilder(ScriptDocumentBlock[] documents, IDocumentConvention[] conventions)
         {
-            var result = new ScriptDocumentBuilder[blocks.Length];
-            for (var i = 0; i < blocks.Length; i++)
-                result[i] = new ScriptDocumentBuilder(blocks[i]);
+            var result = new ScriptDocumentBuilder[documents.Length];
+            for (var i = 0; i < documents.Length; i++)
+                result[i] = new ScriptDocumentBuilder(documents[i], conventions);
 
             return result;
         }
 
         /// <summary>
-        /// Convert language blocks to document blocks.
+        /// Convert language blocks to documents.
         /// </summary>
-        private static ScriptDocumentBlock[] ToDocumentBlock(ILanguageBlock[] blocks, RunspaceContext context)
+        private static ScriptDocumentBlock[] ToDocument(ILanguageBlock[] blocks, RunspaceContext context)
         {
             // Index by Id
             var results = new Dictionary<string, ScriptDocumentBlock>(StringComparer.OrdinalIgnoreCase);
@@ -117,9 +128,51 @@ namespace PSDocs.Runtime
             return results.Values.ToArray();
         }
 
+        /// <summary>
+        /// Get conventions.
+        /// </summary>
+        private static IDocumentConvention[] GetConventions(ILanguageBlock[] blocks, RunspaceContext runspace)
+        {
+            // Index by Id
+            var index = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var results = new List<IDocumentConvention>(blocks.Length);
+            try
+            {
+                foreach (var block in blocks.OfType<ScriptBlockDocumentConvention>())
+                {
+                    // Ignore blocks that don't match
+                    if (!Match(runspace, block, out int order))
+                        continue;
+
+                    if (!index.Contains(block.Id))
+                        results.Insert(order, block);
+                }
+            }
+            finally
+            {
+                //context.ExitSourceFile();
+            }
+            results.Insert(0, new DefaultDocumentConvention("default"));
+            return results.ToArray();
+        }
+
         private static bool Match(RunspaceContext context, ScriptDocumentBlock block)
         {
             return context.Pipeline.Filter.Match(block.Name, block.Tag);
+        }
+
+        private static bool Match(RunspaceContext runspace, ScriptBlockDocumentConvention block, out int order)
+        {
+            order = int.MaxValue;
+            for (var i = 0; runspace.Pipeline.Convention != null && i < runspace.Pipeline.Convention.Length; i++)
+            {
+                if (StringComparer.OrdinalIgnoreCase.Equals(runspace.Pipeline.Convention[i], block.Name) || StringComparer.OrdinalIgnoreCase.Equals(runspace.Pipeline.Convention[i], block.Id))
+                {
+                    order = i;
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

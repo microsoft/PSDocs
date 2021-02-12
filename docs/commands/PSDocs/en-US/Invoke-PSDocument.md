@@ -16,7 +16,7 @@ Create markdown from an input object.
 ```text
 Invoke-PSDocument [-Module <String[]>] [-Name <String[]>] [-Tag <String[]>] [-InstanceName <String[]>]
  [-InputObject <PSObject>] [[-Path] <String>] [-OutputPath <String>] [-PassThru] [-Option <PSDocumentOption>]
- [-Encoding <MarkdownEncoding>] [-Culture <String[]>] [<CommonParameters>]
+ [-Encoding <MarkdownEncoding>] [-Culture <String[]>] [-Convention <String[]>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -265,6 +265,22 @@ Accept wildcard characters: False
 
 A list of cultures for building documents such as _en-AU_, and _en-US_.
 Documents are written to culture specific subdirectories when multiple cultures are generated.
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Convention
+
+Specifies the name of conventions to execute during document generation.
 
 ```yaml
 Type: String[]
