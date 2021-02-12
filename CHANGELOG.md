@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.8.0-B2102012 (pre-release)
+
 What's changed since pre-release v0.8.0-B2101011:
 
 - Engine features:
@@ -247,4 +249,4 @@ What's changed since v0.1.0:
 
 [about_PSDocs_Configuration]: docs/concepts/PSDocs/en-US/about_PSDocs_Configuration.md
 [about_PSDocs_Conventions]: docs/concepts/PSDocs/en-US/about_PSDocs_Conventions.md
-[about_PSDocs_Keywords]: docs/concepts/PSDocs/en-US/about_PSDocs_Keywords.md
+[about_PSDocs_Keywords]: docs/keywords/PSDocs/en-US/about_PSDocs_Keywords.md
