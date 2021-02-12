@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+What's changed since pre-release v0.8.0-B2101011:
+
+- Bug fixes:
+  - Fixed boolean string conversion with the `GetBoolOrDefault` configuration helper. [#140](https://github.com/BernieWhite/PSDocs/issues/140)
+
 ## v0.8.0-B2101011 (pre-release)
 
 What's changed since pre-release v0.8.0-B2101006:
@@ -145,13 +150,16 @@ What's changed since v0.5.0:
   - Added support for locked down environments to ensure that documents are executed as constrained code when Device Guard is used.
     - Use the `Execution.LanguageMode = 'ConstrainedLanguage'` option to force constrained language mode.
   - **Important change**: Improved markdown formatting for tables. [#31](https://github.com/BernieWhite/PSDocs/issues/31)
-    - Table columns are now padded by default to match header width. Set `Markdown.ColumnPadding` option to `None` to match format style from PSDocs <= 0.5.0.
-    - Pipe characters on the start and end of a table row are not added by default. Set `Markdown.UseEdgePipes` option to `Always` to match format style from PSDocs <= 0.5.0.
+    - Table columns are now padded by default to match header width.
+    Set `Markdown.ColumnPadding` option to `None` to match format style from PSDocs <= 0.5.0.
+    - Pipe characters on the start and end of a table row are not added by default.
+    Set `Markdown.UseEdgePipes` option to `Always` to match format style from PSDocs <= 0.5.0.
     - Property expressions now support Label, Expression, Alignment and Width keys.
   - **Experimental**: Publishing of keywords for syntax completion with editors.
 - Deprecations and removals:
   - **Breaking change**: Removed `Import-PSDocumentTemplate` cmdlet. Use `Invoke-PSDocument` instead or dot source.
-  - **Breaking change**: Removed support for `-Function` parameter of `Invoke-PSDocument`. External commands can be executed in document blocks. Re-evaluating if this is really needed.
+  - **Breaking change**: Removed support for `-Function` parameter of `Invoke-PSDocument`.
+  External commands can be executed in document blocks. Re-evaluating if this is really needed.
   - **Important change**: Renamed `-When` parameter on Section block to `-If`.
     - This provides a shorter parameter and more clearly describes the intent of the parameter.
     - `-When` is still works but is deprecated.
@@ -187,7 +195,8 @@ What's changed since v0.3.0:
   - Added `New-PSDocumentOption` cmdlet to configure document generation.
   - Added `-Option` parameter to `Invoke-PSDocument` cmdlet to accept configuration options.
 - General improvements:
-  - **Important change**: Renamed `Yaml` keyword to `Metadata`. `Yaml` keyword is still supported but deprecated, switch to using `Metadata` instead.
+  - **Important change**: Renamed `Yaml` keyword to `Metadata`.
+  `Yaml` keyword is still supported but deprecated, switch to using `Metadata` instead.
   - **Breaking change**: Added support for encoding markdown content output. [#16](https://github.com/BernieWhite/PSDocs/issues/16)
     - To specify the encoding use the `-Encoding` parameter of `Invoke-PSDocument` and `Invoke-DscNodeDocument`.
     - Output now defaults to UTF-8 without byte order mark (BOM) instead of ASCII.

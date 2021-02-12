@@ -59,7 +59,7 @@ namespace PSDocs.Runtime
 
         public bool GetBoolOrDefault(string configurationKey, bool defaultValue)
         {
-            if (!TryGetValue(configurationKey, out object value) || !(value is bool bvalue))
+            if (!TryGetValue(configurationKey, out object value) || !TryBool(value, out bool bvalue))
                 return defaultValue;
 
             return bvalue;
@@ -72,6 +72,17 @@ namespace PSDocs.Runtime
                 return false;
 
             return _Context.Pipeline.Option.Configuration.TryGetValue(name, out value);
+        }
+
+        private bool TryBool(object o, out bool value)
+        {
+            value = default(bool);
+            if (o is bool bvalue || (o is string svalue && bool.TryParse(svalue, out bvalue)))
+            {
+                value = bvalue;
+                return true;
+            }
+            return false;
         }
     }
 }

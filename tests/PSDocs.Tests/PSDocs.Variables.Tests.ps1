@@ -41,12 +41,14 @@ Describe 'PSDocs variables' -Tag 'Variables' {
             PassThru = $True
             Option = @{
                 'Configuration.author' = @{ name = 'unit-tester' }
+                'Configuration.enabled' = 'faLse'
             }
         }
         It '$PSDocs' {
             $result = (Invoke-PSDocument @invokeParams -Name 'PSDocsVariable' | Out-String).Split([System.Environment]::NewLine, [System.StringSplitOptions]::RemoveEmptyEntries);
             $result | Where-Object -FilterScript { $_ -like "TargetObject.Name=*" } | Should -Be 'TargetObject.Name=TestObject;';
             $result | Where-Object -FilterScript { $_ -like "Document.Metadata=*" } | Should -Be 'Document.Metadata=unit-tester;';
+            $result | Where-Object -FilterScript { $_ -like "Document.Enabled=*" } | Should -BeNullOrEmpty;
         }
         It '$Document' {
             $result = (Invoke-PSDocument @invokeParams -Name 'PSDocsDocumentVariable' | Out-String).Split([System.Environment]::NewLine, [System.StringSplitOptions]::RemoveEmptyEntries);
