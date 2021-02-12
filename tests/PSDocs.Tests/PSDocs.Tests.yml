@@ -3,6 +3,7 @@
 configuration:
   Key1: Value2
   UnitTests.String.1: Config string 1
+  UnitTests.Bool.1: true
 
 markdown:
   encoding: UTF8

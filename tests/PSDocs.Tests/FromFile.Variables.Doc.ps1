@@ -15,6 +15,9 @@ Document 'PSDocsVariable' {
     if ($PSDocs.Configuration.GetBoolOrDefault('NotConfig', $True)) {
         "Document.Metadata=$($Document.Metadata['author']);"
     }
+    if ($PSDocs.Configuration.GetBoolOrDefault('Enabled', $True)) {
+        "Document.Enabled=true"
+    }
 }
 
 # Synopsis: Test $Document variable

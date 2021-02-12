@@ -38,14 +38,16 @@ Describe 'New-PSDocumentOption' -Tag 'Option' {
         }
 
         It 'from Hashtable' {
-            $option = New-PSDocumentOption -Option @{ 'Configuration.Key1' = 'Value1' };
+            $option = New-PSDocumentOption -Option @{ 'Configuration.Key1' = 'Value1'; 'Configuration.BoolValue' = $True };
             $option.Configuration.Key1 | Should -Be 'Value1';
+            $option.Configuration.BoolValue | Should -Be $True;
         }
 
         It 'from YAML' {
             $option = New-PSDocumentOption -Option (Join-Path -Path $here -ChildPath 'PSDocs.Tests.yml');
             $option.Configuration.Key1 | Should -Be 'Value2';
-            $option.Configuration.'UnitTests.String.1' | Should -Be 'Config string 1'
+            $option.Configuration.'UnitTests.String.1' | Should -Be 'Config string 1';
+            $option.Configuration.'UnitTests.Bool.1' | Should -Be $True;
         }
     }
 
