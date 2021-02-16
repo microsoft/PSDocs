@@ -2,6 +2,32 @@
 
 ## Unreleased
 
+## v0.8.0
+
+What's changed since v0.7.0:
+
+- Engine features:
+  - Added support for running custom actions using conventions. [#18](https://github.com/BernieWhite/PSDocs/issues/18)
+  [#120](https://github.com/BernieWhite/PSDocs/issues/120)
+    - Conventions provide `Begin`, `Process` and `End` blocks to hook into the document pipeline.
+    - Name or change the output path of documents in `Begin` and `Process` blocks.
+    - Generate table of contents (TOC) and perform publishing actions in `End` blocks.
+    - See [about_PSDocs_Conventions] for more details.
+  - Added support for custom configuration key values. [#121](https://github.com/BernieWhite/PSDocs/issues/121)
+    - See [about_PSDocs_Configuration] for more details.
+- General improvements:
+  - Improve handling when an empty document title is set. [#122](https://github.com/BernieWhite/PSDocs/issues/122)
+  - Added `-Replace` parameter to `Include` keyword to replace tokens in included file. [#134](https://github.com/BernieWhite/PSDocs/issues/134)
+    - A hashtable of replacement tokens can be specified to replace contents within original file.
+    - See [about_PSDocs_Keywords] for more details.
+- Bug fixes:
+  - Fixed boolean string conversion with the `GetBoolOrDefault` configuration helper. [#140](https://github.com/BernieWhite/PSDocs/issues/140)
+  - Fixed use of error action preference with `Include` keyword. [#127](https://github.com/BernieWhite/PSDocs/issues/127)
+
+What's changed since pre-release v0.8.0-B2102012:
+
+- No additional changes.
+
 ## v0.8.0-B2102012 (pre-release)
 
 What's changed since pre-release v0.8.0-B2101011:
