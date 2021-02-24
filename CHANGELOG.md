@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+What's changed since v0.8.0:
+
+- General improvements:
+  - Added support for document data and metadata in `end` convention blocks. [#148](https://github.com/BernieWhite/PSDocs/issues/148)
+
 ## v0.8.0
 
 What's changed since v0.7.0:

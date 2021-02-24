@@ -1,4 +1,7 @@
 ﻿
+using System.Collections;
+using System.Collections.Specialized;
+
 namespace PSDocs.Processor
 {
     internal interface IDocumentResult
@@ -12,5 +15,9 @@ namespace PSDocs.Processor
         string OutputPath { get; }
 
         string FullName { get; }
+
+        OrderedDictionary Metadata { get; }
+
+        Hashtable Data { get; }
     }
 }
