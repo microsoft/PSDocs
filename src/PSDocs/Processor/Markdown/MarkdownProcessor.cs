@@ -2,6 +2,8 @@
 using PSDocs.Configuration;
 using PSDocs.Models;
 using PSDocs.Runtime;
+using System.Collections;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
 
@@ -27,6 +29,8 @@ namespace PSDocs.Processor.Markdown
                 Culture = documentContext.Culture;
                 OutputPath = PSDocumentOption.GetRootedPath(documentContext.OutputPath);
                 FullName = GetFullName();
+                Metadata = documentContext.Metadata;
+                Data = documentContext.Data;
             }
 
             [DebuggerStepThrough]
@@ -44,6 +48,10 @@ namespace PSDocs.Processor.Markdown
             public string OutputPath { get; }
 
             public string FullName { get; }
+
+            public OrderedDictionary Metadata { get; }
+
+            public Hashtable Data { get; }
 
             private string GetFullName()
             {
