@@ -40,7 +40,7 @@ This project is to be considered a proof-of-concept and not a supported product.
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="PowerShellStandard.Library" Version="5.1.0" PrivateAssets="All" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="YamlDotNet" Version="8.1.2" />
   </ItemGroup>
 
