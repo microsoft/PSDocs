@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+What's changed since pre-release v0.9.0-B2102002:
+
+- Engineering:
+  - Bump YamlDotNet dependency to v11.2.0. [#165](https://github.com/BernieWhite/PSDocs/pull/165)
+
 ## v0.9.0-B2102002
 
 What's changed since v0.8.0:
