@@ -1,4 +1,6 @@
-﻿
+﻿// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 using PSDocs.Definitions;
 using PSDocs.Models;
 using PSDocs.Processor;

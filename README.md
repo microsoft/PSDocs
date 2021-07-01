@@ -4,12 +4,15 @@ A PowerShell module with commands to generate markdown from objects using PowerS
 
 ![ci-badge]
 
-## Disclaimer
+## Support
 
-This project is open source and **not a supported product**.
+This project uses GitHub Issues to track bugs and feature requests.
+Please search the existing issues before filing new issues to avoid duplicates.
 
-If you are experiencing problems, have a feature request, or a question, please check for an [issue] on GitHub.
-If you do not see your problem captured, please file a new issue, and follow the provided template.
+- For new issues, file your bug or feature request as a new [issue].
+- For help, discussion, and support questions about using this project, join or start a [discussion].
+
+Support for this project/ product is limited to the resources listed above.
 
 ## Getting the modules
 
@@ -142,9 +145,10 @@ The following conceptual topics exist in the `PSDocs` module:
 
 The following projects use or integrate with PSDocs.
 
-Name          | Description
-----          | -----------
-[PSDocs.Dsc]  | Extension for PSDocs to generate markdown from Desired State Configuration.
+Name           | Description
+----           | -----------
+[PSDocs.Azure] | Generate documentation from Azure infrastructure as code (IaC) artifacts.
+[PSDocs.Dsc]   | Extension for PSDocs to generate markdown from Desired State Configuration.
 
 ## Changes and versioning
 
@@ -156,6 +160,17 @@ For a list of module changes please see the [change log](CHANGELOG.md).
 > Pre-release versions should be considered experimental.
 > Modules and change log details for pre-releases will be removed as standard releases are made available.
 
+## Contributing
+
+This project welcomes contributions and suggestions.
+If you are ready to contribute, please visit the [contribution guide](CONTRIBUTING.md).
+
+## Code of Conduct
+
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
+For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/)
+or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+
 ## Maintainers
 
 - [Bernie White](https://github.com/BernieWhite)
@@ -165,9 +180,11 @@ For a list of module changes please see the [change log](CHANGELOG.md).
 This project is [licensed under the MIT License](LICENSE).
 
 [install]: docs/install-instructions.md
-[issue]: https://github.com/BernieWhite/PSDocs/issues
+[issue]: https://github.com/Microsoft/PSDocs/issues
+[discussion]: https://github.com/Microsoft/PSDocs/discussions
 [ci-badge]: https://bewhite.visualstudio.com/PSDocs/_apis/build/status/PSDocs-CI?branchName=main
 [psg-psdocs]: https://www.powershellgallery.com/packages/PSDocs
 [psg-psdocs-version-badge]: https://img.shields.io/powershellgallery/v/PSDocs.svg
 [psg-psdocs-installs-badge]: https://img.shields.io/powershellgallery/dt/PSDocs.svg
 [PSDocs.Dsc]: https://www.powershellgallery.com/packages/PSDocs.Dsc
+[PSDocs.Azure]: https://azure.github.io/PSDocs.Azure/

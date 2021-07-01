@@ -1,4 +1,7 @@
-﻿using PSDocs.Runtime;
+﻿// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
+using PSDocs.Runtime;
 
 namespace PSDocs.Definitions
 {

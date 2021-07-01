@@ -230,7 +230,7 @@ stages:
         action: edit
         tag: '$(Build.SourceBranchName)'
         releaseNotesSource: inline
-        releaseNotesInline: 'See [change log](https://github.com/BernieWhite/PSDocs/blob/main/CHANGELOG.md)'
+        releaseNotesInline: 'See [change log](https://github.com/Microsoft/PSDocs/blob/main/CHANGELOG.md)'
         assetUploadMode: replace
         addChangeLog: false
         isPreRelease: $(isPreRelease)

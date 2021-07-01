@@ -1,7 +1,7 @@
 ---
 Module Name: PSDocs
 Module Guid: 1f6df554-c081-40d8-9aca-32c1abe4a1b6
-Download Help Link: https://github.com/BernieWhite/PSDocs
+Download Help Link: https://github.com/Microsoft/PSDocs
 Help Version: 0.1.0.0
 Locale: en-US
 ---

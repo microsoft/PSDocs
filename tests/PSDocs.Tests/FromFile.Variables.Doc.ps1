@@ -1,3 +1,5 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 
 # Synopsis: Document for unit testing
 Document 'PSAutomaticVariables' {

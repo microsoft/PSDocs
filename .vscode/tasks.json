@@ -11,7 +11,9 @@
                 "kind": "test",
                 "isDefault": true
             },
-            "problemMatcher": [ "$pester" ],
+            "problemMatcher": [
+                "$pester"
+            ],
             "presentation": {
                 "panel": "dedicated",
                 "clear": true
@@ -21,7 +23,9 @@
             "label": "coverage",
             "type": "shell",
             "command": "Invoke-Build Test -CodeCoverage",
-            "problemMatcher": [ "$pester" ]
+            "problemMatcher": [
+                "$pester"
+            ]
         },
         {
             "label": "build",
@@ -59,6 +63,20 @@
             "presentation": {
                 "clear": true,
                 "panel": "dedicated"
+            }
+        },
+        {
+            "type": "PSRule",
+            "problemMatcher": [
+                "$PSRule"
+            ],
+            "label": "PSRule: Run analysis",
+            "modules": [
+                "PSRule.Rules.MSFT.OSS"
+            ],
+            "presentation": {
+                "panel": "dedicated",
+                "clear": true
             }
         }
     ]

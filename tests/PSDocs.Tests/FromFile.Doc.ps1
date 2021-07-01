@@ -1,3 +1,5 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 
 Export-PSDocumentConvention 'FromFileTest1' {
 

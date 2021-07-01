@@ -1,4 +1,7 @@
-﻿using PSDocs.Configuration;
+﻿// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
+using PSDocs.Configuration;
 using System.IO;
 
 namespace PSDocs.Models
