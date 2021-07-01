@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 #
 # PSDocs module
 #
@@ -17,18 +20,18 @@ CompatiblePSEditions = 'Core', 'Desktop'
 GUID = '1f6df554-c081-40d8-9aca-32c1abe4a1b6'
 
 # Author of this module
-Author = 'Bernie White'
+Author = 'Microsoft Corporation'
 
 # Company or vendor of this module
-CompanyName = 'Bernie White'
+CompanyName = 'Microsoft Corporation'
 
 # Copyright statement for this module
-Copyright = '(c) Bernie White. All rights reserved.'
+Copyright = '(c) Microsoft Corporation. All rights reserved.'
 
 # Description of the functionality provided by this module
 Description = 'Generate markdown from PowerShell.
 
-This project is to be considered a proof-of-concept and not a supported product.'
+This project uses GitHub Issues to track bugs and feature requests. See GitHub project for more information.'
 
 # Minimum version of the Windows PowerShell engine required by this module
 PowerShellVersion = '5.1'
@@ -117,16 +120,16 @@ PrivateData = @{
         Tags = @('Markdown', 'PSDocs', 'DevOps', 'CI')
 
         # A URL to the license for this module.
-        LicenseUri = 'https://github.com/BernieWhite/PSDocs/blob/main/LICENSE'
+        LicenseUri = 'https://github.com/Microsoft/PSDocs/blob/main/LICENSE'
 
         # A URL to the main website for this project.
-        ProjectUri = 'https://github.com/BernieWhite/PSDocs'
+        ProjectUri = 'https://github.com/Microsoft/PSDocs'
 
         # A URL to an icon representing this module.
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = 'https://github.com/BernieWhite/PSDocs/releases'
+        ReleaseNotes = 'https://github.com/Microsoft/PSDocs/releases'
 
     } # End of PSData hashtable
 

@@ -126,11 +126,11 @@ Export-PSDocumentConvention 'TestNamingConvention1' {
 
 ## NOTE
 
-An online version of this document is available at https://github.com/BernieWhite/PSDocs/blob/main/docs/concepts/PSDocs/en-US/about_PSDocs_Conventions.md.
+An online version of this document is available at https://github.com/Microsoft/PSDocs/blob/main/docs/concepts/PSDocs/en-US/about_PSDocs_Conventions.md.
 
 ## SEE ALSO
 
-- [Invoke-PSDocument](https://github.com/BernieWhite/PSDocs/blob/main/docs/commands/PSDocs/en-US/Invoke-PSDocument.md)
+- [Invoke-PSDocument](https://github.com/Microsoft/PSDocs/blob/main/docs/commands/PSDocs/en-US/Invoke-PSDocument.md)
 
 ## KEYWORDS
 

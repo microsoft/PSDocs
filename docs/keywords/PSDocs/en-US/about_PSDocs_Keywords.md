@@ -633,11 +633,11 @@ Document 'Sample' {
 
 ## NOTE
 
-An online version of this document is available at https://github.com/BernieWhite/PSDocs/blob/main/docs/keywords/PSDocs/en-US/about_PSDocs_Keywords.md.
+An online version of this document is available at https://github.com/Microsoft/PSDocs/blob/main/docs/keywords/PSDocs/en-US/about_PSDocs_Keywords.md.
 
 ## SEE ALSO
 
-- [Invoke-PSDocument](https://github.com/BernieWhite/PSDocs/blob/main/docs/commands/PSDocs/en-US/Invoke-PSDocument.md)
+- [Invoke-PSDocument](https://github.com/Microsoft/PSDocs/blob/main/docs/commands/PSDocs/en-US/Invoke-PSDocument.md)
 
 ## KEYWORDS
 

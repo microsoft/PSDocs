@@ -1,4 +1,7 @@
-﻿using BenchmarkDotNet.Attributes;
+﻿// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
+using BenchmarkDotNet.Attributes;
 using PSDocs.Configuration;
 using PSDocs.Models;
 using PSDocs.Pipeline;

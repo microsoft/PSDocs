@@ -1,4 +1,7 @@
-﻿namespace PSDocs.Models
+﻿// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
+namespace PSDocs.Models
 {
     public sealed class BlockQuote : DocumentNode
     {

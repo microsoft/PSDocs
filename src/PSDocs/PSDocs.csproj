@@ -12,13 +12,13 @@
     <!-- <TreatWarningsAsErrors>true</TreatWarningsAsErrors> -->
     <Authors>Bernie White</Authors>
     <AssemblyTitle>PSDocs</AssemblyTitle>
-    <RepositoryUrl>https://github.com/BernieWhite/PSDocs</RepositoryUrl>
-    <PackageLicenseExpression>https://github.com/BernieWhite/PSDocs/blob/main/LICENSE</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/Microsoft/PSDocs</RepositoryUrl>
+    <PackageLicenseExpression>https://github.com/Microsoft/PSDocs/blob/main/LICENSE</PackageLicenseExpression>
     <Version>0.0.1</Version>
-    <Copyright>(c) Bernie White. All rights reserved.</Copyright>
+    <Copyright>Copyright (c) Microsoft Corporation. Licensed under the MIT License.</Copyright>
     <Description>Generate markdown from objects using PowerShell syntax.
 
-This project is to be considered a proof-of-concept and not a supported product.</Description>
+This project uses GitHub Issues to track bugs and feature requests. See GitHub project for more information.</Description>
   </PropertyGroup>
 
   <PropertyGroup>

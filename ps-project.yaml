@@ -7,7 +7,7 @@ info:
 
 repository:
   type: git
-  url: https://github.com/BernieWhite/PSDocs.git
+  url: https://github.com/Microsoft/PSDocs.git
 
 tasks:
   clear:

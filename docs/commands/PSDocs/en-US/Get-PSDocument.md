@@ -1,7 +1,7 @@
 ---
 external help file: PSDocs-help.xml
 Module Name: PSDocs
-online version: https://github.com/BernieWhite/PSDocs/blob/main/docs/commands/PSDocs/en-US/Get-PSDocument.md
+online version: https://github.com/Microsoft/PSDocs/blob/main/docs/commands/PSDocs/en-US/Get-PSDocument.md
 schema: 2.0.0
 ---
 
