@@ -4,7 +4,6 @@
 using PSDocs.Pipeline;
 using PSDocs.Runtime;
 using System.Collections;
-using System.Management.Automation;
 
 namespace PSDocs.Definitions.Conventions
 {

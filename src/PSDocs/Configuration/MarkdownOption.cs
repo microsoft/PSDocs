@@ -1,11 +1,16 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace PSDocs.Configuration
 {
-    public sealed class MarkdownOption
+    /// <summary>
+    /// Options that affect markdown formatting.
+    /// </summary>
+    public sealed class MarkdownOption : IEquatable<MarkdownOption>
     {
         private const string DEFAULT_WRAP_SEPARATOR = " ";
         private const MarkdownEncoding DEFAULT_ENCODING = MarkdownEncoding.Default;
@@ -84,22 +89,82 @@ namespace PSDocs.Configuration
         /// <summary>
         /// Determines how table columns are padded.
         /// </summary>
+        /// <remarks>
+        /// Defaults to MatchHeader.
+        /// </remarks>
         [DefaultValue(null)]
         public ColumnPadding? ColumnPadding { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>
+        /// Defaults to UTF-8 without byte order mark (BOM)
+        /// </remarks>
         [DefaultValue(null)]
         public MarkdownEncoding? Encoding { get; set; }
 
+        /// <summary>
+        /// Determines if empty sections are included in output.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to true.
+        /// </remarks>
         [DefaultValue(null)]
         public bool? SkipEmptySections { get; set; }
 
         /// <summary>
-        /// Are pipes used for the edge of tables? Single column table always require edge pipes.
+        /// Determines when pipes on the edge of a table should be used.
         /// </summary>
+        /// <remarks>
+        /// Defaults to WhenRequired.
+        /// </remarks>
         [DefaultValue(null)]
         public EdgePipeOption? UseEdgePipes { get; set; }
 
+        /// <summary>
+        /// Specifies the character/ string to use when wrapping lines in a table cell.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to ' '.
+        /// </remarks>
         [DefaultValue(null)]
         public string WrapSeparator { get; set; }
+
+        internal void Load(EnvironmentHelper env)
+        {
+            if (env.TryEnum("PSDOCS_MARKDOWN_COLUMNPADDING", out ColumnPadding columnPadding))
+                ColumnPadding = columnPadding;
+
+            if (env.TryEnum("PSDOCS_MARKDOWN_ENCODING", out MarkdownEncoding encoding))
+                Encoding = encoding;
+
+            if (env.TryBool("PSDOCS_MARKDOWN_SKIPEMPTYSECTIONS", out bool skipEmptySections))
+                SkipEmptySections = skipEmptySections;
+
+            if (env.TryEnum("PSDOCS_MARKDOWN_USEEDGEPIPES", out EdgePipeOption useEdgePipes))
+                UseEdgePipes = useEdgePipes;
+
+            if (env.TryString("PSDOCS_MARKDOWN_WRAPSEPARATOR", out string wrapSeparator))
+                WrapSeparator = wrapSeparator;
+        }
+
+        internal void Load(Dictionary<string, object> index)
+        {
+            if (index.TryPopEnum("Markdown.ColumnPadding", out ColumnPadding columnPadding))
+                ColumnPadding = columnPadding;
+
+            if (index.TryPopEnum("Markdown.Encoding", out MarkdownEncoding encoding))
+                Encoding = encoding;
+
+            if (index.TryPopBool("Markdown.SkipEmptySections", out bool skipEmptySections))
+                SkipEmptySections = skipEmptySections;
+
+            if (index.TryPopEnum("Markdown.UseEdgePipes", out EdgePipeOption useEdgePipes))
+                UseEdgePipes = useEdgePipes;
+
+            if (index.TryPopString("Markdown.WrapSeparator", out string wrapSeparator))
+                WrapSeparator = wrapSeparator;
+        }
     }
 }

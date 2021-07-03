@@ -20,10 +20,7 @@ namespace PSDocs.Models
 
         public string Culture => Context?.Culture;
 
-        public override DocumentNodeType Type
-        {
-            get { return DocumentNodeType.Document; }
-        }
+        public override DocumentNodeType Type => DocumentNodeType.Document;
 
         public OrderedDictionary Metadata => Context?.Metadata;
 

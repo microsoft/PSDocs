@@ -5,7 +5,6 @@ using PSDocs.Configuration;
 using PSDocs.Pipeline.Output;
 using PSDocs.Processor;
 using PSDocs.Resources;
-using PSDocs.Runtime;
 using System;
 using System.IO;
 using System.Management.Automation;
@@ -20,7 +19,7 @@ namespace PSDocs.Pipeline
         /// <summary>
         /// Invoke-PSDocument.
         /// </summary>
-        public static IInvokePipelineBuilder Invoke(Source[] source, PSDocumentOption option, PSCmdlet commandRuntime, EngineIntrinsics executionContext)
+        public static IInvokePipelineBuilder Invoke(Source[] source, IPSDocumentOption option, PSCmdlet commandRuntime, EngineIntrinsics executionContext)
         {
             var hostContext = new HostContext(commandRuntime, executionContext);
             var builder = new InvokePipelineBuilder(source, hostContext);
@@ -28,7 +27,7 @@ namespace PSDocs.Pipeline
             return builder;
         }
 
-        public static IGetPipelineBuilder Get(Source[] source, PSDocumentOption option, PSCmdlet commandRuntime, EngineIntrinsics executionContext)
+        public static IGetPipelineBuilder Get(Source[] source, IPSDocumentOption option, PSCmdlet commandRuntime, EngineIntrinsics executionContext)
         {
             var hostContext = new HostContext(commandRuntime, executionContext);
             var builder = new GetPipelineBuilder(source, hostContext);
@@ -36,7 +35,7 @@ namespace PSDocs.Pipeline
             return builder;
         }
 
-        public static SourcePipelineBuilder Source(PSDocumentOption option, PSCmdlet commandRuntime, EngineIntrinsics executionContext)
+        public static SourcePipelineBuilder Source(IPSDocumentOption option, PSCmdlet commandRuntime, EngineIntrinsics executionContext)
         {
             var hostContext = new HostContext(commandRuntime, executionContext);
             var builder = new SourcePipelineBuilder(hostContext);
@@ -47,7 +46,7 @@ namespace PSDocs.Pipeline
 
     public interface IPipelineBuilder
     {
-        IPipelineBuilder Configure(PSDocumentOption option);
+        IPipelineBuilder Configure(IPSDocumentOption option);
 
         IPipeline Build();
     }
@@ -76,6 +75,7 @@ namespace PSDocs.Pipeline
         protected readonly ShouldProcess ShouldProcess;
 
         protected Action<IDocumentResult, bool> OutputVisitor;
+        protected VisitTargetObject VisitTargetObject;
 
         private static readonly ShouldProcess EmptyShouldProcess = (target, action) => true;
 
@@ -86,13 +86,15 @@ namespace PSDocs.Pipeline
             Writer = new HostPipelineWriter(hostContext);
             ShouldProcess = hostContext == null ? EmptyShouldProcess : hostContext.ShouldProcess;
             OutputVisitor = (o, enumerate) => WriteToString(o, enumerate, Writer);
+            VisitTargetObject = PipelineReceiverActions.PassThru;
         }
 
-        public virtual IPipelineBuilder Configure(PSDocumentOption option)
+        public virtual IPipelineBuilder Configure(IPSDocumentOption option)
         {
             Option.Configuration = new ConfigurationOption(option.Configuration);
             Option.Document = DocumentOption.Combine(option.Document, DocumentOption.Default);
             Option.Execution = ExecutionOption.Combine(option.Execution, ExecutionOption.Default);
+            Option.Input = InputOption.Combine(option.Input, InputOption.Default);
             Option.Markdown = MarkdownOption.Combine(option.Markdown, MarkdownOption.Default);
             Option.Output = OutputOption.Combine(option.Output, OutputOption.Default);
 
@@ -135,7 +137,17 @@ namespace PSDocs.Pipeline
 
         protected virtual PipelineContext PrepareContext()
         {
-            return new PipelineContext(Option, Writer, OutputVisitor, null, null);
+            return new PipelineContext(GetOptionContext(), PrepareStream(), Writer, OutputVisitor, null, null);
+        }
+
+        protected virtual OptionContext GetOptionContext()
+        {
+            return new OptionContext(Option);
+        }
+
+        protected virtual PipelineStream PrepareStream()
+        {
+            return new PipelineStream(null, null);
         }
 
         private static void WriteToFile(IDocumentResult result, PSDocumentOption option, IPipelineWriter writer, ShouldProcess shouldProcess)
@@ -195,6 +207,14 @@ namespace PSDocs.Pipeline
 
                 Option.Output.Culture = new string[] { current.Name };
             }
+        }
+
+        protected void AddVisitTargetObjectAction(VisitTargetObjectAction action)
+        {
+            // Nest the previous write action in the new supplied action
+            // Execution chain will be: action -> previous -> previous..n
+            var previous = VisitTargetObject;
+            VisitTargetObject = (targetObject) => action(targetObject, previous);
         }
     }
 

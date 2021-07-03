@@ -24,6 +24,7 @@ $here = (Resolve-Path $PSScriptRoot).Path;
 
 Describe 'PSDocs -- Include keyword' -Tag Include {
     $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Keyword.Doc.ps1';
+    $testObject = [PSCustomObject]@{};
 
     Context 'Markdown' {
         $invokeParams = @{
@@ -50,7 +51,7 @@ Describe 'PSDocs -- Include keyword' -Tag Include {
         }
 
         It 'Should include from culture' {
-            $Null = Invoke-PSDocument @invokeParams -Culture 'en-AU','en-US' -Name 'IncludeCulture';
+            $Null = $testObject | Invoke-PSDocument @invokeParams -Culture 'en-AU','en-US' -Name 'IncludeCulture';
 
             $outputDoc = "$outputPath\en-AU\IncludeCulture.md";
             Test-Path -Path $outputDoc | Should -Be $True;
@@ -62,12 +63,12 @@ Describe 'PSDocs -- Include keyword' -Tag Include {
         }
 
         It 'Should include when file exists' {
-            $Null = Invoke-PSDocument @invokeParams -Name 'IncludeOptional';
-            { $Null = Invoke-PSDocument @invokeParams -Name 'IncludeRequired'; } | Should -Throw -Because 'PSDocs.Runtime.IncludeNotFound';
+            $Null = $testObject | Invoke-PSDocument @invokeParams -Name 'IncludeOptional';
+            { $Null = $testObject | Invoke-PSDocument @invokeParams -Name 'IncludeRequired'; } | Should -Throw -Because 'PSDocs.Runtime.IncludeNotFound';
         }
 
         It 'Should replace tokens' {
-            $result = Invoke-PSDocument @invokeParams -Name 'IncludeReplace' -PassThru;
+            $result = $testObject | Invoke-PSDocument @invokeParams -Name 'IncludeReplace' -PassThru;
             $result | Should -BeLike 'This is a third file to include.*'
         }
     }

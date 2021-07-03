@@ -4,7 +4,8 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "test",
+            "label": "Test",
+            "detail": "Build and run unit tests.",
             "type": "shell",
             "command": "Invoke-Build Test",
             "group": {
@@ -20,6 +21,20 @@
             }
         },
         {
+            "label": "Run Pester test group",
+            "detail": "Runs a specific group for Pester tests.",
+            "type": "shell",
+            "command": "Invoke-Build Test -AssertStyle Client -TestGroup '${input:pesterTestGroup}'",
+            "group": "test",
+            "problemMatcher": [
+                "$pester"
+            ],
+            "presentation": {
+                "clear": true,
+                "panel": "dedicated"
+            }
+        },
+        {
             "label": "coverage",
             "type": "shell",
             "command": "Invoke-Build Test -CodeCoverage",
@@ -28,7 +43,8 @@
             ]
         },
         {
-            "label": "build",
+            "label": "Build",
+            "detail": "Build module.",
             "type": "shell",
             "command": "Invoke-Build Build",
             "group": {
@@ -44,13 +60,15 @@
             "problemMatcher": []
         },
         {
-            "label": "scaffold-docs",
+            "label": "Scaffold docs",
+            "detail": "Generate cmdlet markdown docs.",
             "type": "shell",
             "command": "Invoke-Build ScaffoldHelp",
             "problemMatcher": []
         },
         {
-            "label": "clean",
+            "label": "Clean",
+            "detail": "Clean up temporary working paths.",
             "type": "shell",
             "command": "Invoke-Build Clean",
             "problemMatcher": []
@@ -71,6 +89,7 @@
                 "$PSRule"
             ],
             "label": "PSRule: Run analysis",
+            "detail": "Run repository analysis.",
             "modules": [
                 "PSRule.Rules.MSFT.OSS"
             ],
@@ -78,6 +97,13 @@
                 "panel": "dedicated",
                 "clear": true
             }
+        }
+    ],
+    "inputs": [
+        {
+            "id": "pesterTestGroup",
+            "type": "promptString",
+            "description": "A group to use for Pester tests."
         }
     ]
 }

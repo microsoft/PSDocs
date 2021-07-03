@@ -76,6 +76,36 @@ namespace PSDocs
         }
 
         [DebuggerStepThrough]
+        public static bool TryGetLong(this IDictionary<string, object> dictionary, string key, out long? value)
+        {
+            value = null;
+            if (!dictionary.TryGetValue(key, out object o))
+                return false;
+
+            if (o is long lvalue || (o is string svalue && long.TryParse(svalue, out lvalue)))
+            {
+                value = lvalue;
+                return true;
+            }
+            return false;
+        }
+
+        [DebuggerStepThrough]
+        public static bool TryGetString(this IDictionary<string, object> dictionary, string key, out string value)
+        {
+            value = null;
+            if (!dictionary.TryGetValue(key, out object o))
+                return false;
+
+            if (o is string sValue)
+            {
+                value = sValue;
+                return true;
+            }
+            return false;
+        }
+
+        [DebuggerStepThrough]
         public static void AddUnique(this IDictionary<string, object> dictionary, IEnumerable<KeyValuePair<string, object>> values)
         {
             if (values == null)

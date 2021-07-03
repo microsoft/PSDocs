@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+- Engine features:
+  - Added support for reading objects from file. [#132](https://github.com/Microsoft/PSDocs/issues/132) [#131](https://github.com/Microsoft/PSDocs/issues/131)
+  - Added support for conditionally processing documents based on target object. [#133](https://github.com/Microsoft/PSDocs/issues/113)
+    - **Breaking change**: Documents that do not set a body are skipped.
+    - Conditionally process target objects with script block or selector based conditions.
+    - Script block based conditions are PowerShell code that can be added to `Document` blocks with `-If`.
+    - Selector block based conditions are YAML filters that can be added to `Document` blocks with `-With`.
+    - Added options for configuring processing of input.
+    - See [about_PSDocs_Options] for more details.
+- General improvements:
+  - Added schema for PSDocs configuration options within `ps-docs.yaml`. [#113](https://github.com/Microsoft/PSDocs/issues/113)
+
+See [upgrade notes](docs/upgrade-notes.md) for helpful information when upgrading from previous versions.
+
 ## v0.9.0-B2107002 (pre-release)
 
 What's changed since pre-release v0.9.0-B2106004:
@@ -235,7 +249,8 @@ What's changed since v0.4.0:
   - Added support for building all document definitions from a path using the `-Path` parameter. [#25](https://github.com/Microsoft/PSDocs/issues/25)
     - Additionally document definitions can be filtered with the `-Name` and `-Tag` parameter.
     - This is the recommended way to build documents going forward.
-  - Added support for providing options for `Invoke-PSDocument` using YAML, see `about_PSDocs_Options`.
+  - Added support for providing options for `Invoke-PSDocument` using YAML.
+    - See [about_PSDocs_Options] for more details.
 - General improvements:
   - **Important change**: Deprecated support for using `Invoke-PSDocument` with inline document definitions.
     - Improved support for using named document definitions inline, use this to call inline document definitions.
@@ -298,3 +313,4 @@ What's changed since v0.1.0:
 [about_PSDocs_Configuration]: docs/concepts/PSDocs/en-US/about_PSDocs_Configuration.md
 [about_PSDocs_Conventions]: docs/concepts/PSDocs/en-US/about_PSDocs_Conventions.md
 [about_PSDocs_Keywords]: docs/keywords/PSDocs/en-US/about_PSDocs_Keywords.md
+[about_PSDocs_Options]: docs/concepts/PSDocs/en-US/about_PSDocs_Options.md

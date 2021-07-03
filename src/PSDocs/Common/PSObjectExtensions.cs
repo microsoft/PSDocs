@@ -7,6 +7,11 @@ namespace PSDocs
 {
     internal static class PSObjectExtensions
     {
+        public static bool HasProperty(this PSObject o, string propertyName)
+        {
+            return o.Properties[propertyName] != null;
+        }
+
         /// <summary>
         /// Determines if the PSObject has any note properties.
         /// </summary>

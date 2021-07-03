@@ -7,11 +7,12 @@ using System.Collections.Generic;
 namespace PSDocs.Configuration
 {
     /// <summary>
-    /// A set of custom configuration values that are exposed at runtime.
+    /// A set of key/ value configuration options for document definitions.
     /// </summary>
     public sealed class ConfigurationOption : KeyMapDictionary<object>
     {
-        private const string KEYMAP_PREFIX = "Configuration.";
+        private const string ENVIRONMENT_PREFIX = "PSDOCS_CONFIGURATION_";
+        private const string DICTIONARY_PREFIX = "Configuration.";
 
         public ConfigurationOption()
             : base() { }
@@ -34,9 +35,14 @@ namespace PSDocs.Configuration
             return result;
         }
 
+        internal void Load(EnvironmentHelper env)
+        {
+            base.Load(ENVIRONMENT_PREFIX, env);
+        }
+
         internal void Load(IDictionary<string, object> dictionary)
         {
-            Load(KEYMAP_PREFIX, dictionary);
+            base.Load(DICTIONARY_PREFIX, dictionary);
         }
     }
 }

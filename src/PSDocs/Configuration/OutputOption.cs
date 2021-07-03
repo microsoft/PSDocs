@@ -1,11 +1,16 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace PSDocs.Configuration
 {
-    public sealed class OutputOption
+    /// <summary>
+    /// Options that affect how output is generated.
+    /// </summary>
+    public sealed class OutputOption : IEquatable<OutputOption>
     {
         internal static readonly OutputOption Default = new OutputOption
         {
@@ -58,6 +63,7 @@ namespace PSDocs.Configuration
         }
 
         [DefaultValue(null)]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "Exposed for serialization.")]
         public string[] Culture { get; set; }
 
         /// <summary>
@@ -65,5 +71,23 @@ namespace PSDocs.Configuration
         /// </summary>
         [DefaultValue(null)]
         public string Path { get; set; }
+
+        internal void Load(EnvironmentHelper env)
+        {
+            if (env.TryStringArray("PSDOCS_OUTPUT_CULTURE", out string[] culture))
+                Culture = culture;
+
+            if (env.TryString("PSDOCS_OUTPUT_PATH", out string path))
+                Path = path;
+        }
+
+        internal void Load(Dictionary<string, object> index)
+        {
+            if (index.TryPopStringArray("Output.Culture", out string[] culture))
+                Culture = culture;
+
+            if (index.TryPopString("Output.Path", out string path))
+                Path = path;
+        }
     }
 }

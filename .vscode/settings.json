@@ -6,6 +6,16 @@
         "**/bin/": true,
         "**/obj/": true
     },
+    "yaml.format.singleQuote": true,
+    "yaml.schemas": {
+        "./schemas/PSDocs-options.schema.json": [
+            "/tests/PSDocs.Tests/PSDocs.*.yml",
+            "/ps-docs.yaml"
+        ],
+        "./schemas/PSDocs-language.schema.json": [
+            "/tests/PSDocs.Tests/**.Doc.yaml"
+        ]
+    },
     "[yaml]": {
         "editor.tabSize": 2
     },

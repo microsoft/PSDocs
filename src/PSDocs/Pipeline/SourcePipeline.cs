@@ -13,7 +13,9 @@ namespace PSDocs.Pipeline
 {
     public enum SourceType
     {
-        Script = 1
+        Script = 1,
+
+        Yaml = 2
     }
 
     /// <summary>
@@ -86,10 +88,7 @@ namespace PSDocs.Pipeline
             _Writer = new HostPipelineWriter(hostContext);
         }
 
-        public bool ShouldLoadModule
-        {
-            get { return _HostContext.GetAutoLoadingPreference() == PSModuleAutoLoadingPreference.All; }
-        }
+        public bool ShouldLoadModule => _HostContext.GetAutoLoadingPreference() == PSModuleAutoLoadingPreference.All;
 
         private void VerboseScanSource(string path)
         {
@@ -210,8 +209,7 @@ namespace PSDocs.Pipeline
         private static SourceType GetSourceType(string path)
         {
             var extension = Path.GetExtension(path);
-            //return (extension == ".yaml" || extension == ".yml") ? SourceType.Yaml : SourceType.Script;
-            return SourceType.Script;
+            return (extension == ".yaml" || extension == ".yml") ? SourceType.Yaml : SourceType.Script;
         }
     }
 }

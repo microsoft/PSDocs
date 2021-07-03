@@ -6,9 +6,7 @@
 #
 
 [CmdletBinding()]
-param (
-
-)
+param ()
 
 # Setup error handling
 $ErrorActionPreference = 'Stop';
@@ -18,6 +16,7 @@ Set-StrictMode -Version latest;
 $rootPath = $PWD;
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path;
 Import-Module (Join-Path -Path $rootPath -ChildPath out/modules/PSDocs) -Force;
+$emptyOptionsFilePath = Join-Path -Path $here -ChildPath 'psdocs.yml';
 
 Describe 'New-PSDocumentOption' -Tag 'Option' {
     Context 'Read psdocs.yml' {
@@ -68,6 +67,111 @@ Describe 'New-PSDocumentOption' -Tag 'Option' {
         It 'from YAML' {
             $option = New-PSDocumentOption -Option (Join-Path -Path $here -ChildPath 'PSDocs.Tests.yml');
             $option.Execution.LanguageMode | Should -Be 'ConstrainedLanguage'
+        }
+    }
+
+    Context 'Read Input.Format' {
+        It 'from default' {
+            $option = New-PSDocumentOption -Default;
+            $option.Input.Format | Should -Be 'Detect';
+        }
+
+        It 'from Hashtable' {
+            $option = New-PSDocumentOption -Option @{ 'Input.Format' = 'Yaml' };
+            $option.Input.Format | Should -Be 'Yaml';
+        }
+
+        It 'from YAML' {
+            $option = New-PSDocumentOption -Option (Join-Path -Path $here -ChildPath 'PSDocs.Tests.yml');
+            $option.Input.Format | Should -Be 'Yaml'
+        }
+
+        It 'from Environment' {
+            try {
+                $Env:PSDOCS_INPUT_FORMAT = 'Yaml';
+                $option = New-PSDocumentOption;
+                $option.Input.Format | Should -Be 'Yaml';
+            }
+            finally {
+                Remove-Item 'Env:PSDOCS_INPUT_FORMAT' -Force;
+            }
+        }
+
+        It 'from parameter' {
+            $option = New-PSDocumentOption -Format 'Yaml' -Path $emptyOptionsFilePath;
+            $option.Input.Format | Should -Be 'Yaml';
+        }
+    }
+
+    Context 'Read Input.ObjectPath' {
+        It 'from default' {
+            $option = New-PSDocumentOption -Default;
+            $option.Input.ObjectPath | Should -BeNullOrEmpty;
+        }
+
+        It 'from Hashtable' {
+            $option = New-PSDocumentOption -Option @{ 'Input.ObjectPath' = 'items' };
+            $option.Input.ObjectPath | Should -Be 'items';
+        }
+
+        It 'from YAML' {
+            $option = New-PSDocumentOption -Option (Join-Path -Path $here -ChildPath 'PSDocs.Tests.yml');
+            $option.Input.ObjectPath | Should -Be 'items'
+        }
+
+        It 'from Environment' {
+            try {
+                $Env:PSDOCS_INPUT_OBJECTPATH = 'items';
+                $option = New-PSDocumentOption;
+                $option.Input.ObjectPath | Should -Be 'items';
+            }
+            finally {
+                Remove-Item 'Env:PSDOCS_INPUT_OBJECTPATH' -Force;
+            }
+        }
+
+        It 'from parameter' {
+            $option = New-PSDocumentOption -InputObjectPath 'items' -Path $emptyOptionsFilePath;
+            $option.Input.ObjectPath | Should -Be 'items';
+        }
+    }
+
+    Context 'Read Input.PathIgnore' {
+        It 'from default' {
+            $option = New-PSDocumentOption -Default;
+            $option.Input.PathIgnore | Should -Be $Null;
+        }
+
+        It 'from Hashtable' {
+            $option = New-PSDocumentOption -Option @{ 'Input.PathIgnore' = 'ignore.cs' };
+            $option.Input.PathIgnore | Should -Be 'ignore.cs';
+        }
+
+        It 'from YAML' {
+            $option = New-PSDocumentOption -Option (Join-Path -Path $here -ChildPath 'PSDocs.Tests.yml');
+            $option.Input.PathIgnore | Should -Be '*.Designer.cs';
+        }
+
+        It 'from Environment' {
+            try {
+                # With single item
+                $Env:PSDOCS_INPUT_PATHIGNORE = 'ignore.cs';
+                $option = New-PSDocumentOption;
+                $option.Input.PathIgnore | Should -Be 'ignore.cs';
+
+                # With array
+                $Env:PSDOCS_INPUT_PATHIGNORE = 'ignore.cs;*.Designer.cs';
+                $option = New-PSDocumentOption;
+                $option.Input.PathIgnore | Should -Be 'ignore.cs', '*.Designer.cs';
+            }
+            finally {
+                Remove-Item 'Env:PSDOCS_INPUT_PATHIGNORE' -Force;
+            }
+        }
+
+        It 'from parameter' {
+            $option = New-PSDocumentOption -InputPathIgnore 'ignore.cs' -Path $emptyOptionsFilePath;
+            $option.Input.PathIgnore | Should -Be 'ignore.cs';
         }
     }
 

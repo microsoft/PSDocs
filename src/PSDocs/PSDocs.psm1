@@ -30,6 +30,10 @@ if ($Null -eq (Get-Variable -Name LocalizedHelp -ErrorAction SilentlyContinue)) 
 function Invoke-PSDocument {
     [CmdletBinding(DefaultParameterSetName = 'Input')]
     param (
+        [Parameter(Mandatory = $True, ParameterSetName = 'InputPath')]
+        [Alias('f')]
+        [String[]]$InputPath,
+
         [Parameter(Mandatory = $False)]
         [Alias('m')]
         [String[]]$Module,
@@ -52,7 +56,12 @@ function Invoke-PSDocument {
         [Parameter(Position = 0, Mandatory = $False)]
         [PSDefaultValue(Help = '.')]
         [Alias('p')]
-        [String]$Path = $PWD,
+        [String[]]$Path = $PWD,
+
+        [Parameter(Mandatory = $False)]
+        [Alias('InputFormat')]
+        [ValidateSet('None', 'Yaml', 'Json', 'PowerShellData', 'Detect')]
+        [PSDocs.Configuration.InputFormat]$Format = [PSDocs.Configuration.InputFormat]::Detect,
 
         # The output path to save generated documentation
         [Parameter(Mandatory = $False)]
@@ -128,6 +137,9 @@ function Invoke-PSDocument {
         if ($PSBoundParameters.ContainsKey('Tag')) {
             $Option.Document.Tag = $Tag;
         }
+        if ($PSBoundParameters.ContainsKey('Format')) {
+            $Option.Input.Format = $Format;
+        }
         if ($PSBoundParameters.ContainsKey('OutputPath') -and !$PassThru) {
             $Option.Output.Path = $OutputPath;
         }
@@ -141,6 +153,9 @@ function Invoke-PSDocument {
         $builder = [PSDocs.Pipeline.PipelineBuilder]::Invoke($sourceFiles, $Option, $PSCmdlet, $ExecutionContext);
         $builder.InstanceName($InstanceName);
         $builder.Convention($Convention);
+        if ($PSBoundParameters.ContainsKey('InputPath')) {
+            $builder.InputPath($InputPath);
+        }
         try {
             $pipeline = $builder.Build();
             if ($Null -ne $pipeline) {
@@ -312,6 +327,20 @@ function New-PSDocumentOption {
 
         # Options
 
+        # Sets the Input.Format option
+        [Parameter(Mandatory = $False)]
+        [Alias('InputFormat')]
+        [ValidateSet('None', 'Yaml', 'Json', 'PowerShellData', 'Detect')]
+        [PSDocs.Configuration.InputFormat]$Format = [PSDocs.Configuration.InputFormat]::Detect,
+
+        # Sets the Input.ObjectPath option
+        [Parameter(Mandatory = $False)]
+        [String]$InputObjectPath,
+
+        # Sets the Input.PathIgnore option
+        [Parameter(Mandatory = $False)]
+        [String[]]$InputPathIgnore,
+
         # Sets the Markdown.Encoding option
         [Parameter(Mandatory = $False)]
         [Alias('MarkdownEncoding')]
@@ -399,7 +428,7 @@ function Export-PSDocumentConvention {
     }
 }
 
-# .ExternalHelp PSDocs-Help.xml
+# Implement the Document keyword
 function Document {
     [CmdletBinding()]
     [OutputType([void])]
@@ -411,7 +440,13 @@ function Document {
         [String[]]$Tag,
 
         [Parameter(Position = 1, Mandatory = $True)]
-        [ScriptBlock]$Body
+        [ScriptBlock]$Body,
+
+        [Parameter(Mandatory = $False)]
+        [ScriptBlock]$If,
+
+        [Parameter(Mandatory = $False)]
+        [String[]]$When
     )
     begin {
          # This is just a stub to improve authoring and discovery
@@ -607,6 +642,20 @@ function SetOptions {
 
         # Options
 
+        # Sets the Input.Format option
+        [Parameter(Mandatory = $False)]
+        [Alias('InputFormat')]
+        [ValidateSet('None', 'Yaml', 'Json', 'PowerShellData', 'Detect')]
+        [PSDocs.Configuration.InputFormat]$Format = [PSDocs.Configuration.InputFormat]::Detect,
+
+        # Sets the Input.ObjectPath option
+        [Parameter(Mandatory = $False)]
+        [String]$InputObjectPath,
+
+        # Sets the Input.PathIgnore option
+        [Parameter(Mandatory = $False)]
+        [String[]]$InputPathIgnore,
+
         # Sets the Markdown.Encoding option
         [Parameter(Mandatory = $False)]
         [ValidateSet('Default', 'UTF8', 'UTF7', 'Unicode', 'UTF32', 'ASCII')]
@@ -622,6 +671,21 @@ function SetOptions {
     )
     process {
         # Options
+
+        # Sets option Input.Format
+        if ($PSBoundParameters.ContainsKey('Format')) {
+            $InputObject.Input.Format = $Format;
+        }
+
+        # Sets option Input.ObjectPath
+        if ($PSBoundParameters.ContainsKey('InputObjectPath')) {
+            $InputObject.Input.ObjectPath = $InputObjectPath;
+        }
+
+        # Sets option Input.Encoding
+        if ($PSBoundParameters.ContainsKey('InputPathIgnore')) {
+            $InputObject.Input.PathIgnore = $InputPathIgnore;
+        }
 
         # Sets option Markdown.Encoding
         if ($PSBoundParameters.ContainsKey('Encoding')) {
@@ -653,7 +717,7 @@ function InitDocumentContext {
     }
 }
 
-# Get a list of rule script files in the matching paths
+# Get a list of document script files in the matching paths
 function GetSource {
     [CmdletBinding()]
     [OutputType([PSDocs.Pipeline.Source])]
@@ -816,8 +880,7 @@ function IsDeviceGuardEnabled {
 
 function InitEditorServices {
     [CmdletBinding()]
-    param (
-    )
+    param ()
     process {
         Export-ModuleMember -Function @(
             'Section'
@@ -845,7 +908,7 @@ function InitEditorServices {
 
 # Define variables and types
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignment', '', Justification = 'Variable is used for editor discovery only.')]
-[PSDocs.Runtime.PSDocs]$PSDocs = New-Object -TypeName 'PSDocs.Runtime.PSDocs';
+[PSDocs.Runtime.PSDocs]$PSDocs = [PSDocs.Runtime.PSDocs]::new();
 
 if ($Null -ne (Get-Variable -Name psEditor -ErrorAction Ignore)) {
     InitEditorServices;

@@ -12,16 +12,21 @@ namespace PSDocs.Pipeline
         internal StreamPipeline(PipelineContext context, Source[] source)
             : base(context, source)
         {
-            _Stream = new PipelineStream();
+            _Stream = context.Stream;
         }
 
-        public override void Process(PSObject sourceObject)
+        public override void Begin()
+        {
+            _Stream.Open();
+        }
+
+        public sealed override void Process(PSObject sourceObject)
         {
             _Stream.Enqueue(sourceObject);
-            while (!_Stream.IsEmpty && _Stream.TryDequeue(out PSObject nextObject))
+            while (!_Stream.IsEmpty && _Stream.TryDequeue(out TargetObject nextObject))
                 ProcessObject(nextObject);
         }
 
-        protected abstract void ProcessObject(PSObject sourceObject);
+        protected abstract void ProcessObject(TargetObject targetObject);
     }
 }

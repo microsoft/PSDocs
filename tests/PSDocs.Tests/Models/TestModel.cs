@@ -1,7 +1,5 @@
-﻿// Copyright (c) Microsoft Corporation.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-
-using System.ComponentModel;
 
 namespace PSDocs.Models
 {
@@ -11,10 +9,13 @@ namespace PSDocs.Models
         {
             Name = "Test";
             Description = "This is a\r\ndescription\r\nsplit\r\nover\r\nmultiple\r\nlines.";
+            Generator = "PSDocs";
         }
 
         public string Name { get; set; }
 
         public string Description { get; set; }
+
+        public string Generator { get; set; }
     }
 }

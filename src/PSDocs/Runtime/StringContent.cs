@@ -27,7 +27,7 @@ namespace PSDocs.Runtime
             var stream = new StringStream(_Input);
             stream.SkipLineEnding();
             var indent = stream.GetIndent();
-            
+
             while (!stream.EOF)
             {
                 stream.SkipIndent(indent);

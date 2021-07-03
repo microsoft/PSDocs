@@ -2,9 +2,48 @@
 
 This document contains notes to help upgrade from previous versions of PSDocs.
 
-## Upgrade to v0.7.0 from v0.6.x
+## Upgrade to v0.9.0
 
-Follow these notes to upgrade from PSDocs v0.6.x to v0.7.0.
+Follow these notes to upgrade to v0.9.0 from previous versions.
+
+### Empty documents
+
+Previously output would be generated from any `Document` block.
+
+For example:
+
+```powershell
+Document 'WithTitle' {
+    Title 'Read me'
+    Metadata @{
+        key = 'value'
+    }
+}
+```
+
+Documents that do not generate any body content are ignored.
+If a document **only** sets a title or metadata the document is ignored.
+To generate a document, set any body content.
+
+For example:
+
+```powershell
+Document 'WithText' {
+    Title 'Read me'
+
+    'Some content'
+}
+
+Document 'WithBlockQuote' {
+    Title 'Read me'
+
+    'Some content' | BlockQuote
+}
+```
+
+## Upgrade to v0.7.0
+
+Follow these notes to upgrade to v0.7.0 from previous versions.
 
 ### Inline blocks
 

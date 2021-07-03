@@ -31,7 +31,6 @@ Options can be used by:
 - Configuring the default options file `ps-docs.yaml`.
 
 As mentioned above, a options object can be created with `New-PSDocumentOption` see cmdlet help for syntax and examples.
-
 When using a hashtable, `@{}`, one or more options can be specified with the `-Option` parameter using a dotted notation.
 
 For example:
@@ -108,6 +107,162 @@ $option = New-PSDocumentOption -Option @{ 'Execution.LanguageMode' = 'Constraine
 # YAML: Using the execution/languageMode YAML property
 execution:
   languageMode: ConstrainedLanguage
+```
+
+### Input.Format
+
+Configures the input format for when a string is passed in as a target object.
+This option determines if the target object is deserialized into an alternative form.
+
+Set this option to either `Yaml`, `Json`, `PowerShellData` to deserialize as a specific format.
+The `-Format` parameter will override any value set in configuration.
+
+When the `-InputObject` parameter or pipeline input is used, strings are treated as plain text by default.
+`FileInfo` objects for supported file formats will be deserialized based on file extension.
+
+When the `-InputPath` parameter is used, supported file formats will be deserialized based on file extension.
+The `-InputPath` parameter can be used with a file path or URL.
+
+The following formats are available:
+
+- None - Treat strings as plain text and do not deserialize files.
+- Yaml - Deserialize as one or more YAML objects.
+- Json - Deserialize as one or more JSON objects.
+- PowerShellData - Deserialize as a PowerShell data object.
+- Detect - Detect format based on file extension. This is the default.
+
+If the `Detect` format is used, the file extension will be used to automatically detect the format.
+When the file extension can not be determined `Detect` is the same as `None`.
+
+Detect uses the following file extensions:
+
+- Yaml - `.yaml` or `.yml`
+- Json - `.json` or `.jsonc`
+- PowerShellData - `.psd1`
+
+This option can be specified using:
+
+```powershell
+# PowerShell: Using the Format parameter
+$option = New-PSDocumentOption -Format Yaml;
+```
+
+```powershell
+# PowerShell: Using the Input.Format hashtable key
+$option = New-PSDocumentOption -Option @{ 'Input.Format' = 'Yaml' };
+```
+
+```yaml
+# YAML: Using the input/format property
+input:
+  format: Yaml
+```
+
+```bash
+# Bash: Using environment variable
+export PSDOCS_INPUT_FORMAT=Yaml
+```
+
+```yaml
+# GitHub Actions: Using environment variable
+env:
+  PSDOCS_INPUT_FORMAT: Yaml
+```
+
+```yaml
+# Azure Pipelines: Using environment variable
+variables:
+- name: PSDOCS_INPUT_FORMAT
+  value: Yaml
+```
+
+### Input.ObjectPath
+
+The object path to a property to use instead of the pipeline object.
+
+By default, PSDocs processes objects passed from the pipeline against selected rules.
+When this option is set, instead of evaluating the pipeline object, PSDocs looks for a property of the pipeline object specified by `ObjectPath` and uses that instead.
+If the property specified by `ObjectPath` is a collection/ array, then each item is evaluated separately.
+
+If the property specified by `ObjectPath` does not exist, PSDocs skips the object.
+
+This option can be specified using:
+
+```powershell
+# PowerShell: Using the InputObjectPath parameter
+$option = New-PSDocumentOption -InputObjectPath 'items';
+```
+
+```powershell
+# PowerShell: Using the Input.ObjectPath hashtable key
+$option = New-PSDocumentOption -Option @{ 'Input.ObjectPath' = 'items' };
+```
+
+```yaml
+# YAML: Using the input/objectPath property
+input:
+  objectPath: items
+```
+
+```bash
+# Bash: Using environment variable
+export PSDOCS_INPUT_OBJECTPATH=items
+```
+
+```yaml
+# GitHub Actions: Using environment variable
+env:
+  PSDOCS_INPUT_OBJECTPATH: items
+```
+
+```yaml
+# Azure Pipelines: Using environment variable
+variables:
+- name: PSDOCS_INPUT_OBJECTPATH
+  value: items
+```
+
+### Input.PathIgnore
+
+Ignores input files that match the path spec when using `-InputPath`.
+If specified, files that match the path spec will not be processed.
+By default, all files are processed.
+
+This option can be specified using:
+
+```powershell
+# PowerShell: Using the InputPathIgnore parameter
+$option = New-PSDocumentOption -InputPathIgnore '*.Designer.cs';
+```
+
+```powershell
+# PowerShell: Using the Input.PathIgnore hashtable key
+$option = New-PSDocumentOption -Option @{ 'Input.PathIgnore' = '*.Designer.cs' };
+```
+
+```yaml
+# YAML: Using the input/pathIgnore property
+input:
+  pathIgnore:
+  - '*.Designer.cs'
+```
+
+```bash
+# Bash: Using environment variable
+export PSDOCS_INPUT_PATHIGNORE=*.Designer.cs
+```
+
+```yaml
+# GitHub Actions: Using environment variable
+env:
+  PSDOCS_INPUT_PATHIGNORE: '*.Designer.cs'
+```
+
+```yaml
+# Azure Pipelines: Using environment variable
+variables:
+- name: PSDOCS_INPUT_PATHIGNORE
+  value: '*.Designer.cs'
 ```
 
 ### Markdown.ColumnPadding

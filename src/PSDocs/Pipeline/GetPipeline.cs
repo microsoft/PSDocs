@@ -7,7 +7,7 @@ namespace PSDocs.Pipeline
 {
     public interface IGetPipelineBuilder : IPipelineBuilder
     {
-        
+
     }
 
     /// <summary>

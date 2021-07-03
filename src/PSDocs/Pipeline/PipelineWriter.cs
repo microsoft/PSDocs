@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Management.Automation;
+using System.Management.Automation.Language;
 using System.Threading;
 
 namespace PSDocs.Pipeline
@@ -22,6 +23,8 @@ namespace PSDocs.Pipeline
 
         void WriteDebug(DebugRecord record);
 
+        void WriteDebug(string text, params object[] args);
+
         void WriteObject(object sendToPipeline, bool enumerateCollection);
 
         void WriteHost(HostInformationMessage info);
@@ -36,6 +39,14 @@ namespace PSDocs.Pipeline
                 return;
 
             writer.WriteError(new ErrorRecord(exception, errorId, errorCategory, targetObject));
+        }
+
+        public static void Debug(this IPipelineWriter writer, string message)
+        {
+            if (writer == null)
+                return;
+
+            writer.WriteDebug(new DebugRecord(message));
         }
 
         public static void WarnSourcePathNotFound(this IPipelineWriter writer)
@@ -65,6 +76,21 @@ namespace PSDocs.Pipeline
                 errorCategory: ErrorCategory.InvalidOperation,
                 null
             ));
+        }
+
+        public static void WriteError(this IPipelineWriter writer, ParseError error)
+        {
+            if (writer == null)
+                return;
+
+            var record = new ErrorRecord
+            (
+                exception: new ParseException(message: error.Message, errorId: error.ErrorId),
+                errorId: error.ErrorId,
+                errorCategory: ErrorCategory.InvalidOperation,
+                targetObject: null
+            );
+            writer.WriteError(record);
         }
     }
 
@@ -133,6 +159,15 @@ namespace PSDocs.Pipeline
             DoWriteDebug(record);
         }
 
+        public void WriteDebug(string text, params object[] args)
+        {
+            if (string.IsNullOrEmpty(text) || !ShouldWriteDebug())
+                return;
+
+            text = args == null || args.Length == 0 ? text : string.Format(Thread.CurrentThread.CurrentCulture, text, args);
+            DoWriteDebug(new DebugRecord(text));
+        }
+
         public void WriteObject(object sendToPipeline, bool enumerateCollection)
         {
             if (sendToPipeline == null || !ShouldWriteObject())
@@ -181,32 +216,32 @@ namespace PSDocs.Pipeline
 
         protected virtual void DoWriteError(ErrorRecord record)
         {
-            
+
         }
 
         protected virtual void DoWriteWarning(string text)
         {
-            
+
         }
 
         protected virtual void DoWriteInformation(InformationRecord record)
         {
-            
+
         }
 
         protected virtual void DoWriteVerbose(string text)
         {
-            
+
         }
 
         protected virtual void DoWriteDebug(DebugRecord record)
         {
-            
+
         }
 
         protected virtual void DoWriteObject(object sendToPipeline, bool enumerateCollection)
         {
-            
+
         }
 
         protected virtual void DoWriteHost(HostInformationMessage info)
@@ -229,7 +264,7 @@ namespace PSDocs.Pipeline
         {
             if (_Inner == null)
                 return;
-            
+
             _Inner.Begin();
         }
 

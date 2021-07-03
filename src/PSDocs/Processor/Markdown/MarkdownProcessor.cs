@@ -62,7 +62,7 @@ namespace PSDocs.Processor.Markdown
             }
         }
 
-        public IDocumentResult Process(PSDocumentOption option, Document document)
+        public IDocumentResult Process(IPSDocumentOption option, Document document)
         {
             if (document == null)
                 return null;

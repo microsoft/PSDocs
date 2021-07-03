@@ -117,11 +117,23 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="DebugTargetTypeMismatch" xml:space="preserve">
+    <value>Target failed Type precondition</value>
+  </data>
+  <data name="DefinitionParameterNotFound" xml:space="preserve">
+    <value>Could not find required parameter '{0}' for definition at {1}.</value>
+  </data>
   <data name="FoundModules" xml:space="preserve">
     <value>[PSDocs][D] -- Found {0} PSDocs module(s)</value>
   </data>
   <data name="IncludeNotFound" xml:space="preserve">
     <value>The included file was not found.</value>
+  </data>
+  <data name="InvalidDocumentNesting" xml:space="preserve">
+    <value>Document nesting was detected for definition at {0}. Definitions must not be nested.</value>
+  </data>
+  <data name="InvalidErrorAction" xml:space="preserve">
+    <value>An invalid ErrorAction ({0}) was specified for definition at {1}. Ignore | Stop are supported.</value>
   </data>
   <data name="InvariantCulture" xml:space="preserve">
     <value>A culture must be specified when no culture is specified by the system. To specify a culture use the 'Output.Culture' option.</value>
@@ -144,6 +156,18 @@
   </data>
   <data name="ScriptNotFound" xml:space="preserve">
     <value>The script was not found.</value>
+  </data>
+  <data name="SelectorExpressionTrace" xml:space="preserve">
+    <value>[PSDocs][S][Trace] -- {0}: {1} {0} {2}</value>
+  </data>
+  <data name="SelectorMatchTrace" xml:space="preserve">
+    <value>[PSDocs][S][Trace] -- {0}</value>
+  </data>
+  <data name="SelectorNotFound" xml:space="preserve">
+    <value>The selector '{0}' specified for definition at {1} could not be found.</value>
+  </data>
+  <data name="SelectorTrace" xml:space="preserve">
+    <value>[PSDocs][S][Trace] -- {0}: {1}</value>
   </data>
   <data name="SerializeNullPSObject" xml:space="preserve">
     <value>Can not serialize a null PSObject.</value>

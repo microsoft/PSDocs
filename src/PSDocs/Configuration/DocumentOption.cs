@@ -1,9 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System;
+using System.Collections.Generic;
+
 namespace PSDocs.Configuration
 {
-    public sealed class DocumentOption
+    public sealed class DocumentOption : IEquatable<DocumentOption>
     {
         internal static readonly DocumentOption Default = new DocumentOption
         {
@@ -55,8 +58,28 @@ namespace PSDocs.Configuration
             };
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "Exposed for serialization.")]
         public string[] Include { get; set; }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "Exposed for serialization.")]
         public string[] Tag { get; set; }
+
+        internal void Load(EnvironmentHelper env)
+        {
+            if (env.TryStringArray("PSDOCS_DOCUMENT_INCLUDE", out string[] include))
+                Include = include;
+
+            if (env.TryStringArray("PSDOCS_DOCUMENT_TAG", out string[] tag))
+                Tag = tag;
+        }
+
+        internal void Load(Dictionary<string, object> index)
+        {
+            if (index.TryPopStringArray("Document.Include", out string[] include))
+                Include = include;
+
+            if (index.TryPopStringArray("Document.Tag", out string[] tag))
+                Tag = tag;
+        }
     }
 }

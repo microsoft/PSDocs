@@ -19,9 +19,9 @@ $here = (Resolve-Path $PSScriptRoot).Path;
 
 Describe 'PSDocs -- Table keyword' -Tag Table {
     $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Keyword.Doc.ps1';
+    $testObject = [PSCustomObject]@{};
 
     Context 'Markdown' {
-        $dummyObject = New-Object -TypeName PSObject;
         $invokeParams = @{
             Path = $docFilePath
             PassThru = $True
@@ -36,13 +36,13 @@ Describe 'PSDocs -- Table keyword' -Tag Table {
         }
 
         It 'With property expressions' {
-            $result = Invoke-PSDocument @invokeParams -Name 'TableWithExpression';
+            $result = $testObject | Invoke-PSDocument @invokeParams -Name 'TableWithExpression';
             $result | Should -Match '(\r|\n|\r\n)---- \| :-----     \| :----: \| -----:(\r|\n|\r\n)'
             $result | Should -Match '(\r|\n|\r\n)Dummy \| 1          \| 2      \| 3(\r|\n|\r\n){2,}EOF';
         }
 
         It 'With single entry' {
-            $result = Invoke-PSDocument @invokeParams -Name 'TableSingleEntryMarkdown';
+            $result = $testObject | Invoke-PSDocument @invokeParams -Name 'TableSingleEntryMarkdown';
             $result | Should -Match '\| Name \|(\r|\n|\r\n)| -{1,} \|(\r|\n|\r\n)| Single \|';
         }
 

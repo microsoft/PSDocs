@@ -1,16 +1,19 @@
-﻿// Copyright (c) Microsoft Corporation.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using PSDocs.Annotations;
 using PSDocs.Data;
 using PSDocs.Data.Internal;
 using PSDocs.Definitions;
 using PSDocs.Definitions.Conventions;
+using PSDocs.Definitions.Selectors;
 using PSDocs.Pipeline;
 using PSDocs.Resources;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Management.Automation.Language;
 
 namespace PSDocs.Runtime
 {
@@ -19,18 +22,64 @@ namespace PSDocs.Runtime
         /// <summary>
         /// Executes get document builders from Document script blocks.
         /// </summary>
-        internal static IDocumentBuilder[] GetDocumentBuilder(RunspaceContext runspace, Source[] source)
+        internal static IDocumentBuilder[] GetDocumentBuilder(RunspaceContext context, Source[] source)
         {
-            runspace.PushScope(RunspaceScope.Source);
-            var blocks = GetLanguageBlock(runspace, source);
-            var documents = ToDocument(blocks, runspace);
-            var conventions = GetConventions(blocks, runspace);
+            context.PushScope(RunspaceScope.Source);
+            var blocks = GetLanguageBlock(context, source);
+            var documents = ToDocument(blocks, context);
+            var conventions = GetConventions(blocks, context);
             return ToDocumentBuilder(documents, conventions);
         }
 
-        internal static IDocumentDefinition[] GetDocumentBlock(RunspaceContext runspace, Source[] source)
+        internal static IDocumentDefinition[] GetDocumentBlock(RunspaceContext context, Source[] source)
         {
-            return ToDocument(GetLanguageBlock(runspace, source), runspace);
+            return ToDocument(GetLanguageBlock(context, source), context);
+        }
+
+        internal static void ImportResource(Source[] source, RunspaceContext context)
+        {
+            Import(ReadYamlObjects(source, context), context);
+        }
+
+        /// <summary>
+        /// Read YAML objects and return selectors.
+        /// </summary>
+        internal static IEnumerable<SelectorV1> GetSelector(RunspaceContext context, Source[] source)
+        {
+            return ToSelectorV1(ReadYamlObjects(source, context), context);
+        }
+
+        /// <summary>
+        /// Called from PowerShell to get additional metdata from a language block, such as comment help.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="start"></param>
+        /// <returns></returns>
+        internal static CommentMetadata GetCommentMeta(string path, int lineNumber, int offset)
+        {
+            var context = RunspaceContext.CurrentThread;
+            //if (lineNumber < 0 || context.Pipeline.ExecutionScope == ExecutionScope.None || context.Source.SourceContentCache == null)
+            //    return new CommentMetadata();
+
+            var lines = context.Source.Content;
+            var i = lineNumber;
+            var comments = new List<string>();
+
+            // Back track lines with comments immediately before block
+            for (; i >= 0 && lines[i].Contains("#"); i--)
+                comments.Insert(0, lines[i]);
+
+            // Check if any comments were found
+            var metadata = new CommentMetadata();
+            if (comments.Count > 0)
+            {
+                foreach (var comment in comments)
+                {
+                    if (comment.StartsWith("# Synopsis: ", StringComparison.OrdinalIgnoreCase))
+                        metadata.Synopsis = comment.Substring(12);
+                }
+            }
+            return metadata;
         }
 
         /// <summary>
@@ -52,9 +101,31 @@ namespace PSDocs.Runtime
                     // Process search file per source
                     foreach (var file in source.File)
                     {
+                        if (file.Type != SourceType.Script)
+                            continue;
+
                         ps.Commands.Clear();
                         if (!context.EnterSourceFile(file))
                             throw new FileNotFoundException(PSDocsResources.ScriptNotFound, file.Path);
+
+                        var scriptAst = System.Management.Automation.Language.Parser.ParseFile(file.Path, out Token[] tokens, out ParseError[] errors);
+                        var visitor = new LanguageAst(context.Pipeline);
+                        scriptAst.Visit(visitor);
+
+                        if (visitor.Errors != null && visitor.Errors.Count > 0)
+                        {
+                            foreach (var record in visitor.Errors)
+                                context.Pipeline.Writer?.WriteError(record);
+
+                            continue;
+                        }
+                        if (errors != null && errors.Length > 0)
+                        {
+                            foreach (var error in errors)
+                                context.Pipeline.Writer?.WriteError(error);
+
+                            continue;
+                        }
 
                         try
                         {
@@ -92,6 +163,37 @@ namespace PSDocs.Runtime
             return results.ToArray();
         }
 
+        private static IEnumerable<ILanguageBlock> ReadYamlObjects(Source[] sources, RunspaceContext context)
+        {
+            var builder = new ResourceBuilder();
+            try
+            {
+                foreach (var source in sources)
+                {
+                    foreach (var file in source.File)
+                    {
+                        if (file.Type != SourceType.Yaml)
+                            continue;
+
+                        context.EnterSourceFile(file);
+                        builder.FromFile(file);
+                    }
+                }
+            }
+            finally
+            {
+                context.ExitSourceFile();
+            }
+            return builder.Build();
+        }
+
+        private static void Import(IEnumerable<ILanguageBlock> blocks, RunspaceContext context)
+        {
+            foreach (var resource in blocks.OfType<IResource>().ToArray())
+                context.Pipeline.Import(resource);
+        }
+
+
         /// <summary>
         /// Convert document blocks to document builders.
         /// </summary>
@@ -126,6 +228,32 @@ namespace PSDocs.Runtime
             finally
             {
                 //context.ExitSourceFile();
+            }
+            return results.Values.ToArray();
+        }
+
+        private static SelectorV1[] ToSelectorV1(IEnumerable<ILanguageBlock> blocks, RunspaceContext context)
+        {
+            if (blocks == null)
+                return Array.Empty<SelectorV1>();
+
+            // Index selectors by Id
+            var results = new Dictionary<string, SelectorV1>(StringComparer.OrdinalIgnoreCase);
+            try
+            {
+                foreach (var block in blocks.OfType<SelectorV1>().ToArray())
+                {
+                    // Ignore selectors that don't match
+                    if (!Match(context, block))
+                        continue;
+
+                    if (!results.ContainsKey(block.Id))
+                        results[block.Id] = block;
+                }
+            }
+            finally
+            {
+                context.ExitSourceFile();
             }
             return results.Values.ToArray();
         }
@@ -175,6 +303,11 @@ namespace PSDocs.Runtime
                 }
             }
             return false;
+        }
+
+        private static bool Match(RunspaceContext context, SelectorV1 resource)
+        {
+            return true;
         }
     }
 }

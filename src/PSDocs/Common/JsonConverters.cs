@@ -134,4 +134,121 @@ namespace PSDocs
             return true;
         }
     }
+
+    /// <summary>
+    /// A custom serializer to convert PSObjects that may or maynot be in a JSON array to an a PSObject array.
+    /// </summary>
+    internal sealed class PSObjectArrayJsonConverter : JsonConverter
+    {
+        public override bool CanConvert(Type objectType)
+        {
+            return objectType == typeof(PSObject[]);
+        }
+
+        public override bool CanWrite => false;
+
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType != JsonToken.StartObject && reader.TokenType != JsonToken.StartArray)
+                throw new PipelineSerializationException(PSDocsResources.ReadJsonFailed);
+
+            var result = new List<PSObject>();
+            var isArray = reader.TokenType == JsonToken.StartArray;
+
+            if (isArray)
+                reader.Read();
+
+            while (reader.TokenType != JsonToken.None && (!isArray || (isArray && reader.TokenType != JsonToken.EndArray)))
+            {
+                var value = ReadObject(reader: reader);
+                result.Add(value);
+
+                // Consume the EndObject token
+                reader.Read();
+            }
+            return result.ToArray();
+        }
+
+        private static PSObject ReadObject(JsonReader reader)
+        {
+            if (reader.TokenType != JsonToken.StartObject || !reader.Read())
+                throw new PipelineSerializationException(PSDocsResources.ReadJsonFailed);
+
+            var result = new PSObject();
+            string name = null;
+
+            // Read each token
+            while (reader.TokenType != JsonToken.EndObject)
+            {
+                switch (reader.TokenType)
+                {
+                    case JsonToken.PropertyName:
+                        name = reader.Value.ToString();
+                        break;
+
+                    case JsonToken.StartObject:
+                        var value = ReadObject(reader: reader);
+                        result.Properties.Add(new PSNoteProperty(name: name, value: value));
+                        break;
+
+                    case JsonToken.StartArray:
+                        var items = ReadArray(reader: reader);
+                        result.Properties.Add(new PSNoteProperty(name: name, value: items));
+                        break;
+
+                    case JsonToken.Comment:
+                        break;
+
+                    default:
+                        result.Properties.Add(new PSNoteProperty(name: name, value: reader.Value));
+                        break;
+                }
+                if (!reader.Read() || reader.TokenType == JsonToken.None)
+                    throw new PipelineSerializationException(PSDocsResources.ReadJsonFailed);
+            }
+            return result;
+        }
+
+        private static PSObject[] ReadArray(JsonReader reader)
+        {
+            if (reader.TokenType != JsonToken.StartArray || !reader.Read())
+                throw new PipelineSerializationException(PSDocsResources.ReadJsonFailed);
+
+            var result = new List<PSObject>();
+
+            // Read until the end of the array
+            while (reader.TokenType != JsonToken.EndArray)
+            {
+                switch (reader.TokenType)
+                {
+                    case JsonToken.StartObject:
+                        result.Add(ReadObject(reader: reader));
+                        break;
+
+                    case JsonToken.StartArray:
+                        result.Add(PSObject.AsPSObject(ReadArray(reader)));
+                        break;
+
+                    case JsonToken.Null:
+                        result.Add(null);
+                        break;
+
+                    case JsonToken.Comment:
+                        break;
+
+                    default:
+                        result.Add(PSObject.AsPSObject(reader.Value));
+                        break;
+                }
+                if (!reader.Read() || reader.TokenType == JsonToken.None)
+                    throw new PipelineSerializationException(PSDocsResources.ReadJsonFailed);
+            }
+            return result.ToArray();
+        }
+    }
 }

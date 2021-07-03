@@ -3,9 +3,7 @@
 
 using PSDocs.Definitions.Conventions;
 using PSDocs.Runtime;
-using System;
 using System.Management.Automation;
-using System.Management.Automation.Language;
 
 namespace PSDocs.Commands
 {
@@ -14,7 +12,6 @@ namespace PSDocs.Commands
     {
         private const string InvokeCmdletName = "Invoke-PSDocumentConvention";
         private const string InvokeCmdlet_BodyParameter = "Body";
-        private const string InvokeCmdlet_InputObjectParameter = "InputObject";
 
         /// <summary>
         /// Convention name.
@@ -44,11 +41,11 @@ namespace PSDocs.Commands
         protected override void ProcessRecord()
         {
             var context = RunspaceContext.CurrentThread;
-            var sourceFile = context.SourceFile;
+            var source = context.Source;
 
             // Return convention
             var result = new ScriptBlockDocumentConvention(
-                source: sourceFile,
+                source: source.File,
                 name: Name,
                 begin: ConventionBlock(context, Begin),
                 process: ConventionBlock(context, Process),

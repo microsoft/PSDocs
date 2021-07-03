@@ -3,6 +3,8 @@
 
 using PSDocs.Configuration;
 using PSDocs.Data.Internal;
+using PSDocs.Definitions;
+using PSDocs.Definitions.Selectors;
 using PSDocs.Pipeline;
 using System;
 using System.Collections;
@@ -42,40 +44,43 @@ namespace PSDocs.Runtime
         private const string ErrorPreference = "ErrorActionPreference";
         private const string WarningPreference = "WarningPreference";
         private const string VerbosePreference = "VerbosePreference";
-
         private const string DebugPreference = "DebugPreference";
-
-        internal readonly PipelineContext Pipeline;
 
         [ThreadStatic]
         internal static RunspaceContext CurrentThread;
-        private Runspace _Runspace;
+
+        internal readonly Dictionary<string, object> ExpressionCache;
 
         private readonly Dictionary<string, Hashtable> _LocalizedDataCache;
+
+        private Runspace _Runspace;
         private string[] _Culture;
-        private Stack<RunspaceScope> _Scope;
+        private readonly Stack<RunspaceScope> _Scope;
 
         // Track whether Dispose has been called.
         private bool _Disposed;
 
         public RunspaceContext(PipelineContext pipeline)
         {
+            CurrentThread = this;
             _Scope = new Stack<RunspaceScope>();
             Pipeline = pipeline;
             _Runspace = GetRunspace();
             _LocalizedDataCache = new Dictionary<string, Hashtable>();
+            ExpressionCache = new Dictionary<string, object>();
         }
 
-        public SourceFile SourceFile { get; private set; }
+        public PipelineContext Pipeline { get; }
+
+        public SourceScope Source { get; private set; }
 
         public ScriptDocumentBuilder Builder { get; private set; }
 
-        public PSObject TargetObject { get; private set; }
+        public TargetObject TargetObject { get; private set; }
 
-        public string Culture
-        {
-            get { return _Culture[0]; }
-        }
+        public IEnumerable Output { get; private set; }
+
+        public string Culture => _Culture[0];
 
         public DocumentContext DocumentContext { get; private set; }
 
@@ -93,8 +98,6 @@ namespace PSDocs.Runtime
             DocumentContext = null;
             PopScope();
         }
-
-        public IEnumerable Output { get; private set; }
 
         internal void SetOutput(IEnumerable output)
         {
@@ -168,13 +171,13 @@ namespace PSDocs.Runtime
             if (file == null || !File.Exists(file.Path))
                 return false;
 
-            SourceFile = file;
+            Source = new SourceScope(file);
             return true;
         }
 
         public void ExitSourceFile()
         {
-            SourceFile = null;
+            Source = null;
         }
 
         #endregion SourceFile
@@ -185,6 +188,7 @@ namespace PSDocs.Runtime
         {
             CurrentThread = this;
             Builder = builder;
+            Pipeline.Option.SwitchScope(builder.Module);
         }
 
         public void ExitBuilder()
@@ -196,7 +200,7 @@ namespace PSDocs.Runtime
 
         #region TargetObject
 
-        public void EnterTargetObject(PSObject targetObject)
+        public void EnterTargetObject(TargetObject targetObject)
         {
             TargetObject = targetObject;
         }
@@ -204,6 +208,21 @@ namespace PSDocs.Runtime
         public void ExitTargetObject()
         {
             TargetObject = null;
+        }
+
+        public bool TrySelector(string name)
+        {
+            name = ResourceHelper.GetId(Source.File.ModuleName, name);
+            if (TargetObject == null || Pipeline == null || !Pipeline.Selector.TryGetValue(name, out SelectorVisitor selector))
+                return false;
+
+            var annotation = TargetObject.GetAnnotation<SelectorTargetAnnotation>();
+            if (annotation.TryGetSelectorResult(selector, out bool result))
+                return result;
+
+            result = selector.Match(TargetObject.Value);
+            annotation.SetSelectorResult(selector, result);
+            return result;
         }
 
         #endregion TargetObject
@@ -268,7 +287,7 @@ namespace PSDocs.Runtime
 
         public string GetLocalizedPath(string file)
         {
-            if (string.IsNullOrEmpty(SourceFile.ResourcePath))
+            if (string.IsNullOrEmpty(Source.File.ResourcePath))
                 return null;
 
             for (var i = 0; i < _Culture.Length; i++)
@@ -281,7 +300,7 @@ namespace PSDocs.Runtime
 
         public string[] GetLocalizedPaths(string file)
         {
-            if (string.IsNullOrEmpty(SourceFile.ResourcePath))
+            if (string.IsNullOrEmpty(Source.File.ResourcePath))
                 return null;
 
             var result = new List<string>();
@@ -296,10 +315,10 @@ namespace PSDocs.Runtime
         private bool TryLocalizedPath(string culture, string file, out string path)
         {
             path = null;
-            if (SourceFile == null || string.IsNullOrEmpty(SourceFile.ResourcePath))
+            if (Source == null || string.IsNullOrEmpty(Source.File.ResourcePath))
                 return false;
 
-            path = Path.Combine(SourceFile.ResourcePath, culture, file);
+            path = Path.Combine(Source.File.ResourcePath, culture, file);
             return File.Exists(path);
         }
 

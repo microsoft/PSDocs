@@ -38,6 +38,8 @@ namespace PSDocs.Data.Internal
 
         internal Document Document { get; private set; }
 
+        public string Module => _Block.Module;
+
         Document IDocumentBuilder.Process(RunspaceContext context, PSObject sourceObject)
         {
             context.EnterBuilder(this);
@@ -48,6 +50,9 @@ namespace PSDocs.Data.Internal
                 _Parent = new Stack<SectionNode>();
                 _Current = Document = new Document(context.DocumentContext);
                 Document.AddNodes(_Block.Body.Invoke());
+                if (Document.Node.Count == 0)
+                    return null;
+
                 ProcessConventions(context, sourceObject);
                 return Document;
             }
@@ -88,7 +93,7 @@ namespace PSDocs.Data.Internal
             _Current = new Section
             {
                 Title = name,
-                Level = _Current.Level+1,
+                Level = _Current.Level + 1,
             };
             return _Current;
         }
