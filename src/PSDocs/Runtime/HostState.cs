@@ -53,13 +53,7 @@ namespace PSDocs.Runtime
             public InstanceNameVariable()
                 : base(VariableName, null, ScopedItemOptions.ReadOnly) { }
 
-            public override object Value
-            {
-                get
-                {
-                    return RunspaceContext.CurrentThread?.DocumentContext.InstanceName ?? RunspaceContext.CurrentThread.Builder.Name;
-                }
-            }
+            public override object Value => RunspaceContext.CurrentThread?.DocumentContext.InstanceName ?? RunspaceContext.CurrentThread.Builder.Name;
         }
 
         public sealed class TargetObjectVariable : PSVariable
@@ -69,7 +63,7 @@ namespace PSDocs.Runtime
             public TargetObjectVariable()
                 : base(VariableName, null, ScopedItemOptions.ReadOnly) { }
 
-            public override object Value => RunspaceContext.CurrentThread.TargetObject;
+            public override object Value => RunspaceContext.CurrentThread.TargetObject.Value;
         }
 
         public sealed class InputObjectVariable : PSVariable
@@ -79,7 +73,7 @@ namespace PSDocs.Runtime
             public InputObjectVariable()
                 : base(VariableName, null, ScopedItemOptions.ReadOnly) { }
 
-            public override object Value => RunspaceContext.CurrentThread.TargetObject;
+            public override object Value => RunspaceContext.CurrentThread.TargetObject.Value;
         }
 
         public sealed class DocumentVariable : PSVariable

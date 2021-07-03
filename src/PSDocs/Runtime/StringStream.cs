@@ -15,13 +15,7 @@ namespace PSDocs.Runtime
         private int _Position = -1;
         private char _Current = EmptyChar;
 
-        public bool EOF
-        {
-            get
-            {
-                return _Position > _LastIndex;
-            }
-        }
+        public bool EOF => _Position > _LastIndex;
 
         public StringStream(string input)
         {

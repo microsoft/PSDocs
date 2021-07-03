@@ -122,33 +122,34 @@ Describe 'PSDocs instance names' -Tag 'Common', 'InstanceName' {
 }
 
 Describe 'Invoke-PSDocument' -Tag 'Cmdlet', 'Common', 'Invoke-PSDocument', 'FromPath' {
+    $testObject = [PSCustomObject]@{};
     Context 'With -Path' {
         It 'Should match name' {
             # Only generate documents for the named document
-            Invoke-PSDocument -Path $here -OutputPath $outputPath -Name FromFileTest2;
+            $testObject | Invoke-PSDocument -Path $here -OutputPath $outputPath -Name FromFileTest2;
             Test-Path -Path "$outputPath\FromFileTest1.md" | Should -Be $False;
             Test-Path -Path "$outputPath\FromFileTest2.md" | Should -Be $True;
             Test-Path -Path "$outputPath\FromFileTest3.md" | Should -Be $False;
         }
         It 'Should match single tag' {
             # Only generate for documents with matching tag
-            Invoke-PSDocument -Path $here -OutputPath $outputPath -Tag Test3;
+            $testObject | Invoke-PSDocument -Path $here -OutputPath $outputPath -Tag Test3;
             Test-Path -Path "$outputPath\FromFileTest1.md" | Should -Be $False;
             Test-Path -Path "$outputPath\FromFileTest3.md" | Should -Be $True;
         }
         It 'Should match all tags' {
             # Only generate for documents with all matching tags
-            Invoke-PSDocument -Path $here -OutputPath $outputPath -Tag Test4,Test5;
+            $testObject | Invoke-PSDocument -Path $here -OutputPath $outputPath -Tag Test4,Test5;
             Test-Path -Path "$outputPath\FromFileTest1.md" | Should -Be $False;
             Test-Path -Path "$outputPath\FromFileTest4.md" | Should -Be $False;
             Test-Path -Path "$outputPath\FromFileTest5.md" | Should -Be $True;
         }
         It 'Should generate exception' {
-            { Invoke-PSDocument -Path $here -OutputPath $outputPath -Name InvalidCommand -ErrorAction Stop } | Should -Throw -ExceptionType PSDocs.Pipeline.RuntimeException;
+            { $testObject | Invoke-PSDocument -Path $here -OutputPath $outputPath -Name InvalidCommand -ErrorAction Stop } | Should -Throw -ExceptionType PSDocs.Pipeline.RuntimeException;
             $Error[0].Exception.Message | Should -Match '^(The term ''New-PSDocsInvalidCommand'' is not recognized)';
-            { Invoke-PSDocument -Path $here -OutputPath $outputPath -Name InvalidCommandWithSection -ErrorAction Stop } | Should -Throw -ExceptionType PSDocs.Pipeline.RuntimeException;
+            { $testObject | Invoke-PSDocument -Path $here -OutputPath $outputPath -Name InvalidCommandWithSection -ErrorAction Stop } | Should -Throw -ExceptionType PSDocs.Pipeline.RuntimeException;
             $Error[0].Exception.Message | Should -Match '^(The term ''New-PSDocsInvalidCommand'' is not recognized)';
-            { Invoke-PSDocument -Path $here -OutputPath $outputPath -Name WithWriteError -ErrorAction Stop } | Should -Throw;
+            { $testObject | Invoke-PSDocument -Path $here -OutputPath $outputPath -Name WithWriteError -ErrorAction Stop } | Should -Throw;
             $Error[0].Exception.Message | Should -Match 'Verify Write-Error is raised as an exception';
         }
     }
@@ -158,7 +159,7 @@ Describe 'Invoke-PSDocument' -Tag 'Cmdlet', 'Common', 'Invoke-PSDocument', 'From
 
         It 'Returns documents' {
             $Null = Import-Module $testModuleSourcePath -Force;
-            $result = @(Invoke-PSDocument -Module 'TestModule' -Name 'TestDocument1' -Culture 'en-US', 'en-AU', 'en-ZZ');
+            $result = @($testObject | Invoke-PSDocument -Module 'TestModule' -Name 'TestDocument1' -Culture 'en-US', 'en-AU', 'en-ZZ');
             $result | Should -Not -BeNullOrEmpty;
             $result.Length | Should -Be 3;
             $result[0].Split([System.Environment]::NewLine, [System.StringSplitOptions]::RemoveEmptyEntries) | Should -Be "Culture=en-US";
@@ -169,9 +170,19 @@ Describe 'Invoke-PSDocument' -Tag 'Cmdlet', 'Common', 'Invoke-PSDocument', 'From
 
     Context 'With -PassThru' {
         It 'Should return results' {
-            $result = @(Invoke-PSDocument -Path $here -OutputPath $outputPath -Name FromFileTest1,FromFileTest2 -PassThru);
+            $result = @($testObject | Invoke-PSDocument -Path $here -OutputPath $outputPath -Name FromFileTest1,FromFileTest2 -PassThru);
             $result | Should -Not -BeNullOrEmpty;
             $result.Length | Should -Be 2;
+            $result[0] | Should -Match "`# Test title";
+            $result[1] | Should -Match "test: Test2";
+        }
+    }
+
+    Context 'With -InputPath' {
+        It 'Should return results' {
+            $result = @(Invoke-PSDocument -Path $here -OutputPath $outputPath -InputPath $here/*.yml -Name FromFileTest1,FromFileTest2 -PassThru);
+            $result | Should -Not -BeNullOrEmpty;
+            $result.Length | Should -Be 4;
             $result[0] | Should -Match "`# Test title";
             $result[1] | Should -Match "test: Test2";
         }
@@ -180,14 +191,14 @@ Describe 'Invoke-PSDocument' -Tag 'Cmdlet', 'Common', 'Invoke-PSDocument', 'From
     Context 'With constrained language' {
         # Check that '[Console]::WriteLine('Should fail')' is not executed
         It 'Should fail to execute blocked code' {
-            { Invoke-PSDocument -Path $here -OutputPath $outputPath -Name 'ConstrainedTest2' -Option @{ 'Execution.LanguageMode' = 'ConstrainedLanguage' } -ErrorAction Stop } | Should -Throw 'Cannot invoke method. Method invocation is supported only on core types in this language mode.';
+            { $testObject | Invoke-PSDocument -Path $here -OutputPath $outputPath -Name 'ConstrainedTest2' -Option @{ 'Execution.LanguageMode' = 'ConstrainedLanguage' } -ErrorAction Stop } | Should -Throw 'Cannot invoke method. Method invocation is supported only on core types in this language mode.';
             Test-Path -Path "$outputPath\ConstrainedTest2.md" | Should -Be $False;
         }
         It 'Checks if DeviceGuard is enabled' {
             Mock -CommandName IsDeviceGuardEnabled -ModuleName PSDocs -Verifiable -MockWith {
                 return $True;
             }
-            Invoke-PSDocument -Path $here -OutputPath $outputPath -Name 'ConstrainedTest1';
+            $testObject | Invoke-PSDocument -Path $here -OutputPath $outputPath -Name 'ConstrainedTest1';
             Assert-MockCalled -CommandName IsDeviceGuardEnabled -ModuleName PSDocs -Times 1;
         }
     }

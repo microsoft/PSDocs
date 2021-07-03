@@ -14,12 +14,14 @@ namespace PSDocs.Runtime
     {
         private Configuration _Configuration;
         private PSDocsDocument _Document;
+        private PSDocsSource _Source;
 
         public PSDocs() { }
 
         internal PSDocs(RunspaceContext context)
             : base(context) { }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Exposed as helper for PowerShell.")]
         public sealed class PSDocsDocument : ScopedItem
         {
             internal PSDocsDocument(RunspaceContext context)
@@ -72,6 +74,19 @@ namespace PSDocs.Runtime
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Exposed as helper for PowerShell.")]
+        public sealed class PSDocsSource : ScopedItem
+        {
+            internal PSDocsSource(RunspaceContext context)
+                : base(context) { }
+
+            public string Path => GetContext().TargetObject?.Source.Path;
+
+            public string FullName => GetContext().TargetObject?.Source.FullName;
+
+            public string DirectoryName => GetContext().TargetObject?.Source.DirectoryName;
+        }
+
         /// <summary>
         /// The current target object.
         /// </summary>
@@ -80,7 +95,7 @@ namespace PSDocs.Runtime
             get
             {
                 RequireScope(RunspaceScope.Document | RunspaceScope.ConventionBegin | RunspaceScope.ConventionProcess | RunspaceScope.Condition);
-                return GetContext().TargetObject;
+                return GetContext().TargetObject.Value;
             }
         }
 
@@ -95,10 +110,7 @@ namespace PSDocs.Runtime
         /// <summary>
         /// Custom configuration values.
         /// </summary>
-        public Configuration Configuration
-        {
-            get { return GetConfiguration(); }
-        }
+        public Configuration Configuration => GetConfiguration();
 
         /// <summary>
         /// The current culture.
@@ -112,10 +124,7 @@ namespace PSDocs.Runtime
             }
         }
 
-        public PSDocsDocument Document
-        {
-            get { return GetDocument(); }
-        }
+        public PSDocsDocument Document => GetDocument();
 
         public IEnumerable Output
         {
@@ -125,6 +134,8 @@ namespace PSDocs.Runtime
                 return GetContext().Output;
             }
         }
+
+        public PSDocsSource Source => GetSource();
 
         /// <summary>
         /// Format a string with arguments.
@@ -159,6 +170,15 @@ namespace PSDocs.Runtime
                 _Document = new PSDocsDocument(GetContext());
 
             return _Document;
+        }
+
+        private PSDocsSource GetSource()
+        {
+            RequireScope(RunspaceScope.Document | RunspaceScope.ConventionBegin | RunspaceScope.ConventionProcess | RunspaceScope.Condition);
+            if (_Source == null)
+                _Source = new PSDocsSource(GetContext());
+
+            return _Source;
         }
 
         #endregion Helper methods

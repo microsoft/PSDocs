@@ -41,7 +41,7 @@ namespace PSDocs
         {
             var builder = PipelineBuilder.Invoke(GetSource(), GetOption(new string[] { documentName }), null, null);
             var pipeline = builder.Build() as InvokePipeline;
-            var targetObject = PSObject.AsPSObject(new TestModel());
+            var targetObject = new TargetObject(PSObject.AsPSObject(new TestModel()));
             return pipeline.BuildDocument(targetObject);
         }
 

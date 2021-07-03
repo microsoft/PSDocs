@@ -1,11 +1,16 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace PSDocs.Configuration
 {
-    public sealed class ExecutionOption
+    /// <summary>
+    /// Options that affect document execution.
+    /// </summary>
+    public sealed class ExecutionOption : IEquatable<ExecutionOption>
     {
         private const LanguageMode DEFAULT_LANGUAGEMODE = Configuration.LanguageMode.FullLanguage;
 
@@ -53,7 +58,25 @@ namespace PSDocs.Configuration
             };
         }
 
+        /// <summary>
+        /// The PowerShell language mode to use for document execution.
+        /// </summary>
+        /// <remarks>
+        /// The default is FullLanguage.
+        /// </remarks>
         [DefaultValue(null)]
         public LanguageMode? LanguageMode { get; set; }
+
+        internal void Load(EnvironmentHelper env)
+        {
+            if (env.TryEnum("PSDOCS_EXECUTION_LANGUAGEMODE", out LanguageMode languageMode))
+                LanguageMode = languageMode;
+        }
+
+        internal void Load(Dictionary<string, object> index)
+        {
+            if (index.TryPopEnum("Execution.LanguageMode", out LanguageMode languageMode))
+                LanguageMode = languageMode;
+        }
     }
 }

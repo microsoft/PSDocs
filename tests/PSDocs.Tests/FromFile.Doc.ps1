@@ -5,7 +5,7 @@ Export-PSDocumentConvention 'FromFileTest1' {
 
 }
 
-document 'FromFileTest1' {
+Document 'FromFileTest1' {
     Title 'Test title'
     Metadata @{
         test = 'Test1'
@@ -15,7 +15,7 @@ document 'FromFileTest1' {
     }
 }
 
-document 'FromFileTest2' {
+Document 'FromFileTest2' {
     Metadata @{
         test = 'Test2'
     }
@@ -24,7 +24,7 @@ document 'FromFileTest2' {
     }
 }
 
-document 'FromFileTest3' -Tag 'Test3' {
+Document 'FromFileTest3' -Tag 'Test3' {
     Metadata @{
         test = 'Test3'
     }
@@ -33,25 +33,41 @@ document 'FromFileTest3' -Tag 'Test3' {
     }
 }
 
-document 'FromFileTest4' -Tag 'Test4' {
+Document 'FromFileTest4' -Tag 'Test4' {
     Section 'Test' {
         'Test 4'
     }
 }
 
-document 'FromFileTest5' -Tag 'Test4','Test5' {
+Document 'FromFileTest5' -Tag 'Test4','Test5' {
     Section 'Test' {
         'Test 5'
     }
 }
 
-document 'ConstrainedTest1' {
+Document 'ConstrainedTest1' {
     Section 'Test' {
         'Test 1'
     }
 }
 
-document 'ConstrainedTest2' {
+Document 'ConstrainedTest2' {
 
     [Console]::WriteLine('Should fail');
+}
+
+Document 'WithIf' -If { $TargetObject.Generator -eq 'PSDocs' } {
+    Metadata @{
+        Name = $PSDocs.TargetObject.Name
+    }
+
+    'EOF'
+}
+
+Document 'WithSelector' -With 'GeneratorSelector' {
+    Metadata @{
+        Name = $PSDocs.TargetObject.Name
+    }
+
+    'EOF'
 }

@@ -110,9 +110,15 @@ namespace PSDocs.Benchmark
         }
 
         [Benchmark]
-        public void InvokeMarkdownProcessor() => _InvokeMarkdownProcessor(_Document[0]);
+        public void InvokeMarkdownProcessor()
+        {
+            _InvokeMarkdownProcessor(_Document[0]);
+        }
 
         [Benchmark]
-        public void InvokePipeline() => _InvokePipeline(_SourceObject);
+        public void InvokePipeline()
+        {
+            _InvokePipeline(_SourceObject);
+        }
     }
 }

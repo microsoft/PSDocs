@@ -1,14 +1,13 @@
-﻿// Copyright (c) Microsoft Corporation.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using PSDocs.Configuration;
 using PSDocs.Data;
 using PSDocs.Models;
 using PSDocs.Processor;
 using PSDocs.Processor.Markdown;
 using PSDocs.Runtime;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Management.Automation;
 
 namespace PSDocs.Pipeline
 {
@@ -26,11 +25,27 @@ namespace PSDocs.Pipeline
     {
         private string[] _InstanceName;
         private string[] _Convention;
+        private InputFileInfo[] _InputPath;
+
 
         internal InvokePipelineBuilder(Source[] source, HostContext hostContext)
             : base(source, hostContext)
         {
-            // Do nothing
+            _InputPath = null;
+        }
+
+        public void InputPath(string[] path)
+        {
+            if (path == null || path.Length == 0)
+                return;
+
+            var basePath = PSDocumentOption.GetWorkingPath();
+            var filter = PathFilterBuilder.Create(basePath, Option.Input.PathIgnore);
+            filter.UseGitIgnore();
+
+            var builder = new InputPathBuilder(Writer, basePath, "*", filter.Build());
+            builder.Add(path);
+            _InputPath = builder.Build();
         }
 
         public void InstanceName(string[] instanceName)
@@ -60,8 +75,49 @@ namespace PSDocs.Pipeline
         protected override PipelineContext PrepareContext()
         {
             var instanceNameBinder = new InstanceNameBinder(_InstanceName);
-            var context = new PipelineContext(Option, Writer, OutputVisitor, instanceNameBinder, _Convention);
+            var context = new PipelineContext(GetOptionContext(), PrepareStream(), Writer, OutputVisitor, instanceNameBinder, _Convention);
             return context;
+        }
+
+        protected override PipelineStream PrepareStream()
+        {
+            if (!string.IsNullOrEmpty(Option.Input.ObjectPath))
+            {
+                AddVisitTargetObjectAction((targetObject, next) =>
+                {
+                    return PipelineReceiverActions.ReadObjectPath(targetObject, next, Option.Input.ObjectPath, true);
+                });
+            }
+
+            if (Option.Input.Format == InputFormat.Yaml)
+            {
+                AddVisitTargetObjectAction((targetObject, next) =>
+                {
+                    return PipelineReceiverActions.ConvertFromYaml(targetObject, next);
+                });
+            }
+            else if (Option.Input.Format == InputFormat.Json)
+            {
+                AddVisitTargetObjectAction((targetObject, next) =>
+                {
+                    return PipelineReceiverActions.ConvertFromJson(targetObject, next);
+                });
+            }
+            else if (Option.Input.Format == InputFormat.PowerShellData)
+            {
+                AddVisitTargetObjectAction((targetObject, next) =>
+                {
+                    return PipelineReceiverActions.ConvertFromPowerShellData(targetObject, next);
+                });
+            }
+            else if (Option.Input.Format == InputFormat.Detect && _InputPath != null)
+            {
+                AddVisitTargetObjectAction((targetObject, next) =>
+                {
+                    return PipelineReceiverActions.DetectInputFormat(targetObject, next);
+                });
+            }
+            return new PipelineStream(VisitTargetObject, _InputPath);
         }
     }
 
@@ -80,17 +136,18 @@ namespace PSDocs.Pipeline
             : base(context, source)
         {
             _Runspace = new RunspaceContext(Context);
+            HostHelper.ImportResource(Source, _Runspace);
             _Builder = HostHelper.GetDocumentBuilder(_Runspace, Source);
             _Processor = new MarkdownProcessor();
             _Completed = new List<IDocumentResult>();
         }
 
-        protected override void ProcessObject(PSObject sourceObject)
+        protected override void ProcessObject(TargetObject targetObject)
         {
             try
             {
-                var doc = BuildDocument(sourceObject);
-                for (var i = 0; i < doc.Length; i++)
+                var doc = BuildDocument(targetObject);
+                for (var i = 0; doc != null && i < doc.Length; i++)
                 {
                     var result = WriteDocument(doc[i]);
                     if (result != null)
@@ -131,9 +188,9 @@ namespace PSDocs.Pipeline
             return _Processor.Process(Context.Option, document);
         }
 
-        internal Document[] BuildDocument(PSObject sourceObject)
+        internal Document[] BuildDocument(TargetObject targetObject)
         {
-            _Runspace.EnterTargetObject(sourceObject);
+            _Runspace.EnterTargetObject(targetObject);
             var result = new List<Document>();
             for (var c = 0; c < Context.Option.Output.Culture.Length; c++)
             {
@@ -145,9 +202,9 @@ namespace PSDocs.Pipeline
                         _Runspace.EnterDocument(instanceName);
                         try
                         {
-                            // TODO: Add target name binding
-                            var document = _Builder[i].Process(_Runspace, sourceObject);
-                            result.Add(document);
+                            var document = _Builder[i].Process(_Runspace, targetObject.Value);
+                            if (document != null)
+                                result.Add(document);
                         }
                         finally
                         {

@@ -61,6 +61,24 @@ namespace PSDocs.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Target failed Type precondition.
+        /// </summary>
+        internal static string DebugTargetTypeMismatch {
+            get {
+                return ResourceManager.GetString("DebugTargetTypeMismatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not find required parameter &apos;{0}&apos; for definition at {1}..
+        /// </summary>
+        internal static string DefinitionParameterNotFound {
+            get {
+                return ResourceManager.GetString("DefinitionParameterNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to [PSDocs][D] -- Found {0} PSDocs module(s).
         /// </summary>
         internal static string FoundModules {
@@ -75,6 +93,24 @@ namespace PSDocs.Resources {
         internal static string IncludeNotFound {
             get {
                 return ResourceManager.GetString("IncludeNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Document nesting was detected for definition at {0}. Definitions must not be nested..
+        /// </summary>
+        internal static string InvalidDocumentNesting {
+            get {
+                return ResourceManager.GetString("InvalidDocumentNesting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An invalid ErrorAction ({0}) was specified for definition at {1}. Ignore | Stop are supported..
+        /// </summary>
+        internal static string InvalidErrorAction {
+            get {
+                return ResourceManager.GetString("InvalidErrorAction", resourceCulture);
             }
         }
         
@@ -138,6 +174,42 @@ namespace PSDocs.Resources {
         internal static string ScriptNotFound {
             get {
                 return ResourceManager.GetString("ScriptNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to [PSDocs][S][Trace] -- {0}: {1} {0} {2}.
+        /// </summary>
+        internal static string SelectorExpressionTrace {
+            get {
+                return ResourceManager.GetString("SelectorExpressionTrace", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to [PSDocs][S][Trace] -- {0}.
+        /// </summary>
+        internal static string SelectorMatchTrace {
+            get {
+                return ResourceManager.GetString("SelectorMatchTrace", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The selector &apos;{0}&apos; specified for definition at {1} could not be found..
+        /// </summary>
+        internal static string SelectorNotFound {
+            get {
+                return ResourceManager.GetString("SelectorNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to [PSDocs][S][Trace] -- {0}: {1}.
+        /// </summary>
+        internal static string SelectorTrace {
+            get {
+                return ResourceManager.GetString("SelectorTrace", resourceCulture);
             }
         }
         

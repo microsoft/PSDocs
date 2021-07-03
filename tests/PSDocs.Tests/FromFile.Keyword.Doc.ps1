@@ -124,6 +124,8 @@ Document 'MetadataSingleEntry' {
     Metadata ([ordered]@{
         title = 'Test'
     })
+
+    'EOF'
 }
 
 Document 'MetadataMultipleEntry' {
@@ -131,6 +133,8 @@ Document 'MetadataMultipleEntry' {
         value1 = 'ABC'
         value2 = 'EFG'
     })
+
+    'EOF'
 }
 
 Document 'MetadataMultipleBlock' {
@@ -260,11 +264,15 @@ Document 'TableWithEmptyColumn' {
 
 Document 'SingleTitle' {
     Title 'Test title'
+
+    'EOF'
 }
 
 Document 'MultipleTitle' {
     Title 'Title 1'
     Title 'Title 2'
+
+    'EOF'
 }
 
 # Synopsis: Tests Title with empty or null string
@@ -272,6 +280,8 @@ Document 'EmptyTitle' {
     $value = ''
     Title $notValue
     Title $value
+
+    'EOF'
 }
 
 #endregion Title

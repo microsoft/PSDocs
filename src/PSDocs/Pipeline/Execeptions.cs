@@ -42,6 +42,62 @@ namespace PSDocs.Pipeline
         }
     }
 
+    /// <summary>
+    /// A parser exception.
+    /// </summary>
+    [Serializable]
+    public sealed class ParseException : PipelineException
+    {
+        /// <summary>
+        /// Creates a rule exception.
+        /// </summary>
+        public ParseException()
+        {
+        }
+
+        public ParseException(string message)
+            : base(message) { }
+
+        public ParseException(string message, Exception innerException)
+            : base(message, innerException) { }
+
+        /// <summary>
+        /// Creates a rule exception.
+        /// </summary>
+        /// <param name="message">The detail of the exception.</param>
+        internal ParseException(string message, string errorId) : base(message)
+        {
+            ErrorId = errorId;
+        }
+
+        /// <summary>
+        /// Creates a rule exception.
+        /// </summary>
+        /// <param name="message">The detail of the exception.</param>
+        /// <param name="innerException">A nested exception that caused the issue.</param>
+        internal ParseException(string message, string errorId, Exception innerException) : base(message, innerException)
+        {
+            ErrorId = errorId;
+        }
+
+        private ParseException(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+            ErrorId = info.GetString("ErrorId");
+        }
+
+        public string ErrorId { get; }
+
+        [SecurityPermission(SecurityAction.Demand, SerializationFormatter = true)]
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            if (info == null)
+                throw new ArgumentNullException(nameof(info));
+
+            info.AddValue("ErrorId", ErrorId);
+            base.GetObjectData(info, context);
+        }
+    }
+
     [Serializable]
     public sealed class RuntimeException : PipelineException
     {

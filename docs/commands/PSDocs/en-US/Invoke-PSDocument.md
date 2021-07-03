@@ -13,10 +13,22 @@ Create markdown from an input object.
 
 ## SYNTAX
 
+### Input (Default)
+
 ```text
 Invoke-PSDocument [-Module <String[]>] [-Name <String[]>] [-Tag <String[]>] [-InstanceName <String[]>]
- [-InputObject <PSObject>] [[-Path] <String>] [-OutputPath <String>] [-PassThru] [-Option <PSDocumentOption>]
- [-Encoding <MarkdownEncoding>] [-Culture <String[]>] [-Convention <String[]>] [<CommonParameters>]
+ [-InputObject <PSObject>] [[-Path] <String[]>] [-Format <InputFormat>] [-OutputPath <String>] [-PassThru]
+ [-Option <PSDocumentOption>] [-Encoding <MarkdownEncoding>] [-Culture <String[]>] [-Convention <String[]>]
+ [<CommonParameters>]
+```
+
+### InputPath
+
+```text
+Invoke-PSDocument -InputPath <String[]> [-Module <String[]>] [-Name <String[]>] [-Tag <String[]>]
+ [-InstanceName <String[]>] [[-Path] <String[]>] [-Format <InputFormat>] [-OutputPath <String>] [-PassThru]
+ [-Option <PSDocumentOption>] [-Encoding <MarkdownEncoding>] [-Culture <String[]>] [-Convention <String[]>]
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -159,13 +171,58 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -Format
+
+Configures the input format for when a string is passed in as a target object.
+
+When the `-InputObject` parameter or pipeline input is used, strings are treated as plain text by default.
+Set this option to either `Yaml`, `Json`, `PowerShellData` to have PSDocs deserialize the object.
+
+When the `-InputPath` parameter is used with a file path or URL.
+If the Detect format is used, the file extension will be used to automatically detect the format.
+When `-InputPath` is not used, `Detect` is the same as `None`.
+
+See `about_PSDocs_Options` for details.
+
+This parameter takes precedence over the `Input.Format` option if set.
+
+```yaml
+Type: InputFormat
+Parameter Sets: (All)
+Aliases: InputFormat
+Accepted values: None, Yaml, Json, PowerShellData, Detect
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -InputPath
+
+Instead of processing objects from the pipeline,
+import objects file the specified file paths.
+
+```yaml
+Type: String[]
+Parameter Sets: InputPath
+Aliases: f
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### -InputObject
 
 An input object that will be passed to each document and can be referenced within document blocks as `$TargetObject`.
 
 ```yaml
 Type: PSObject
-Parameter Sets: (All)
+Parameter Sets: Input
 Aliases:
 
 Required: False
@@ -250,7 +307,7 @@ Accept wildcard characters: False
 A list of paths to use document definitions from.
 
 ```yaml
-Type: String
+Type: String[]
 Parameter Sets: (All)
 Aliases: p
 

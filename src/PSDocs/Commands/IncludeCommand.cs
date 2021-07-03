@@ -48,7 +48,7 @@ namespace PSDocs.Commands
                 ));
                 return;
             }
-            WriteObject(result);            
+            WriteObject(result);
         }
     }
 }

@@ -9,8 +9,10 @@ namespace PSDocs.Commands
     [Cmdlet(VerbsCommon.New, LanguageKeywords.Definition)]
     internal sealed class DefinitionCommand : PSCmdlet
     {
-        private const string InvokeBlockCmdletName = "Invoke-Block";
-        private const string InvokeBlockCmdlet_BodyParameter = "Body";
+        private const string InvokeCmdletName = "Invoke-Block";
+        private const string InvokeCmdlet_IfParameter = "If";
+        private const string InvokeCmdlet_WithParameter = "With";
+        private const string InvokeCmdlet_BodyParameter = "Body";
 
         /// <summary>
         /// Document block name.
@@ -31,31 +33,40 @@ namespace PSDocs.Commands
         [Parameter(Mandatory = false)]
         public string[] Tag { get; set; }
 
+        /// <summary>
+        /// An optional script precondition before the Document is evaluated.
+        /// </summary>
+        [Parameter(Mandatory = false)]
+        public ScriptBlock If { get; set; }
+
+        /// <summary>
+        /// An optional selector precondition before the Document is evaluated.
+        /// </summary>
+        [Parameter(Mandatory = false)]
+        public string[] With { get; set; }
+
         protected override void ProcessRecord()
         {
             var context = RunspaceContext.CurrentThread;
-            var sourceFile = context.SourceFile;
+            var source = context.Source;
             var extent = new ResourceExtent(
-                file: sourceFile.Path,
+                file: source.File.Path,
                 startLineNumber: Body.Ast.Extent.StartLineNumber
             );
 
             // Create PS instance for execution
             var ps = context.NewPowerShell();
-            ps.AddCommand(new CmdletInfo(InvokeBlockCmdletName, typeof(InvokeDocumentCommand)));
-            //ps.AddParameter(InvokeBlockCmdlet_TypeParameter, NodeType);
-            ps.AddParameter(InvokeBlockCmdlet_BodyParameter, Body);
+            ps.AddCommand(new CmdletInfo(InvokeCmdletName, typeof(InvokeDocumentCommand)));
+            ps.AddParameter(InvokeCmdlet_IfParameter, If);
+            ps.AddParameter(InvokeCmdlet_WithParameter, With);
+            ps.AddParameter(InvokeCmdlet_BodyParameter, Body);
 
             var block = new ScriptDocumentBlock(
-                source: sourceFile,
+                source: source.File,
                 name: Name,
-                //info: helpInfo,
                 body: ps,
                 tag: Tag,
                 extent: extent
-            //type: NodeType
-            //dependsOn: RuleHelper.ExpandRuleName(DependsOn, MyInvocation.ScriptName, source.ModuleName),
-            //configuration: Configure
             );
             WriteObject(block);
         }

@@ -5,6 +5,7 @@ using PSDocs.Resources;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Management.Automation;
@@ -19,7 +20,37 @@ namespace PSDocs.Configuration
     /// </summary>
     internal delegate string PathDelegate();
 
-    public sealed class PSDocumentOption
+    public interface IPSDocumentOption
+    {
+        /// <summary>
+        /// A set of key/ value configuration options for document definitions.
+        /// </summary>
+        ConfigurationOption Configuration { get; }
+
+        DocumentOption Document { get; }
+
+        /// <summary>
+        /// Options that affect document execution.
+        /// </summary>
+        ExecutionOption Execution { get; }
+
+        /// <summary>
+        /// Options that affect how input types are processed.
+        /// </summary>
+        InputOption Input { get; }
+
+        /// <summary>
+        /// Options that affect markdown formatting.
+        /// </summary>
+        MarkdownOption Markdown { get; }
+
+        /// <summary>
+        /// Options that affect how output is generated.
+        /// </summary>
+        OutputOption Output { get; }
+    }
+
+    public sealed class PSDocumentOption : IPSDocumentOption
     {
         private const string DEFAULT_FILENAME = "ps-docs.yaml";
 
@@ -27,6 +58,7 @@ namespace PSDocs.Configuration
         {
             Document = DocumentOption.Default,
             Execution = ExecutionOption.Default,
+            Input = InputOption.Default,
             Markdown = MarkdownOption.Default,
             Output = OutputOption.Default,
         };
@@ -39,6 +71,7 @@ namespace PSDocs.Configuration
             Configuration = new ConfigurationOption();
             Document = new DocumentOption();
             Execution = new ExecutionOption();
+            Input = new InputOption();
             Markdown = new MarkdownOption();
             Output = new OutputOption();
         }
@@ -51,6 +84,7 @@ namespace PSDocs.Configuration
             Configuration = new ConfigurationOption(option?.Configuration);
             Document = new DocumentOption(option?.Document);
             Execution = new ExecutionOption(option?.Execution);
+            Input = new InputOption(option?.Input);
             Markdown = new MarkdownOption(option?.Markdown);
             Output = new OutputOption(option?.Output);
         }
@@ -61,7 +95,7 @@ namespace PSDocs.Configuration
         private static PathDelegate _GetWorkingPath = () => Directory.GetCurrentDirectory();
 
         /// <summary>
-        /// Sets the current culture to use when processing rules unless otherwise specified.
+        /// Sets the current culture to use when processing documents unless otherwise specified.
         /// </summary>
         private static CultureInfo _CurrentCulture = Thread.CurrentThread.CurrentCulture;
 
@@ -70,20 +104,31 @@ namespace PSDocs.Configuration
         /// </summary>
         public string Generator { get; set; }
 
+        /// <summary>
+        /// A set of key/ value configuration options for document definitions.
+        /// </summary>
         public ConfigurationOption Configuration { get; set; }
 
         public DocumentOption Document { get; set; }
 
         /// <summary>
-        /// Options that affect script execution.
+        /// Options that affect document execution.
         /// </summary>
         public ExecutionOption Execution { get; set; }
+
+        /// <summary>
+        /// Options that affect how input types are processed.
+        /// </summary>
+        public InputOption Input { get; set; }
 
         /// <summary>
         /// Options that affect markdown formatting.
         /// </summary>
         public MarkdownOption Markdown { get; set; }
 
+        /// <summary>
+        /// Options that affect how output is generated.
+        /// </summary>
         public OutputOption Output { get; set; }
 
         public string ToYaml()
@@ -106,6 +151,7 @@ namespace PSDocs.Configuration
             result.Configuration = ConfigurationOption.Combine(result.Configuration, o2?.Configuration);
             result.Document = DocumentOption.Combine(result.Document, o2?.Document);
             result.Execution = ExecutionOption.Combine(result.Execution, o2?.Execution);
+            result.Input = InputOption.Combine(result.Input, o2?.Input);
             result.Markdown = MarkdownOption.Combine(result.Markdown, o2?.Markdown);
             result.Output = OutputOption.Combine(result.Output, o2?.Output);
             return result;
@@ -135,7 +181,7 @@ namespace PSDocs.Configuration
                     return Default.Clone();
                 }
             }
-            return FromYaml(path: filePath, yaml: File.ReadAllText(filePath));
+            return FromEnvironment(FromYaml(path: filePath, yaml: File.ReadAllText(filePath)));
         }
 
         public static PSDocumentOption FromDefault()
@@ -160,7 +206,7 @@ namespace PSDocs.Configuration
             if (!File.Exists(filePath))
                 return new PSDocumentOption();
 
-            return FromYaml(path: filePath, yaml: File.ReadAllText(filePath));
+            return FromEnvironment(FromYaml(path: filePath, yaml: File.ReadAllText(filePath)));
         }
 
         /// <summary>
@@ -256,6 +302,7 @@ namespace PSDocs.Configuration
                 Configuration == other.Configuration &&
                 Document == other.Document &&
                 Execution == other.Execution &&
+                Input == other.Input &&
                 Markdown == other.Markdown &&
                 Output == other.Output;
         }
@@ -268,6 +315,7 @@ namespace PSDocs.Configuration
                 hash = hash * 23 + (Configuration != null ? Configuration.GetHashCode() : 0);
                 hash = hash * 23 + (Document != null ? Document.GetHashCode() : 0);
                 hash = hash * 23 + (Execution != null ? Execution.GetHashCode() : 0);
+                hash = hash * 23 + (Input != null ? Input.GetHashCode() : 0);
                 hash = hash * 23 + (Markdown != null ? Markdown.GetHashCode() : 0);
                 hash = hash * 23 + (Output != null ? Output.GetHashCode() : 0);
                 return hash;
@@ -280,41 +328,7 @@ namespace PSDocs.Configuration
         /// <param name="hashtable"></param>
         public static implicit operator PSDocumentOption(Hashtable hashtable)
         {
-            var option = new PSDocumentOption();
-
-            // Build index to allow mapping
-            var index = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-            foreach (DictionaryEntry entry in hashtable)
-                index.Add(entry.Key.ToString(), entry.Value);
-
-            // Start loading matching values
-            if (index.TryPopEnum("execution.languagemode", out LanguageMode languageMode))
-                option.Execution.LanguageMode = languageMode;
-
-            if (index.TryPopString("markdown.wrapseparator", out string svalue))
-                option.Markdown.WrapSeparator = svalue;
-
-            if (index.TryPopEnum("markdown.encoding", out MarkdownEncoding markdownEncoding))
-                option.Markdown.Encoding = markdownEncoding;
-
-            if (index.TryPopBool("markdown.skipemptysections", out bool bvalue))
-                option.Markdown.SkipEmptySections = bvalue;
-
-            if (index.TryPopEnum("markdown.columnpadding", out ColumnPadding columnPadding))
-                option.Markdown.ColumnPadding = columnPadding;
-
-            if (index.TryPopEnum("markdown.useedgepipes", out EdgePipeOption useEdgePipes))
-                option.Markdown.UseEdgePipes = useEdgePipes;
-
-            if(index.TryPopStringArray("output.culture", out string[] savalue))
-                option.Output.Culture = savalue;
-
-            if(index.TryPopString("output.path", out svalue))
-                option.Output.Path = svalue;
-
-            // Process configuration values
-            option.Configuration.Load(index);
-            return option;
+            return FromHashtable(hashtable);
         }
 
         /// <summary>
@@ -323,8 +337,53 @@ namespace PSDocs.Configuration
         /// <param name="path"></param>
         public static implicit operator PSDocumentOption(string path)
         {
-            var option = FromFile(path);
+            return FromFile(path);
+        }
+
+        private static PSDocumentOption FromEnvironment(PSDocumentOption option)
+        {
+            if (option == null)
+                option = new PSDocumentOption();
+
+            // Start loading matching values
+            var env = EnvironmentHelper.Default;
+            //option.Document.Load(env); // Currently set from cmdlet
+            option.Execution.Load(env);
+            option.Input.Load(env);
+            option.Markdown.Load(env);
+            option.Output.Load(env);
+            option.Configuration.Load(env);
             return option;
+        }
+
+        public static PSDocumentOption FromHashtable(Hashtable hashtable)
+        {
+            var option = new PSDocumentOption();
+            if (hashtable == null)
+                return option;
+
+            // Start loading matching values
+            var index = BuildIndex(hashtable);
+            //option.Document.Load(index); // Currently set from cmdlet
+            option.Execution.Load(index);
+            option.Input.Load(index);
+            option.Markdown.Load(index);
+            option.Output.Load(index);
+            option.Configuration.Load(index);
+            return option;
+        }
+
+        /// <summary>
+        /// Build index to allow mapping values.
+        /// </summary>
+        [DebuggerStepThrough]
+        internal static Dictionary<string, object> BuildIndex(Hashtable hashtable)
+        {
+            var index = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+            foreach (DictionaryEntry entry in hashtable)
+                index.Add(entry.Key.ToString(), entry.Value);
+
+            return index;
         }
 
         /// <summary>
@@ -364,6 +423,18 @@ namespace PSDocs.Configuration
         }
 
         /// <summary>
+        /// Get a full path instead of a relative path that may be passed from PowerShell.
+        /// </summary>
+        internal static string GetRootedBasePath(string path)
+        {
+            var rootedPath = GetRootedPath(path);
+            if (rootedPath.Length > 0 && IsSeparator(rootedPath[rootedPath.Length - 1]))
+                return rootedPath;
+
+            return string.Concat(rootedPath, Path.DirectorySeparatorChar);
+        }
+
+        /// <summary>
         /// Determine if the combined file path is exists.
         /// </summary>
         /// <param name="path">A directory path where a options file may be stored.</param>
@@ -373,6 +444,12 @@ namespace PSDocs.Configuration
         {
             var filePath = Path.Combine(path, name);
             return File.Exists(filePath) ? filePath : null;
+        }
+
+        [DebuggerStepThrough]
+        private static bool IsSeparator(char c)
+        {
+            return c == Path.DirectorySeparatorChar || c == Path.AltDirectorySeparatorChar;
         }
     }
 }

@@ -5,9 +5,6 @@ namespace PSDocs.Models
 {
     public sealed class Section : SectionNode
     {
-        public override DocumentNodeType Type
-        {
-            get { return DocumentNodeType.Section; }
-        }
+        public override DocumentNodeType Type => DocumentNodeType.Section;
     }
 }

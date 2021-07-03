@@ -1,0 +1,213 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "PSDocs options",
+    "description": "A schema for PSDocs YAML options files.",
+    "$ref": "#/definitions/options",
+    "definitions": {
+        "configuration": {
+            "type": "object",
+            "title": "Configuration values",
+            "description": "A set of key/ value configuration options for document definitions.",
+            "markdownDescription": "A set of key/ value configuration options for document definitions. [See help](https://github.com/microsoft/PSDocs/blob/main/docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#configuration)",
+            "defaultSnippets": [
+                {
+                    "label": "Configuration value",
+                    "body": {
+                        "${1:Key}": "${2:Value}"
+                    }
+                }
+            ]
+        },
+        "execution-option": {
+            "type": "object",
+            "title": "Execution options",
+            "description": "Options that affect document execution.",
+            "properties": {
+                "languageMode": {
+                    "type": "string",
+                    "title": "Language mode",
+                    "description": "The PowerShell language mode to use for document execution. The default is FullLanguage.",
+                    "markdownDescription": "The PowerShell language mode to use for document execution. The default is `FullLanguage`. [See help](https://github.com/microsoft/PSDocs/blob/main/docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#executionlanguagemode)",
+                    "enum": [
+                        "FullLanguage",
+                        "ConstrainedLanguage"
+                    ],
+                    "default": "FullLanguage"
+                }
+            },
+            "additionalProperties": false
+        },
+        "input-option": {
+            "type": "object",
+            "title": "Input options",
+            "description": "Options that affect how input types are processed.",
+            "properties": {
+                "format": {
+                    "type": "string",
+                    "title": "Input format",
+                    "description": "The input string format. The default is Detect, which will try to detect the format when the -InputPath parameter is used.",
+                    "markdownDescription": "The input string format. The default is `Detect`, which will try to detect the format when the `-InputPath` parameter is used. [See help](https://github.com/microsoft/PSDocs/blob/main/docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#inputformat)",
+                    "enum": [
+                        "None",
+                        "Yaml",
+                        "Json",
+                        "PowerShellData",
+                        "Detect"
+                    ],
+                    "default": "Detect"
+                },
+                "objectPath": {
+                    "type": "string",
+                    "title": "Object path",
+                    "description": "The object path to a property to use instead of the pipeline object.",
+                    "markdownDescription": "The object path to a property to use instead of the pipeline object. [See help](https://github.com/microsoft/PSDocs/blob/main/docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#inputobjectpath)"
+                },
+                "pathIgnore": {
+                    "type": "array",
+                    "title": "Path ignore",
+                    "description": "Ignores input files that match the path spec.",
+                    "markdownDescription": "Ignores input files that match the path spec. [See help](https://github.com/microsoft/PSDocs/blob/main/docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#inputpathignore)",
+                    "items": {
+                        "type": "string"
+                    },
+                    "uniqueItems": true
+                }
+            },
+            "additionalProperties": false
+        },
+        "markdown-option": {
+            "type": "object",
+            "title": "Markdown options",
+            "description": "Options that affect markdown formatting.",
+            "properties": {
+                "columnPadding": {
+                    "type": "string",
+                    "title": "Column padding",
+                    "description": "Determines how table columns are padded. By default (MatchHeader), pads the header with a single space, then pads the column value, to the same width as the header.",
+                    "markdownDescription": "Determines how table columns are padded. By default (`MatchHeader`), pads the header with a single space, then pads the column value, to the same width as the header. [See help](https://github.com/microsoft/PSDocs/blob/main/docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#markdowncolumnpadding)",
+                    "enum": [
+                        "None",
+                        "Single",
+                        "MatchHeader",
+                        "Undefined"
+                    ],
+                    "default": "MatchHeader"
+                },
+                "encoding": {
+                    "type": "string",
+                    "title": "Encoding",
+                    "description": "Sets the text encoding used for markdown output files. By default (Default), UTF-8 without byte order mark (BOM) is used.",
+                    "markdownDescription": "Sets the text encoding used for markdown output files. By default (`Default`), UTF-8 without byte order mark (BOM) is used. [See help](https://github.com/microsoft/PSDocs/blob/main/docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#markdownencoding)",
+                    "enum": [
+                        "Default",
+                        "UTF8",
+                        "UTF7",
+                        "Unicode",
+                        "UTF32",
+                        "ASCII"
+                    ],
+                    "default": "Default"
+                },
+                "skipEmptySections": {
+                    "type": "boolean",
+                    "title": "Skip empty sections",
+                    "description": "Determines if empty sections are included in output. By default, sections without content are not included in output.",
+                    "markdownDescription": "Determines if empty sections are included in output. By default, sections without content are not included in output. [See help](https://github.com/microsoft/PSDocs/blob/main/docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#markdownskipemptysections)",
+                    "default": true
+                },
+                "useEdgePipes": {
+                    "type": "string",
+                    "title": "Use edge pipes",
+                    "description": "Determines when pipes on the edge of a table should be used. By default (WhenRequired), edge pipes are only used when required.",
+                    "markdownDescription": "Determines when pipes on the edge of a table should be used. By default (`WhenRequired`), edge pipes are only used when required. [See help](https://github.com/microsoft/PSDocs/blob/main/docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#markdownuseedgepipes)",
+                    "enum": [
+                        "WhenRequired",
+                        "Always"
+                    ],
+                    "default": "WhenRequired"
+                },
+                "wrapSeparator": {
+                    "type": "string",
+                    "title": "Wrap separator",
+                    "description": "Specifies the character/ string to use when wrapping lines in a table cell. By default a space is used.",
+                    "markdownDescription": "Specifies the character/ string to use when wrapping lines in a table cell. By default a space (` `) is used. [See help](https://github.com/microsoft/PSDocs/blob/main/docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#markdownwrapseparator)",
+                    "default": " "
+                }
+            },
+            "additionalProperties": false
+        },
+        "output-option": {
+            "type": "object",
+            "title": "Output options",
+            "description": "Options that affect how output is generated.",
+            "properties": {
+                "culture": {
+                    "title": "Culture",
+                    "description": "One or more cultures to use for generating output. When multiple cultures are specified, the first matching culture will be used. By default, the current PowerShell culture is used.",
+                    "markdownDescription": "One or more cultures to use for generating output. When multiple cultures are specified, the first matching culture will be used. By default, the current PowerShell culture is used. [See help](https://github.com/microsoft/PSDocs/blob/main/docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#outputculture)",
+                    "oneOf": [
+                        {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "description": "A culture for generating output.",
+                                "minLength": 2,
+                                "uniqueItems": true
+                            }
+                        },
+                        {
+                            "type": "string",
+                            "minLength": 2,
+                            "defaultSnippets": [
+                                {
+                                    "label": "en-AU",
+                                    "bodyText": "en-AU"
+                                },
+                                {
+                                    "label": "en-US",
+                                    "bodyText": "en-US"
+                                },
+                                {
+                                    "label": "en-GB",
+                                    "bodyText": "en-GB"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "path": {
+                    "type": "string",
+                    "title": "Output path",
+                    "description": "The file path location to save results.",
+                    "markdownDescription": "The file path location to save results. [See help](https://github.com/microsoft/PSDocs/blob/main/docs/concepts/PSDocs/en-US/about_PSDocs_Options.md#outputpath)"
+                }
+            },
+            "additionalProperties": false
+        },
+        "options": {
+            "properties": {
+                "configuration": {
+                    "type": "object",
+                    "$ref": "#/definitions/configuration"
+                },
+                "execution": {
+                    "type": "object",
+                    "$ref": "#/definitions/execution-option"
+                },
+                "input": {
+                    "type": "object",
+                    "$ref": "#/definitions/input-option"
+                },
+                "markdown": {
+                    "type": "object",
+                    "$ref": "#/definitions/markdown-option"
+                },
+                "output": {
+                    "type": "object",
+                    "$ref": "#/definitions/output-option"
+                }
+            },
+            "additionalProperties": false
+        }
+    }
+}

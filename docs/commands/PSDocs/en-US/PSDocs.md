@@ -14,10 +14,6 @@ Generate markdown from PowerShell.
 
 ## PSDocs Cmdlets
 
-### [Document](Document.md)
-
-Defines a named block that can be called to output documentation.
-
 ### [Get-PSDocumentHeader](Get-PSDocumentHeader.md)
 
 Get the Yaml header from a PSDocs generated markdown file.

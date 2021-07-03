@@ -16,13 +16,13 @@ namespace PSDocs.Processor.Markdown
         private const string TripleBacktick = "```";
         private const string MARKDOWN_FRONTMATTER = "---";
 
-        public readonly PSDocumentOption Option;
+        public readonly IPSDocumentOption Option;
         public readonly Document Document;
         private readonly StringBuilder Builder;
 
         private LineEnding _Ending;
 
-        internal MarkdownProcessorContext(PSDocumentOption option, Document document)
+        internal MarkdownProcessorContext(IPSDocumentOption option, Document document)
         {
             Option = option;
             Document = document;

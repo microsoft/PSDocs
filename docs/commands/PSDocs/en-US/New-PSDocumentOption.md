@@ -16,21 +16,24 @@ Create options to configure document generation.
 ### FromPath (Default)
 
 ```text
-New-PSDocumentOption [-Path <String>] [-Encoding <MarkdownEncoding>] [-Culture <String[]>]
- [-OutputPath <String>] [<CommonParameters>]
+New-PSDocumentOption [-Path <String>] [-Format <InputFormat>] [-InputObjectPath <String>]
+ [-InputPathIgnore <String[]>] [-Encoding <MarkdownEncoding>] [-Culture <String[]>] [-OutputPath <String>]
+ [<CommonParameters>]
 ```
 
 ### FromOption
 
 ```text
-New-PSDocumentOption -Option <PSDocumentOption> [-Encoding <MarkdownEncoding>] [-Culture <String[]>]
- [-OutputPath <String>] [<CommonParameters>]
+New-PSDocumentOption -Option <PSDocumentOption> [-Format <InputFormat>] [-InputObjectPath <String>]
+ [-InputPathIgnore <String[]>] [-Encoding <MarkdownEncoding>] [-Culture <String[]>] [-OutputPath <String>]
+ [<CommonParameters>]
 ```
 
 ### FromDefault
 
 ```text
-New-PSDocumentOption [-Default] [-Encoding <MarkdownEncoding>] [-Culture <String[]>] [-OutputPath <String>]
+New-PSDocumentOption [-Default] [-Format <InputFormat>] [-InputObjectPath <String>]
+ [-InputPathIgnore <String[]>] [-Encoding <MarkdownEncoding>] [-Culture <String[]>] [-OutputPath <String>]
  [<CommonParameters>]
 ```
 
@@ -94,6 +97,59 @@ Parameter Sets: FromDefault
 Aliases:
 
 Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Format
+
+Sets the `Input.Format` option to configure the input format for when a string is passed in as a target object.
+See about_PSDocs_Options for more information.
+
+```yaml
+Type: InputFormat
+Parameter Sets: (All)
+Aliases: InputFormat
+Accepted values: None, Yaml, Json, PowerShellData, Detect
+
+Required: False
+Position: Named
+Default value: Detect
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -InputObjectPath
+
+Sets the `Input.ObjectPath` option to use an object path to use instead of the pipeline object.
+See about_PSDocs_Options for more information.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -InputPathIgnore
+
+Sets the `Input.PathIgnore` option.
+If specified, files that match the path spec will not be processed.
+See about_PSDocs_Options for more information.
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases:
+
+Required: False
 Position: Named
 Default value: None
 Accept pipeline input: False

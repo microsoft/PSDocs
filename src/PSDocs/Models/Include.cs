@@ -13,7 +13,7 @@ namespace PSDocs.Models
 
         public string Path
         {
-            get { return _Path; }
+            get => _Path;
             set
             {
                 _Path = value;
