@@ -2,9 +2,11 @@
 
 ## Unreleased
 
+What's changed since pre-release v0.9.0-B2107002:
+
 - Engine features:
   - Added support for reading objects from file. [#132](https://github.com/Microsoft/PSDocs/issues/132) [#131](https://github.com/Microsoft/PSDocs/issues/131)
-  - Added support for conditionally processing documents based on target object. [#133](https://github.com/Microsoft/PSDocs/issues/113)
+  - Added support for conditionally processing documents based on target object. [#133](https://github.com/Microsoft/PSDocs/issues/133)
     - **Breaking change**: Documents that do not set a body are skipped.
     - Conditionally process target objects with script block or selector based conditions.
     - Script block based conditions are PowerShell code that can be added to `Document` blocks with `-If`.
