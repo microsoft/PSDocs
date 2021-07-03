@@ -24,7 +24,7 @@
             "label": "Run Pester test group",
             "detail": "Runs a specific group for Pester tests.",
             "type": "shell",
-            "command": "Invoke-Build Test -AssertStyle Client -TestGroup '${input:pesterTestGroup}'",
+            "command": "Invoke-Build Test -TestGroup '${input:pesterTestGroup}'",
             "group": "test",
             "problemMatcher": [
                 "$pester"
