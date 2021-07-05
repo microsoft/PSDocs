@@ -1,0 +1,13 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+---
+# Synopsis: A selector for unit testing.
+apiVersion: github.com/microsoft/PSDocs/v1
+kind: Selector
+metadata:
+  name: AlwaysTrue
+spec:
+  if:
+    field: '__not_value__'
+    exists: false

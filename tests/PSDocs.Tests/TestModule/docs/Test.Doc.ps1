@@ -5,6 +5,6 @@ Document 'TestDocument1' {
     "Culture=$($LocalizedData.Culture)";
 }
 
-Document 'TestDocument2' {
+Document 'TestDocument2' -With 'AlwaysTrue' {
 
 }

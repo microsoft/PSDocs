@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+What's changed since pre-release v0.9.0-B2107010:
+
+- Bug fixes:
+  - Fixed failed to get document definitions with selectors. [#174](https://github.com/Microsoft/PSDocs/issues/174)
+  - Fixed PowerShell command completion `Document` keyword. [#175](https://github.com/Microsoft/PSDocs/issues/175)
+
 ## v0.9.0-B2107010 (pre-release)
 
 What's changed since pre-release v0.9.0-B2107002:

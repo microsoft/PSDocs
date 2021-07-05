@@ -35,6 +35,7 @@ namespace PSDocs.Pipeline
             : base(context, source)
         {
             _Runspace = new RunspaceContext(Context);
+            HostHelper.ImportResource(Source, _Runspace);
         }
 
         public override void End()

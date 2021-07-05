@@ -446,7 +446,7 @@ function Document {
         [ScriptBlock]$If,
 
         [Parameter(Mandatory = $False)]
-        [String[]]$When
+        [String[]]$With
     )
     begin {
          # This is just a stub to improve authoring and discovery
