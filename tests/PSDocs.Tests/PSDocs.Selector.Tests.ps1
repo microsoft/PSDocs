@@ -40,14 +40,32 @@ Describe 'PSDocs selectors' -Tag 'Selector' {
     $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Selector.Doc.ps1';
     $selectorFilePath = Join-Path -Path $here -ChildPath 'Selectors.Doc.yaml';
 
-    Context 'With -InputObject' {
+    Context 'Invoke definitions' {
         $invokeParams = @{
             Path = @($docFilePath, $selectorFilePath)
         }
+        
         It 'Generates documentation for matching objects' {
             $result = @($dummyObject | Invoke-PSDocument @invokeParams -Name 'Selector.WithInputObject' -PassThru);
             $result | Should -Not -BeNullOrEmpty;
             $result | Should -Not -Be 'Name: HashName';
+        }
+    }
+
+    Context 'Get definitions' {
+        It 'With selector' {
+            $getParams = @{
+                Path = @($docFilePath, $selectorFilePath)
+            }
+            $result = @(Get-PSDocument @getParams)
+            $result | Should -Not -BeNullOrEmpty;
+        }
+
+        It 'Missing selector' {
+            $getParams = @{
+                Path = @($docFilePath)
+            }
+            { Get-PSDocument @getParams -ErrorAction Stop } | Should -Throw -ErrorId 'PSDocs.Parse.SelectorNotFound';
         }
     }
 }
