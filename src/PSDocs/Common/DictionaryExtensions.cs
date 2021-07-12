@@ -106,6 +106,16 @@ namespace PSDocs
         }
 
         [DebuggerStepThrough]
+        public static bool TryGetStringArray(this IDictionary<string, object> dictionary, string key, out string[] value)
+        {
+            value = null;
+            if (!dictionary.TryGetValue(key, out object o))
+                return false;
+
+            return TryStringArray(o, out value);
+        }
+
+        [DebuggerStepThrough]
         public static void AddUnique(this IDictionary<string, object> dictionary, IEnumerable<KeyValuePair<string, object>> values)
         {
             if (values == null)
@@ -116,6 +126,17 @@ namespace PSDocs
                 if (!dictionary.ContainsKey(kv.Key))
                     dictionary.Add(kv.Key, kv.Value);
             }
+        }
+
+        [DebuggerStepThrough]
+        private static bool TryStringArray(object o, out string[] value)
+        {
+            value = default;
+            if (o == null)
+                return false;
+
+            value = o.GetType().IsArray ? ((object[])o).OfType<string>().ToArray() : new string[] { o.ToString() };
+            return true;
         }
     }
 }

@@ -336,6 +336,62 @@ namespace PSDocs
             return TryString(pattern, out string patternString) && TryString(value, out string s) && Match(patternString, s, caseSensitive);
         }
 
+        internal static bool StartsWith(string actualValue, object expectedValue, bool caseSensitive)
+        {
+            if (!TryString(expectedValue, out string expected))
+                return false;
+
+            return actualValue.StartsWith(expected, caseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase);
+        }
+
+        internal static bool EndsWith(string actualValue, object expectedValue, bool caseSensitive)
+        {
+            if (!TryString(expectedValue, out string expected))
+                return false;
+
+            return actualValue.EndsWith(expected, caseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase);
+        }
+
+        internal static bool Contains(string actualValue, object expectedValue, bool caseSensitive)
+        {
+            if (!TryString(expectedValue, out string expected))
+                return false;
+
+            return actualValue.IndexOf(expected, caseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+        internal static bool IsLower(string actualValue, bool requireLetters, out bool notLetter)
+        {
+            notLetter = false;
+            for (var i = 0; i < actualValue.Length; i++)
+            {
+                if (!char.IsLetter(actualValue, i) && requireLetters)
+                {
+                    notLetter = true;
+                    return false;
+                }
+                if (char.IsLetter(actualValue, i) && !char.IsLower(actualValue, i))
+                    return false;
+            }
+            return true;
+        }
+
+        internal static bool IsUpper(string actualValue, bool requireLetters, out bool notLetter)
+        {
+            notLetter = false;
+            for (var i = 0; i < actualValue.Length; i++)
+            {
+                if (!char.IsLetter(actualValue, i) && requireLetters)
+                {
+                    notLetter = true;
+                    return false;
+                }
+                if (char.IsLetter(actualValue, i) && !char.IsUpper(actualValue, i))
+                    return false;
+            }
+            return true;
+        }
+
         internal static bool AnyValue(object actualValue, object expectedValue, bool caseSensitive, out object foundValue)
         {
             foundValue = actualValue;

@@ -144,6 +144,24 @@
                 },
                 {
                     "$ref": "#/definitions/selectorConditionGreaterOrEquals"
+                },
+                {
+                    "$ref": "#/definitions/selectorConditionStartsWith"
+                },
+                {
+                    "$ref": "#/definitions/selectorConditionEndsWith"
+                },
+                {
+                    "$ref": "#/definitions/selectorConditionContains"
+                },
+                {
+                    "$ref": "#/definitions/selectorConditionIsString"
+                },
+                {
+                    "$ref": "#/definitions/selectorConditionIsLower"
+                },
+                {
+                    "$ref": "#/definitions/selectorConditionIsUpper"
                 }
             ]
         },
@@ -474,6 +492,134 @@
             "oneOf": [
                 {
                     "$ref": "#/definitions/selectorProperties"
+                }
+            ]
+        },
+        "selectorConditionStartsWith": {
+            "type": "object",
+            "properties": {
+                "startsWith": {
+                    "title": "Starts with",
+                    "description": "Must start with one of the specified values.",
+                    "markdownDescription": "Must start with one of the specified values. [See help](https://github.com/microsoft/PSDocs/blob/main/docs/concepts/PSDocs/en-US/about_PSDocs_Selectors.md#startswith)",
+                    "$ref": "#/definitions/selectorExpressionValueMultiString"
+                }
+            },
+            "required": [
+                "startsWith"
+            ],
+            "oneOf": [
+                {
+                    "$ref": "#/definitions/selectorProperties"
+                }
+            ]
+        },
+        "selectorConditionEndsWith": {
+            "type": "object",
+            "properties": {
+                "endsWith": {
+                    "title": "Ends with",
+                    "description": "Must end with one of the specified values.",
+                    "markdownDescription": "Must end with one of the specified values. [See help](https://github.com/microsoft/PSDocs/blob/main/docs/concepts/PSDocs/en-US/about_PSDocs_Selectors.md#endswith)",
+                    "$ref": "#/definitions/selectorExpressionValueMultiString"
+                }
+            },
+            "required": [
+                "endsWith"
+            ],
+            "oneOf": [
+                {
+                    "$ref": "#/definitions/selectorProperties"
+                }
+            ]
+        },
+        "selectorConditionContains": {
+            "type": "object",
+            "properties": {
+                "contains": {
+                    "title": "Contains",
+                    "description": "Must contain one of the specified values.",
+                    "markdownDescription": "Must contain one of the specified values. [See help](https://github.com/microsoft/PSDocs/blob/main/docs/concepts/PSDocs/en-US/about_PSDocs_Selectors.md#contains)",
+                    "$ref": "#/definitions/selectorExpressionValueMultiString"
+                }
+            },
+            "required": [
+                "contains"
+            ],
+            "oneOf": [
+                {
+                    "$ref": "#/definitions/selectorProperties"
+                }
+            ]
+        },
+        "selectorConditionIsString": {
+            "type": "object",
+            "properties": {
+                "isString": {
+                    "type": "boolean",
+                    "title": "Is string",
+                    "description": "Must be a string type.",
+                    "markdownDescription": "Must be a string type. [See help](https://github.com/microsoft/PSDocs/blob/main/docs/concepts/PSDocs/en-US/about_PSDocs_Selectors.md#isstring)"
+                }
+            },
+            "required": [
+                "isString"
+            ],
+            "oneOf": [
+                {
+                    "$ref": "#/definitions/selectorProperties"
+                }
+            ]
+        },
+        "selectorConditionIsLower": {
+            "type": "object",
+            "properties": {
+                "isLower": {
+                    "type": "boolean",
+                    "title": "Is Lowercase",
+                    "description": "Must be a lowercase string.",
+                    "markdownDescription": "Must be a lowercase string. [See help](https://github.com/microsoft/PSDocs/blob/main/docs/concepts/PSDocs/en-US/about_PSDocs_Selectors.md#islower)"
+                }
+            },
+            "required": [
+                "isLower"
+            ],
+            "oneOf": [
+                {
+                    "$ref": "#/definitions/selectorProperties"
+                }
+            ]
+        },
+        "selectorConditionIsUpper": {
+            "type": "object",
+            "properties": {
+                "isUpper": {
+                    "type": "boolean",
+                    "title": "Is Uppercase",
+                    "description": "Must be an uppercase string.",
+                    "markdownDescription": "Must be an uppercase string. [See help](https://github.com/microsoft/PSDocs/blob/main/docs/concepts/PSDocs/en-US/about_PSDocs_Selectors.md#isupper)"
+                }
+            },
+            "required": [
+                "isUpper"
+            ],
+            "oneOf": [
+                {
+                    "$ref": "#/definitions/selectorProperties"
+                }
+            ]
+        },
+        "selectorExpressionValueMultiString": {
+            "oneOf": [
+                {
+                    "type": "string"
+                },
+                {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "uniqueItems": true
                 }
             ]
         }
