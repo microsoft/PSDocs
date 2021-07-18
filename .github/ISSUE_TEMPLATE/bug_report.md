@@ -30,7 +30,7 @@ Steps to reproduce the issue:
 **Module in use and version:**
 
 - Module: PSDocs
-- Version: **[e.g. 0.7.0]**
+- Version: **[e.g. 0.9.0]**
 
 Captured output from `$PSVersionTable`:
 
