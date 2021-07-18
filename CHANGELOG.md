@@ -2,6 +2,38 @@
 
 ## Unreleased
 
+## v0.9.0
+
+What's changed since v0.8.0:
+
+- Engine features:
+  - Added support for reading objects from file. [#132](https://github.com/Microsoft/PSDocs/issues/132) [#131](https://github.com/Microsoft/PSDocs/issues/131)
+  - Added support for conditionally processing documents based on target object. [#133](https://github.com/Microsoft/PSDocs/issues/133)
+    - **Breaking change**: Documents that do not set a body are skipped.
+    - Conditionally process target objects with script block or selector based conditions.
+    - Script block based conditions are PowerShell code that can be added to `Document` blocks with `-If`.
+    - Selector block based conditions are YAML filters that can be added to `Document` blocks with `-With`.
+    - Added options for configuring processing of input.
+    - See [about_PSDocs_Selectors] and [about_PSDocs_Options] for more details.
+- General improvements:
+  - Added string selector conditions. [#178](https://github.com/microsoft/PSDocs/issues/178)
+    - Use `startWith`, `contains`, and `endsWith` to check for a sub-string.
+    - Use `isString`, `isLower`, and `isUpper` to check for string type and casing.
+    - See [about_PSDocs_Selectors] and [about_PSDocs_Options] for more details.
+  - Added schema for PSDocs configuration options within `ps-docs.yaml`. [#113](https://github.com/Microsoft/PSDocs/issues/113)
+  - Added support for document data and metadata in `end` convention blocks. [#148](https://github.com/Microsoft/PSDocs/issues/148)
+- Engineering:
+  - Migrated PSDocs to Microsoft GitHub organization. [#145](https://github.com/microsoft/PSDocs/issues/145)
+  - Bump YamlDotNet dependency to v11.2.1. [#168](https://github.com/microsoft/PSDocs/pull/168)
+- Bug fixes:
+  - Fixed PowerShell command completion `Document` keyword. [#175](https://github.com/Microsoft/PSDocs/issues/175)
+
+What's changed since pre-release v0.9.0-B2107020:
+
+- No additional changes.
+
+See [upgrade notes](docs/upgrade-notes.md) for helpful information when upgrading from previous versions.
+
 ## v0.9.0-B2107020 (pre-release)
 
 What's changed since pre-release v0.9.0-B2107015:
