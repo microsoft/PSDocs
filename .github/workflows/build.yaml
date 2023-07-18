@@ -49,7 +49,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: Module
-          path: ./out/modules/PSRule/*
+          path: ./out/modules/PSDocs/*
           retention-days: 3
           if-no-files-found: error
 
@@ -62,14 +62,14 @@ jobs:
       #     retention-days: 3
       #     if-no-files-found: error
 
-      - name: Upload PSRule Results
-        uses: actions/upload-artifact@v3
-        if: always()
-        with:
-          name: Module.PSRule.TestResults
-          path: ./reports/ps-rule*.xml
-          retention-days: 3
-          if-no-files-found: error
+      # - name: Upload PSRule Results
+      #   uses: actions/upload-artifact@v3
+      #   if: always()
+      #   with:
+      #     name: Module.PSRule.TestResults
+      #     path: ./reports/ps-rule*.xml
+      #     retention-days: 3
+      #     if-no-files-found: error
 
   test:
     name: Test (${{ matrix.rid }}-${{ matrix.shell }})
@@ -128,7 +128,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: Module
-          path: ./out/modules/PSRule
+          path: ./out/modules/PSDocs
 
       - if: ${{ matrix.shell == 'pwsh' }}
         name: Test module (PowerShell)
