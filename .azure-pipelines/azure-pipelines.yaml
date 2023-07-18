@@ -18,10 +18,7 @@ trigger:
     include:
     - 'v0.*'
 
-pr:
-  branches:
-    include:
-    - 'main'
+pr: none
 
 stages:
 
