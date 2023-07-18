@@ -1,10 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using PSDocs.Commands;
 using System;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
+using PSDocs.Commands;
 
 namespace PSDocs.Runtime
 {
@@ -89,7 +89,7 @@ namespace PSDocs.Runtime
         /// <summary>
         /// Define language commands.
         /// </summary>
-        private readonly static SessionStateCmdletEntry[] BuiltInCmdlets = new SessionStateCmdletEntry[]
+        private static readonly SessionStateCmdletEntry[] BuiltInCmdlets = new SessionStateCmdletEntry[]
         {
             new SessionStateCmdletEntry(LanguageCmdlets.NewDefinition, typeof(DefinitionCommand), null),
             new SessionStateCmdletEntry(LanguageCmdlets.ExportConvention, typeof(ExportConventionCommand), null),
@@ -110,7 +110,7 @@ namespace PSDocs.Runtime
         /// <summary>
         /// Define language aliases.
         /// </summary>
-        private readonly static SessionStateAliasEntry[] BuiltInAliases = new SessionStateAliasEntry[]
+        private static readonly SessionStateAliasEntry[] BuiltInAliases = new SessionStateAliasEntry[]
         {
             new SessionStateAliasEntry(LanguageKeywords.Document, LanguageCmdlets.NewDefinition, string.Empty, ScopedItemOptions.ReadOnly),
             new SessionStateAliasEntry(LanguageKeywords.Section, LanguageCmdlets.NewSection, string.Empty, ScopedItemOptions.ReadOnly),

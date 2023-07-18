@@ -1,8 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using PSDocs.Runtime;
 using System.Management.Automation;
+using PSDocs.Runtime;
 
 namespace PSDocs.Commands
 {

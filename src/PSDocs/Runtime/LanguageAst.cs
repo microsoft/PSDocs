@@ -1,14 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using PSDocs.Definitions;
-using PSDocs.Pipeline;
-using PSDocs.Resources;
 using System;
 using System.Collections.Generic;
 using System.Management.Automation;
 using System.Management.Automation.Language;
 using System.Threading;
+using PSDocs.Definitions;
+using PSDocs.Pipeline;
+using PSDocs.Resources;
 
 namespace PSDocs.Runtime
 {
@@ -51,7 +51,7 @@ namespace PSDocs.Runtime
 
             public bool Has<TAst>(string parameterName, out TAst parameterValue) where TAst : CommandElementAst
             {
-                var result = Bound.TryGetValue(parameterName, out CommandElementAst value) && value is TAst;
+                var result = Bound.TryGetValue(parameterName, out var value) && value is TAst;
                 parameterValue = result ? value as TAst : null;
                 return result;
             }
@@ -64,7 +64,7 @@ namespace PSDocs.Runtime
                     _Offset++;
                     return true;
                 }
-                int relative = position - _Offset;
+                var relative = position - _Offset;
                 var result = Unbound.Count > relative && Unbound[relative] is TAst;
                 value = result ? Unbound[relative] as TAst : null;
                 return result;
@@ -171,8 +171,8 @@ namespace PSDocs.Runtime
         private static ParameterBindResult BindParameters(CommandAst commandAst)
         {
             var result = new ParameterBindResult();
-            int i = 1;
-            int next = 2;
+            var i = 1;
+            var next = 2;
             for (; i < commandAst.CommandElements.Count; i++, next++)
             {
                 // Is named parameter
@@ -221,7 +221,7 @@ namespace PSDocs.Runtime
         private static ScriptBlockAst GetParentBlock(Ast ast)
         {
             var block = ast;
-            while (block != null && !(block is ScriptBlockAst))
+            while (block != null && block is not ScriptBlockAst)
                 block = block.Parent;
 
             return (ScriptBlockAst)block;

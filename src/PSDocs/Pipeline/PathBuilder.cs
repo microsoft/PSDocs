@@ -1,13 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using PSDocs.Configuration;
-using PSDocs.Data;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Management.Automation;
+using PSDocs.Configuration;
+using PSDocs.Data;
 
 namespace PSDocs.Pipeline
 {
@@ -87,7 +87,7 @@ namespace PSDocs.Pipeline
             if (TryUrl(path) || TryPath(path, out path))
                 return;
 
-            var pathLiteral = GetSearchParameters(path, out string searchPattern, out SearchOption searchOption, out PathFilter filter);
+            var pathLiteral = GetSearchParameters(path, out var searchPattern, out var searchOption, out var filter);
             var files = Directory.EnumerateFiles(pathLiteral, searchPattern, searchOption);
             foreach (var file in files)
                 if (ShouldInclude(file, filter))
@@ -160,7 +160,7 @@ namespace PSDocs.Pipeline
         private string GetSearchParameters(string path, out string searchPattern, out SearchOption searchOption, out PathFilter filter)
         {
             searchOption = SearchOption.AllDirectories;
-            var pathLiteral = TrimPath(path, out bool relativeAnchor);
+            var pathLiteral = TrimPath(path, out var relativeAnchor);
 
             if (TryFilter(pathLiteral, out searchPattern, out filter))
                 return _BasePath;
@@ -352,12 +352,12 @@ namespace PSDocs.Pipeline
 
             public bool TryMatch(PathStream other, int offset)
             {
-                return other.Peak(offset, out char c) && IsMatch(c);
+                return other.Peak(offset, out var c) && IsMatch(c);
             }
 
             public bool IsUnmatchedSingle(PathStream other, int offset)
             {
-                return other.Peak(offset, out char c) && IsWilcardQ(c) && other.Peak(offset + 1, out char cnext) && IsMatch(cnext);
+                return other.Peak(offset, out var c) && IsWilcardQ(c) && other.Peak(offset + 1, out var cnext) && IsMatch(cnext);
             }
 
             private bool IsMatch(char c)
@@ -669,7 +669,7 @@ namespace PSDocs.Pipeline
             var cleanPath = start > 0 ? path.Remove(0, start) : path;
 
             // Include unless excluded
-            bool result = false;
+            var result = false;
 
             // Compare expressions
             for (var i = 0; i < _Expression.Length; i++)

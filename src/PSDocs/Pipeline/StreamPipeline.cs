@@ -23,7 +23,7 @@ namespace PSDocs.Pipeline
         public sealed override void Process(PSObject sourceObject)
         {
             _Stream.Enqueue(sourceObject);
-            while (!_Stream.IsEmpty && _Stream.TryDequeue(out TargetObject nextObject))
+            while (!_Stream.IsEmpty && _Stream.TryDequeue(out var nextObject))
                 ProcessObject(nextObject);
         }
 

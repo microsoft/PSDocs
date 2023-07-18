@@ -1,6 +1,10 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using PSDocs.Annotations;
 using PSDocs.Data;
 using PSDocs.Data.Internal;
@@ -9,11 +13,6 @@ using PSDocs.Definitions.Conventions;
 using PSDocs.Definitions.Selectors;
 using PSDocs.Pipeline;
 using PSDocs.Resources;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Management.Automation.Language;
 
 namespace PSDocs.Runtime
 {
@@ -108,7 +107,7 @@ namespace PSDocs.Runtime
                         if (!context.EnterSourceFile(file))
                             throw new FileNotFoundException(PSDocsResources.ScriptNotFound, file.Path);
 
-                        var scriptAst = System.Management.Automation.Language.Parser.ParseFile(file.Path, out Token[] tokens, out ParseError[] errors);
+                        var scriptAst = System.Management.Automation.Language.Parser.ParseFile(file.Path, out var tokens, out var errors);
                         var visitor = new LanguageAst(context.Pipeline);
                         scriptAst.Visit(visitor);
 
@@ -271,7 +270,7 @@ namespace PSDocs.Runtime
                 foreach (var block in blocks.OfType<ScriptBlockDocumentConvention>())
                 {
                     // Ignore blocks that don't match
-                    if (!Match(runspace, block, out int order))
+                    if (!Match(runspace, block, out var order))
                         continue;
 
                     if (!index.Contains(block.Id))

@@ -1,14 +1,14 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using PSDocs.Configuration;
-using PSDocs.Pipeline.Output;
-using PSDocs.Processor;
-using PSDocs.Resources;
 using System;
 using System.IO;
 using System.Management.Automation;
 using System.Text;
+using PSDocs.Configuration;
+using PSDocs.Pipeline.Output;
+using PSDocs.Processor;
+using PSDocs.Resources;
 
 namespace PSDocs.Pipeline
 {

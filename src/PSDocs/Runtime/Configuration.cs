@@ -31,7 +31,7 @@ namespace PSDocs.Runtime
 
         public string[] GetStringValues(string configurationKey)
         {
-            if (!TryGetValue(configurationKey, out object value) || value == null)
+            if (!TryGetValue(configurationKey, out var value) || value == null)
                 return System.Array.Empty<string>();
 
             if (value is string valueT)
@@ -53,7 +53,7 @@ namespace PSDocs.Runtime
 
         public object GetValueOrDefault(string configurationKey, object defaultValue)
         {
-            if (!TryGetValue(configurationKey, out object value) || value == null)
+            if (!TryGetValue(configurationKey, out var value) || value == null)
                 return defaultValue;
 
             return value;
@@ -61,7 +61,7 @@ namespace PSDocs.Runtime
 
         public bool GetBoolOrDefault(string configurationKey, bool defaultValue)
         {
-            if (!TryGetValue(configurationKey, out object value) || !TryBool(value, out bool bvalue))
+            if (!TryGetValue(configurationKey, out var value) || !TryBool(value, out var bvalue))
                 return defaultValue;
 
             return bvalue;
@@ -78,7 +78,7 @@ namespace PSDocs.Runtime
 
         private bool TryBool(object o, out bool value)
         {
-            value = default(bool);
+            value = default;
             if (o is bool bvalue || (o is string svalue && bool.TryParse(svalue, out bvalue)))
             {
                 value = bvalue;

@@ -1,8 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using PSDocs.Configuration;
 using System.Collections.Generic;
+using PSDocs.Configuration;
 
 namespace PSDocs.Pipeline
 {
@@ -57,7 +57,7 @@ namespace PSDocs.Pipeline
 
         internal void SwitchScope(string module)
         {
-            _Option = !string.IsNullOrEmpty(module) && _ModuleScope.TryGetValue(module, out IPSDocumentOption moduleOption) ? moduleOption : _Workspace;
+            _Option = !string.IsNullOrEmpty(module) && _ModuleScope.TryGetValue(module, out var moduleOption) ? moduleOption : _Workspace;
         }
     }
 }

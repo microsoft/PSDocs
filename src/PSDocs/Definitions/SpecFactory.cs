@@ -1,10 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using PSDocs.Annotations;
-using PSDocs.Pipeline;
 using System;
 using System.Collections.Generic;
+using PSDocs.Annotations;
+using PSDocs.Pipeline;
 
 namespace PSDocs.Definitions
 {

@@ -18,7 +18,7 @@ namespace PSDocs.Configuration
         private const ColumnPadding DEFAULT_COLUMN_PADDING = Configuration.ColumnPadding.MatchHeader;
         private const EdgePipeOption DEFAULT_USE_EDGE_PIPES = EdgePipeOption.WhenRequired;
 
-        internal static readonly MarkdownOption Default = new MarkdownOption
+        internal static readonly MarkdownOption Default = new()
         {
             ColumnPadding = DEFAULT_COLUMN_PADDING,
             Encoding = DEFAULT_ENCODING,
@@ -64,7 +64,7 @@ namespace PSDocs.Configuration
         {
             unchecked // Overflow is fine
             {
-                int hash = 17;
+                var hash = 17;
                 hash = hash * 23 + (ColumnPadding.HasValue ? ColumnPadding.Value.GetHashCode() : 0);
                 hash = hash * 23 + (Encoding.HasValue ? Encoding.Value.GetHashCode() : 0);
                 hash = hash * 23 + (SkipEmptySections.HasValue ? SkipEmptySections.GetHashCode() : 0);
@@ -139,13 +139,13 @@ namespace PSDocs.Configuration
             if (env.TryEnum("PSDOCS_MARKDOWN_ENCODING", out MarkdownEncoding encoding))
                 Encoding = encoding;
 
-            if (env.TryBool("PSDOCS_MARKDOWN_SKIPEMPTYSECTIONS", out bool skipEmptySections))
+            if (env.TryBool("PSDOCS_MARKDOWN_SKIPEMPTYSECTIONS", out var skipEmptySections))
                 SkipEmptySections = skipEmptySections;
 
             if (env.TryEnum("PSDOCS_MARKDOWN_USEEDGEPIPES", out EdgePipeOption useEdgePipes))
                 UseEdgePipes = useEdgePipes;
 
-            if (env.TryString("PSDOCS_MARKDOWN_WRAPSEPARATOR", out string wrapSeparator))
+            if (env.TryString("PSDOCS_MARKDOWN_WRAPSEPARATOR", out var wrapSeparator))
                 WrapSeparator = wrapSeparator;
         }
 
@@ -157,13 +157,13 @@ namespace PSDocs.Configuration
             if (index.TryPopEnum("Markdown.Encoding", out MarkdownEncoding encoding))
                 Encoding = encoding;
 
-            if (index.TryPopBool("Markdown.SkipEmptySections", out bool skipEmptySections))
+            if (index.TryPopBool("Markdown.SkipEmptySections", out var skipEmptySections))
                 SkipEmptySections = skipEmptySections;
 
             if (index.TryPopEnum("Markdown.UseEdgePipes", out EdgePipeOption useEdgePipes))
                 UseEdgePipes = useEdgePipes;
 
-            if (index.TryPopString("Markdown.WrapSeparator", out string wrapSeparator))
+            if (index.TryPopString("Markdown.WrapSeparator", out var wrapSeparator))
                 WrapSeparator = wrapSeparator;
         }
     }

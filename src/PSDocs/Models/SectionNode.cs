@@ -30,13 +30,13 @@ namespace PSDocs.Models
             var items = new PSObject[collection.Count];
             collection.CopyTo(items, 0);
 
-            int count = 0;
+            var count = 0;
             for (var i = 0; i < items.Length; i++)
             {
                 if (items[i] == null || items[i].BaseObject == null)
                     continue;
 
-                if (!(items[i].BaseObject is DocumentNode node))
+                if (items[i].BaseObject is not DocumentNode node)
                     node = new Text { Content = items[i].BaseObject.ToString() };
 
                 count++;

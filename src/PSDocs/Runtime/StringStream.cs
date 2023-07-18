@@ -56,7 +56,7 @@ namespace PSDocs.Runtime
         public int GetIndent()
         {
             var offset = 0;
-            while (Peak(offset, out char c) && IsIndent(c))
+            while (Peak(offset, out var c) && IsIndent(c))
                 offset++;
 
             return offset;

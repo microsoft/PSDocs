@@ -12,7 +12,7 @@ namespace PSDocs.Configuration
     /// </summary>
     public sealed class OutputOption : IEquatable<OutputOption>
     {
-        internal static readonly OutputOption Default = new OutputOption
+        internal static readonly OutputOption Default = new()
         {
             Culture = null,
             Path = null,
@@ -46,7 +46,7 @@ namespace PSDocs.Configuration
         {
             unchecked // Overflow is fine
             {
-                int hash = 17;
+                var hash = 17;
                 hash = hash * 23 + (Culture != null ? Culture.GetHashCode() : 0);
                 hash = hash * 23 + (Path != null ? Path.GetHashCode() : 0);
                 return hash;
@@ -74,19 +74,19 @@ namespace PSDocs.Configuration
 
         internal void Load(EnvironmentHelper env)
         {
-            if (env.TryStringArray("PSDOCS_OUTPUT_CULTURE", out string[] culture))
+            if (env.TryStringArray("PSDOCS_OUTPUT_CULTURE", out var culture))
                 Culture = culture;
 
-            if (env.TryString("PSDOCS_OUTPUT_PATH", out string path))
+            if (env.TryString("PSDOCS_OUTPUT_PATH", out var path))
                 Path = path;
         }
 
         internal void Load(Dictionary<string, object> index)
         {
-            if (index.TryPopStringArray("Output.Culture", out string[] culture))
+            if (index.TryPopStringArray("Output.Culture", out var culture))
                 Culture = culture;
 
-            if (index.TryPopString("Output.Path", out string path))
+            if (index.TryPopString("Output.Path", out var path))
                 Path = path;
         }
     }

@@ -1,16 +1,27 @@
 #
-# Stale issues
+# Stale item management
 #
-name: 'Close stale issues'
+
+# NOTES:
+# This workflow manages stale work items on the repository.
+
+name: Stale maintenance
 on:
   schedule:
-  - cron: '30 1 * * *'
+    - cron: '30 1 * * *'
+  workflow_dispatch:
+
+permissions: {}
 
 jobs:
-  stale:
+  issue:
+    name: Close stale issues
     runs-on: ubuntu-latest
+    if: github.repository == 'microsoft/PSDocs'
+    permissions:
+      issues: write
     steps:
-      - uses: actions/stale@v4
+      - uses: actions/stale@v8
         with:
           stale-issue-message: >
             This issue has been automatically marked as stale because it has not had
@@ -25,5 +36,5 @@ jobs:
           days-before-close: 7
           days-before-pr-close: -1
 
-          any-of-labels: 'question,duplicate,incomplete'
+          any-of-labels: 'question,duplicate,incomplete,waiting-feedback'
           stale-issue-label: stale

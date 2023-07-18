@@ -1,10 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System.Management.Automation;
 using PSDocs.Data.Internal;
 using PSDocs.Pipeline;
 using PSDocs.Runtime;
-using System.Management.Automation;
 
 namespace PSDocs.Commands
 {
@@ -65,7 +65,7 @@ namespace PSDocs.Commands
 
         protected static bool True(object o)
         {
-            return o != null && TryBool(o, out bool bResult) && bResult;
+            return o != null && TryBool(o, out var bResult) && bResult;
         }
 
         protected static bool TryBool(object o, out bool value)

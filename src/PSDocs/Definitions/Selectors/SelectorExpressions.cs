@@ -1,10 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using PSDocs.Pipeline;
-using PSDocs.Resources;
 using System;
 using System.Collections.Generic;
+using PSDocs.Pipeline;
+using PSDocs.Resources;
 
 namespace PSDocs.Definitions.Selectors
 {
@@ -83,12 +83,12 @@ namespace PSDocs.Definitions.Selectors
 
         public bool IsOperator(string name)
         {
-            return TryDescriptor(name, out ISelectorExpresssionDescriptor d) && d != null && d.Type == SelectorExpressionType.Operator;
+            return TryDescriptor(name, out var d) && d != null && d.Type == SelectorExpressionType.Operator;
         }
 
         public bool IsCondition(string name)
         {
-            return TryDescriptor(name, out ISelectorExpresssionDescriptor d) && d != null && d.Type == SelectorExpressionType.Condition;
+            return TryDescriptor(name, out var d) && d != null && d.Type == SelectorExpressionType.Condition;
         }
 
         private void With(ISelectorExpresssionDescriptor descriptor)
@@ -200,7 +200,7 @@ namespace PSDocs.Definitions.Selectors
         private const string FIELD = "field";
 
         // Define built-ins
-        internal readonly static ISelectorExpresssionDescriptor[] Builtin = new ISelectorExpresssionDescriptor[]
+        internal static readonly ISelectorExpresssionDescriptor[] Builtin = new ISelectorExpresssionDescriptor[]
         {
             // Operators
             new SelectorExpresssionDescriptor(IF, SelectorExpressionType.Operator, If),
@@ -278,7 +278,7 @@ namespace PSDocs.Definitions.Selectors
         internal static bool Exists(SelectorContext context, SelectorInfo info, object[] args, object o)
         {
             var properties = GetProperties(args);
-            if (TryPropertyBool(properties, EXISTS, out bool? propertyValue) && TryField(properties, out string field))
+            if (TryPropertyBool(properties, EXISTS, out var propertyValue) && TryField(properties, out var field))
             {
                 context.Debug(PSDocsResources.SelectorExpressionTrace, EXISTS, field, propertyValue);
                 return propertyValue == ExpressionHelpers.Exists(context, o, field, caseSensitive: false);
@@ -289,10 +289,10 @@ namespace PSDocs.Definitions.Selectors
         internal static bool Equals(SelectorContext context, SelectorInfo info, object[] args, object o)
         {
             var properties = GetProperties(args);
-            if (TryProperty(properties, EQUALS, out object propertyValue) && TryField(properties, out string field))
+            if (TryProperty(properties, EQUALS, out var propertyValue) && TryField(properties, out var field))
             {
                 context.Debug(PSDocsResources.SelectorExpressionTrace, EQUALS, field, propertyValue);
-                if (!ObjectHelper.GetField(context, o, field, caseSensitive: false, out object value))
+                if (!ObjectHelper.GetField(context, o, field, caseSensitive: false, out var value))
                     return false;
 
                 // int, string, bool
@@ -304,10 +304,10 @@ namespace PSDocs.Definitions.Selectors
         internal static bool NotEquals(SelectorContext context, SelectorInfo info, object[] args, object o)
         {
             var properties = GetProperties(args);
-            if (TryProperty(properties, NOTEQUALS, out object propertyValue) && TryField(properties, out string field))
+            if (TryProperty(properties, NOTEQUALS, out var propertyValue) && TryField(properties, out var field))
             {
                 context.Debug(PSDocsResources.SelectorExpressionTrace, NOTEQUALS, field, propertyValue);
-                if (!ObjectHelper.GetField(context, o, field, caseSensitive: false, out object value))
+                if (!ObjectHelper.GetField(context, o, field, caseSensitive: false, out var value))
                     return true;
 
                 // int, string, bool
@@ -319,10 +319,10 @@ namespace PSDocs.Definitions.Selectors
         internal static bool HasValue(SelectorContext context, SelectorInfo info, object[] args, object o)
         {
             var properties = GetProperties(args);
-            if (TryPropertyBool(properties, HASVALUE, out bool? propertyValue) && TryField(properties, out string field))
+            if (TryPropertyBool(properties, HASVALUE, out var propertyValue) && TryField(properties, out var field))
             {
                 context.Debug(PSDocsResources.SelectorExpressionTrace, HASVALUE, field, propertyValue);
-                if (!ObjectHelper.GetField(context, o, field, caseSensitive: false, out object value))
+                if (!ObjectHelper.GetField(context, o, field, caseSensitive: false, out var value))
                     return !propertyValue.Value;
 
                 return !propertyValue.Value == ExpressionHelpers.NullOrEmpty(value);
@@ -333,10 +333,10 @@ namespace PSDocs.Definitions.Selectors
         internal static bool Match(SelectorContext context, SelectorInfo info, object[] args, object o)
         {
             var properties = GetProperties(args);
-            if (TryProperty(properties, MATCH, out object propertyValue) && TryField(properties, out string field))
+            if (TryProperty(properties, MATCH, out var propertyValue) && TryField(properties, out var field))
             {
                 context.Debug(PSDocsResources.SelectorExpressionTrace, MATCH, field, propertyValue);
-                if (!ObjectHelper.GetField(context, o, field, caseSensitive: false, out object value))
+                if (!ObjectHelper.GetField(context, o, field, caseSensitive: false, out var value))
                     return false;
 
                 return ExpressionHelpers.Match(propertyValue, value, caseSensitive: false);
@@ -347,10 +347,10 @@ namespace PSDocs.Definitions.Selectors
         internal static bool NotMatch(SelectorContext context, SelectorInfo info, object[] args, object o)
         {
             var properties = GetProperties(args);
-            if (TryProperty(properties, NOTMATCH, out object propertyValue) && TryField(properties, out string field))
+            if (TryProperty(properties, NOTMATCH, out var propertyValue) && TryField(properties, out var field))
             {
                 context.Debug(PSDocsResources.SelectorExpressionTrace, NOTMATCH, field, propertyValue);
-                if (!ObjectHelper.GetField(context, o, field, caseSensitive: false, out object value))
+                if (!ObjectHelper.GetField(context, o, field, caseSensitive: false, out var value))
                     return true;
 
                 return !ExpressionHelpers.Match(propertyValue, value, caseSensitive: false);
@@ -361,10 +361,10 @@ namespace PSDocs.Definitions.Selectors
         internal static bool In(SelectorContext context, SelectorInfo info, object[] args, object o)
         {
             var properties = GetProperties(args);
-            if (TryPropertyArray(properties, IN, out Array propertyValue) && TryField(properties, out string field))
+            if (TryPropertyArray(properties, IN, out var propertyValue) && TryField(properties, out var field))
             {
                 context.Debug(PSDocsResources.SelectorExpressionTrace, IN, field, propertyValue);
-                if (!ObjectHelper.GetField(context, o, field, caseSensitive: false, out object value))
+                if (!ObjectHelper.GetField(context, o, field, caseSensitive: false, out var value))
                     return false;
 
                 for (var i = 0; propertyValue != null && i < propertyValue.Length; i++)
@@ -380,10 +380,10 @@ namespace PSDocs.Definitions.Selectors
         internal static bool NotIn(SelectorContext context, SelectorInfo info, object[] args, object o)
         {
             var properties = GetProperties(args);
-            if (TryPropertyArray(properties, NOTIN, out Array propertyValue) && TryField(properties, out string field))
+            if (TryPropertyArray(properties, NOTIN, out var propertyValue) && TryField(properties, out var field))
             {
                 context.Debug(PSDocsResources.SelectorExpressionTrace, NOTIN, field, propertyValue);
-                if (!ObjectHelper.GetField(context, o, field, caseSensitive: false, out object value))
+                if (!ObjectHelper.GetField(context, o, field, caseSensitive: false, out var value))
                     return true;
 
                 for (var i = 0; propertyValue != null && i < propertyValue.Length; i++)
@@ -399,16 +399,16 @@ namespace PSDocs.Definitions.Selectors
         internal static bool Less(SelectorContext context, SelectorInfo info, object[] args, object o)
         {
             var properties = GetProperties(args);
-            if (TryPropertyLong(properties, LESS, out long? propertyValue) && TryField(properties, out string field))
+            if (TryPropertyLong(properties, LESS, out var propertyValue) && TryField(properties, out var field))
             {
                 context.Debug(PSDocsResources.SelectorExpressionTrace, LESS, field, propertyValue);
-                if (!ObjectHelper.GetField(context, o, field, caseSensitive: false, out object value))
+                if (!ObjectHelper.GetField(context, o, field, caseSensitive: false, out var value))
                     return true;
 
                 if (value == null)
                     return 0 < propertyValue;
 
-                if (ExpressionHelpers.CompareNumeric(value, propertyValue, convert: false, compare: out int compare, value: out _))
+                if (ExpressionHelpers.CompareNumeric(value, propertyValue, convert: false, compare: out var compare, value: out _))
                     return compare < 0;
             }
             return false;
@@ -417,16 +417,16 @@ namespace PSDocs.Definitions.Selectors
         internal static bool LessOrEquals(SelectorContext context, SelectorInfo info, object[] args, object o)
         {
             var properties = GetProperties(args);
-            if (TryPropertyLong(properties, LESSOREQUALS, out long? propertyValue) && TryField(properties, out string field))
+            if (TryPropertyLong(properties, LESSOREQUALS, out var propertyValue) && TryField(properties, out var field))
             {
                 context.Debug(PSDocsResources.SelectorExpressionTrace, LESSOREQUALS, field, propertyValue);
-                if (!ObjectHelper.GetField(context, o, field, caseSensitive: false, out object value))
+                if (!ObjectHelper.GetField(context, o, field, caseSensitive: false, out var value))
                     return true;
 
                 if (value == null)
                     return 0 <= propertyValue;
 
-                if (ExpressionHelpers.CompareNumeric(value, propertyValue, convert: false, compare: out int compare, value: out _))
+                if (ExpressionHelpers.CompareNumeric(value, propertyValue, convert: false, compare: out var compare, value: out _))
                     return compare <= 0;
             }
             return false;
@@ -435,16 +435,16 @@ namespace PSDocs.Definitions.Selectors
         internal static bool Greater(SelectorContext context, SelectorInfo info, object[] args, object o)
         {
             var properties = GetProperties(args);
-            if (TryPropertyLong(properties, GREATER, out long? propertyValue) && TryField(properties, out string field))
+            if (TryPropertyLong(properties, GREATER, out var propertyValue) && TryField(properties, out var field))
             {
                 context.Debug(PSDocsResources.SelectorExpressionTrace, GREATER, field, propertyValue);
-                if (!ObjectHelper.GetField(context, o, field, caseSensitive: false, out object value))
+                if (!ObjectHelper.GetField(context, o, field, caseSensitive: false, out var value))
                     return true;
 
                 if (value == null)
                     return 0 > propertyValue;
 
-                if (ExpressionHelpers.CompareNumeric(value, propertyValue, convert: false, compare: out int compare, value: out _))
+                if (ExpressionHelpers.CompareNumeric(value, propertyValue, convert: false, compare: out var compare, value: out _))
                     return compare > 0;
             }
             return false;
@@ -453,16 +453,16 @@ namespace PSDocs.Definitions.Selectors
         internal static bool GreaterOrEquals(SelectorContext context, SelectorInfo info, object[] args, object o)
         {
             var properties = GetProperties(args);
-            if (TryPropertyLong(properties, GREATEROREQUALS, out long? propertyValue) && TryField(properties, out string field))
+            if (TryPropertyLong(properties, GREATEROREQUALS, out var propertyValue) && TryField(properties, out var field))
             {
                 context.Debug(PSDocsResources.SelectorExpressionTrace, GREATEROREQUALS, field, propertyValue);
-                if (!ObjectHelper.GetField(context, o, field, caseSensitive: false, out object value))
+                if (!ObjectHelper.GetField(context, o, field, caseSensitive: false, out var value))
                     return true;
 
                 if (value == null)
                     return 0 >= propertyValue;
 
-                if (ExpressionHelpers.CompareNumeric(value, propertyValue, convert: false, compare: out int compare, value: out _))
+                if (ExpressionHelpers.CompareNumeric(value, propertyValue, convert: false, compare: out var compare, value: out _))
                     return compare >= 0;
             }
             return false;
@@ -471,10 +471,10 @@ namespace PSDocs.Definitions.Selectors
         internal static bool StartsWith(SelectorContext context, SelectorInfo info, object[] args, object o)
         {
             var properties = GetProperties(args);
-            if (TryPropertyStringArray(properties, STARTSWITH, out string[] propertyValue) && TryOperand(context, o, properties, out object operand))
+            if (TryPropertyStringArray(properties, STARTSWITH, out var propertyValue) && TryOperand(context, o, properties, out var operand))
             {
                 context.Debug(PSDocsResources.SelectorExpressionTrace, STARTSWITH, operand, propertyValue);
-                if (!ExpressionHelpers.TryString(operand, out string value))
+                if (!ExpressionHelpers.TryString(operand, out var value))
                     return false;
 
                 for (var i = 0; propertyValue != null && i < propertyValue.Length; i++)
@@ -490,10 +490,10 @@ namespace PSDocs.Definitions.Selectors
         internal static bool EndsWith(SelectorContext context, SelectorInfo info, object[] args, object o)
         {
             var properties = GetProperties(args);
-            if (TryPropertyStringArray(properties, ENDSWITH, out string[] propertyValue) && TryOperand(context, o, properties, out object operand))
+            if (TryPropertyStringArray(properties, ENDSWITH, out var propertyValue) && TryOperand(context, o, properties, out var operand))
             {
                 context.Debug(PSDocsResources.SelectorExpressionTrace, ENDSWITH, operand, propertyValue);
-                if (!ExpressionHelpers.TryString(operand, out string value))
+                if (!ExpressionHelpers.TryString(operand, out var value))
                     return false;
 
                 for (var i = 0; propertyValue != null && i < propertyValue.Length; i++)
@@ -509,10 +509,10 @@ namespace PSDocs.Definitions.Selectors
         internal static bool Contains(SelectorContext context, SelectorInfo info, object[] args, object o)
         {
             var properties = GetProperties(args);
-            if (TryPropertyStringArray(properties, CONTAINS, out string[] propertyValue) && TryOperand(context, o, properties, out object operand))
+            if (TryPropertyStringArray(properties, CONTAINS, out var propertyValue) && TryOperand(context, o, properties, out var operand))
             {
                 context.Debug(PSDocsResources.SelectorExpressionTrace, CONTAINS, operand, propertyValue);
-                if (!ExpressionHelpers.TryString(operand, out string value))
+                if (!ExpressionHelpers.TryString(operand, out var value))
                     return false;
 
                 for (var i = 0; propertyValue != null && i < propertyValue.Length; i++)
@@ -528,7 +528,7 @@ namespace PSDocs.Definitions.Selectors
         internal static bool IsString(SelectorContext context, SelectorInfo info, object[] args, object o)
         {
             var properties = GetProperties(args);
-            if (TryPropertyBool(properties, ISSTRING, out bool? propertyValue) && TryOperand(context, o, properties, out object operand))
+            if (TryPropertyBool(properties, ISSTRING, out var propertyValue) && TryOperand(context, o, properties, out var operand))
             {
                 context.Debug(PSDocsResources.SelectorExpressionTrace, ISSTRING, operand, propertyValue);
                 return propertyValue == ExpressionHelpers.TryString(operand, out _);
@@ -539,9 +539,9 @@ namespace PSDocs.Definitions.Selectors
         internal static bool IsLower(SelectorContext context, SelectorInfo info, object[] args, object o)
         {
             var properties = GetProperties(args);
-            if (TryPropertyBool(properties, ISLOWER, out bool? propertyValue) && TryOperand(context, o, properties, out object operand))
+            if (TryPropertyBool(properties, ISLOWER, out var propertyValue) && TryOperand(context, o, properties, out var operand))
             {
-                if (!ExpressionHelpers.TryString(operand, out string value))
+                if (!ExpressionHelpers.TryString(operand, out var value))
                     return !propertyValue.Value;
 
                 context.Debug(PSDocsResources.SelectorExpressionTrace, ISLOWER, operand, propertyValue);
@@ -553,9 +553,9 @@ namespace PSDocs.Definitions.Selectors
         internal static bool IsUpper(SelectorContext context, SelectorInfo info, object[] args, object o)
         {
             var properties = GetProperties(args);
-            if (TryPropertyBool(properties, ISUPPER, out bool? propertyValue) && TryOperand(context, o, properties, out object operand))
+            if (TryPropertyBool(properties, ISUPPER, out var propertyValue) && TryOperand(context, o, properties, out var operand))
             {
-                if (!ExpressionHelpers.TryString(operand, out string value))
+                if (!ExpressionHelpers.TryString(operand, out var value))
                     return !propertyValue.Value;
 
                 context.Debug(PSDocsResources.SelectorExpressionTrace, ISUPPER, operand, propertyValue);
@@ -591,7 +591,7 @@ namespace PSDocs.Definitions.Selectors
         private static bool TryOperand(SelectorContext context, object o, SelectorExpression.PropertyBag properties, out object operand)
         {
             operand = null;
-            if (properties.TryGetString(FIELD, out string field))
+            if (properties.TryGetString(FIELD, out var field))
                 return ObjectHelper.GetField(context, o, field, caseSensitive: false, out operand);
 
             return false;
@@ -599,7 +599,7 @@ namespace PSDocs.Definitions.Selectors
 
         private static bool TryPropertyArray(SelectorExpression.PropertyBag properties, string propertyName, out Array propertyValue)
         {
-            if (properties.TryGetValue(propertyName, out object array) && array is Array arrayValue)
+            if (properties.TryGetValue(propertyName, out var array) && array is Array arrayValue)
             {
                 propertyValue = arrayValue;
                 return true;
@@ -614,7 +614,7 @@ namespace PSDocs.Definitions.Selectors
             {
                 return true;
             }
-            else if (properties.TryGetString(propertyName, out string s))
+            else if (properties.TryGetString(propertyName, out var s))
             {
                 propertyValue = new string[] { s };
                 return true;

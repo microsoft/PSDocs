@@ -1,13 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System;
+using System.Collections.Generic;
 using PSDocs.Configuration;
 using PSDocs.Definitions;
 using PSDocs.Definitions.Selectors;
 using PSDocs.Models;
 using PSDocs.Processor;
-using System;
-using System.Collections.Generic;
 
 namespace PSDocs.Pipeline
 {

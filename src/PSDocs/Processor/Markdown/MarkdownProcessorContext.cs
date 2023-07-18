@@ -1,10 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using PSDocs.Configuration;
-using PSDocs.Models;
 using System;
 using System.Text;
+using PSDocs.Configuration;
+using PSDocs.Models;
 
 namespace PSDocs.Processor.Markdown
 {

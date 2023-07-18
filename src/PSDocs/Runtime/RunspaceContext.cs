@@ -1,11 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using PSDocs.Configuration;
-using PSDocs.Data.Internal;
-using PSDocs.Definitions;
-using PSDocs.Definitions.Selectors;
-using PSDocs.Pipeline;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,6 +9,10 @@ using System.IO;
 using System.Management.Automation;
 using System.Management.Automation.Language;
 using System.Management.Automation.Runspaces;
+using PSDocs.Configuration;
+using PSDocs.Data.Internal;
+using PSDocs.Definitions;
+using PSDocs.Pipeline;
 
 namespace PSDocs.Runtime
 {
@@ -213,11 +212,11 @@ namespace PSDocs.Runtime
         public bool TrySelector(string name)
         {
             name = ResourceHelper.GetId(Source.File.ModuleName, name);
-            if (TargetObject == null || Pipeline == null || !Pipeline.Selector.TryGetValue(name, out SelectorVisitor selector))
+            if (TargetObject == null || Pipeline == null || !Pipeline.Selector.TryGetValue(name, out var selector))
                 return false;
 
             var annotation = TargetObject.GetAnnotation<SelectorTargetAnnotation>();
-            if (annotation.TryGetSelectorResult(selector, out bool result))
+            if (annotation.TryGetSelectorResult(selector, out var result))
                 return result;
 
             result = selector.Match(TargetObject.Value);
@@ -254,7 +253,7 @@ namespace PSDocs.Runtime
 
         private const string DATA_FILENAME = "PSDocs-strings.psd1";
 
-        private static readonly Hashtable Empty = new Hashtable();
+        private static readonly Hashtable Empty = new();
 
         internal Hashtable GetLocalizedStrings()
         {
@@ -262,7 +261,7 @@ namespace PSDocs.Runtime
             if (path == null || path.Length == 0)
                 return Empty;
 
-            if (_LocalizedDataCache.TryGetValue(path[0], out Hashtable result))
+            if (_LocalizedDataCache.TryGetValue(path[0], out var result))
                 return result;
 
             result = ReadLocalizedStrings(path[0]) ?? new Hashtable();
@@ -275,7 +274,7 @@ namespace PSDocs.Runtime
 
         private static Hashtable ReadLocalizedStrings(string path)
         {
-            var ast = Parser.ParseFile(path, out Token[] tokens, out ParseError[] errors);
+            var ast = Parser.ParseFile(path, out var tokens, out var errors);
             var data = ast.Find(a => a is HashtableAst, false);
             if (data != null)
             {
@@ -292,7 +291,7 @@ namespace PSDocs.Runtime
 
             for (var i = 0; i < _Culture.Length; i++)
             {
-                if (TryLocalizedPath(_Culture[i], file, out string path))
+                if (TryLocalizedPath(_Culture[i], file, out var path))
                     return path;
             }
             return null;
@@ -306,7 +305,7 @@ namespace PSDocs.Runtime
             var result = new List<string>();
             for (var i = 0; i < _Culture.Length; i++)
             {
-                if (TryLocalizedPath(_Culture[i], file, out string path))
+                if (TryLocalizedPath(_Culture[i], file, out var path))
                     result.Add(path);
             }
             return result.ToArray();

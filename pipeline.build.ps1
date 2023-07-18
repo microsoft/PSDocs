@@ -104,13 +104,13 @@ task TestDotNet {
     if ($CodeCoverage) {
         exec {
             # Test library
-            dotnet test --collect:"Code Coverage" --logger trx -r (Join-Path $PWD -ChildPath reports/) tests/PSDocs.Tests
+            dotnet test -r (Join-Path $PWD -ChildPath reports/) tests/PSDocs.Tests
         }
     }
     else {
         exec {
             # Test library
-            dotnet test --logger trx -r (Join-Path $PWD -ChildPath reports/) tests/PSDocs.Tests
+            dotnet test tests/PSDocs.Tests
         }
     }
 }
@@ -250,7 +250,7 @@ task TestModule Pester, PSScriptAnalyzer, {
 
 task Benchmark {
     if ($Benchmark -or $BuildTask -eq 'Benchmark') {
-        dotnet run -p src/PSDocs.Benchmark -f netcoreapp3.1 -c Release -- benchmark --output $PWD;
+        dotnet run -p src/PSDocs.Benchmark -f net7.0 -c Release -- benchmark --output $PWD;
     }
 }
 

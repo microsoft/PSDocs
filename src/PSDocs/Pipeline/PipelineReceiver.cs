@@ -1,15 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using Newtonsoft.Json;
-using PSDocs.Configuration;
-using PSDocs.Data;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Management.Automation;
 using System.Net;
+using Newtonsoft.Json;
+using PSDocs.Configuration;
+using PSDocs.Data;
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
 using YamlDotNet.Serialization;
@@ -56,7 +56,7 @@ namespace PSDocs.Pipeline
             if (!IsAcceptedType(targetObject))
                 return new TargetObject[] { targetObject };
 
-            var json = ReadAsString(targetObject.Value, out InputFileInfo sourceInfo);
+            var json = ReadAsString(targetObject.Value, out var sourceInfo);
             var value = JsonConvert.DeserializeObject<PSObject[]>(json, new PSObjectArrayJsonConverter());
             return VisitItems(value, sourceInfo, next);
         }
@@ -73,7 +73,7 @@ namespace PSDocs.Pipeline
                 .WithNodeTypeResolver(new PSObjectYamlTypeResolver())
                 .Build();
 
-            var reader = ReadAsReader(targetObject.Value, out InputFileInfo sourceInfo);
+            var reader = ReadAsReader(targetObject.Value, out var sourceInfo);
             var parser = new YamlDotNet.Core.Parser(reader);
             var result = new List<TargetObject>();
             parser.TryConsume<StreamStart>(out _);
@@ -94,7 +94,7 @@ namespace PSDocs.Pipeline
             if (!IsAcceptedType(targetObject))
                 return new TargetObject[] { targetObject };
 
-            var data = ReadAsString(targetObject.Value, out InputFileInfo sourceInfo);
+            var data = ReadAsString(targetObject.Value, out var sourceInfo);
             var ast = System.Management.Automation.Language.Parser.ParseInput(data, out _, out _);
             var hashtables = ast.FindAll(item => item is System.Management.Automation.Language.HashtableAst, false);
             if (hashtables == null)
@@ -111,7 +111,7 @@ namespace PSDocs.Pipeline
 
         public static IEnumerable<TargetObject> ReadObjectPath(TargetObject targetObject, VisitTargetObject source, string objectPath, bool caseSensitive)
         {
-            if (!ObjectHelper.GetField(bindingContext: null, targetObject: targetObject, name: objectPath, caseSensitive: caseSensitive, value: out object nestedObject))
+            if (!ObjectHelper.GetField(bindingContext: null, targetObject: targetObject, name: objectPath, caseSensitive: caseSensitive, value: out var nestedObject))
                 return EmptyArray;
 
             var nestedType = nestedObject.GetType();
@@ -161,21 +161,21 @@ namespace PSDocs.Pipeline
             else if (sourceObject.BaseObject is InputFileInfo inputFileInfo)
             {
                 sourceInfo = inputFileInfo;
-                using (var reader = new StreamReader(inputFileInfo.FullName))
-                    return reader.ReadToEnd();
+                using var reader = new StreamReader(inputFileInfo.FullName);
+                return reader.ReadToEnd();
             }
             else if (sourceObject.BaseObject is FileInfo fileInfo)
             {
                 sourceInfo = new InputFileInfo(PSDocumentOption.GetRootedBasePath(""), fileInfo.FullName);
-                using (var reader = new StreamReader(fileInfo.FullName))
-                    return reader.ReadToEnd();
+                using var reader = new StreamReader(fileInfo.FullName);
+                return reader.ReadToEnd();
             }
             else
             {
                 var uri = sourceObject.BaseObject as Uri;
                 sourceInfo = new InputFileInfo(null, uri.ToString());
-                using (var webClient = new WebClient())
-                    return webClient.DownloadString(uri);
+                using var webClient = new WebClient();
+                return webClient.DownloadString(uri);
             }
         }
 
@@ -200,10 +200,8 @@ namespace PSDocs.Pipeline
             {
                 var uri = sourceObject.BaseObject as Uri;
                 sourceInfo = new InputFileInfo(null, uri.ToString());
-                using (var webClient = new WebClient())
-                {
-                    return new StringReader(webClient.DownloadString(uri));
-                }
+                using var webClient = new WebClient();
+                return new StringReader(webClient.DownloadString(uri));
             }
         }
 

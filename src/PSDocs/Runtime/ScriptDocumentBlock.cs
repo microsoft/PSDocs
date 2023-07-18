@@ -1,11 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using PSDocs.Definitions;
-using PSDocs.Pipeline;
 using System;
 using System.Diagnostics;
 using System.Management.Automation;
+using PSDocs.Definitions;
+using PSDocs.Pipeline;
 
 namespace PSDocs.Runtime
 {

@@ -1,11 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using PSDocs.Pipeline;
-using PSDocs.Runtime;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using PSDocs.Pipeline;
+using PSDocs.Runtime;
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
 using YamlDotNet.Serialization;
@@ -85,20 +85,18 @@ namespace PSDocs.Definitions
 
         internal void FromFile(SourceFile file)
         {
-            using (var reader = new StreamReader(file.Path))
+            using var reader = new StreamReader(file.Path);
+            var parser = new Parser(reader);
+            parser.TryConsume<StreamStart>(out _);
+            while (parser.Current is DocumentStart)
             {
-                var parser = new Parser(reader);
-                parser.TryConsume<StreamStart>(out _);
-                while (parser.Current is DocumentStart)
-                {
-                    var item = _Deserializer.Deserialize<ResourceObject>(parser: parser);
-                    if (item == null || item.Block == null)
-                        continue;
+                var item = _Deserializer.Deserialize<ResourceObject>(parser: parser);
+                if (item == null || item.Block == null)
+                    continue;
 
-                    _Output.Add(item.Block);
-                }
-                reader.Close();
+                _Output.Add(item.Block);
             }
+            reader.Close();
         }
 
         internal IEnumerable<ILanguageBlock> Build()
@@ -202,7 +200,7 @@ namespace PSDocs.Definitions
 
         TAnnotation IAnnotated<ResourceAnnotation>.GetAnnotation<TAnnotation>()
         {
-            return _Annotations.TryGetValue(typeof(TAnnotation), out ResourceAnnotation annotation) ? (TAnnotation)annotation : null;
+            return _Annotations.TryGetValue(typeof(TAnnotation), out var annotation) ? (TAnnotation)annotation : null;
         }
 
         void IAnnotated<ResourceAnnotation>.SetAnnotation<TAnnotation>(TAnnotation annotation)
@@ -219,7 +217,7 @@ namespace PSDocs.Definitions
 
         internal static bool IsObsolete(ResourceMetadata metadata)
         {
-            if (metadata == null || metadata.Annotations == null || !metadata.Annotations.TryGetBool(ANNOTATION_OBSOLETE, out bool? obsolete))
+            if (metadata == null || metadata.Annotations == null || !metadata.Annotations.TryGetBool(ANNOTATION_OBSOLETE, out var obsolete))
                 return false;
 
             return obsolete.GetValueOrDefault(false);

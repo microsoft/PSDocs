@@ -1,12 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using PSDocs.Models;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Management.Automation;
+using PSDocs.Models;
 
 namespace PSDocs.Commands
 {
@@ -132,7 +132,7 @@ namespace PSDocs.Commands
         {
             var variables = new List<PSVariable>(new PSVariable[] { new PSVariable("_", value) });
             var output = GetPSObject(expression.InvokeWithContext(null, variables, null));
-            return TryString(output, out string soutput) ? soutput : output.ToString();
+            return TryString(output, out var soutput) ? soutput : output.ToString();
         }
 
         private static PSObject GetPSObject(Collection<PSObject> collection)

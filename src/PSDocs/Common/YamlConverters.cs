@@ -1,14 +1,14 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System;
+using System.Collections.Generic;
+using System.Management.Automation;
 using PSDocs.Annotations;
 using PSDocs.Configuration;
 using PSDocs.Definitions;
 using PSDocs.Definitions.Selectors;
 using PSDocs.Runtime;
-using System;
-using System.Collections.Generic;
-using System.Management.Automation;
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
 using YamlDotNet.Serialization;
@@ -173,7 +173,7 @@ namespace PSDocs
             if (parser.TryConsume<SequenceStart>(out _))
             {
                 var values = new List<PSObject>();
-                while (!(parser.Current is SequenceEnd))
+                while (parser.Current is not SequenceEnd)
                 {
                     if (parser.Current is MappingStart)
                     {
@@ -260,7 +260,7 @@ namespace PSDocs
                 emitter.Emit(new MappingStart());
                 emitter.Emit(new MappingEnd());
             }
-            if (!(value is FieldMap map))
+            if (value is not FieldMap map)
                 return;
 
             emitter.Emit(new MappingStart());
@@ -320,22 +320,22 @@ namespace PSDocs
                 while (reader.TryConsume(out Scalar scalar))
                 {
                     // Read apiVersion
-                    if (TryApiVersion(reader, scalar, out string apiVersionValue))
+                    if (TryApiVersion(reader, scalar, out var apiVersionValue))
                     {
                         apiVersion = apiVersionValue;
                     }
                     // Read kind
-                    else if (TryKind(reader, scalar, out string kindValue))
+                    else if (TryKind(reader, scalar, out var kindValue))
                     {
                         kind = kindValue;
                     }
                     // Read metadata
-                    else if (TryMetadata(reader, scalar, nestedObjectDeserializer, out ResourceMetadata metadataValue))
+                    else if (TryMetadata(reader, scalar, nestedObjectDeserializer, out var metadataValue))
                     {
                         metadata = metadataValue;
                     }
                     // Read spec
-                    else if (apiVersion != null && kind != null && TrySpec(reader, scalar, apiVersion, kind, nestedObjectDeserializer, metadata, comment, out IResource resource))
+                    else if (apiVersion != null && kind != null && TrySpec(reader, scalar, apiVersion, kind, nestedObjectDeserializer, metadata, comment, out var resource))
                     {
                         result = resource;
                     }
@@ -380,7 +380,7 @@ namespace PSDocs
 
             if (reader.Current is MappingStart)
             {
-                if (!_Next.Deserialize(reader, typeof(ResourceMetadata), nestedObjectDeserializer, out object value))
+                if (!_Next.Deserialize(reader, typeof(ResourceMetadata), nestedObjectDeserializer, out var value))
                     return false;
 
                 metadata = (ResourceMetadata)value;
@@ -401,9 +401,9 @@ namespace PSDocs
         private bool TryResource(IParser reader, string apiVersion, string kind, Func<IParser, Type, object> nestedObjectDeserializer, ResourceMetadata metadata, CommentMetadata comment, out IResource spec)
         {
             spec = null;
-            if (_Factory.TryDescriptor(apiVersion, kind, out ISpecDescriptor descriptor) && reader.Current is MappingStart)
+            if (_Factory.TryDescriptor(apiVersion, kind, out var descriptor) && reader.Current is MappingStart)
             {
-                if (!_Next.Deserialize(reader, descriptor.SpecType, nestedObjectDeserializer, out object value))
+                if (!_Next.Deserialize(reader, descriptor.SpecType, nestedObjectDeserializer, out var value))
                     return false;
 
                 spec = descriptor.CreateInstance(RunspaceContext.CurrentThread.Source.File, metadata, comment, value);
@@ -484,7 +484,7 @@ namespace PSDocs
         {
             SelectorExpression result = null;
             var properties = new SelectorExpression.PropertyBag();
-            MapProperty(properties, reader, nestedObjectDeserializer, out string key);
+            MapProperty(properties, reader, nestedObjectDeserializer, out var key);
             if (key != null && TryCondition(key))
             {
                 result = MapCondition(key, properties, reader, nestedObjectDeserializer);
@@ -505,7 +505,7 @@ namespace PSDocs
             name = null;
             while (reader.TryConsume(out Scalar scalar))
             {
-                string key = scalar.Value;
+                var key = scalar.Value;
                 if (TryCondition(key) || TryOperator(key))
                     name = key;
 
@@ -541,7 +541,7 @@ namespace PSDocs
         private bool TryExpression<T>(IParser reader, string type, Func<IParser, Type, object> nestedObjectDeserializer, out T expression) where T : SelectorExpression
         {
             expression = null;
-            if (_Factory.TryDescriptor(type, out ISelectorExpresssionDescriptor descriptor))
+            if (_Factory.TryDescriptor(type, out var descriptor))
             {
                 expression = (T)descriptor.CreateInstance(RunspaceContext.CurrentThread.Source.File, null);
                 return expression != null;

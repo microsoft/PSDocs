@@ -1,13 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using Newtonsoft.Json;
-using PSDocs.Models;
-using PSDocs.Runtime;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Management.Automation;
+using Newtonsoft.Json;
+using PSDocs.Models;
+using PSDocs.Runtime;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -68,7 +68,7 @@ namespace PSDocs.Commands
 
         private void AddContent(object input)
         {
-            var result = TryConvertScriptBlock(input, Info, out StringContent content) ||
+            var result = TryConvertScriptBlock(input, Info, out var content) ||
                 TryConvertJson(input, Info, out content) ||
                 TryConvertYaml(input, Info, out content) ||
                 TryConvertString(input, Info, out content);
@@ -91,18 +91,16 @@ namespace PSDocs.Commands
             if (baseObject is string || baseType.IsValueType)
                 return false;
 
-            using (StringWriter sw = new StringWriter())
+            using var sw = new StringWriter();
+            using (var writer = new JsonTextWriter(sw))
             {
-                using (JsonTextWriter writer = new JsonTextWriter(sw))
-                {
-                    writer.Indentation = 4;
-                    JsonSerializer serializer = new JsonSerializer();
-                    serializer.Converters.Insert(0, new PSObjectJsonConverter());
-                    serializer.Formatting = Formatting.Indented;
-                    serializer.Serialize(writer, input);
-                }
-                content = new StringContent(sw.ToString(), info);
+                writer.Indentation = 4;
+                var serializer = new JsonSerializer();
+                serializer.Converters.Insert(0, new PSObjectJsonConverter());
+                serializer.Formatting = Formatting.Indented;
+                serializer.Serialize(writer, input);
             }
+            content = new StringContent(sw.ToString(), info);
             return true;
         }
 
@@ -129,7 +127,7 @@ namespace PSDocs.Commands
         private static bool TryConvertScriptBlock(object input, string info, out StringContent content)
         {
             content = null;
-            if (!(input is ScriptBlock s))
+            if (input is not ScriptBlock s)
                 return false;
 
             content = new StringContent(s.ToString(), info ?? Info_ScriptBlock);

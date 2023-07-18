@@ -1,14 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System;
+using System.IO;
+using System.Management.Automation;
 using PSDocs.Configuration;
 using PSDocs.Models;
 using PSDocs.Pipeline;
 using PSDocs.Runtime;
-using System;
-using System.IO;
-using System.Management.Automation;
-using Xunit;
 
 namespace PSDocs
 {
