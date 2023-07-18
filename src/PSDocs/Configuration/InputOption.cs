@@ -16,7 +16,7 @@ namespace PSDocs.Configuration
         private const string DEFAULT_OBJECTPATH = null;
         private const string[] DEFAULT_PATHIGNORE = null;
 
-        internal static readonly InputOption Default = new InputOption
+        internal static readonly InputOption Default = new()
         {
             Format = DEFAULT_FORMAT,
             ObjectPath = DEFAULT_OBJECTPATH,
@@ -57,7 +57,7 @@ namespace PSDocs.Configuration
         {
             unchecked // Overflow is fine
             {
-                int hash = 17;
+                var hash = 17;
                 hash = hash * 23 + (Format.HasValue ? Format.Value.GetHashCode() : 0);
                 hash = hash * 23 + (ObjectPath != null ? ObjectPath.GetHashCode() : 0);
                 hash = hash * 23 + (PathIgnore != null ? PathIgnore.GetHashCode() : 0);
@@ -100,10 +100,10 @@ namespace PSDocs.Configuration
             if (env.TryEnum("PSDOCS_INPUT_FORMAT", out InputFormat format))
                 Format = format;
 
-            if (env.TryString("PSDOCS_INPUT_OBJECTPATH", out string objectPath))
+            if (env.TryString("PSDOCS_INPUT_OBJECTPATH", out var objectPath))
                 ObjectPath = objectPath;
 
-            if (env.TryStringArray("PSDOCS_INPUT_PATHIGNORE", out string[] pathIgnore))
+            if (env.TryStringArray("PSDOCS_INPUT_PATHIGNORE", out var pathIgnore))
                 PathIgnore = pathIgnore;
         }
 
@@ -112,10 +112,10 @@ namespace PSDocs.Configuration
             if (index.TryPopEnum("Input.Format", out InputFormat format))
                 Format = format;
 
-            if (index.TryPopString("Input.ObjectPath", out string objectPath))
+            if (index.TryPopString("Input.ObjectPath", out var objectPath))
                 ObjectPath = objectPath;
 
-            if (index.TryPopStringArray("Input.PathIgnore", out string[] pathIgnore))
+            if (index.TryPopStringArray("Input.PathIgnore", out var pathIgnore))
                 PathIgnore = pathIgnore;
         }
     }

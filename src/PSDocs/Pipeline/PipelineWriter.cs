@@ -1,13 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using PSDocs.Resources;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Management.Automation;
 using System.Management.Automation.Language;
 using System.Threading;
+using PSDocs.Resources;
 
 namespace PSDocs.Pipeline
 {

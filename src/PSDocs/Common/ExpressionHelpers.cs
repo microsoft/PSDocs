@@ -1,9 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using Newtonsoft.Json.Linq;
-using PSDocs.Configuration;
-using PSDocs.Runtime;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,6 +8,9 @@ using System.IO;
 using System.Management.Automation;
 using System.Text.RegularExpressions;
 using System.Threading;
+using Newtonsoft.Json.Linq;
+using PSDocs.Configuration;
+using PSDocs.Runtime;
 
 namespace PSDocs
 {
@@ -29,7 +29,7 @@ namespace PSDocs
 
             o = GetBaseObject(o);
             return (o is ICollection c && c.Count == 0) ||
-                (TryString(o, out string s) && string.IsNullOrEmpty(s));
+                (TryString(o, out var s) && string.IsNullOrEmpty(s));
         }
 
         internal static bool Exists(IBindingContext bindingContext, object inputObject, string field, bool caseSensitive)
@@ -39,16 +39,16 @@ namespace PSDocs
 
         internal static bool Equal(object expectedValue, object actualValue, bool caseSensitive, bool convertExpected = false, bool convertActual = false)
         {
-            if (TryString(expectedValue, out string s1) && TryString(actualValue, out string s2))
+            if (TryString(expectedValue, out var s1) && TryString(actualValue, out var s2))
                 return StringEqual(s1, s2, caseSensitive);
 
-            if (TryBool(expectedValue, convertExpected, out bool b1) && TryBool(actualValue, convertActual, out bool b2))
+            if (TryBool(expectedValue, convertExpected, out var b1) && TryBool(actualValue, convertActual, out var b2))
                 return b1 == b2;
 
-            if (TryLong(expectedValue, convertExpected, out long l1) && TryLong(actualValue, convertActual, out long l2))
+            if (TryLong(expectedValue, convertExpected, out var l1) && TryLong(actualValue, convertActual, out var l2))
                 return l1 == l2;
 
-            if (TryInt(expectedValue, convertExpected, out int i1) && TryInt(actualValue, convertActual, out int i2))
+            if (TryInt(expectedValue, convertExpected, out var i1) && TryInt(actualValue, convertActual, out var i2))
                 return i1 == i2;
 
             var expectedBase = GetBaseObject(expectedValue);
@@ -58,25 +58,25 @@ namespace PSDocs
 
         internal static bool CompareNumeric(object actual, object expected, bool convert, out int compare, out object value)
         {
-            if (TryInt(actual, convert, out int actualInt) && TryInt(expected, convert: true, value: out int expectedInt))
+            if (TryInt(actual, convert, out var actualInt) && TryInt(expected, convert: true, value: out var expectedInt))
             {
                 compare = Comparer<int>.Default.Compare(actualInt, expectedInt);
                 value = actualInt;
                 return true;
             }
-            else if (TryLong(actual, convert, out long actualLong) && TryLong(expected, convert: true, value: out long expectedLong))
+            else if (TryLong(actual, convert, out var actualLong) && TryLong(expected, convert: true, value: out var expectedLong))
             {
                 compare = Comparer<long>.Default.Compare(actualLong, expectedLong);
                 value = actualLong;
                 return true;
             }
-            else if (TryFloat(actual, convert, out float actualFloat) && TryFloat(expected, convert: true, value: out float expectedFloat))
+            else if (TryFloat(actual, convert, out var actualFloat) && TryFloat(expected, convert: true, value: out var expectedFloat))
             {
                 compare = Comparer<float>.Default.Compare(actualFloat, expectedFloat);
                 value = actualFloat;
                 return true;
             }
-            else if (TryDateTime(actual, convert, out DateTime actualDateTime) && TryDateTime(expected, convert: true, value: out DateTime expectedDateTime))
+            else if (TryDateTime(actual, convert, out var actualDateTime) && TryDateTime(expected, convert: true, value: out var expectedDateTime))
             {
                 compare = Comparer<DateTime>.Default.Compare(actualDateTime, expectedDateTime);
                 value = actualDateTime;
@@ -115,7 +115,7 @@ namespace PSDocs
             if (TryString(o, out value))
                 return true;
 
-            if (TryInt(o, false, out int ivalue))
+            if (TryInt(o, false, out var ivalue))
             {
                 value = ivalue.ToString(Thread.CurrentThread.CurrentCulture);
                 return true;
@@ -126,7 +126,7 @@ namespace PSDocs
         internal static bool TryConvertStringArray(object[] o, out string[] value)
         {
             value = Array.Empty<string>();
-            if (o == null || o.Length == 0 || !TryConvertString(o[0], out string s))
+            if (o == null || o.Length == 0 || !TryConvertString(o[0], out var s))
                 return false;
 
             value = new string[o.Length];
@@ -160,12 +160,12 @@ namespace PSDocs
                 value = token.Value<int>();
                 return true;
             }
-            else if (convert && TryString(o, out string s) && int.TryParse(s, out ivalue))
+            else if (convert && TryString(o, out var s) && int.TryParse(s, out ivalue))
             {
                 value = ivalue;
                 return true;
             }
-            value = default(int);
+            value = default;
             return false;
         }
 
@@ -182,12 +182,12 @@ namespace PSDocs
                 value = token.Value<bool>();
                 return true;
             }
-            else if (convert && TryString(o, out string s) && bool.TryParse(s, out bvalue))
+            else if (convert && TryString(o, out var s) && bool.TryParse(s, out bvalue))
             {
                 value = bvalue;
                 return true;
             }
-            value = default(bool);
+            value = default;
             return false;
         }
 
@@ -204,12 +204,12 @@ namespace PSDocs
                 value = token.Value<byte>();
                 return true;
             }
-            else if (convert && TryString(o, out string s) && byte.TryParse(s, out bvalue))
+            else if (convert && TryString(o, out var s) && byte.TryParse(s, out bvalue))
             {
                 value = bvalue;
                 return true;
             }
-            value = default(byte);
+            value = default;
             return false;
         }
 
@@ -236,12 +236,12 @@ namespace PSDocs
                 value = token.Value<long>();
                 return true;
             }
-            else if (convert && TryString(o, out string s) && long.TryParse(s, out l))
+            else if (convert && TryString(o, out var s) && long.TryParse(s, out l))
             {
                 value = l;
                 return true;
             }
-            value = default(long);
+            value = default;
             return false;
         }
 
@@ -258,7 +258,7 @@ namespace PSDocs
                 value = ivalue;
                 return true;
             }
-            value = default(float);
+            value = default;
             return false;
         }
 
@@ -270,7 +270,7 @@ namespace PSDocs
                 value = dvalue;
                 return true;
             }
-            value = default(double);
+            value = default;
             return false;
         }
 
@@ -311,17 +311,17 @@ namespace PSDocs
                 value = token.Value<DateTime>();
                 return true;
             }
-            else if (convert && TryString(o, out string s) && DateTime.TryParse(s, out dvalue))
+            else if (convert && TryString(o, out var s) && DateTime.TryParse(s, out dvalue))
             {
                 value = dvalue;
                 return true;
             }
-            else if (convert && TryInt(o, convert: false, out int daysOffset))
+            else if (convert && TryInt(o, convert: false, out var daysOffset))
             {
                 value = DateTime.Now.AddDays(daysOffset);
                 return true;
             }
-            value = default(DateTime);
+            value = default;
             return false;
         }
 
@@ -333,12 +333,12 @@ namespace PSDocs
 
         internal static bool Match(object pattern, object value, bool caseSensitive)
         {
-            return TryString(pattern, out string patternString) && TryString(value, out string s) && Match(patternString, s, caseSensitive);
+            return TryString(pattern, out var patternString) && TryString(value, out var s) && Match(patternString, s, caseSensitive);
         }
 
         internal static bool StartsWith(string actualValue, object expectedValue, bool caseSensitive)
         {
-            if (!TryString(expectedValue, out string expected))
+            if (!TryString(expectedValue, out var expected))
                 return false;
 
             return actualValue.StartsWith(expected, caseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase);
@@ -346,7 +346,7 @@ namespace PSDocs
 
         internal static bool EndsWith(string actualValue, object expectedValue, bool caseSensitive)
         {
-            if (!TryString(expectedValue, out string expected))
+            if (!TryString(expectedValue, out var expected))
                 return false;
 
             return actualValue.EndsWith(expected, caseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase);
@@ -354,7 +354,7 @@ namespace PSDocs
 
         internal static bool Contains(string actualValue, object expectedValue, bool caseSensitive)
         {
-            if (!TryString(expectedValue, out string expected))
+            if (!TryString(expectedValue, out var expected))
                 return false;
 
             return actualValue.IndexOf(expected, caseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase) >= 0;
@@ -444,7 +444,7 @@ namespace PSDocs
         private static bool TryPipelineCache<T>(string prefix, string key, out T value)
         {
             value = default;
-            if (RunspaceContext.CurrentThread.ExpressionCache.TryGetValue(string.Concat(prefix, key), out object ovalue))
+            if (RunspaceContext.CurrentThread.ExpressionCache.TryGetValue(string.Concat(prefix, key), out var ovalue))
             {
                 value = (T)ovalue;
                 return true;

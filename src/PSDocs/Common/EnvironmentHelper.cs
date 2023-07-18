@@ -10,9 +10,9 @@ namespace PSDocs
 {
     internal sealed class EnvironmentHelper
     {
-        private readonly static char[] STRINGARRAY_SEPARATOR = new char[] { ';' };
+        private static readonly char[] STRINGARRAY_SEPARATOR = new char[] { ';' };
 
-        public static readonly EnvironmentHelper Default = new EnvironmentHelper();
+        public static readonly EnvironmentHelper Default = new();
 
         internal bool TryString(string key, out string value)
         {
@@ -22,7 +22,7 @@ namespace PSDocs
         internal bool TrySecureString(string key, out SecureString value)
         {
             value = null;
-            if (!TryString(key, out string variable))
+            if (!TryString(key, out var variable))
                 return false;
 
             value = new NetworkCredential("na", variable).SecurePassword;
@@ -32,19 +32,19 @@ namespace PSDocs
         internal bool TryInt(string key, out int value)
         {
             value = default;
-            return TryVariable(key, out string variable) && int.TryParse(variable, out value);
+            return TryVariable(key, out var variable) && int.TryParse(variable, out value);
         }
 
         internal bool TryBool(string key, out bool value)
         {
             value = default;
-            return TryVariable(key, out string variable) && TryParseBool(variable, out value);
+            return TryVariable(key, out var variable) && TryParseBool(variable, out value);
         }
 
         internal bool TryEnum<TEnum>(string key, out TEnum value) where TEnum : struct
         {
             value = default;
-            if (!TryVariable(key, out string variable))
+            if (!TryVariable(key, out var variable))
                 return false;
 
             return Enum.TryParse(variable, ignoreCase: true, out value);
@@ -53,7 +53,7 @@ namespace PSDocs
         internal bool TryStringArray(string key, out string[] value)
         {
             value = default;
-            if (!TryVariable(key, out string variable))
+            if (!TryVariable(key, out var variable))
                 return false;
 
             value = variable.Split(STRINGARRAY_SEPARATOR, options: StringSplitOptions.RemoveEmptyEntries);
@@ -71,7 +71,7 @@ namespace PSDocs
             if (bool.TryParse(variable, out value))
                 return true;
 
-            if (int.TryParse(variable, out int ivalue))
+            if (int.TryParse(variable, out var ivalue))
             {
                 value = ivalue > 0;
                 return true;

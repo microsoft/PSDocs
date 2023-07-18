@@ -1,9 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using PSDocs.Pipeline;
 using System.Collections.Generic;
 using System.Diagnostics;
+using PSDocs.Pipeline;
 
 namespace PSDocs.Definitions.Selectors
 {

@@ -30,7 +30,7 @@ namespace PSDocs.Commands
 
             var builder = GetBuilder();
             var section = builder.EnterSection(Name);
-            bool shouldWrite = true;
+            var shouldWrite = true;
 
             try
             {

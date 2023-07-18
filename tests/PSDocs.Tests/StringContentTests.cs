@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 using PSDocs.Runtime;
-using Xunit;
 
 namespace PSDocs
 {

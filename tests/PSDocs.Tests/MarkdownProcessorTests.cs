@@ -5,7 +5,6 @@ using PSDocs.Configuration;
 using PSDocs.Models;
 using PSDocs.Processor.Markdown;
 using PSDocs.Runtime;
-using Xunit;
 
 namespace PSDocs
 {

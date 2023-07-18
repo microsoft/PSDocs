@@ -8,7 +8,7 @@ namespace PSDocs.Configuration
 {
     public sealed class DocumentOption : IEquatable<DocumentOption>
     {
-        internal static readonly DocumentOption Default = new DocumentOption
+        internal static readonly DocumentOption Default = new()
         {
             Include = null,
             Tag = null,
@@ -42,7 +42,7 @@ namespace PSDocs.Configuration
         {
             unchecked // Overflow is fine
             {
-                int hash = 17;
+                var hash = 17;
                 hash = hash * 23 + (Include != null ? Include.GetHashCode() : 0);
                 hash = hash * 23 + (Tag != null ? Tag.GetHashCode() : 0);
                 return hash;
@@ -66,19 +66,19 @@ namespace PSDocs.Configuration
 
         internal void Load(EnvironmentHelper env)
         {
-            if (env.TryStringArray("PSDOCS_DOCUMENT_INCLUDE", out string[] include))
+            if (env.TryStringArray("PSDOCS_DOCUMENT_INCLUDE", out var include))
                 Include = include;
 
-            if (env.TryStringArray("PSDOCS_DOCUMENT_TAG", out string[] tag))
+            if (env.TryStringArray("PSDOCS_DOCUMENT_TAG", out var tag))
                 Tag = tag;
         }
 
         internal void Load(Dictionary<string, object> index)
         {
-            if (index.TryPopStringArray("Document.Include", out string[] include))
+            if (index.TryPopStringArray("Document.Include", out var include))
                 Include = include;
 
-            if (index.TryPopStringArray("Document.Tag", out string[] tag))
+            if (index.TryPopStringArray("Document.Tag", out var tag))
                 Tag = tag;
         }
     }

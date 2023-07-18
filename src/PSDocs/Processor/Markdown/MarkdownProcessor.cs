@@ -1,13 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using PSDocs.Configuration;
-using PSDocs.Models;
-using PSDocs.Runtime;
 using System.Collections;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
+using PSDocs.Configuration;
+using PSDocs.Models;
+using PSDocs.Runtime;
 
 namespace PSDocs.Processor.Markdown
 {

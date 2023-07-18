@@ -1,16 +1,16 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System;
+using System.IO;
+using System.Management.Automation;
+using System.Reflection;
 using BenchmarkDotNet.Attributes;
 using PSDocs.Configuration;
 using PSDocs.Models;
 using PSDocs.Pipeline;
 using PSDocs.Processor.Markdown;
 using PSDocs.Runtime;
-using System;
-using System.IO;
-using System.Management.Automation;
-using System.Reflection;
 
 namespace PSDocs.Benchmark
 {

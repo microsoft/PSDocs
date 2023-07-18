@@ -1,8 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using PSDocs.Pipeline;
 using System.Text;
+using PSDocs.Pipeline;
 
 namespace PSDocs.Runtime
 {

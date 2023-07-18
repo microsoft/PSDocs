@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using PSDocs.Resources;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,6 +9,7 @@ using System.Globalization;
 using System.IO;
 using System.Management.Automation;
 using System.Threading;
+using PSDocs.Resources;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -54,7 +54,7 @@ namespace PSDocs.Configuration
     {
         private const string DEFAULT_FILENAME = "ps-docs.yaml";
 
-        private static readonly PSDocumentOption Default = new PSDocumentOption
+        private static readonly PSDocumentOption Default = new()
         {
             Document = DocumentOption.Default,
             Execution = ExecutionOption.Default,
@@ -311,7 +311,7 @@ namespace PSDocs.Configuration
         {
             unchecked // Overflow is fine
             {
-                int hash = 17;
+                var hash = 17;
                 hash = hash * 23 + (Configuration != null ? Configuration.GetHashCode() : 0);
                 hash = hash * 23 + (Document != null ? Document.GetHashCode() : 0);
                 hash = hash * 23 + (Execution != null ? Execution.GetHashCode() : 0);

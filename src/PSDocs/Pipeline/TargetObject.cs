@@ -1,11 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using PSDocs.Data;
-using PSDocs.Definitions.Selectors;
 using System;
 using System.Collections.Generic;
 using System.Management.Automation;
+using PSDocs.Data;
+using PSDocs.Definitions.Selectors;
 
 namespace PSDocs.Pipeline
 {
@@ -50,7 +50,7 @@ namespace PSDocs.Pipeline
 
         public T GetAnnotation<T>() where T : TargetObjectAnnotation, new()
         {
-            if (!_Annotations.TryGetValue(typeof(T), out TargetObjectAnnotation value))
+            if (!_Annotations.TryGetValue(typeof(T), out var value))
             {
                 value = new T();
                 _Annotations.Add(typeof(T), value);

@@ -65,7 +65,7 @@ namespace PSDocs.Configuration
 
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
-            var found = TryField(binder.Name, out string[] value);
+            var found = TryField(binder.Name, out var value);
             result = value;
             return found;
         }

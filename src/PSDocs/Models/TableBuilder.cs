@@ -1,11 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using PSDocs.Pipeline;
-using PSDocs.Resources;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using PSDocs.Pipeline;
+using PSDocs.Resources;
 
 namespace PSDocs.Models
 {
@@ -47,7 +47,7 @@ namespace PSDocs.Models
             var index = GetIndex(hashtable);
 
             // Start loading matching values
-            if (index.TryGetValue(FIELD_NAME, out object value))
+            if (index.TryGetValue(FIELD_NAME, out var value))
                 header.Label = (string)value;
 
             if (index.TryGetValue(FIELD_LABEL, out value))

@@ -1,11 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System;
+using System.Management.Automation;
 using PSDocs.Models;
 using PSDocs.Processor;
 using PSDocs.Runtime;
-using System;
-using System.Management.Automation;
 
 namespace PSDocs.Data
 {

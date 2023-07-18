@@ -114,7 +114,7 @@ namespace PSDocs
             public NameToken Get()
             {
                 var token = new NameToken();
-                NameToken result = token;
+                var result = token;
                 while (Next())
                 {
                     var start = Position;
@@ -125,7 +125,7 @@ namespace PSDocs
                     }
 
                     // Jump to the next separator or end
-                    var end = IndexOf(out NameTokenType tokenType);
+                    var end = IndexOf(out var tokenType);
                     token.Type = tokenType;
                     if (tokenType == NameTokenType.Field)
                     {
@@ -162,11 +162,10 @@ namespace PSDocs
         public static bool GetField(IBindingContext bindingContext, object targetObject, string name, bool caseSensitive, out object value)
         {
             // Try to load nameToken from cache
-            if (bindingContext == null || !bindingContext.GetNameToken(expression: name, nameToken: out NameToken nameToken))
+            if (bindingContext == null || !bindingContext.GetNameToken(expression: name, nameToken: out var nameToken))
             {
                 nameToken = GetNameToken(expression: name);
-                if (bindingContext != null)
-                    bindingContext.CacheNameToken(expression: name, nameToken: nameToken);
+                bindingContext?.CacheNameToken(expression: name, nameToken: nameToken);
             }
             return GetField(targetObject: targetObject, token: nameToken, caseSensitive: caseSensitive, value: out value);
         }
@@ -180,7 +179,7 @@ namespace PSDocs
 
             var baseType = baseObject.GetType();
             object field = null;
-            bool foundField = false;
+            var foundField = false;
 
             // Handle this object
             if (token.Type == NameTokenType.Self)

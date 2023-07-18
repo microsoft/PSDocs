@@ -1,10 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using PSDocs.Configuration;
-using PSDocs.Runtime;
 using System.Collections;
 using System.IO;
+using PSDocs.Configuration;
+using PSDocs.Runtime;
 
 namespace PSDocs.Definitions.Conventions
 {

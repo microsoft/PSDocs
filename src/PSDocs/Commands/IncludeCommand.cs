@@ -1,12 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using PSDocs.Models;
-using PSDocs.Resources;
-using PSDocs.Runtime;
 using System.Collections;
 using System.IO;
 using System.Management.Automation;
+using PSDocs.Models;
+using PSDocs.Resources;
+using PSDocs.Runtime;
 
 namespace PSDocs.Commands
 {

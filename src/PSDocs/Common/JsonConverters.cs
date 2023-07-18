@@ -1,13 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using Newtonsoft.Json;
-using PSDocs.Pipeline;
-using PSDocs.Resources;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Management.Automation;
+using Newtonsoft.Json;
+using PSDocs.Pipeline;
+using PSDocs.Resources;
 
 namespace PSDocs
 {
@@ -23,7 +23,7 @@ namespace PSDocs
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            if (!(value is PSObject pso))
+            if (value is not PSObject pso)
                 throw new ArgumentException(message: PSDocsResources.SerializeNullPSObject, paramName: nameof(value));
 
             if (WriteFileSystemInfo(writer, value, serializer) || WriteBaseObject(writer, pso, serializer))
@@ -115,7 +115,7 @@ namespace PSDocs
         /// </summary>
         private static bool WriteFileSystemInfo(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            if (!(value is FileSystemInfo fileSystemInfo))
+            if (value is not FileSystemInfo fileSystemInfo)
                 return false;
 
             serializer.Serialize(writer, fileSystemInfo.FullName);

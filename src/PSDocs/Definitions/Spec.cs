@@ -20,7 +20,7 @@ namespace PSDocs.Definitions
         internal const string V1 = "github.com/microsoft/PSDocs/v1";
         internal const string Selector = "Selector";
 
-        public readonly static ISpecDescriptor[] BuiltinTypes = new ISpecDescriptor[]
+        public static readonly ISpecDescriptor[] BuiltinTypes = new ISpecDescriptor[]
         {
             new SpecDescriptor<SelectorV1, SelectorV1Spec>(V1, Selector),
         };

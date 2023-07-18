@@ -14,7 +14,7 @@ namespace PSDocs.Configuration
     {
         private const LanguageMode DEFAULT_LANGUAGEMODE = Configuration.LanguageMode.FullLanguage;
 
-        internal static readonly ExecutionOption Default = new ExecutionOption
+        internal static readonly ExecutionOption Default = new()
         {
             LanguageMode = DEFAULT_LANGUAGEMODE,
         };
@@ -44,7 +44,7 @@ namespace PSDocs.Configuration
         {
             unchecked // Overflow is fine
             {
-                int hash = 17;
+                var hash = 17;
                 hash = hash * 23 + (LanguageMode.HasValue ? LanguageMode.Value.GetHashCode() : 0);
                 return hash;
             }

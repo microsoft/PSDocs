@@ -1,9 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using PSDocs.Resources;
 using System;
 using System.Diagnostics;
+using PSDocs.Resources;
 
 namespace PSDocs.Definitions.Selectors
 {

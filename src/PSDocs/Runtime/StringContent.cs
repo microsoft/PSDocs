@@ -31,7 +31,7 @@ namespace PSDocs.Runtime
             while (!stream.EOF)
             {
                 stream.SkipIndent(indent);
-                if (stream.UntilLineEnding(out string text))
+                if (stream.UntilLineEnding(out var text))
                     lines.Add(text);
 
                 stream.SkipLineEnding();

@@ -20,7 +20,7 @@ namespace PSDocs
         public static bool TryPopValue<T>(this IDictionary<string, object> dictionary, string key, out T value)
         {
             value = default;
-            if (TryPopValue(dictionary, key, out object v) && ObjectHelper.GetBaseObject(v) is T result)
+            if (TryPopValue(dictionary, key, out var v) && ObjectHelper.GetBaseObject(v) is T result)
             {
                 value = result;
                 return true;
@@ -32,7 +32,7 @@ namespace PSDocs
         public static bool TryPopBool(this IDictionary<string, object> dictionary, string key, out bool value)
         {
             value = default;
-            return TryPopValue(dictionary, key, out object v) && bool.TryParse(v.ToString(), out value);
+            return TryPopValue(dictionary, key, out var v) && bool.TryParse(v.ToString(), out value);
         }
 
         [DebuggerStepThrough]
@@ -45,14 +45,14 @@ namespace PSDocs
         public static bool TryPopEnum<TEnum>(this IDictionary<string, object> dictionary, string key, out TEnum value) where TEnum : struct
         {
             value = default;
-            return TryPopString(dictionary, key, out string result) && Enum.TryParse(result, out value);
+            return TryPopString(dictionary, key, out var result) && Enum.TryParse(result, out value);
         }
 
         [DebuggerStepThrough]
         public static bool TryPopStringArray(this IDictionary<string, object> dictionary, string key, out string[] value)
         {
             value = null;
-            if (!TryPopValue(dictionary, key, out object result))
+            if (!TryPopValue(dictionary, key, out var result))
                 return false;
 
             var o = ObjectHelper.GetBaseObject(result);
@@ -64,7 +64,7 @@ namespace PSDocs
         public static bool TryGetBool(this IDictionary<string, object> dictionary, string key, out bool? value)
         {
             value = null;
-            if (!dictionary.TryGetValue(key, out object o))
+            if (!dictionary.TryGetValue(key, out var o))
                 return false;
 
             if (o is bool bvalue || (o is string svalue && bool.TryParse(svalue, out bvalue)))
@@ -79,7 +79,7 @@ namespace PSDocs
         public static bool TryGetLong(this IDictionary<string, object> dictionary, string key, out long? value)
         {
             value = null;
-            if (!dictionary.TryGetValue(key, out object o))
+            if (!dictionary.TryGetValue(key, out var o))
                 return false;
 
             if (o is long lvalue || (o is string svalue && long.TryParse(svalue, out lvalue)))
@@ -94,7 +94,7 @@ namespace PSDocs
         public static bool TryGetString(this IDictionary<string, object> dictionary, string key, out string value)
         {
             value = null;
-            if (!dictionary.TryGetValue(key, out object o))
+            if (!dictionary.TryGetValue(key, out var o))
                 return false;
 
             if (o is string sValue)
@@ -109,7 +109,7 @@ namespace PSDocs
         public static bool TryGetStringArray(this IDictionary<string, object> dictionary, string key, out string[] value)
         {
             value = null;
-            if (!dictionary.TryGetValue(key, out object o))
+            if (!dictionary.TryGetValue(key, out var o))
                 return false;
 
             return TryStringArray(o, out value);
