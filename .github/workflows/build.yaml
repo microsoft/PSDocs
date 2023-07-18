@@ -43,7 +43,7 @@ jobs:
       - name: Build module
         shell: pwsh
         timeout-minutes: 5
-        run: Invoke-Build -Configuration Release -AssertStyle GitHubActions
+        run: Invoke-Build -Configuration Release
 
       - name: Upload module
         uses: actions/upload-artifact@v3
@@ -134,10 +134,10 @@ jobs:
         name: Test module (PowerShell)
         shell: pwsh
         timeout-minutes: 15
-        run: Invoke-Build TestModule -Configuration Release -AssertStyle GitHubActions
+        run: Invoke-Build TestModule -Configuration Release
 
       - if: ${{ matrix.shell == 'powershell' }}
         name: Test module (Windows PowerShell)
         shell: powershell
         timeout-minutes: 30
-        run: Invoke-Build TestModule -Configuration Release -AssertStyle GitHubActions
+        run: Invoke-Build TestModule -Configuration Release
