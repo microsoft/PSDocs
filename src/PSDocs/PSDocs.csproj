@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -41,7 +41,7 @@ This project uses GitHub Issues to track bugs and feature requests. See GitHub p
     </PackageReference>
     <PackageReference Include="PowerShellStandard.Library" Version="5.1.1" PrivateAssets="All" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="YamlDotNet" Version="13.1.1" />
+    <PackageReference Include="YamlDotNet" Version="13.4.0" />
   </ItemGroup>
 
   <ItemGroup>
