@@ -126,7 +126,7 @@ task CopyModule {
 task BuildModule BuildDotNet, CopyModule, VersionModule
 
 # Synopsis: Build help
-task BuildHelp BuildModule, PlatyPS, {
+task BuildHelp BuildModule, Dependencies, {
     # Avoid YamlDotNet issue in same app domain
     exec {
         $pwshPath = (Get-Process -Id $PID).Path;
@@ -177,18 +177,6 @@ task VersionModule {
     }
 }
 
-task ReleaseModule VersionModule, {
-    $modulePath = (Join-Path -Path $ArtifactPath -ChildPath 'PSDocs');
-    Write-Verbose -Message "[ReleaseModule] -- Checking module path: $modulePath";
-
-    if (!(Test-Path -Path $modulePath)) {
-        Write-Error -Message "[ReleaseModule] -- Module path does not exist";
-    }
-    elseif (![String]::IsNullOrEmpty($ApiKey)) {
-        Publish-Module -Path $modulePath -NuGetApiKey $ApiKey;
-    }
-}
-
 # Synopsis: Install NuGet provider
 task NuGet {
     if ($Null -eq (Get-PackageProvider -Name NuGet -ErrorAction Ignore)) {
@@ -196,31 +184,15 @@ task NuGet {
     }
 }
 
-# Synopsis: Install Pester module
-task Pester NuGet, {
-    if ($Null -eq (Get-InstalledModule -Name Pester -RequiredVersion 4.10.1 -ErrorAction Ignore)) {
-        Install-Module -Name Pester -RequiredVersion 4.10.1 -Scope CurrentUser -Force -SkipPublisherCheck;
-    }
-    Import-Module -Name Pester -RequiredVersion 4.10.1 -Verbose:$False;
-}
-
-# Synopsis: Install PSScriptAnalyzer module
-task PSScriptAnalyzer NuGet, {
-    if ($Null -eq (Get-InstalledModule -Name PSScriptAnalyzer -MinimumVersion 1.18.1 -ErrorAction Ignore)) {
-        Install-Module -Name PSScriptAnalyzer -MinimumVersion 1.18.1 -Scope CurrentUser -Force;
-    }
-    Import-Module -Name PSScriptAnalyzer -Verbose:$False;
-}
-
-# Synopsis: Install PlatyPS module
-task platyPS {
-    if ($Null -eq (Get-InstalledModule -Name PlatyPS -MinimumVersion 0.14.0 -ErrorAction Ignore)) {
-        Install-Module -Name PlatyPS -Scope CurrentUser -MinimumVersion 0.14.0 -Force;
-    }
+task Dependencies NuGet, {
+    Import-Module $PWD/scripts/dependencies.psm1;
+    Install-Dependencies -Path $PWD/modules.json -Dev;
 }
 
 # Synopsis: Test the module
-task TestModule Pester, PSScriptAnalyzer, {
+task TestModule Dependencies, {
+    Import-Module Pester -RequiredVersion 4.10.1 -Force;
+
     # Run Pester tests
     $pesterParams = @{ Path = $PWD; OutputFile = 'reports/pester-unit.xml'; OutputFormat = 'NUnitXml'; PesterOption = @{ IncludeVSCodeMarker = $True }; PassThru = $True; };
 
@@ -255,15 +227,8 @@ task Benchmark {
 }
 
 # Synopsis: Run script analyzer
-task Analyze Build, PSScriptAnalyzer, {
+task Analyze Build, Dependencies, {
     Invoke-ScriptAnalyzer -Path out/modules/PSDocs;
-}
-
-# Synopsis: Add shipit build tag
-task TagBuild {
-    if ($Null -ne $Env:BUILD_DEFINITIONNAME) {
-        Write-Host "`#`#vso[build.addbuildtag]shipit";
-    }
 }
 
 # Synopsis: Remove temp files.
@@ -274,8 +239,6 @@ task Clean {
 task Build Clean, BuildModule, VersionModule, BuildHelp
 
 task Test Build, TestDotNet, TestModule
-
-task Release ReleaseModule, TagBuild
 
 # Synopsis: Build and test. Entry point for CI Build stage
 task . Build, TestDotNet
