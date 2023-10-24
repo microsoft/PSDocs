@@ -12,13 +12,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet" Version="0.13.6" />
     <PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.1.1" />
-    <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.2.5" />
+    <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.3.8" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(OS)' == 'Windows_NT'">
-    <PackageReference Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.13.6" />
+    <PackageReference Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.13.9" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net472'">

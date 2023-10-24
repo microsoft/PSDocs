@@ -12,8 +12,8 @@
     <!-- <TreatWarningsAsErrors>true</TreatWarningsAsErrors> -->
     <Authors>Bernie White</Authors>
     <AssemblyTitle>PSDocs</AssemblyTitle>
-    <RepositoryUrl>https://github.com/Microsoft/PSDocs</RepositoryUrl>
-    <PackageLicenseExpression>https://github.com/Microsoft/PSDocs/blob/main/LICENSE</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/microsoft/PSDocs</RepositoryUrl>
+    <PackageLicenseExpression>https://github.com/microsoft/PSDocs/blob/main/LICENSE</PackageLicenseExpression>
     <Version>0.0.1</Version>
     <Copyright>Copyright (c) Microsoft Corporation. Licensed under the MIT License.</Copyright>
     <Description>Generate markdown from objects using PowerShell syntax.
@@ -35,13 +35,13 @@ This project uses GitHub Issues to track bugs and feature requests. See GitHub p
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="7.0.3">
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="7.0.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="PowerShellStandard.Library" Version="5.1.1" PrivateAssets="All" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="YamlDotNet" Version="13.1.1" />
+    <PackageReference Include="YamlDotNet" Version="13.7.1" />
   </ItemGroup>
 
   <ItemGroup>

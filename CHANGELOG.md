@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+What's changed since v0.9.0:
+
+- Engineering:
+  - Bump YamlDotNet to v13.7.1.
+  - Bump Newtonsoft.Json to v13.0.3.
+
 ## v0.9.0
 
 What's changed since v0.8.0:
@@ -24,7 +30,7 @@ What's changed since v0.8.0:
   - Added support for document data and metadata in `end` convention blocks. [#148](https://github.com/Microsoft/PSDocs/issues/148)
 - Engineering:
   - Migrated PSDocs to Microsoft GitHub organization. [#145](https://github.com/microsoft/PSDocs/issues/145)
-  - Bump YamlDotNet dependency to v11.2.1. [#168](https://github.com/microsoft/PSDocs/pull/168)
+  - Bump YamlDotNet to v11.2.1. [#168](https://github.com/microsoft/PSDocs/pull/168)
 - Bug fixes:
   - Fixed PowerShell command completion `Document` keyword. [#175](https://github.com/Microsoft/PSDocs/issues/175)
 
