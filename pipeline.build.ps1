@@ -222,7 +222,7 @@ task TestModule Dependencies, {
 
 task Benchmark {
     if ($Benchmark -or $BuildTask -eq 'Benchmark') {
-        dotnet run -p src/PSDocs.Benchmark -f net7.0 -c Release -- benchmark --output $PWD;
+        dotnet run --project src/PSDocs.Benchmark -f net7.0 -c Release -- benchmark --output $PWD;
     }
 }
 
