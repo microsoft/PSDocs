@@ -5,6 +5,7 @@
 What's changed since v0.9.0:
 
 - Engineering:
+    - CI update Pester to v5.6.1
     - Bump BenchmarkDotNet to v0.14.0. 
     - Bump Microsoft.CodeCoverage to v17.10.0. 
     - Bump Microsoft.NET.Test.Sdk to v17.10.0. 
