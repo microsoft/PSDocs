@@ -193,38 +193,29 @@ task Dependencies NuGet, {
 task TestModule Dependencies, {
     Import-Module Pester -RequiredVersion 5.6.1 -Force;
 
-    # Run Pester tests
-    $pesterParams = @{
-        Path           = $PWD
-        Output         = @{
-            Format = 'NUnitXml'
-            File   = 'reports/pester-unit.xml'
-        }
-        Configuration  = @{
-            Run = @{
-                PassThru            = $True
-                IncludeVSCodeMarker = $True
-            }
-        }
-    }
+    # Define Pester configuration
+    $pesterConfig = [PesterConfiguration]::Default
+    $pesterConfig.Run.PassThru = $True
+    $pesterConfig.Run.IncludeVSCodeMarker = $True
+    $pesterConfig.Outputs.NUnitXml.Enabled = $True
+    $pesterConfig.Outputs.NUnitXml.Path = 'reports/pester-unit.xml'
 
     if ($CodeCoverage) {
-        $pesterParams.Configuration.CodeCoverage = @{
-            OutputFormat = 'JaCoCo'
-            OutputPath   = (Join-Path -Path $PWD -ChildPath 'reports/pester-coverage.xml')
-            Path         = (Join-Path -Path $PWD -ChildPath 'out/modules/**/*.psm1')
-        }
+        $pesterConfig.CodeCoverage.OutputFormat = 'JaCoCo'
+        $pesterConfig.CodeCoverage.OutputPath = 'reports/pester-coverage.xml'
+        $pesterConfig.CodeCoverage.Path = (Join-Path -Path $PWD -ChildPath 'out/modules/**/*.psm1')
     }
 
     if (!(Test-Path -Path reports)) {
-        $Null = New-Item -Path reports -ItemType Directory -Force
+        $Null = New-Item -Path reports -ItemType Directory -Force;
     }
 
     if ($Null -ne $TestGroup) {
-        $pesterParams.Configuration.Run.Tags = $TestGroup
+        $pesterConfig.Filter.Tag = $TestGroup
     }
 
-    $results = Invoke-Pester @pesterParams
+    # Run Pester tests
+    $results = Invoke-Pester -Configuration $pesterConfig
 
     # Throw an error if Pester tests failed
     if ($Null -eq $results) {
