@@ -190,35 +190,51 @@ task Dependencies NuGet, {
 }
 
 # Synopsis: Test the module
-task TestModule Dependencies, {
-    Import-Module Pester -RequiredVersion 5.6.1 -Force;
+task TestModuleDependencies {
+    Import-Module Pester -RequiredVersion 5.6.1 -Force
 
     # Run Pester tests
-    $pesterParams = @{ Path = $PWD; OutputFile = 'reports/pester-unit.xml'; OutputFormat = 'NUnitXml'; PesterOption = @{ IncludeVSCodeMarker = $True }; PassThru = $True; };
+    $pesterParams = @{
+        Path           = $PWD
+        Output         = @{
+            Format = 'NUnitXml'
+            File   = 'reports/pester-unit.xml'
+        }
+        Configuration  = @{
+            Run = @{
+                PassThru            = $True
+                IncludeVSCodeMarker = $True
+            }
+        }
+    }
 
     if ($CodeCoverage) {
-        $pesterParams.Add('CodeCoverage', (Join-Path -Path $PWD -ChildPath 'out/modules/**/*.psm1'));
-        $pesterParams.Add('CodeCoverageOutputFile', (Join-Path -Path $PWD -ChildPath reports/pester-coverage.xml));
+        $pesterParams.Configuration.CodeCoverage = @{
+            OutputFormat = 'JaCoCo'
+            OutputPath   = (Join-Path -Path $PWD -ChildPath 'reports/pester-coverage.xml')
+            Path         = (Join-Path -Path $PWD -ChildPath 'out/modules/**/*.psm1')
+        }
     }
 
     if (!(Test-Path -Path reports)) {
-        $Null = New-Item -Path reports -ItemType Directory -Force;
+        $Null = New-Item -Path reports -ItemType Directory -Force
     }
 
     if ($Null -ne $TestGroup) {
-        $pesterParams['Tags'] = $TestGroup;
+        $pesterParams.Configuration.Run.Tags = $TestGroup
     }
 
-    $results = Invoke-Pester @pesterParams;
+    $results = Invoke-Pester @pesterParams
 
-    # Throw an error if pester tests failed
+    # Throw an error if Pester tests failed
     if ($Null -eq $results) {
-        throw 'Failed to get Pester test results.';
+        throw 'Failed to get Pester test results.'
     }
-    elseif ($results.FailedCount -gt 0) {
-        throw "$($results.FailedCount) tests failed.";
+    elseif ($results.Result.FailedCount -gt 0) {
+        throw "$($results.Result.FailedCount) tests failed."
     }
 }
+
 
 task Benchmark {
     if ($Benchmark -or $BuildTask -eq 'Benchmark') {
