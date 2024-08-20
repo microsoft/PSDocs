@@ -11,3 +11,6 @@ src/**/*-help.xml
 src/**/*.help.txt
 BenchmarkDotNet.Artifacts/
 PSDocs.Benchmark*.log
+.idea/.idea.PSDocs/.idea/.gitignore
+.idea/.idea.PSDocs/.idea/indexLayout.xml
+.idea/.idea.PSDocs/.idea/vcs.xml
