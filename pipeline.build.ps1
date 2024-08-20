@@ -191,7 +191,7 @@ task Dependencies NuGet, {
 
 # Synopsis: Test the module
 task TestModule Dependencies, {
-    Import-Module Pester -RequiredVersion 4.10.1 -Force;
+    Import-Module Pester -RequiredVersion 5.6.1 -Force;
 
     # Run Pester tests
     $pesterParams = @{ Path = $PWD; OutputFile = 'reports/pester-unit.xml'; OutputFormat = 'NUnitXml'; PesterOption = @{ IncludeVSCodeMarker = $True }; PassThru = $True; };
