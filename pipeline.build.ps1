@@ -196,7 +196,6 @@ task TestModule Dependencies, {
     # Define Pester configuration
     $pesterConfig = [PesterConfiguration]::Default
     $pesterConfig.Run.PassThru = $True
-    $pesterConfig.Run.IncludeVSCodeMarker = $True
     $pesterConfig.Outputs.NUnitXml.Enabled = $True
     $pesterConfig.Outputs.NUnitXml.Path = 'reports/pester-unit.xml'
 
