@@ -190,8 +190,8 @@ task Dependencies NuGet, {
 }
 
 # Synopsis: Test the module
-task TestModuleDependencies {
-    Import-Module Pester -RequiredVersion 5.6.1 -Force
+task TestModule Dependencies, {
+    Import-Module Pester -RequiredVersion 5.6.1 -Force;
 
     # Run Pester tests
     $pesterParams = @{
