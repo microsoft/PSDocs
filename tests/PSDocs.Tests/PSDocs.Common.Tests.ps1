@@ -64,8 +64,8 @@ Describe 'PSDocs instance names' -Tag 'Common', 'InstanceName' {
             $null = Invoke-PSDocument @invokeParams -InstanceName 'Instance1' -Name 'WithInstanceName';
         }
         It 'Should not create a output with the document name' {
-            Test-Path -Path "$outputPath\WithInstanceName.md" | Should -Be $False;
-            Test-Path -Path "$outputPath\Instance1.md" | Should -Be $True;
+            Test-Path -Path "$outputPath\WithInstanceName.md" | Should $False;
+            Test-Path -Path "$outputPath\Instance1.md" | Should $True;
             Get-Content -Path "$outputPath\Instance1.md" -Raw | Should -Match 'Instance1';
         }
     }
