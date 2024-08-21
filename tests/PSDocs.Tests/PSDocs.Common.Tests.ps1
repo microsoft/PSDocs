@@ -232,9 +232,9 @@ Describe 'Invoke-PSDocument' -Tag 'Cmdlet', 'Common', 'Invoke-PSDocument', 'From
 Describe 'Get-PSDocument' -Tag 'Cmdlet', 'Common', 'Get-PSDocument' {
     Context 'With -Module' {
         BeforeAll {
-            $testModuleSourcePath = Join-Path $here -ChildPath 'TestModule';
-            Mock -ModuleName 'PSDocs' LoadModule;
-            Import-Module $testModuleSourcePath -Force;
+            $testModuleSourcePath = Join-Path $here -ChildPath 'TestModule'
+            Mock -ModuleName 'PSDocs' LoadModule
+            Import-Module $testModuleSourcePath -Force
             if ($Null -ne (Get-Module -Name TestModule -ErrorAction SilentlyContinue)) {
                 $Null = Remove-Module -Name TestModule;
             }
