@@ -233,13 +233,14 @@ Describe 'Get-PSDocument' -Tag 'Cmdlet', 'Common', 'Get-PSDocument' {
     Context 'With -Module' {
         BeforeAll {
             $testModuleSourcePath = Join-Path $here -ChildPath 'TestModule'
-            Mock -ModuleName 'PSDocs' LoadModule
+            $mock = Mock -ModuleName 'PSDocs' LoadModule
             Import-Module $testModuleSourcePath -Force
             if ($Null -ne (Get-Module -Name TestModule -ErrorAction SilentlyContinue)) {
                 $Null = Remove-Module -Name TestModule;
             }
             $Null = Import-Module $testModuleSourcePath -Force;
             $result = @(Get-PSDocument -Module 'TestModule');
+            $currentLoadingPreference = Get-Variable -Name PSModuleAutoLoadingPreference -ErrorAction SilentlyContinue -ValueOnly
         }
         It 'Returns documents' {
             $result | Should -Not -BeNullOrEmpty;
@@ -249,21 +250,19 @@ Describe 'Get-PSDocument' -Tag 'Cmdlet', 'Common', 'Get-PSDocument' {
 
 
         It 'Loads module with preference' {
-            Mock -ModuleName 'PSDocs' LoadModule;
-            $currentLoadingPreference = Get-Variable -Name PSModuleAutoLoadingPreference -ErrorAction SilentlyContinue -ValueOnly
             try {
                 # Test negative case
                 $Global:PSModuleAutoLoadingPreference = [System.Management.Automation.PSModuleAutoLoadingPreference]::None
                 Write-Host "Calling Get-PSDocument with preference set to None"
                 $Null = Get-PSDocument -Module 'TestModule'
                 #Assert-MockCalled -CommandName 'LoadModule' -ModuleName 'PSDocs' -Times 0 -Scope 'It'
-                Should -Invoke LoadModule -ModuleName 'PSDocs' -Times 0 -Scope 'It'
+                $mock | Should -Invoke LoadModule -ModuleName 'PSDocs' -Times 0 -Scope 'It'
                 # Test positive case
                 $Global:PSModuleAutoLoadingPreference = [System.Management.Automation.PSModuleAutoLoadingPreference]::All
                 Write-Host "Calling Get-PSDocument with preference set to All"
                 $Null = Get-PSDocument -Module 'TestModule'
                 #Assert-MockCalled -CommandName 'LoadModule' -ModuleName 'PSDocs' -Times 1 -Scope 'It' -Exactly
-                Should -Invoke LoadModule -ModuleName 'PSDocs' -Times 1 -Scope 'It'
+                $mock | Should -Invoke LoadModule -ModuleName 'PSDocs' -Times 1 -Scope 'It'
                 
                 Assert-VerifiableMocks
             }
