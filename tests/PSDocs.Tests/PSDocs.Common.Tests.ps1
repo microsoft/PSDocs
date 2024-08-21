@@ -260,6 +260,7 @@ Describe 'Get-PSDocument' -Tag 'Cmdlet', 'Common', 'Get-PSDocument' {
             $Null = Get-PSDocument -Module 'TestModule';
             Assert-MockCalled -CommandName 'LoadModule' -ModuleName 'PSDocs' -Times 1 -Scope 'It';
             #>
+            $Global:PSModuleAutoLoadingPreference = [System.Management.Automation.PSModuleAutoLoadingPreference]::All;
             $Null = Get-PSDocument -Module 'TestModule';
             Should -Invoke -CommandName 'LoadModule' -ModuleName 'PSDocs' -Times 1 -Scope 'It';
             if ($Null -eq $currentLoadingPreference) {
