@@ -102,9 +102,10 @@ Describe 'PSDocs instance names' -Tag 'Common', 'InstanceName' {
                 InputObject = $testObject
                 OutputPath  = $outputPath
             }
+            $encodings = @('UTF8', 'UTF7', 'Unicode', 'ASCII', 'UTF32')
         }
         # Check each encoding can be written then read
-        foreach ($encoding in @('UTF8', 'UTF7', 'Unicode', 'ASCII', 'UTF32')) {
+        foreach ($encoding in $encodings) {
             $currentEncoding = $encoding
             It "Should generate $encoding encoded content" {
                 Invoke-PSDocument @invokeParams -InstanceName "With$currentEncoding" -Encoding $currentEncoding -Name 'WithEncoding';
