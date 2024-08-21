@@ -235,7 +235,6 @@ Describe 'Get-PSDocument' -Tag 'Cmdlet', 'Common', 'Get-PSDocument' {
             $testModuleSourcePath = Join-Path $here -ChildPath 'TestModule';
             Mock -ModuleName 'PSDocs' LoadModule;
             Import-Module $testModuleSourcePath -Force;
-            $rootPath = $PWD;
             if ($Null -ne (Get-Module -Name TestModule -ErrorAction SilentlyContinue)) {
                 $Null = Remove-Module -Name TestModule;
             }
