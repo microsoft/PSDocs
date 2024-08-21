@@ -171,11 +171,11 @@ Describe 'Invoke-PSDocument' -Tag 'Cmdlet', 'Common', 'Invoke-PSDocument', 'From
     Context 'With -Module' {
         BeforeAll {
             $testModuleSourcePath = Join-Path $here -ChildPath 'TestModule';
+            $Null = Import-Module $testModuleSourcePath -Force;
+            $result = @($testObject | Invoke-PSDocument -Module 'TestModule' -Name 'TestDocument1' -Culture 'en-US', 'en-AU', 'en-ZZ');
         }
 
         It 'Returns documents' {
-            $Null = Import-Module $testModuleSourcePath -Force;
-            $result = @($testObject | Invoke-PSDocument -Module 'TestModule' -Name 'TestDocument1' -Culture 'en-US', 'en-AU', 'en-ZZ');
             $result | Should -Not -BeNullOrEmpty;
             $result.Length | Should -Be 3;
             $result[0].Split([System.Environment]::NewLine, [System.StringSplitOptions]::RemoveEmptyEntries) | Should -Be "Culture=en-US";
@@ -185,8 +185,10 @@ Describe 'Invoke-PSDocument' -Tag 'Cmdlet', 'Common', 'Invoke-PSDocument', 'From
     }
 
     Context 'With -PassThru' {
-        It 'Should return results' {
+        BeforeAll{
             $result = @($testObject | Invoke-PSDocument -Path $here -OutputPath $outputPath -Name FromFileTest1, FromFileTest2 -PassThru);
+        }
+        It 'Should return results' {
             $result | Should -Not -BeNullOrEmpty;
             $result.Length | Should -Be 2;
             $result[0] | Should -Match "`# Test title";
@@ -195,8 +197,10 @@ Describe 'Invoke-PSDocument' -Tag 'Cmdlet', 'Common', 'Invoke-PSDocument', 'From
     }
 
     Context 'With -InputPath' {
-        It 'Should return results' {
+        BeforeAll{
             $result = @(Invoke-PSDocument -Path $here -OutputPath $outputPath -InputPath $here/*.yml -Name FromFileTest1, FromFileTest2 -PassThru);
+        }
+        It 'Should return results' {
             $result | Should -Not -BeNullOrEmpty;
             $result.Length | Should -Be 4;
             $result[0] | Should -Match "`# Test title";
@@ -205,6 +209,9 @@ Describe 'Invoke-PSDocument' -Tag 'Cmdlet', 'Common', 'Invoke-PSDocument', 'From
     }
 
     Context 'With constrained language' {
+        BeforeAll {
+            $testObject = [PSCustomObject]@{};
+        }
         # Check that '[Console]::WriteLine('Should fail')' is not executed
         It 'Should fail to execute blocked code' {
             { $testObject | Invoke-PSDocument -Path $here -OutputPath $outputPath -Name 'ConstrainedTest2' -Option @{ 'Execution.LanguageMode' = 'ConstrainedLanguage' } -ErrorAction Stop } | Should -Throw 'Cannot invoke method. Method invocation is supported only on core types in this language mode.';
@@ -225,10 +232,11 @@ Describe 'Get-PSDocument' -Tag 'Cmdlet', 'Common', 'Get-PSDocument' {
     Context 'With -Module' {
         BeforeAll {
             $testModuleSourcePath = Join-Path $here -ChildPath 'TestModule';
-        }
-        It 'Returns documents' {
             $Null = Import-Module $testModuleSourcePath -Force;
             $result = @(Get-PSDocument -Module 'TestModule');
+            $currentLoadingPreference = Get-Variable -Name PSModuleAutoLoadingPreference -ErrorAction SilentlyContinue -ValueOnly;
+        }
+        It 'Returns documents' {
             $result | Should -Not -BeNullOrEmpty;
             $result.Length | Should -Be 2;
             $result.Id | Should -BeIn 'TestModule\TestDocument1', 'TestModule\TestDocument2';
@@ -240,7 +248,6 @@ Describe 'Get-PSDocument' -Tag 'Cmdlet', 'Common', 'Get-PSDocument' {
 
         It 'Loads module with preference' {
             Mock -CommandName 'LoadModule' -ModuleName 'PSDocs';
-            $currentLoadingPreference = Get-Variable -Name PSModuleAutoLoadingPreference -ErrorAction SilentlyContinue -ValueOnly;
 
             try {
                 # Test negative case
