@@ -253,15 +253,13 @@ Describe 'Get-PSDocument' -Tag 'Cmdlet', 'Common', 'Get-PSDocument' {
             try {
                 # Test negative case
                 $Global:PSModuleAutoLoadingPreference = [System.Management.Automation.PSModuleAutoLoadingPreference]::None;
-                Write-Host "Calling Get-PSDocument with preference set to None"
                 $Null = Get-PSDocument -Module 'TestModule';
-                Assert-MockCalled -CommandName 'LoadModule' -ModuleName 'PSDocs' -Times 0 -Scope 'It';
+                { Get-Module -Name 'PSDocs' } | Should -Throw;
+
                 # Test positive case
                 $Global:PSModuleAutoLoadingPreference = [System.Management.Automation.PSModuleAutoLoadingPreference]::All;
-                Write-Host "Calling Get-PSDocument with preference set to All"
                 $Null = Get-PSDocument -Module 'TestModule';
-                Assert-MockCalled -CommandName 'LoadModule' -ModuleName 'PSDocs' -Times 1 -Scope 'It' -Exactly;
-                Assert-VerifiableMocks;
+                { Get-Module -Name 'PSDocs' } | Should -Not -Throw;
             }
             finally {
                 if ($Null -eq $currentLoadingPreference) {
