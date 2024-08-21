@@ -233,9 +233,10 @@ Describe 'Get-PSDocument' -Tag 'Cmdlet', 'Common', 'Get-PSDocument' {
     Context 'With -Module' {
         BeforeAll {
             $testModuleSourcePath = Join-Path $here -ChildPath 'TestModule';
-            $Null = Import-Module $testModuleSourcePath -Force;
-            $currentLoadingPreference = Get-Variable -Name PSModuleAutoLoadingPreference -ErrorAction SilentlyContinue -ValueOnly;
-            Mock -CommandName 'LoadModule' -ModuleName 'PSDocs';
+            Mock -CommandName 'LoadModule' -ModuleName 'PSDocs'; 
+            $Global:PSModuleAutoLoadingPreference = [System.Management.Automation.PSModuleAutoLoadingPreference]::All;
+            Import-Module $testModuleSourcePath -Force;
+            $result = @(Get-PSDocument -Module 'TestModule');
         }
         It 'Returns documents' {
             $result = @(Get-PSDocument -Module 'TestModule');
