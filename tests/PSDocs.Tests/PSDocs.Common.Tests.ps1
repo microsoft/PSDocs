@@ -238,9 +238,10 @@ Describe 'Get-PSDocument' -Tag 'Cmdlet', 'Common', 'Get-PSDocument' {
             if ($Null -ne (Get-Module -Name TestModule -ErrorAction SilentlyContinue)) {
                 $Null = Remove-Module -Name TestModule;
             }
+            $Null = Import-Module $testModuleSourcePath -Force;
+            $result = @(Get-PSDocument -Module 'TestModule');
         }
         It 'Returns documents' {
-            $result = @(Get-PSDocument -Module 'TestModule');
             $result | Should -Not -BeNullOrEmpty;
             $result.Length | Should -Be 2;
             $result.Id | Should -BeIn 'TestModule\TestDocument1', 'TestModule\TestDocument2';
