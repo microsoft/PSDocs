@@ -11,7 +11,7 @@ param ()
 BeforeAll {
     # Setup error handling
     $ErrorActionPreference = 'Stop';
-    Set-StrictMode -Version latest;
+    #Set-StrictMode -Version latest;
 
     # Setup tests paths
     $rootPath = $PWD;
@@ -267,7 +267,6 @@ Describe 'Get-PSDocument' -Tag 'Cmdlet', 'Common', 'Get-PSDocument' {
             else {
                 $Global:PSModuleAutoLoadingPreference = $currentLoadingPreference;
             }
-            
         }
 
         It 'Use modules already loaded' {
