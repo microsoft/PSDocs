@@ -43,9 +43,8 @@ Describe 'PSDocs instance names' -Tag 'Common', 'InstanceName' {
                 InputObject = $dummyObject
                 OutputPath  = $outputPath
             }
-            Import-Module (Join-Path -Path $rootPath.Path -ChildPath out/modules/PSDocs) -Force;
+            $result = Invoke-PSDocument @invokeParams -Name 'WithoutInstanceName';
         }
-        $result = Invoke-PSDocument @invokeParams -Name 'WithoutInstanceName';
         It 'Should generate an output named WithoutInstanceName.md' {
             Test-Path -Path $result.FullName | Should be $True;
             $outputDoc = Get-Content -Path $result.FullName -Raw;
@@ -62,8 +61,8 @@ Describe 'PSDocs instance names' -Tag 'Common', 'InstanceName' {
                 InputObject = $dummyObject
                 OutputPath  = $outputPath
             }
+            $null = Invoke-PSDocument @invokeParams -InstanceName 'Instance1' -Name 'WithInstanceName';
         }
-        $null = Invoke-PSDocument @invokeParams -InstanceName 'Instance1' -Name 'WithInstanceName';
         It 'Should not create a output with the document name' {
             Test-Path -Path "$outputPath\WithInstanceName.md" | Should -Be $False;
             Test-Path -Path "$outputPath\Instance1.md" | Should -Be $True;
@@ -78,8 +77,8 @@ Describe 'PSDocs instance names' -Tag 'Common', 'InstanceName' {
                 InputObject = $dummyObject
                 OutputPath  = $outputPath
             }
+            $null = Invoke-PSDocument @invokeParams -InstanceName 'Instance2', 'Instance3' -Name 'WithMultiInstanceName';
         }
-        $null = Invoke-PSDocument @invokeParams -InstanceName 'Instance2', 'Instance3' -Name 'WithMultiInstanceName';
         It 'Should not create a output with the document name' {
             Test-Path -Path "$outputPath\WithMultiInstanceName.md" | Should be $False;
         }
