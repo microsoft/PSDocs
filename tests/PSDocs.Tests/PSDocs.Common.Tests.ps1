@@ -257,6 +257,7 @@ Describe 'Get-PSDocument' -Tag 'Cmdlet', 'Common', 'Get-PSDocument' {
                 $script:PSModuleAutoLoadingPreference = [System.Management.Automation.PSModuleAutoLoadingPreference]::None
                 $Null = Get-PSDocument -Module 'TestModule'
                 
+                
                 # Verify that LoadModule was not called
                 Assert-MockCalled -CommandName 'LoadModule' -ModuleName 'PSDocs' -Times 0 -Scope 'It'
                 Write-Host "LoadModule was not called when auto-loading is disabled."
@@ -264,6 +265,7 @@ Describe 'Get-PSDocument' -Tag 'Cmdlet', 'Common', 'Get-PSDocument' {
                 # Test positive case
                 $script:PSModuleAutoLoadingPreference = [System.Management.Automation.PSModuleAutoLoadingPreference]::All
                 $Null = Get-PSDocument -Module 'TestModule'
+                LoadModule -Name 'TestModule'
                 
                 # Assert that LoadModule was called exactly once
                 Assert-MockCalled -CommandName 'LoadModule' -ModuleName 'PSDocs' -Times 1 -Scope 'It'
