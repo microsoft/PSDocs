@@ -257,10 +257,15 @@ Describe 'Get-PSDocument' -Tag 'Cmdlet', 'Common', 'Get-PSDocument' {
                 $script:PSModuleAutoLoadingPreference = [System.Management.Automation.PSModuleAutoLoadingPreference]::None
                 $Null = Get-PSDocument -Module 'TestModule'
                 Assert-MockCalled -CommandName 'LoadModule' -ModuleName 'PSDocs' -Times 0 -Scope 'It'
-
+        
                 # Test positive case
                 $script:PSModuleAutoLoadingPreference = [System.Management.Automation.PSModuleAutoLoadingPreference]::All
                 $Null = Get-PSDocument -Module 'TestModule'
+                
+                # Debugging output
+                $mockCalls = (Get-MockCalled -CommandName 'LoadModule' -ModuleName 'PSDocs')
+                Write-Host "Mock Calls: $($mockCalls.Count)"
+                
                 Assert-MockCalled -CommandName 'LoadModule' -ModuleName 'PSDocs' -Times 1 -Scope 'It'
             }
             finally {
@@ -272,6 +277,7 @@ Describe 'Get-PSDocument' -Tag 'Cmdlet', 'Common', 'Get-PSDocument' {
                 }
             }
         }
+        
 
         It 'Use modules already loaded' {
             Mock -CommandName 'GetAutoloadPreference' -ModuleName 'PSDocs' -MockWith {
