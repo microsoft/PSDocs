@@ -253,7 +253,7 @@ Describe 'Get-PSDocument' -Tag 'Cmdlet', 'Common', 'Get-PSDocument' {
         }
 
 
-        InModuleScope PSDocs {
+        InModuleScope TestModule {
             It 'Loads module with preference' {
                 Mock -CommandName 'LoadModule' -ModuleName 'PSDocs' -Verifiable;
                 $currentLoadingPreference = Get-Variable -Name PSModuleAutoLoadingPreference -ErrorAction SilentlyContinue -ValueOnly
