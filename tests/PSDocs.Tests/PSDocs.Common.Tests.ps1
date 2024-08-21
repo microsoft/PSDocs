@@ -33,17 +33,12 @@ BeforeAll {
             Value = 'HashValue'
         }
     }
+    $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Cmdlets.Doc.ps1';
 }
 
-
-
-
-
 Describe 'PSDocs instance names' -Tag 'Common', 'InstanceName' {
-
     Context 'Generate a document without an instance name' {
         BeforeAll {
-            $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Cmdlets.Doc.ps1';
             $invokeParams = @{
                 Path        = $docFilePath
                 InputObject = $dummyObject
@@ -61,10 +56,12 @@ Describe 'PSDocs instance names' -Tag 'Common', 'InstanceName' {
     }
 
     Context 'Generate a document with an instance name' {
-        $invokeParams = @{
-            Path        = $docFilePath
-            InputObject = $dummyObject
-            OutputPath  = $outputPath
+        BeforeAll {
+            $invokeParams = @{
+                Path        = $docFilePath
+                InputObject = $dummyObject
+                OutputPath  = $outputPath
+            }
         }
         $null = Invoke-PSDocument @invokeParams -InstanceName 'Instance1' -Name 'WithInstanceName';
         It 'Should not create a output with the document name' {
@@ -75,10 +72,12 @@ Describe 'PSDocs instance names' -Tag 'Common', 'InstanceName' {
     }
 
     Context 'Generate a document with multiple instance names' {
-        $invokeParams = @{
-            Path        = $docFilePath
-            InputObject = $dummyObject
-            OutputPath  = $outputPath
+        BeforeAll {
+            $invokeParams = @{
+                Path        = $docFilePath
+                InputObject = $dummyObject
+                OutputPath  = $outputPath
+            }
         }
         $null = Invoke-PSDocument @invokeParams -InstanceName 'Instance2', 'Instance3' -Name 'WithMultiInstanceName';
         It 'Should not create a output with the document name' {
@@ -95,13 +94,15 @@ Describe 'PSDocs instance names' -Tag 'Common', 'InstanceName' {
     }
 
     Context 'Generate a document with a specific encoding' {
-        $testObject = [PSCustomObject]@{
-            Name = 'TestObject'
-        }
-        $invokeParams = @{
-            Path        = $docFilePath
-            InputObject = $testObject
-            OutputPath  = $outputPath
+        BeforeAll {
+            $testObject = [PSCustomObject]@{
+                Name = 'TestObject'
+            }
+            $invokeParams = @{
+                Path        = $docFilePath
+                InputObject = $testObject
+                OutputPath  = $outputPath
+            }
         }
         # Check each encoding can be written then read
         foreach ($encoding in @('UTF8', 'UTF7', 'Unicode', 'ASCII', 'UTF32')) {
@@ -113,13 +114,15 @@ Describe 'PSDocs instance names' -Tag 'Common', 'InstanceName' {
     }
 
     Context 'With -PassThru' {
-        $testObject = [PSCustomObject]@{
-            Name = 'TestObject'
-        }
-        $invokeParams = @{
-            Path        = $docFilePath
-            InputObject = $testObject
-            PassThru    = $True
+        BeforeAll {
+            $testObject = [PSCustomObject]@{
+                Name = 'TestObject'
+            }
+            $invokeParams = @{
+                Path        = $docFilePath
+                InputObject = $testObject
+                PassThru    = $True
+            }
         }
         It 'Should return results' {
             $result = Invoke-PSDocument @invokeParams -Name 'WithPassThru';
@@ -129,8 +132,11 @@ Describe 'PSDocs instance names' -Tag 'Common', 'InstanceName' {
 }
 
 Describe 'Invoke-PSDocument' -Tag 'Cmdlet', 'Common', 'Invoke-PSDocument', 'FromPath' {
-    $testObject = [PSCustomObject]@{};
+    
     Context 'With -Path' {
+        BeforeAll {
+            $testObject = [PSCustomObject]@{};
+        }
         It 'Should match name' {
             # Only generate documents for the named document
             $testObject | Invoke-PSDocument -Path $here -OutputPath $outputPath -Name FromFileTest2;
@@ -162,7 +168,9 @@ Describe 'Invoke-PSDocument' -Tag 'Cmdlet', 'Common', 'Invoke-PSDocument', 'From
     }
 
     Context 'With -Module' {
-        $testModuleSourcePath = Join-Path $here -ChildPath 'TestModule';
+        BeforeAll {
+            $testModuleSourcePath = Join-Path $here -ChildPath 'TestModule';
+        }
 
         It 'Returns documents' {
             $Null = Import-Module $testModuleSourcePath -Force;
@@ -212,11 +220,11 @@ Describe 'Invoke-PSDocument' -Tag 'Cmdlet', 'Common', 'Invoke-PSDocument', 'From
 }
 
 Describe 'Get-PSDocument' -Tag 'Cmdlet', 'Common', 'Get-PSDocument' {
-    $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Cmdlets.Doc.ps1';
 
     Context 'With -Module' {
-        $testModuleSourcePath = Join-Path $here -ChildPath 'TestModule';
-
+        BeforeAll {
+            $testModuleSourcePath = Join-Path $here -ChildPath 'TestModule';
+        }
         It 'Returns documents' {
             $Null = Import-Module $testModuleSourcePath -Force;
             $result = @(Get-PSDocument -Module 'TestModule');
@@ -319,11 +327,11 @@ Describe 'Get-PSDocument' -Tag 'Cmdlet', 'Common', 'Get-PSDocument' {
 }
 
 Describe 'Get-PSDocumentHeader' -Tag 'Cmdlet', 'Common', 'Get-PSDocumentHeader' {
-    $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Cmdlets.Doc.ps1';
-
     Context 'With -Path' {
-        $testObject = [PSCustomObject]@{
-            Name = 'TestObject'
+        BeforeAll {
+            $testObject = [PSCustomObject]@{
+                Name = 'TestObject'
+            }
         }
         $invokeParams = @{
             Path        = $docFilePath

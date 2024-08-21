@@ -15,7 +15,7 @@ BeforeAll {
 
     # Setup tests paths
     $rootPath = $PWD;
-    $here = Split-Path -Parent $MyInvocation.MyCommand.Path;
+    $here = Split-Path -Parent $MyInvocation.MyCommand.Definition
     Import-Module (Join-Path -Path $rootPath -ChildPath out/modules/PSDocs) -Force;
     $emptyOptionsFilePath = Join-Path -Path $here -ChildPath 'psdocs.yml';
 }

@@ -35,14 +35,12 @@ BeforeAll {
             generator = 'notPSDocs'
         }
     )
+    $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Selector.Doc.ps1';
+    $selectorFilePath = Join-Path -Path $here -ChildPath 'Selectors.Doc.yaml';
 }
 Describe 'PSDocs selectors' -Tag 'Selector' {
-
-
     Context 'Invoke definitions' {
         BeforeAll {
-            $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Selector.Doc.ps1';
-            $selectorFilePath = Join-Path -Path $here -ChildPath 'Selectors.Doc.yaml';
         
             $invokeParams = @{
                 Path = @($docFilePath, $selectorFilePath)

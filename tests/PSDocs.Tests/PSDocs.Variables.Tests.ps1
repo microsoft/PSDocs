@@ -17,15 +17,15 @@ BeforeAll {
     $rootPath = $PWD;
     Import-Module (Join-Path -Path $rootPath -ChildPath out/modules/PSDocs) -Force;
     $here = (Resolve-Path $PSScriptRoot).Path;
+    $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Variables.Doc.ps1';
+    $testObject = [PSCustomObject]@{
+        Name = 'TestObject'
+    }
 }
 Describe 'PSDocs variables' -Tag 'Variables' {
 
     Context 'PowerShell automatic variables' {
         BeforeAll {
-            $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Variables.Doc.ps1';
-            $testObject = [PSCustomObject]@{
-                Name = 'TestObject'
-            }
             $invokeParams = @{
                 Path        = $docFilePath
                 InputObject = $testObject
@@ -41,13 +41,15 @@ Describe 'PSDocs variables' -Tag 'Variables' {
     }
 
     Context 'PSDocs automatic variables' {
-        $invokeParams = @{
-            Path        = $docFilePath
-            InputObject = $testObject
-            PassThru    = $True
-            Option      = @{
-                'Configuration.author'  = @{ name = 'unit-tester' }
-                'Configuration.enabled' = 'faLse'
+        BeforeAll {
+            $invokeParams = @{
+                Path        = $docFilePath
+                InputObject = $testObject
+                PassThru    = $True
+                Option      = @{
+                    'Configuration.author'  = @{ name = 'unit-tester' }
+                    'Configuration.enabled' = 'faLse'
+                }
             }
         }
         It '$PSDocs' {
