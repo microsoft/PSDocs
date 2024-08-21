@@ -235,6 +235,7 @@ Describe 'Get-PSDocument' -Tag 'Cmdlet', 'Common', 'Get-PSDocument' {
             $testModuleSourcePath = Join-Path $here -ChildPath 'TestModule';
             Mock -CommandName 'LoadModule' -ModuleName 'PSDocs' -Verifiable;
             Import-Module $testModuleSourcePath -Force;
+            Import-Module PSDocs -Force;
             $result = @(Get-PSDocument -Module 'TestModule');
             $currentLoadingPreference = Get-Variable -Name PSModuleAutoLoadingPreference -ErrorAction SilentlyContinue -ValueOnly
         }
@@ -250,7 +251,6 @@ Describe 'Get-PSDocument' -Tag 'Cmdlet', 'Common', 'Get-PSDocument' {
         }
 
         InModuleScope PSDocs {
-
             It 'Loads module with preference' {
                 try {
                     # Test negative case
