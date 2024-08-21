@@ -7,6 +7,7 @@
 
 [CmdletBinding()]
 param ()
+
 BeforeAll {
     # Setup error handling
     $ErrorActionPreference = 'Stop';
@@ -14,10 +15,8 @@ BeforeAll {
 
     # Setup tests paths
     $rootPath = $PWD;
-
-    Import-Module (Join-Path -Path $rootPath -ChildPath out/modules/PSDocs) -Force;
-
-    $outputPath = Join-Path -Path $rootPath -ChildPath out/tests/PSDocs.Tests/Common;
+    Import-Module (Join-Path -Path $rootPath.Path -ChildPath out/modules/PSDocs) -Force;
+    $outputPath = Join-Path -Path $rootPath.Path -ChildPath out/tests/PSDocs.Tests/Common;
     Remove-Item -Path $outputPath -Force -Recurse -Confirm:$False -ErrorAction Ignore;
     $Null = New-Item -Path $outputPath -ItemType Directory -Force;
     $here = (Resolve-Path $PSScriptRoot).Path;

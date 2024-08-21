@@ -24,8 +24,6 @@ BeforeAll {
     $here = (Resolve-Path $PSScriptRoot).Path;
 }
 Describe 'PSDocs -- Include keyword' -Tag Include {
-
-
     Context 'Markdown' {
         BeforeAll {
             $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Keyword.Doc.ps1';
