@@ -235,9 +235,13 @@ Describe 'Get-PSDocument' -Tag 'Cmdlet', 'Common', 'Get-PSDocument' {
             $testModuleSourcePath = Join-Path $here -ChildPath 'TestModule';
             Mock -CommandName 'LoadModule' -ModuleName 'PSDocs' -Verifiable;
             Import-Module $testModuleSourcePath -Force;
-            Import-Module PSDocs -Force;
+            $rootPath = $PWD;
+            Import-Module (Join-Path -Path $rootPath.Path -ChildPath out/modules/PSDocs) -Force;
             $result = @(Get-PSDocument -Module 'TestModule');
             $currentLoadingPreference = Get-Variable -Name PSModuleAutoLoadingPreference -ErrorAction SilentlyContinue -ValueOnly
+            if (-not (Get-Module -Name PSDocs -ListAvailable)) {
+                Throw "PSDocs module is not available on this system."
+            }
         }
         It 'Returns documents' {
             $result = @(Get-PSDocument -Module 'TestModule');
@@ -252,6 +256,8 @@ Describe 'Get-PSDocument' -Tag 'Cmdlet', 'Common', 'Get-PSDocument' {
 
         InModuleScope PSDocs {
             It 'Loads module with preference' {
+                Mock -CommandName 'LoadModule' -ModuleName 'PSDocs'
+                $currentLoadingPreference = Get-Variable -Name PSModuleAutoLoadingPreference -ErrorAction SilentlyContinue -ValueOnly
                 try {
                     # Test negative case
                     $Global:PSModuleAutoLoadingPreference = [System.Management.Automation.PSModuleAutoLoadingPreference]::None
