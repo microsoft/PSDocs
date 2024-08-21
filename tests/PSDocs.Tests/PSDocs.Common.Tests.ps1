@@ -170,6 +170,7 @@ Describe 'Invoke-PSDocument' -Tag 'Cmdlet', 'Common', 'Invoke-PSDocument', 'From
 
     Context 'With -Module' {
         BeforeAll {
+            $testObject = [PSCustomObject]@{};
             $testModuleSourcePath = Join-Path $here -ChildPath 'TestModule';
             $Null = Import-Module $testModuleSourcePath -Force;
             $result = @($testObject | Invoke-PSDocument -Module 'TestModule' -Name 'TestDocument1' -Culture 'en-US', 'en-AU', 'en-ZZ');
@@ -186,6 +187,7 @@ Describe 'Invoke-PSDocument' -Tag 'Cmdlet', 'Common', 'Invoke-PSDocument', 'From
 
     Context 'With -PassThru' {
         BeforeAll{
+            $testObject = [PSCustomObject]@{};
             $result = @($testObject | Invoke-PSDocument -Path $here -OutputPath $outputPath -Name FromFileTest1, FromFileTest2 -PassThru);
         }
         It 'Should return results' {
