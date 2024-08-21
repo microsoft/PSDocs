@@ -240,6 +240,10 @@ Describe 'Get-PSDocument' -Tag 'Cmdlet', 'Common', 'Get-PSDocument' {
             if (-not (Get-Module -Name PSDocs -ListAvailable)) {
                 Throw "PSDocs module is not available on this system."
             }
+
+            if ($Null -ne (Get-Module -Name TestModule -ErrorAction SilentlyContinue)) {
+                $Null = Remove-Module -Name TestModule;
+            }
         }
         It 'Returns documents' {
             $result = @(Get-PSDocument -Module 'TestModule');
@@ -248,13 +252,10 @@ Describe 'Get-PSDocument' -Tag 'Cmdlet', 'Common', 'Get-PSDocument' {
             $result.Id | Should -BeIn 'TestModule\TestDocument1', 'TestModule\TestDocument2';
         }
 
-        if ($Null -ne (Get-Module -Name TestModule -ErrorAction SilentlyContinue)) {
-            $Null = Remove-Module -Name TestModule;
-        }
 
         InModuleScope PSDocs {
             It 'Loads module with preference' {
-                Mock -CommandName 'LoadModule' -ModuleName 'PSDocs'
+                Mock -CommandName 'LoadModule' -ModuleName 'PSDocs' -Verifiable;
                 $currentLoadingPreference = Get-Variable -Name PSModuleAutoLoadingPreference -ErrorAction SilentlyContinue -ValueOnly
                 try {
                     # Test negative case
