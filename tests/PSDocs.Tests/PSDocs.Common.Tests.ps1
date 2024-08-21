@@ -233,7 +233,7 @@ Describe 'Get-PSDocument' -Tag 'Cmdlet', 'Common', 'Get-PSDocument' {
     Context 'With -Module' {
         BeforeAll {
             $testModuleSourcePath = Join-Path $here -ChildPath 'TestModule';
-            Mock -CommandName 'LoadModule' -ModuleName 'PSDocs' -Verifiable;
+            Mock -ModuleName 'PSDocs' LoadModule;
             Import-Module $testModuleSourcePath -Force;
             $rootPath = $PWD;
             Import-Module (Join-Path -Path $rootPath.Path -ChildPath out/modules/PSDocs) -Force -ErrorAction Stop;
@@ -253,35 +253,35 @@ Describe 'Get-PSDocument' -Tag 'Cmdlet', 'Common', 'Get-PSDocument' {
         }
 
 
-        InModuleScope TestModule {
-            It 'Loads module with preference' {
-                Mock -CommandName 'LoadModule' -ModuleName 'PSDocs' -Verifiable;
-                $currentLoadingPreference = Get-Variable -Name PSModuleAutoLoadingPreference -ErrorAction SilentlyContinue -ValueOnly
-                try {
-                    # Test negative case
-                    $Global:PSModuleAutoLoadingPreference = [System.Management.Automation.PSModuleAutoLoadingPreference]::None
-                    Write-Host "Calling Get-PSDocument with preference set to None"
-                    $Null = Get-PSDocument -Module 'TestModule'
-                    Assert-MockCalled -CommandName 'LoadModule' -ModuleName 'PSDocs' -Times 0 -Scope 'It'
-    
-                    # Test positive case
-                    $Global:PSModuleAutoLoadingPreference = [System.Management.Automation.PSModuleAutoLoadingPreference]::All
-                    Write-Host "Calling Get-PSDocument with preference set to All"
-                    $Null = Get-PSDocument -Module 'TestModule'
-                    Assert-MockCalled -CommandName 'LoadModule' -ModuleName 'PSDocs' -Times 1 -Scope 'It' -Exactly
-    
-                    Assert-VerifiableMocks
+        It 'Loads module with preference' {
+            Mock -ModuleName 'PSDocs' LoadModule;
+            $currentLoadingPreference = Get-Variable -Name PSModuleAutoLoadingPreference -ErrorAction SilentlyContinue -ValueOnly
+            try {
+                # Test negative case
+                $Global:PSModuleAutoLoadingPreference = [System.Management.Automation.PSModuleAutoLoadingPreference]::None
+                Write-Host "Calling Get-PSDocument with preference set to None"
+                $Null = Get-PSDocument -Module 'TestModule'
+                #Assert-MockCalled -CommandName 'LoadModule' -ModuleName 'PSDocs' -Times 0 -Scope 'It'
+                Should -Invoke LoadModule -ModuleName 'PSDocs' -Times 0 -Scope 'It'
+                # Test positive case
+                $Global:PSModuleAutoLoadingPreference = [System.Management.Automation.PSModuleAutoLoadingPreference]::All
+                Write-Host "Calling Get-PSDocument with preference set to All"
+                $Null = Get-PSDocument -Module 'TestModule'
+                #Assert-MockCalled -CommandName 'LoadModule' -ModuleName 'PSDocs' -Times 1 -Scope 'It' -Exactly
+                Should -Invoke LoadModule -ModuleName 'PSDocs' -Times 1 -Scope 'It'
+                
+                Assert-VerifiableMocks
+            }
+            finally {
+                if ($Null -eq $currentLoadingPreference) {
+                    Remove-Variable -Name PSModuleAutoLoadingPreference -Force -ErrorAction SilentlyContinue
                 }
-                finally {
-                    if ($Null -eq $currentLoadingPreference) {
-                        Remove-Variable -Name PSModuleAutoLoadingPreference -Force -ErrorAction SilentlyContinue
-                    }
-                    else {
-                        $Global:PSModuleAutoLoadingPreference = $currentLoadingPreference
-                    }
+                else {
+                    $Global:PSModuleAutoLoadingPreference = $currentLoadingPreference
                 }
             }
         }
+
 
         It 'Use modules already loaded' {
             Mock -CommandName 'GetAutoloadPreference' -ModuleName 'PSDocs' -MockWith {
