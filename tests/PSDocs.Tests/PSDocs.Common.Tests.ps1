@@ -236,11 +236,6 @@ Describe 'Get-PSDocument' -Tag 'Cmdlet', 'Common', 'Get-PSDocument' {
             Mock -ModuleName 'PSDocs' LoadModule;
             Import-Module $testModuleSourcePath -Force;
             $rootPath = $PWD;
-            Import-Module (Join-Path -Path $rootPath.Path -ChildPath out/modules/PSDocs) -Force -ErrorAction Stop;
-            if (-not (Get-Module -Name PSDocs -ListAvailable)) {
-                Throw "PSDocs module is not available on this system."
-            }
-
             if ($Null -ne (Get-Module -Name TestModule -ErrorAction SilentlyContinue)) {
                 $Null = Remove-Module -Name TestModule;
             }
