@@ -46,11 +46,11 @@ Describe 'PSDocs instance names' -Tag 'Common', 'InstanceName' {
             $result = Invoke-PSDocument @invokeParams -Name 'WithoutInstanceName';
         }
         It 'Should generate an output named WithoutInstanceName.md' {
-            Test-Path -Path $result.FullName | Should $True;
+            Test-Path -Path $result.FullName | Should -Be $True;
             $outputDoc = Get-Content -Path $result.FullName -Raw;
-            $outputDoc | Should match 'WithoutInstanceName';
-            $outputDoc | Should match 'ObjectName';
-            $outputDoc | Should match 'HashName';
+            $outputDoc | Should -Match 'WithoutInstanceName';
+            $outputDoc | Should -Match 'ObjectName';
+            $outputDoc | Should -Match 'HashName';
         }
     }
 
@@ -64,9 +64,9 @@ Describe 'PSDocs instance names' -Tag 'Common', 'InstanceName' {
             $null = Invoke-PSDocument @invokeParams -InstanceName 'Instance1' -Name 'WithInstanceName';
         }
         It 'Should not create a output with the document name' {
-            Test-Path -Path "$outputPath\WithInstanceName.md" | Should $False;
-            Test-Path -Path "$outputPath\Instance1.md" | Should $True;
-            Get-Content -Path "$outputPath\Instance1.md" -Raw | Should match 'Instance1';
+            Test-Path -Path "$outputPath\WithInstanceName.md" | Should -Be $False;
+            Test-Path -Path "$outputPath\Instance1.md" | Should -Be $True;
+            Get-Content -Path "$outputPath\Instance1.md" -Raw | Should -Match 'Instance1';
         }
     }
 
@@ -80,15 +80,15 @@ Describe 'PSDocs instance names' -Tag 'Common', 'InstanceName' {
             $null = Invoke-PSDocument @invokeParams -InstanceName 'Instance2', 'Instance3' -Name 'WithMultiInstanceName';
         }
         It 'Should not create a output with the document name' {
-            Test-Path -Path "$outputPath\WithMultiInstanceName.md" | Should be $False;
+            Test-Path -Path "$outputPath\WithMultiInstanceName.md" | Should -Be $False;
         }
         It 'Should generate an output named Instance2.md' {
-            Test-Path -Path "$outputPath\Instance2.md" | Should be $True;
-            Get-Content -Path "$outputPath\Instance2.md" -Raw | Should match 'Instance2';
+            Test-Path -Path "$outputPath\Instance2.md" | Should -Be $True;
+            Get-Content -Path "$outputPath\Instance2.md" -Raw | Should -Match 'Instance2';
         }
         It 'Should generate an output named Instance3.md' {
-            Test-Path -Path "$outputPath\Instance3.md" | Should be $True;
-            Get-Content -Path "$outputPath\Instance3.md" -Raw | Should match 'Instance3';
+            Test-Path -Path "$outputPath\Instance3.md" | Should -Be $True;
+            Get-Content -Path "$outputPath\Instance3.md" -Raw | Should -Match 'Instance3';
         }
     }
 
