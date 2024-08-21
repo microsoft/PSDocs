@@ -235,10 +235,10 @@ Describe 'Get-PSDocument' -Tag 'Cmdlet', 'Common', 'Get-PSDocument' {
         BeforeAll {
             $testModuleSourcePath = Join-Path $here -ChildPath 'TestModule';
             $Null = Import-Module $testModuleSourcePath -Force;
+            $currentLoadingPreference = Get-Variable -Name PSModuleAutoLoadingPreference -ErrorAction SilentlyContinue -ValueOnly;
         }
         It 'Returns documents' {
             $result = @(Get-PSDocument -Module 'TestModule');
-            $currentLoadingPreference = Get-Variable -Name PSModuleAutoLoadingPreference -ErrorAction SilentlyContinue -ValueOnly;
             $result | Should -Not -BeNullOrEmpty;
             $result.Length | Should -Be 2;
             $result.Id | Should -BeIn 'TestModule\TestDocument1', 'TestModule\TestDocument2';
