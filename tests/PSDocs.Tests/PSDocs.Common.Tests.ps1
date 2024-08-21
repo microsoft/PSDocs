@@ -233,7 +233,7 @@ Describe 'Get-PSDocument' -Tag 'Cmdlet', 'Common', 'Get-PSDocument' {
     Context 'With -Module' {
         BeforeAll {
             $testModuleSourcePath = Join-Path $here -ChildPath 'TestModule';
-            Mock -CommandName 'LoadModule' -ModuleName 'PSDocs'; 
+            Mock -CommandName 'LoadModule' -ModuleName 'PSDocs' -Verifiable;
             Import-Module $testModuleSourcePath -Force;
             $result = @(Get-PSDocument -Module 'TestModule');
             $currentLoadingPreference = Get-Variable -Name PSModuleAutoLoadingPreference -ErrorAction SilentlyContinue -ValueOnly
@@ -250,8 +250,6 @@ Describe 'Get-PSDocument' -Tag 'Cmdlet', 'Common', 'Get-PSDocument' {
         }
 
         It 'Loads module with preference' {
-            Mock -CommandName 'LoadModule' -ModuleName 'PSDocs' -Verifiable;
-            $currentLoadingPreference = Get-Variable -Name PSModuleAutoLoadingPreference -ErrorAction SilentlyContinue -ValueOnly;
             try {
                 # Test negative case
                 $Global:PSModuleAutoLoadingPreference = [System.Management.Automation.PSModuleAutoLoadingPreference]::None;
