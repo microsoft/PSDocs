@@ -105,9 +105,10 @@ Describe 'PSDocs instance names' -Tag 'Common', 'InstanceName' {
         }
         # Check each encoding can be written then read
         foreach ($encoding in @('UTF8', 'UTF7', 'Unicode', 'ASCII', 'UTF32')) {
+            $currentEncoding = $encoding
             It "Should generate $encoding encoded content" {
-                Invoke-PSDocument @invokeParams -InstanceName "With$encoding" -Encoding $encoding -Name 'WithEncoding';
-                Get-Content -Path (Join-Path -Path $outputPath -ChildPath "With$encoding.md") -Encoding $encoding | Out-String | Should -Match "^(With$encoding(\r|\n|\r\n))$";
+                Invoke-PSDocument @invokeParams -InstanceName "With$currentEncoding" -Encoding $currentEncoding -Name 'WithEncoding';
+                Get-Content -Path (Join-Path -Path $outputPath -ChildPath "With$currentEncoding.md") -Encoding $currentEncoding | Out-String | Should -Match "^(With$currentEncoding(\r|\n|\r\n))$";
             }
         }
     }
