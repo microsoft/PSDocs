@@ -43,6 +43,7 @@ Describe 'PSDocs instance names' -Tag 'Common', 'InstanceName' {
                 InputObject = $dummyObject
                 OutputPath  = $outputPath
             }
+            Import-Module (Join-Path -Path $rootPath.Path -ChildPath out/modules/PSDocs) -Force;
         }
         $result = Invoke-PSDocument @invokeParams -Name 'WithoutInstanceName';
         It 'Should generate an output named WithoutInstanceName.md' {
