@@ -46,11 +46,11 @@ Describe 'PSDocs instance names' -Tag 'Common', 'InstanceName' {
             $result = Invoke-PSDocument @invokeParams -Name 'WithoutInstanceName';
         }
         It 'Should generate an output named WithoutInstanceName.md' {
-            Test-Path -Path $result.FullName | Should be $True;
+            Test-Path -Path $result.FullName | Should $True;
             $outputDoc = Get-Content -Path $result.FullName -Raw;
-            $outputDoc | Should -Match 'WithoutInstanceName';
-            $outputDoc | Should -Match 'ObjectName';
-            $outputDoc | Should -Match 'HashName';
+            $outputDoc | Should match 'WithoutInstanceName';
+            $outputDoc | Should match 'ObjectName';
+            $outputDoc | Should match 'HashName';
         }
     }
 
@@ -66,7 +66,7 @@ Describe 'PSDocs instance names' -Tag 'Common', 'InstanceName' {
         It 'Should not create a output with the document name' {
             Test-Path -Path "$outputPath\WithInstanceName.md" | Should $False;
             Test-Path -Path "$outputPath\Instance1.md" | Should $True;
-            Get-Content -Path "$outputPath\Instance1.md" -Raw | Should -Match 'Instance1';
+            Get-Content -Path "$outputPath\Instance1.md" -Raw | Should match 'Instance1';
         }
     }
 
