@@ -7,41 +7,48 @@
 
 [CmdletBinding()]
 param ()
+BeforeAll {
+    # Setup error handling
+    $ErrorActionPreference = 'Stop';
+    Set-StrictMode -Version latest;
 
-# Setup error handling
-$ErrorActionPreference = 'Stop';
-Set-StrictMode -Version latest;
+    # Setup tests paths
+    $rootPath = $PWD;
 
-# Setup tests paths
-$rootPath = $PWD;
+    Import-Module (Join-Path -Path $rootPath -ChildPath out/modules/PSDocs) -Force;
 
-Import-Module (Join-Path -Path $rootPath -ChildPath out/modules/PSDocs) -Force;
+    $outputPath = Join-Path -Path $rootPath -ChildPath out/tests/PSDocs.Tests/Common;
+    Remove-Item -Path $outputPath -Force -Recurse -Confirm:$False -ErrorAction Ignore;
+    $Null = New-Item -Path $outputPath -ItemType Directory -Force;
+    $here = (Resolve-Path $PSScriptRoot).Path;
 
-$outputPath = Join-Path -Path $rootPath -ChildPath out/tests/PSDocs.Tests/Common;
-Remove-Item -Path $outputPath -Force -Recurse -Confirm:$False -ErrorAction Ignore;
-$Null = New-Item -Path $outputPath -ItemType Directory -Force;
-$here = (Resolve-Path $PSScriptRoot).Path;
-
-$dummyObject = New-Object -TypeName PSObject -Property @{
-    Object = [PSObject]@{
-        Name = 'ObjectName'
-        Value = 'ObjectValue'
-    }
-
-    Hashtable = @{
-        Name = 'HashName'
-        Value = 'HashValue'
+    $dummyObject = New-Object -TypeName PSObject -Property @{
+        Object    = [PSObject]@{
+            Name  = 'ObjectName'
+            Value = 'ObjectValue'
+        }
+    
+        Hashtable = @{
+            Name  = 'HashName'
+            Value = 'HashValue'
+        }
     }
 }
 
+
+
+
+
 Describe 'PSDocs instance names' -Tag 'Common', 'InstanceName' {
-    $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Cmdlets.Doc.ps1';
 
     Context 'Generate a document without an instance name' {
-        $invokeParams = @{
-            Path = $docFilePath
-            InputObject = $dummyObject
-            OutputPath = $outputPath
+        BeforeAll {
+            $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Cmdlets.Doc.ps1';
+            $invokeParams = @{
+                Path        = $docFilePath
+                InputObject = $dummyObject
+                OutputPath  = $outputPath
+            }
         }
         $result = Invoke-PSDocument @invokeParams -Name 'WithoutInstanceName';
         It 'Should generate an output named WithoutInstanceName.md' {
@@ -55,9 +62,9 @@ Describe 'PSDocs instance names' -Tag 'Common', 'InstanceName' {
 
     Context 'Generate a document with an instance name' {
         $invokeParams = @{
-            Path = $docFilePath
+            Path        = $docFilePath
             InputObject = $dummyObject
-            OutputPath = $outputPath
+            OutputPath  = $outputPath
         }
         $null = Invoke-PSDocument @invokeParams -InstanceName 'Instance1' -Name 'WithInstanceName';
         It 'Should not create a output with the document name' {
@@ -69,11 +76,11 @@ Describe 'PSDocs instance names' -Tag 'Common', 'InstanceName' {
 
     Context 'Generate a document with multiple instance names' {
         $invokeParams = @{
-            Path = $docFilePath
+            Path        = $docFilePath
             InputObject = $dummyObject
-            OutputPath = $outputPath
+            OutputPath  = $outputPath
         }
-        $null = Invoke-PSDocument @invokeParams -InstanceName 'Instance2','Instance3' -Name 'WithMultiInstanceName';
+        $null = Invoke-PSDocument @invokeParams -InstanceName 'Instance2', 'Instance3' -Name 'WithMultiInstanceName';
         It 'Should not create a output with the document name' {
             Test-Path -Path "$outputPath\WithMultiInstanceName.md" | Should be $False;
         }
@@ -92,9 +99,9 @@ Describe 'PSDocs instance names' -Tag 'Common', 'InstanceName' {
             Name = 'TestObject'
         }
         $invokeParams = @{
-            Path = $docFilePath
+            Path        = $docFilePath
             InputObject = $testObject
-            OutputPath = $outputPath
+            OutputPath  = $outputPath
         }
         # Check each encoding can be written then read
         foreach ($encoding in @('UTF8', 'UTF7', 'Unicode', 'ASCII', 'UTF32')) {
@@ -110,9 +117,9 @@ Describe 'PSDocs instance names' -Tag 'Common', 'InstanceName' {
             Name = 'TestObject'
         }
         $invokeParams = @{
-            Path = $docFilePath
+            Path        = $docFilePath
             InputObject = $testObject
-            PassThru = $True
+            PassThru    = $True
         }
         It 'Should return results' {
             $result = Invoke-PSDocument @invokeParams -Name 'WithPassThru';
@@ -139,7 +146,7 @@ Describe 'Invoke-PSDocument' -Tag 'Cmdlet', 'Common', 'Invoke-PSDocument', 'From
         }
         It 'Should match all tags' {
             # Only generate for documents with all matching tags
-            $testObject | Invoke-PSDocument -Path $here -OutputPath $outputPath -Tag Test4,Test5;
+            $testObject | Invoke-PSDocument -Path $here -OutputPath $outputPath -Tag Test4, Test5;
             Test-Path -Path "$outputPath\FromFileTest1.md" | Should -Be $False;
             Test-Path -Path "$outputPath\FromFileTest4.md" | Should -Be $False;
             Test-Path -Path "$outputPath\FromFileTest5.md" | Should -Be $True;
@@ -170,7 +177,7 @@ Describe 'Invoke-PSDocument' -Tag 'Cmdlet', 'Common', 'Invoke-PSDocument', 'From
 
     Context 'With -PassThru' {
         It 'Should return results' {
-            $result = @($testObject | Invoke-PSDocument -Path $here -OutputPath $outputPath -Name FromFileTest1,FromFileTest2 -PassThru);
+            $result = @($testObject | Invoke-PSDocument -Path $here -OutputPath $outputPath -Name FromFileTest1, FromFileTest2 -PassThru);
             $result | Should -Not -BeNullOrEmpty;
             $result.Length | Should -Be 2;
             $result[0] | Should -Match "`# Test title";
@@ -180,7 +187,7 @@ Describe 'Invoke-PSDocument' -Tag 'Cmdlet', 'Common', 'Invoke-PSDocument', 'From
 
     Context 'With -InputPath' {
         It 'Should return results' {
-            $result = @(Invoke-PSDocument -Path $here -OutputPath $outputPath -InputPath $here/*.yml -Name FromFileTest1,FromFileTest2 -PassThru);
+            $result = @(Invoke-PSDocument -Path $here -OutputPath $outputPath -InputPath $here/*.yml -Name FromFileTest1, FromFileTest2 -PassThru);
             $result | Should -Not -BeNullOrEmpty;
             $result.Length | Should -Be 4;
             $result[0] | Should -Match "`# Test title";
@@ -319,9 +326,9 @@ Describe 'Get-PSDocumentHeader' -Tag 'Cmdlet', 'Common', 'Get-PSDocumentHeader' 
             Name = 'TestObject'
         }
         $invokeParams = @{
-            Path = $docFilePath
+            Path        = $docFilePath
             InputObject = $testObject
-            OutputPath = $outputPath
+            OutputPath  = $outputPath
         }
         It 'Get Metadata header' {
             $result = Invoke-PSDocument @invokeParams -Name 'WithMetadata';

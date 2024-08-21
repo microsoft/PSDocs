@@ -8,26 +8,29 @@
 [CmdletBinding()]
 param ()
 
-# Setup error handling
-$ErrorActionPreference = 'Stop';
-Set-StrictMode -Version latest;
+BeforeAll {
+    # Setup error handling
+    $ErrorActionPreference = 'Stop';
+    Set-StrictMode -Version latest;
 
-# Setup tests paths
-$rootPath = $PWD;
-Import-Module (Join-Path -Path $rootPath -ChildPath out/modules/PSDocs) -Force;
-$here = (Resolve-Path $PSScriptRoot).Path;
-
+    # Setup tests paths
+    $rootPath = $PWD;
+    Import-Module (Join-Path -Path $rootPath -ChildPath out/modules/PSDocs) -Force;
+    $here = (Resolve-Path $PSScriptRoot).Path;
+}
 Describe 'PSDocs variables' -Tag 'Variables' {
-    $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Variables.Doc.ps1';
-    $testObject = [PSCustomObject]@{
-        Name = 'TestObject'
-    }
 
     Context 'PowerShell automatic variables' {
-        $invokeParams = @{
-            Path = $docFilePath
-            InputObject = $testObject
-            PassThru = $True
+        BeforeAll {
+            $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Variables.Doc.ps1';
+            $testObject = [PSCustomObject]@{
+                Name = 'TestObject'
+            }
+            $invokeParams = @{
+                Path        = $docFilePath
+                InputObject = $testObject
+                PassThru    = $True
+            }
         }
         It 'Paths' {
             $result = (Invoke-PSDocument @invokeParams -Name 'PSAutomaticVariables' | Out-String).Split([System.Environment]::NewLine, [System.StringSplitOptions]::RemoveEmptyEntries);
@@ -39,11 +42,11 @@ Describe 'PSDocs variables' -Tag 'Variables' {
 
     Context 'PSDocs automatic variables' {
         $invokeParams = @{
-            Path = $docFilePath
+            Path        = $docFilePath
             InputObject = $testObject
-            PassThru = $True
-            Option = @{
-                'Configuration.author' = @{ name = 'unit-tester' }
+            PassThru    = $True
+            Option      = @{
+                'Configuration.author'  = @{ name = 'unit-tester' }
                 'Configuration.enabled' = 'faLse'
             }
         }
