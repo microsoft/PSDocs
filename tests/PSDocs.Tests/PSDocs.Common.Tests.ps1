@@ -249,24 +249,31 @@ Describe 'Get-PSDocument' -Tag 'Cmdlet', 'Common', 'Get-PSDocument' {
             $Null = Remove-Module -Name TestModule;
         }
 
-        It 'Loads module with preference' {
-            try {
-                # Test negative case
-                $Global:PSModuleAutoLoadingPreference = [System.Management.Automation.PSModuleAutoLoadingPreference]::None;
-                $Null = Get-PSDocument -Module 'TestModule';
-                { Get-Module -Name 'PSDocs' } | Should -Throw;
+        InModuleScope PSDocs {
 
-                # Test positive case
-                $Global:PSModuleAutoLoadingPreference = [System.Management.Automation.PSModuleAutoLoadingPreference]::All;
-                $Null = Get-PSDocument -Module 'TestModule';
-                { Get-Module -Name 'PSDocs' } | Should -Not -Throw;
-            }
-            finally {
-                if ($Null -eq $currentLoadingPreference) {
-                    Remove-Variable -Name PSModuleAutoLoadingPreference -Force -ErrorAction SilentlyContinue;
+            It 'Loads module with preference' {
+                try {
+                    # Test negative case
+                    $Global:PSModuleAutoLoadingPreference = [System.Management.Automation.PSModuleAutoLoadingPreference]::None
+                    Write-Host "Calling Get-PSDocument with preference set to None"
+                    $Null = Get-PSDocument -Module 'TestModule'
+                    Assert-MockCalled -CommandName 'LoadModule' -ModuleName 'PSDocs' -Times 0 -Scope 'It'
+    
+                    # Test positive case
+                    $Global:PSModuleAutoLoadingPreference = [System.Management.Automation.PSModuleAutoLoadingPreference]::All
+                    Write-Host "Calling Get-PSDocument with preference set to All"
+                    $Null = Get-PSDocument -Module 'TestModule'
+                    Assert-MockCalled -CommandName 'LoadModule' -ModuleName 'PSDocs' -Times 1 -Scope 'It' -Exactly
+    
+                    Assert-VerifiableMocks
                 }
-                else {
-                    $Global:PSModuleAutoLoadingPreference = $currentLoadingPreference;
+                finally {
+                    if ($Null -eq $currentLoadingPreference) {
+                        Remove-Variable -Name PSModuleAutoLoadingPreference -Force -ErrorAction SilentlyContinue
+                    }
+                    else {
+                        $Global:PSModuleAutoLoadingPreference = $currentLoadingPreference
+                    }
                 }
             }
         }
