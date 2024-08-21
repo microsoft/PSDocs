@@ -197,10 +197,9 @@ task TestModule Dependencies, {
     $pesterConfig = [PesterConfiguration]::Default
     $pesterConfig.Run.PassThru = $True
     # Enable NUnitXml output
-    $pesterConfig.Output.Verbosity = 'Detailed'
-    $pesterConfig.Output.Add('NUnitXml', @{
-        Path = 'reports/pester-unit.xml'
-    })
+    $pesterConfig.TestResult.OutputFormat = "NUnitXml"
+    $pesterConfig.TestResult.OutputPath = 'reports/pester-unit.xml'
+    $pesterConfig.TestResult.Enabled = $True
 
     if ($CodeCoverage) {
         $pesterConfig.CodeCoverage.OutputFormat = 'JaCoCo'
