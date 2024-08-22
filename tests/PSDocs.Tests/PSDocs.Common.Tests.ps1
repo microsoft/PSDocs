@@ -241,6 +241,7 @@ Describe 'Get-PSDocument' -Tag 'Cmdlet', 'Common', 'Get-PSDocument' {
             $Null = Import-Module $testModuleSourcePath -Force;
             $result = @(Get-PSDocument -Module 'TestModule');
             $currentLoadingPreference = Get-Variable -Name PSModuleAutoLoadingPreference -ErrorAction SilentlyContinue -ValueOnly
+            $Env:PSModulePath = $here;
         }
         It 'Returns documents' {
             $result | Should -Not -BeNullOrEmpty;
