@@ -8,27 +8,30 @@
 [CmdletBinding()]
 param ()
 
-# Setup error handling
-$ErrorActionPreference = 'Stop';
-Set-StrictMode -Version latest;
+BeforeAll {
+    # Setup error handling
+    $ErrorActionPreference = 'Stop';
+    Set-StrictMode -Version latest;
 
-# Setup tests paths
-$rootPath = $PWD;
-Import-Module (Join-Path -Path $rootPath -ChildPath out/modules/PSDocs) -Force;
-$here = (Resolve-Path $PSScriptRoot).Path;
-$nl = [System.Environment]::NewLine;
+    # Setup tests paths
+    $rootPath = $PWD;
+    Import-Module (Join-Path -Path $rootPath -ChildPath out/modules/PSDocs) -Force;
+    $here = (Resolve-Path $PSScriptRoot).Path;
+    $nl = [System.Environment]::NewLine;
+}
 
 Describe 'PSDocs -- Code keyword' -Tag Code {
-    $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Keyword.Doc.ps1';
-    $testObject = [PSCustomObject]@{
-        Name = 'TestObject'
-    }
-
     Context 'Markdown' {
-        $invokeParams = @{
-            Path = $docFilePath
-            InputObject = $testObject
-            PassThru = $True
+        BeforeAll {
+            $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Keyword.Doc.ps1';
+            $testObject = [PSCustomObject]@{
+                Name = 'TestObject'
+            }
+            $invokeParams = @{
+                Path        = $docFilePath
+                InputObject = $testObject
+                PassThru    = $True
+            }
         }
         It 'Should have generated output' {
             $result = Invoke-PSDocument @invokeParams -Name 'CodeMarkdown';

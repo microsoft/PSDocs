@@ -191,14 +191,20 @@ task Dependencies NuGet, {
 
 # Synopsis: Test the module
 task TestModule Dependencies, {
-    Import-Module Pester -RequiredVersion 4.10.1 -Force;
+    Import-Module Pester -RequiredVersion 5.6.1 -Force;
 
-    # Run Pester tests
-    $pesterParams = @{ Path = $PWD; OutputFile = 'reports/pester-unit.xml'; OutputFormat = 'NUnitXml'; PesterOption = @{ IncludeVSCodeMarker = $True }; PassThru = $True; };
+    # Define Pester configuration
+    $pesterConfig = [PesterConfiguration]::Default
+    $pesterConfig.Run.PassThru = $True
+    # Enable NUnitXml output
+    $pesterConfig.TestResult.OutputFormat = "NUnitXml"
+    $pesterConfig.TestResult.OutputPath = 'reports/pester-unit.xml'
+    $pesterConfig.TestResult.Enabled = $True
 
     if ($CodeCoverage) {
-        $pesterParams.Add('CodeCoverage', (Join-Path -Path $PWD -ChildPath 'out/modules/**/*.psm1'));
-        $pesterParams.Add('CodeCoverageOutputFile', (Join-Path -Path $PWD -ChildPath reports/pester-coverage.xml));
+        $pesterConfig.CodeCoverage.OutputFormat = 'JaCoCo'
+        $pesterConfig.CodeCoverage.OutputPath = 'reports/pester-coverage.xml'
+        $pesterConfig.CodeCoverage.Path = (Join-Path -Path $PWD -ChildPath 'out/modules/**/*.psm1')
     }
 
     if (!(Test-Path -Path reports)) {
@@ -206,19 +212,21 @@ task TestModule Dependencies, {
     }
 
     if ($Null -ne $TestGroup) {
-        $pesterParams['Tags'] = $TestGroup;
+        $pesterConfig.Filter.Tag = $TestGroup
     }
 
-    $results = Invoke-Pester @pesterParams;
+    # Run Pester tests
+    $results = Invoke-Pester -Configuration $pesterConfig
 
-    # Throw an error if pester tests failed
+    # Throw an error if Pester tests failed
     if ($Null -eq $results) {
-        throw 'Failed to get Pester test results.';
+        throw 'Failed to get Pester test results.'
     }
-    elseif ($results.FailedCount -gt 0) {
-        throw "$($results.FailedCount) tests failed.";
+    elseif ($results.Result.FailedCount -gt 0) {
+        throw "$($results.Result.FailedCount) tests failed."
     }
 }
+
 
 task Benchmark {
     if ($Benchmark -or $BuildTask -eq 'Benchmark') {

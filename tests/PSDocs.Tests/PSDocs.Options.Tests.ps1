@@ -8,28 +8,30 @@
 [CmdletBinding()]
 param ()
 
-# Setup error handling
-$ErrorActionPreference = 'Stop';
-Set-StrictMode -Version latest;
+BeforeAll {
+    # Setup error handling
+    $ErrorActionPreference = 'Stop';
+    Set-StrictMode -Version latest;
 
-# Setup tests paths
-$rootPath = $PWD;
-$here = Split-Path -Parent $MyInvocation.MyCommand.Path;
-Import-Module (Join-Path -Path $rootPath -ChildPath out/modules/PSDocs) -Force;
-$emptyOptionsFilePath = Join-Path -Path $here -ChildPath 'psdocs.yml';
-
+    # Setup tests paths
+    $rootPath = $PWD;
+    $here = Split-Path -Parent $MyInvocation.MyCommand.Definition
+    Import-Module (Join-Path -Path $rootPath -ChildPath out/modules/PSDocs) -Force;
+    $emptyOptionsFilePath = Join-Path -Path $here -ChildPath 'psdocs.yml';
+}
 Describe 'New-PSDocumentOption' -Tag 'Option' {
     Context 'Read psdocs.yml' {
-
-        try {
-            Push-Location -Path $here;
-            It 'can read default YAML' {
-                $option = New-PSDocumentOption;
-                $option.Generator | Should -Be 'PSDocs';
+        BeforeAll {
+            try {
+                Push-Location -Path $here;
+                It 'can read default YAML' {
+                    $option = New-PSDocumentOption;
+                    $option.Generator | Should -Be 'PSDocs';
+                }
             }
-        }
-        finally {
-            Pop-Location;
+            finally {
+                Pop-Location;
+            }
         }
     }
 

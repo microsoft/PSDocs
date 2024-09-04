@@ -9,26 +9,29 @@
 param (
 
 )
+BeforeAll {
+    # Setup error handling
+    $ErrorActionPreference = 'Stop';
+    Set-StrictMode -Version latest;
 
-# Setup error handling
-$ErrorActionPreference = 'Stop';
-Set-StrictMode -Version latest;
-
-# Setup tests paths
-$rootPath = $PWD;
-Import-Module (Join-Path -Path $rootPath -ChildPath out/modules/PSDocs) -Force;
-$here = (Resolve-Path $PSScriptRoot).Path;
-$dummyObject = New-Object -TypeName PSObject;
-
+    # Setup tests paths
+    $rootPath = $PWD;
+    Import-Module (Join-Path -Path $rootPath -ChildPath out/modules/PSDocs) -Force;
+    $here = (Resolve-Path $PSScriptRoot).Path;
+    $dummyObject = New-Object -TypeName PSObject;
+}
 Describe 'PSDocs -- Metadata keyword' -Tag Metadata {
-    $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Keyword.Doc.ps1';
 
     Context 'Markdown' {
+        BeforeAll{
+
+    $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Keyword.Doc.ps1';
         $invokeParams = @{
-            Path = $docFilePath
+            Path        = $docFilePath
             InputObject = $dummyObject
-            PassThru = $True
+            PassThru    = $True
         }
+    }
         It 'Metadata single entry' {
             $result = Invoke-PSDocument @invokeParams -Name 'MetadataSingleEntry';
             $result | Should -Match '---(\r|\n|\r\n)title: Test(\r|\n|\r\n)---';

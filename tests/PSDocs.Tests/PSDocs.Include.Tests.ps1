@@ -8,29 +8,31 @@
 [CmdletBinding()]
 param ()
 
-# Setup error handling
-$ErrorActionPreference = 'Stop';
-Set-StrictMode -Version latest;
+BeforeAll {
+    # Setup error handling
+    $ErrorActionPreference = 'Stop';
+    Set-StrictMode -Version latest;
 
-# Setup tests paths
-$rootPath = $PWD;
+    # Setup tests paths
+    $rootPath = $PWD;
 
-Import-Module (Join-Path -Path $rootPath -ChildPath out/modules/PSDocs) -Force;
+    Import-Module (Join-Path -Path $rootPath -ChildPath out/modules/PSDocs) -Force;
 
-$outputPath = Join-Path -Path $rootPath -ChildPath out/tests/PSDocs.Tests/Include;
-Remove-Item -Path $outputPath -Force -Recurse -Confirm:$False -ErrorAction Ignore;
-$Null = New-Item -Path $outputPath -ItemType Directory -Force;
-$here = (Resolve-Path $PSScriptRoot).Path;
-
+    $outputPath = Join-Path -Path $rootPath -ChildPath out/tests/PSDocs.Tests/Include;
+    Remove-Item -Path $outputPath -Force -Recurse -Confirm:$False -ErrorAction Ignore;
+    $Null = New-Item -Path $outputPath -ItemType Directory -Force;
+    $here = (Resolve-Path $PSScriptRoot).Path;
+}
 Describe 'PSDocs -- Include keyword' -Tag Include {
-    $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Keyword.Doc.ps1';
-    $testObject = [PSCustomObject]@{};
-
     Context 'Markdown' {
-        $invokeParams = @{
-            Path = $docFilePath
-            OutputPath = $outputPath
-            ErrorAction = [System.Management.Automation.ActionPreference]::Stop
+        BeforeAll {
+            $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Keyword.Doc.ps1';
+            $testObject = [PSCustomObject]@{};
+            $invokeParams = @{
+                Path        = $docFilePath
+                OutputPath  = $outputPath
+                ErrorAction = [System.Management.Automation.ActionPreference]::Stop
+            }
         }
 
         It 'Should include a relative path' {
@@ -51,7 +53,7 @@ Describe 'PSDocs -- Include keyword' -Tag Include {
         }
 
         It 'Should include from culture' {
-            $Null = $testObject | Invoke-PSDocument @invokeParams -Culture 'en-AU','en-US' -Name 'IncludeCulture';
+            $Null = $testObject | Invoke-PSDocument @invokeParams -Culture 'en-AU', 'en-US' -Name 'IncludeCulture';
 
             $outputDoc = "$outputPath\en-AU\IncludeCulture.md";
             Test-Path -Path $outputDoc | Should -Be $True;
