@@ -3,7 +3,7 @@
 ## Unreleased
 
 What's changed since v0.9.0:
-
+- Update maintainer.
 - Engineering:
     - CI update Pester to v5.6.1
     - Bump BenchmarkDotNet to v0.14.0. 
