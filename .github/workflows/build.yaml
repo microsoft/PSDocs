@@ -46,7 +46,7 @@ jobs:
         run: Invoke-Build -Configuration Release
 
       - name: Upload module
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Module
           path: ./out/modules/PSDocs/*
