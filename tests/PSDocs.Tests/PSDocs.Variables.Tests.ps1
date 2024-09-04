@@ -8,26 +8,29 @@
 [CmdletBinding()]
 param ()
 
-# Setup error handling
-$ErrorActionPreference = 'Stop';
-Set-StrictMode -Version latest;
+BeforeAll {
+    # Setup error handling
+    $ErrorActionPreference = 'Stop';
+    Set-StrictMode -Version latest;
 
-# Setup tests paths
-$rootPath = $PWD;
-Import-Module (Join-Path -Path $rootPath -ChildPath out/modules/PSDocs) -Force;
-$here = (Resolve-Path $PSScriptRoot).Path;
-
-Describe 'PSDocs variables' -Tag 'Variables' {
+    # Setup tests paths
+    $rootPath = $PWD;
+    Import-Module (Join-Path -Path $rootPath -ChildPath out/modules/PSDocs) -Force;
+    $here = (Resolve-Path $PSScriptRoot).Path;
     $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Variables.Doc.ps1';
     $testObject = [PSCustomObject]@{
         Name = 'TestObject'
     }
+}
+Describe 'PSDocs variables' -Tag 'Variables' {
 
     Context 'PowerShell automatic variables' {
-        $invokeParams = @{
-            Path = $docFilePath
-            InputObject = $testObject
-            PassThru = $True
+        BeforeAll {
+            $invokeParams = @{
+                Path        = $docFilePath
+                InputObject = $testObject
+                PassThru    = $True
+            }
         }
         It 'Paths' {
             $result = (Invoke-PSDocument @invokeParams -Name 'PSAutomaticVariables' | Out-String).Split([System.Environment]::NewLine, [System.StringSplitOptions]::RemoveEmptyEntries);
@@ -38,13 +41,15 @@ Describe 'PSDocs variables' -Tag 'Variables' {
     }
 
     Context 'PSDocs automatic variables' {
-        $invokeParams = @{
-            Path = $docFilePath
-            InputObject = $testObject
-            PassThru = $True
-            Option = @{
-                'Configuration.author' = @{ name = 'unit-tester' }
-                'Configuration.enabled' = 'faLse'
+        BeforeAll {
+            $invokeParams = @{
+                Path        = $docFilePath
+                InputObject = $testObject
+                PassThru    = $True
+                Option      = @{
+                    'Configuration.author'  = @{ name = 'unit-tester' }
+                    'Configuration.enabled' = 'faLse'
+                }
             }
         }
         It '$PSDocs' {
