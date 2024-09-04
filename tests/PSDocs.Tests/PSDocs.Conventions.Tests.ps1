@@ -7,28 +7,31 @@
 
 [CmdletBinding()]
 param ()
+BeforeAll {
+    # Setup error handling
+    $ErrorActionPreference = 'Stop';
+    Set-StrictMode -Version latest;
 
-# Setup error handling
-$ErrorActionPreference = 'Stop';
-Set-StrictMode -Version latest;
-
-# Setup tests paths
-$rootPath = $PWD;
-Import-Module (Join-Path -Path $rootPath -ChildPath out/modules/PSDocs) -Force;
-$outputPath = Join-Path -Path $rootPath -ChildPath out/tests/PSDocs.Tests/Conventions;
-$here = (Resolve-Path $PSScriptRoot).Path;
-
+    # Setup tests paths
+    $rootPath = $PWD;
+    Import-Module (Join-Path -Path $rootPath -ChildPath out/modules/PSDocs) -Force;
+    $outputPath = Join-Path -Path $rootPath -ChildPath out/tests/PSDocs.Tests/Conventions;
+    $here = (Resolve-Path $PSScriptRoot).Path;
+}
 Describe 'PSDocs -- Conventions' -Tag Conventions {
-    $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Conventions.Doc.ps1';
-    $testObject = [PSCustomObject]@{
-        Name = 'TestObject'
-    }
+
 
     Context '-Convention' {
-        $invokeParams = @{
-            Path = $docFilePath
-            InputObject = $testObject
-            OutputPath = $outputPath
+        BeforeAll {
+            $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Conventions.Doc.ps1';
+            $testObject = [PSCustomObject]@{
+                Name = 'TestObject'
+            }
+            $invokeParams = @{
+                Path        = $docFilePath
+                InputObject = $testObject
+                OutputPath  = $outputPath
+            }
         }
         It 'Generate output' {
             # Singe convention

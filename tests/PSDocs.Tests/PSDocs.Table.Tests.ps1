@@ -8,28 +8,32 @@
 [CmdletBinding()]
 param ()
 
-# Setup error handling
-$ErrorActionPreference = 'Stop';
-Set-StrictMode -Version latest;
+BeforeAll {
+    # Setup error handling
+    $ErrorActionPreference = 'Stop';
+    Set-StrictMode -Version latest;
 
-# Setup tests paths
-$rootPath = $PWD;
-Import-Module (Join-Path -Path $rootPath -ChildPath out/modules/PSDocs) -Force;
-$here = (Resolve-Path $PSScriptRoot).Path;
-
+    # Setup tests paths
+    $rootPath = $PWD;
+    Import-Module (Join-Path -Path $rootPath -ChildPath out/modules/PSDocs) -Force;
+    $here = (Resolve-Path $PSScriptRoot).Path;
+}
 Describe 'PSDocs -- Table keyword' -Tag Table {
-    $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Keyword.Doc.ps1';
-    $testObject = [PSCustomObject]@{};
+    
 
     Context 'Markdown' {
-        $invokeParams = @{
-            Path = $docFilePath
-            PassThru = $True
+        BeforeAll {
+            $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Keyword.Doc.ps1';
+            $testObject = [PSCustomObject]@{};
+            $invokeParams = @{
+                Path     = $docFilePath
+                PassThru = $True
+            }
         }
         It 'With defaults' {
             $result = Invoke-PSDocument @invokeParams -InputObject $rootPath -InstanceName Table -Name 'TableTests' -Option @{
                 'Markdown.ColumnPadding' = 'None'
-                'Markdown.UseEdgePipes' = 'Always'
+                'Markdown.UseEdgePipes'  = 'Always'
             };
             $result | Should -Match '(\r|\n|\r\n)|LICENSE|False|(\r|\n|\r\n)';
             $result | Should -Match '(\r|\n|\r\n)|README.md|False|(\r|\n|\r\n)';
@@ -53,7 +57,7 @@ Describe 'PSDocs -- Table keyword' -Tag Table {
 
         It 'With multiline column' {
             $testObject = [PSCustomObject]@{
-                Name = 'Test'
+                Name        = 'Test'
                 Description = "This is a`r`ndescription`r`nsplit`r`nover`r`nmultiple`r`nlines."
             }
 
@@ -70,7 +74,7 @@ Describe 'PSDocs -- Table keyword' -Tag Table {
 
         It 'With null column' {
             $testObject = [PSCustomObject]@{
-                Name = 'Test'
+                Name  = 'Test'
                 Value = 'Value'
             }
             $result = Invoke-PSDocument @invokeParams -Name 'TableWithEmptyColumn' -InputObject $testObject -InstanceName 'TableWithEmptyColumn';

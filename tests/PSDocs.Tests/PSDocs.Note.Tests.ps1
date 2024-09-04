@@ -9,27 +9,30 @@
 param (
 
 )
+BeforeAll {
+    # Setup error handling
+    $ErrorActionPreference = 'Stop';
+    Set-StrictMode -Version latest;
 
-# Setup error handling
-$ErrorActionPreference = 'Stop';
-Set-StrictMode -Version latest;
-
-# Setup tests paths
-$rootPath = $PWD;
-Import-Module (Join-Path -Path $rootPath -ChildPath out/modules/PSDocs) -Force;
-$here = (Resolve-Path $PSScriptRoot).Path;
-
+    # Setup tests paths
+    $rootPath = $PWD;
+    Import-Module (Join-Path -Path $rootPath -ChildPath out/modules/PSDocs) -Force;
+    $here = (Resolve-Path $PSScriptRoot).Path;
+}
 Describe 'PSDocs -- Note keyword' -Tag Note {
-    $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Keyword.Doc.ps1';
-    $testObject = [PSCustomObject]@{
-        Name = 'TestObject'
-    }
+   
 
     Context 'Markdown' {
-        $invokeParams = @{
-            Path = $docFilePath
-            InputObject = $testObject
-            PassThru = $True
+        BeforeAll {
+            $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Keyword.Doc.ps1';
+            $testObject = [PSCustomObject]@{
+                Name = 'TestObject'
+            }
+            $invokeParams = @{
+                Path        = $docFilePath
+                InputObject = $testObject
+                PassThru    = $True
+            }
         }
         It 'Should handle single line input' {
             $result = Invoke-PSDocument @invokeParams -Name 'NoteSingleMarkdown';
