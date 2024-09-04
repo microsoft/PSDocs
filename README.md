@@ -197,6 +197,7 @@ or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any addi
 ## Maintainers
 
 - [Bernie White](https://github.com/BernieWhite)
+- [Vic Perdana](https://github.com/vicperdana)
 
 ## License
 
