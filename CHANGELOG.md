@@ -3,12 +3,18 @@
 ## Unreleased
 
 What's changed since v0.9.0:
-
+- Update maintainer.
 - Engineering:
-  - Bump YamlDotNet to v13.7.1.
-    [#284](https://github.com/microsoft/PSDocs/pull/284)
-  - Bump Newtonsoft.Json to v13.0.3.
-    [#284](https://github.com/microsoft/PSDocs/pull/284)
+    - CI update Pester to v5.6.1
+    - Bump BenchmarkDotNet to v0.14.0. 
+    - Bump Microsoft.CodeCoverage to v17.10.0. 
+    - Bump Microsoft.NET.Test.Sdk to v17.10.0. 
+    - Bump xunit to v2.9.0. 
+    - Bump xunit.runner.visualstudio to v2.5.7.
+    - Bump YamlDotNet to v13.7.1.
+      [#284](https://github.com/microsoft/PSDocs/pull/284)
+    - Bump Newtonsoft.Json to v13.0.3.
+      [#284](https://github.com/microsoft/PSDocs/pull/284)
 
 ## v0.9.0
 

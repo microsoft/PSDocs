@@ -8,27 +8,32 @@
 [CmdletBinding()]
 param ()
 
-# Setup error handling
-$ErrorActionPreference = 'Stop';
-Set-StrictMode -Version latest;
+BeforeAll {
+    # Setup error handling
+    $ErrorActionPreference = 'Stop';
+    Set-StrictMode -Version latest;
 
-# Setup tests paths
-$rootPath = $PWD;
-Import-Module (Join-Path -Path $rootPath -ChildPath out/modules/PSDocs) -Force;
-$here = (Resolve-Path $PSScriptRoot).Path;
-
+    # Setup tests paths
+    $rootPath = $PWD;
+    Import-Module (Join-Path -Path $rootPath -ChildPath out/modules/PSDocs) -Force;
+    $here = (Resolve-Path $PSScriptRoot).Path;
+}
 Describe 'PSDocs -- Title keyword' -Tag Title {
-    $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Keyword.Doc.ps1';
-    $testObject = [PSCustomObject]@{
-        Name = 'TestObject'
-    }
+    
 
     Context 'Markdown' {
-        $invokeParams = @{
-            Path = $docFilePath
-            InputObject = $testObject
-            PassThru = $True
-            ErrorAction = [System.Management.Automation.ActionPreference]::Stop
+        BeforeAll {
+            $docFilePath = Join-Path -Path $here -ChildPath 'FromFile.Keyword.Doc.ps1';
+            $testObject = [PSCustomObject]@{
+                Name = 'TestObject'
+            }
+        
+            $invokeParams = @{
+                Path        = $docFilePath
+                InputObject = $testObject
+                PassThru    = $True
+                ErrorAction = [System.Management.Automation.ActionPreference]::Stop
+            }
         }
         It 'With single title' {
             $result = Invoke-PSDocument @invokeParams -Name 'SingleTitle';
