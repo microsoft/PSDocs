@@ -1,12 +1,19 @@
 # Support
 
+> [!IMPORTANT]
+> **This repository is archived and is no longer actively maintained.**
+> All future work on PSDocs is consolidated under **[Azure/PSDocs.Azure](https://github.com/Azure/PSDocs.Azure)**.
+> Please raise new issues and discussions in [Azure/PSDocs.Azure](https://github.com/Azure/PSDocs.Azure) instead.
+
 ## How to file issues and get help
 
-This project uses GitHub Issues to track bugs and feature requests.
-Please search the existing issues before filing new issues to avoid duplicates.
+New issues and feature requests should be raised in [Azure/PSDocs.Azure](https://github.com/Azure/PSDocs.Azure).
+Issues and discussions in this repository are no longer monitored.
 
-- For new issues, file your bug or feature request as a new [issue].
-- For help, discussion, and support questions about using this project, join or start a [discussion].
+The links below are retained for historical reference only:
+
+- Existing [issue] history.
+- Existing [discussion] history.
 
 ## Microsoft Support Policy
 

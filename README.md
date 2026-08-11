@@ -1,16 +1,24 @@
 # PSDocs
 
+> [!IMPORTANT]
+> **This repository is archived and is no longer actively maintained.**
+>
+> All future work on PSDocs is consolidated under **[Azure/PSDocs.Azure](https://github.com/Azure/PSDocs.Azure)**.
+>
+> - Please open new issues, discussions, and pull requests in [Azure/PSDocs.Azure](https://github.com/Azure/PSDocs.Azure).
+> - Issues, discussions, and pull requests in this repository will no longer be monitored.
+> - Existing published module versions remain available on the PowerShell Gallery, but no new releases will be made from this repository.
+>
+> This repository remains available in read-only form for historical reference.
+
 A PowerShell module with commands to generate markdown from objects using PowerShell syntax.
 
 ![ci-badge]
 
 ## Support
 
-This project uses GitHub Issues to track bugs and feature requests.
-Please search the existing issues before filing new issues to avoid duplicates.
-
-- For new issues, file your bug or feature request as a new [issue].
-- For help, discussion, and support questions about using this project, join or start a [discussion].
+New issues, feature requests, and discussions should be raised in [Azure/PSDocs.Azure](https://github.com/Azure/PSDocs.Azure).
+Issues and discussions in this repository are no longer monitored.
 
 Support for this project/ product is limited to the resources listed above.
 
